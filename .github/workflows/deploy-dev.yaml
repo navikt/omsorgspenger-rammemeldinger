@@ -1,4 +1,4 @@
-name: Deploy til gcp-dev
+name: Deploy til dev-gcp
 
 on:
   push:
@@ -12,6 +12,8 @@ on:
 
 env:
   BASE_IMAGE: docker.pkg.github.com/${{ github.repository }}/omsorgspenger-rammemeldinger
+  GITHUB_USERNAME: x-access-token
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   Build:
@@ -41,7 +43,7 @@ jobs:
           docker push $BASE_IMAGE:latest
           docker push $IMAGE
 
-      - name: Deploy til gcp-dev
+      - name: Deploy til dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
