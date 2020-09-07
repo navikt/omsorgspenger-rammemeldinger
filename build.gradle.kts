@@ -65,6 +65,18 @@ tasks.withType<Test> {
     }
 }
 
+tasks.withType<ShadowJar> {
+    archiveBaseName.set("app")
+    archiveClassifier.set("")
+    manifest {
+        attributes(
+                mapOf(
+                        "Main-Class" to mainClass
+                )
+        )
+    }
+}
+
 tasks.withType<Wrapper> {
     gradleVersion = "6.6.1"
 }

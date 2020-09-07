@@ -7,7 +7,7 @@ on:
     paths-ignore:
       - '**.md'
       - '.gitignore'
-      - 'LICENCE'
+      - 'LICENSE'
       - 'CODEOWNERS'
 
 env:
