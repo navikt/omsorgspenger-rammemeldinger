@@ -1,6 +1,14 @@
 name: Deploy til gcp-dev
 
-on: [workflow_dispatch]
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENCE'
+      - 'CODEOWNERS'
 
 env:
   BASE_IMAGE: docker.pkg.github.com/${{ github.repository }}/omsorgspenger-rammemeldinger

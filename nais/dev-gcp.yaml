@@ -26,8 +26,7 @@ spec:
       cpu: 200m
       memory: 256Mi
   ingresses:
-    - https://omsorgspenger-rammemeldinger.dev.nav.no
-    - https://omsorgspenger-rammemeldinger.dev.nav.no
+    - https://omsorgspenger-rammemeldinger.dev.adea.no
   replicas:
     min: 1
     max: 2

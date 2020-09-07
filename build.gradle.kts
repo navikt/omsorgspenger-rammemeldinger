@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val dusseldorfKtorVersion = "1.4.0.c4c0d66"
@@ -10,6 +11,7 @@ val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
     kotlin("jvm") version "1.4.0"
+    id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 
 buildscript {
