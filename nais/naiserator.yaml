@@ -1,0 +1,57 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: {{app}}
+  namespace: {{namespace}}
+  labels:
+    team: {{team}}
+spec:
+  image: {{ image }}
+  port: 8080
+  accessPolicy:
+    outbound:
+      external:
+        - host: login.microsoftonline.com
+      {{#each kafkaBootstrapServers as |server|}}
+         - host: {{server}}
+      ports:
+        - port: 8443
+          name: kafka
+          protocol: TLS
+      {{/each}}
+
+  liveness:
+    path: isalive
+    initialDelay: 20
+    timeout: 1
+    periodSeconds: 5
+    failureThreshold: 10
+  readiness:
+    path: isready
+    initialDelay: 20
+    timeout: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  ingresses:
+  {{#each ingresses as |url|}}
+     - {{url}}
+  {{/each}}
+  replicas:
+    min: {{minReplicas}}
+    max: {{maxReplicas}}
+    cpuThresholdPercentage: 90
+  prometheus:
+    enabled: true
+    path: /metrics
+  envFrom:
+    - secret: omsorgspenger-meldinger-srvusercredentials
+  env:
+  {{#each env}}
+     - name: {{@key}}
+  value: "{{this}}"
+  {{/each}}
