@@ -13,13 +13,14 @@ spec:
       external:
         - host: login.microsoftonline.com
       {{#each kafkaBootstrapServers as |server|}}
-         - host: {{server}}
+        - host: {{server}}
       ports:
         - port: 8443
           name: kafka
           protocol: TLS
       {{/each}}
 
+      rules: []
   liveness:
     path: isalive
     initialDelay: 20
