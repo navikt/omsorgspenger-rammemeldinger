@@ -1,37 +1,37 @@
 package no.nav.omsorgspenger
 
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.metrics.micrometer.*
-import io.ktor.routing.*
-import io.ktor.util.*
-import io.prometheus.client.hotspot.DefaultExports
-import no.nav.helse.dusseldorf.ktor.core.*
-import no.nav.helse.dusseldorf.ktor.metrics.MetricsRoute
-import no.nav.helse.dusseldorf.ktor.metrics.init
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.RapidApplication
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.River
+import org.slf4j.LoggerFactory
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+fun main() {
+    val env = System.getenv()
+    val logger = LoggerFactory.getLogger("no.nav.omsorgspenger")
 
-@KtorExperimentalAPI
-fun Application.app() {
-    val appId = environment.config.id()
-    logProxyProperties()
-    DefaultExports.initialize()
+    RapidApplication.create(env).apply {
+        RapidApp(this)
+    }.apply {
+        register(object : RapidsConnection.StatusListener {
+            override fun onStartup(rapidsConnection: RapidsConnection) {
+                logger.info("Startup achieved!")
+            }
+        })
+    }.start()
+}
 
-    install(StatusPages) {
-        DefaultStatusPages()
+internal class RapidApp(
+        rapidsConnection: RapidsConnection) : River.PacketListener {
+
+    init {
+        River(rapidsConnection).apply {
+            validate { it.requireValue("@event_name", "my_event") }
+            validate { it.requireKey("a_required_key") }
+        }.register(this)
     }
 
-    install(MicrometerMetrics) {
-        init(appId)
-    }
-
-    intercept(ApplicationCallPipeline.Monitoring) {
-        call.request.log()
-    }
-
-    install(Routing) {
-        DefaultProbeRoutes()
-        MetricsRoute()
+    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+        println(packet["a_required_key"].asText())
     }
 }

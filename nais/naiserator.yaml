@@ -13,7 +13,7 @@ spec:
       external:
         - host: login.microsoftonline.com
       {{#each kafkaBootstrapServers as |server|}}
-         - host: {{server}}
+        - host: {{server}}
       ports:
         - port: 8443
           name: kafka
@@ -55,3 +55,4 @@ spec:
      - name: {{@key}}
   value: "{{this}}"
   {{/each}}
+     - name:
