@@ -48,7 +48,8 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-  envFrom:
+  filesFrom:
+    - mountPath: /var/run/secrets/nais.io/service_user
     - secret: omsorgspenger-meldinger-srvusercredentials
   env:
   {{#each env}}
