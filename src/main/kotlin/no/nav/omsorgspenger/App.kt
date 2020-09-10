@@ -42,5 +42,5 @@ internal fun String.readFile() =
         try {
             File(this).readText(Charsets.UTF_8)
         } catch (err: FileNotFoundException) {
-            null
+            logger.error("File not found: $this")
         }
