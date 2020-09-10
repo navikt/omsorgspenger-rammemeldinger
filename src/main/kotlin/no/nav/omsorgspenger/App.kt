@@ -9,6 +9,10 @@ internal val logger = LoggerFactory.getLogger("no.nav.omsorgspenger")
 fun main() {
     var env = System.getenv()
 
+    if(env.containsKey("username") && env.containsKey("password")) {
+        logger.debug("Contains username & password!")
+    }
+
     RapidApplication.create(env).apply {
         OmsorgspengerRammemeldinger(this)
     }.apply {
