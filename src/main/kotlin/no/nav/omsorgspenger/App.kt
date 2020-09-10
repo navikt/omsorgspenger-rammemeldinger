@@ -19,7 +19,7 @@ fun main() {
     val pass = "/var/run/secrets/nais.io/service_user/password".readFile()
 
     if(user != null ) {
-        logger.info("Username found")
+        logger.info("Username found: $user")
     }
 
     if(pass != null) {
