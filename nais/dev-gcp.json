@@ -14,7 +14,6 @@
     "b27apvl00047.preprod.local"
   ],
   "env": {
-    "SERVER_PORT": "8080",
     "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
     "KAFKA_PROPERTIES_SECURITY_PROTOCOL": "SASL_SSL",
     "KAFKA_RAPID_TOPIC": "k9-rapid-v1",
