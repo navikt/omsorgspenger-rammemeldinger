@@ -2,7 +2,10 @@ package no.nav.omsorgspenger
 
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.readFile
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.io.FileNotFoundException
 
 internal val logger = LoggerFactory.getLogger("no.nav.omsorgspenger")
 
@@ -12,6 +15,18 @@ fun main() {
     if(env.containsKey("username") && env.containsKey("password")) {
         logger.debug("Contains username & password!")
     }
+
+    val user = "/var/run/secrets/nais.io/service_user/username".readFile()
+    val pass = "/var/run/secrets/nais.io/service_user/username".readFile()
+
+    if(user != null ) {
+        logger.debug("Username found")
+    }
+
+    if(pass != null) {
+        logger.debug("Password found")
+    }
+
 
     RapidApplication.create(env).apply {
         OmsorgspengerRammemeldinger(this)
@@ -23,3 +38,10 @@ fun main() {
         })
     }.start()
 }
+
+private fun String.readFile() =
+        try {
+            File(this).readText(Charsets.UTF_8)
+        } catch (err: FileNotFoundException) {
+            null
+        }
