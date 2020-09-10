@@ -1,0 +1,19 @@
+name: Vulnerabilities scanning of dependencies
+on:
+  schedule:
+    - cron:  '0 3 * * *'
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/gradle@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          command: monitor
+          args: --org=omsorgspenger --configuration-attributes=usage:java-runtime --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
