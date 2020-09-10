@@ -49,8 +49,8 @@ spec:
     enabled: true
     path: /metrics
   filesFrom:
-    - mountPath: /var/run/secrets/nais.io/service_user
     - secret: omsorgspenger-meldinger-srvusercredentials
+      mountPath: /var/run/secrets/nais.io/service_user
   env:
   {{#each env}}
     - name: {{@key}}

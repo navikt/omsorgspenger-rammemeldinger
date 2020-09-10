@@ -12,18 +12,18 @@ fun main() {
     var env = System.getenv()
 
     if(env.containsKey("username") && env.containsKey("password")) {
-        logger.debug("Contains username & password!")
+        logger.info("Contains username & password!")
     }
 
     val user = "/var/run/secrets/nais.io/service_user/username".readFile()
     val pass = "/var/run/secrets/nais.io/service_user/password".readFile()
 
     if(user != null ) {
-        logger.debug("Username found")
+        logger.info("Username found")
     }
 
     if(pass != null) {
-        logger.debug("Password found")
+        logger.info("Password found")
     }
 
 
