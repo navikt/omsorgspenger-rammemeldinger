@@ -1,37 +1,14 @@
 package no.nav.omsorgspenger
 
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.metrics.micrometer.*
-import io.ktor.routing.*
-import io.ktor.util.*
-import io.prometheus.client.hotspot.DefaultExports
-import no.nav.helse.dusseldorf.ktor.core.*
-import no.nav.helse.dusseldorf.ktor.metrics.MetricsRoute
-import no.nav.helse.dusseldorf.ktor.metrics.init
+import no.nav.helse.rapids_rivers.RapidApplication
+import org.slf4j.LoggerFactory
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+internal val logger = LoggerFactory.getLogger("no.nav.omsorgspenger")
 
-@KtorExperimentalAPI
-fun Application.app() {
-    val appId = environment.config.id()
-    logProxyProperties()
-    DefaultExports.initialize()
+fun main() {
+    var env = System.getenv()
 
-    install(StatusPages) {
-        DefaultStatusPages()
-    }
-
-    install(MicrometerMetrics) {
-        init(appId)
-    }
-
-    intercept(ApplicationCallPipeline.Monitoring) {
-        call.request.log()
-    }
-
-    install(Routing) {
-        DefaultProbeRoutes()
-        MetricsRoute()
-    }
+    RapidApplication.create(env).apply {
+        OmsorgspengerRammemeldinger(this)
+    }.start()
 }
