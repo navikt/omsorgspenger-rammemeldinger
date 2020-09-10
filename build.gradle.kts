@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val junitJupiterVersion = "5.6.2"
 val commonsTextVersion = "1.9"
 val jsonassertVersion = "1.5.0"
+val k9rapidVersion = "1.151be7f"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
@@ -13,7 +14,8 @@ plugins {
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:1.61e42df")
+    implementation("no.nav.k9.rapid:river:$k9rapidVersion")
+    //implementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
 
     implementation("org.apache.commons:commons-text:$commonsTextVersion")
 
