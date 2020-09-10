@@ -2,7 +2,6 @@ package no.nav.omsorgspenger
 
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.readFile
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
@@ -17,7 +16,7 @@ fun main() {
     }
 
     val user = "/var/run/secrets/nais.io/service_user/username".readFile()
-    val pass = "/var/run/secrets/nais.io/service_user/username".readFile()
+    val pass = "/var/run/secrets/nais.io/service_user/password".readFile()
 
     if(user != null ) {
         logger.debug("Username found")
@@ -39,7 +38,7 @@ fun main() {
     }.start()
 }
 
-private fun String.readFile() =
+internal fun String.readFile() =
         try {
             File(this).readText(Charsets.UTF_8)
         } catch (err: FileNotFoundException) {
