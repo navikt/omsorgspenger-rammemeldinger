@@ -14,15 +14,15 @@ plugins {
 }
 
 dependencies {
-    implementation("no.nav.k9.rapid:river:$k9rapidVersion")
-    //implementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
-
+    implementation(kotlin("stdlib-jdk8"))
     implementation("org.apache.commons:commons-text:$commonsTextVersion")
+    implementation("no.nav.k9.rapid:river:$k9rapidVersion")
 
+    testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
     testImplementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
+
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
-    implementation(kotlin("stdlib-jdk8"))
 }
 
 repositories {
@@ -64,9 +64,9 @@ tasks.withType<Wrapper> {
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "14"
 }
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "14"
 }

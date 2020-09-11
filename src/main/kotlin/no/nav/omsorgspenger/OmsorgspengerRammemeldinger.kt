@@ -7,22 +7,21 @@ import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.k9.rapid.river.skalLøseBehov
 import org.slf4j.LoggerFactory
 
-class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) : River.PacketListener {
+internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) : River.PacketListener {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     init {
         River(rapidsConnection).apply {
             validate {
-                //it.skalLøseBehov(behov)
-                it.requireKey("@id")
-                it.interestedIn("@løsninger", "løst")
+                it.skalLøseBehov(behov)
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         logger.info("Skall løse behov")
+
         val id = packet["@id"].asText()
         val løsning = mapOf(
                 "utfall" to "gjennomført",
