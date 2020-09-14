@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger
+package no.nav.omsorgspenger.overføringer
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -9,11 +9,15 @@ import no.nav.k9.rapid.behov.Behovsformat
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.k9.rapid.river.sendMedId
 import no.nav.k9.rapid.river.skalLøseBehov
+import no.nav.omsorgspenger.overføringer.Barn.Companion.erBarn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
+import no.nav.omsorgspenger.requireArray
+import no.nav.omsorgspenger.requireInt
+import no.nav.omsorgspenger.requireText
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
-internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) : River.PacketListener {
+internal class StartOverføringAvOmsorgsdager(rapidsConnection: RapidsConnection) : River.PacketListener {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -24,11 +28,11 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
                 it.requireAll(Behovsformat.Behovsrekkefølge, listOf(Behov))
             }
             validate {
-                it.require(OmsorgsdagerTattUtIÅr, JsonNode::asInt)
-                it.require(OmsorgsdagerÅOverføre, JsonNode::asInt)
-                it.require(OverførerFra, JsonNode::asText)
-                it.require(OverførerTil, JsonNode::asText)
-                it.require(Barn, JsonNode::isArray)
+                it.require(OmsorgsdagerTattUtIÅr, JsonNode::requireInt)
+                it.require(OmsorgsdagerÅOverføre, JsonNode::requireInt)
+                it.require(OverførerFra, JsonNode::requireText)
+                it.require(OverførerTil, JsonNode::requireText)
+                it.require(Barn) { json -> json.requireArray { entry -> entry.erBarn() } }
             }
         }.register(this)
     }

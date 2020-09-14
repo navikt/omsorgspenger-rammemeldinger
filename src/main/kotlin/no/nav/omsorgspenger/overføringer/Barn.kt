@@ -10,7 +10,12 @@ internal data class Barn(
     internal val utvidetRett: Boolean
 ) {
     internal companion object {
-        internal fun JsonNode.somBarn() = Barn(
+        internal fun JsonNode.erBarn() = try {
+            somBarn()
+            true
+        } catch (cause: Throwable) { false }
+
+         internal fun JsonNode.somBarn() = Barn(
             identitetsnummer = get("identitetsnummer").asText(),
             fødselsdato = LocalDate.parse(get("fødselsdato").asText()),
             aleneOmOmsorgen = get("aleneOmOmsorgen").asBoolean(),

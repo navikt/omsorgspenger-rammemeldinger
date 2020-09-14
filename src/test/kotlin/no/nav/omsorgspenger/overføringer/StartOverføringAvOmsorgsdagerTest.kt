@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger
+package no.nav.omsorgspenger.overføringer
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovssekvens
@@ -14,10 +14,10 @@ import java.time.LocalDate
 import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class OmsorgspengerRammemeldingerTest {
+internal class StartOverføringAvOmsorgsdagerTest {
 
     private val rapid = TestRapid().apply {
-        OmsorgspengerRammemeldinger(this)
+        StartOverføringAvOmsorgsdager(this)
     }
 
     @BeforeEach
