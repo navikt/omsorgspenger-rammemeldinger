@@ -20,6 +20,7 @@ spec:
           protocol: TLS
       {{/each}}
 
+      rules: []
   liveness:
     path: isalive
     initialDelay: 20
