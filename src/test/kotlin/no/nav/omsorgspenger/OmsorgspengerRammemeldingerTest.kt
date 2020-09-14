@@ -3,6 +3,7 @@ package no.nav.omsorgspenger
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
+import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsning
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsningResolver
 import no.nav.k9.rapid.losning.somMelding
 import org.junit.jupiter.api.Assertions.*
@@ -25,7 +26,7 @@ internal class OmsorgspengerRammemeldingerTest {
     }
 
     @Test
-    fun `Gyldig behov som gjennomføres `() {
+    fun `Overfører dager avsender har tilgjengelig`() {
         val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
         val fra = "11111111111"
         val til = "11111111112"
@@ -55,18 +56,75 @@ internal class OmsorgspengerRammemeldingerTest {
 
         assertEquals(id, løsningId)
         assertTrue(løsning.erGjennomført())
-        assertTrue(løsning.overføringer.containsKey(fra))
-        assertTrue(løsning.overføringer.containsKey(til))
-        // Personen overføringen er fra har gitt 1 og fått 0 overføringer
-        assertEquals(1, løsning.overføringer.getValue(fra).gitt.size)
-        assertEquals(omsorgsdagerÅOverføre, løsning.overføringer.getValue(fra).gitt.first().antallDager)
-        assertEquals(0, løsning.overføringer.getValue(fra).fått.size)
-        // Personen overføringen er til har fått 1 og gitt 0 overføringer
-        assertEquals(0, løsning.overføringer.getValue(til).gitt.size)
-        assertEquals(1, løsning.overføringer.getValue(til).fått.size)
-        assertEquals(omsorgsdagerÅOverføre, løsning.overføringer.getValue(til).fått.first().antallDager)
+        løsning.overføringer.assertOverføringer(
+            fra = fra,
+            til = til,
+            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+        )
     }
-    
+
+    @Test
+    fun `Forsøker å overføre fler dager enn avsender har tilgjengelig`() {
+        val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        val fra = "11111111111"
+        val til = "11111111112"
+        val omsorgsdagerÅOverføre = 5
+
+        val (behovssekvensId, behovssekvens) = behovssekvens(
+            id = id,
+            fra = fra,
+            til = til,
+            omsorgsdagerTattUtIÅr = 6,
+            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+        )
+
+        assertEquals(id, behovssekvensId)
+
+        rapid.sendTestMessage(behovssekvens)
+
+        val (løsningId, løsning) = rapid.løsning()
+
+        assertEquals(id, løsningId)
+        assertTrue(løsning.erAvslått())
+
+        løsning.overføringer.assertOverføringer(
+            fra = fra,
+            til = til,
+            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+        )
+    }
+
+    @Test
+    fun `Forsøker å overføre fler enn 10 dager`() {
+        val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        val fra = "11111111111"
+        val til = "11111111112"
+        val omsorgsdagerÅOverføre = 11
+
+        val (behovssekvensId, behovssekvens) = behovssekvens(
+            id = id,
+            fra = fra,
+            til = til,
+            omsorgsdagerTattUtIÅr = 0,
+            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+        )
+
+        assertEquals(id, behovssekvensId)
+
+        rapid.sendTestMessage(behovssekvens)
+
+        val (løsningId, løsning) = rapid.løsning()
+
+        assertEquals(id, løsningId)
+        assertTrue(løsning.erAvslått())
+
+        løsning.overføringer.assertOverføringer(
+            fra = fra,
+            til = til,
+            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+        )
+    }
+
 
     @Test
     fun `Melding som ikke inneholder behov for å overføre omsorgsdager`() {
@@ -77,6 +135,32 @@ internal class OmsorgspengerRammemeldingerTest {
         rapid.sendTestMessage(ugyldigtBehov)
 
         assertEquals(0, rapid.inspektør.size)
+    }
+
+    private fun Map<String, OverføreOmsorgsdagerLøsning.Overføringer>.assertOverføringer(
+        fra: String,
+        til: String,
+        omsorgsdagerÅOverføre: Int) {
+        // Skal inneholde overføringer for begge parter
+        assertTrue(containsKey(fra))
+        assertTrue(containsKey(til))
+        // Personen overføringen er fra har gitt 1 og fått 0 overføringer
+        assertEquals(1, getValue(fra).gitt.size)
+        assertEquals(omsorgsdagerÅOverføre,getValue(fra).gitt.first().antallDager)
+        assertEquals(0, getValue(fra).fått.size)
+        // Personen overføringen er til har fått 1 og gitt 0 overføringer
+        assertEquals(0, getValue(til).gitt.size)
+        assertEquals(1, getValue(til).fått.size)
+        assertEquals(omsorgsdagerÅOverføre, getValue(til).fått.first().antallDager)
+    }
+
+    private fun TestRapid.løsning() : Pair<String, OverføreOmsorgsdagerLøsning> {
+        assertEquals(1, inspektør.size)
+        return inspektør
+            .message(0)
+            .toString()
+            .somMelding()
+            .løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
     }
 
     internal companion object {
