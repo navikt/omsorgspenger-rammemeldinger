@@ -1,9 +1,12 @@
 package no.nav.omsorgspenger
 
+import de.huxhorn.sulky.ulid.ULID
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
-import org.junit.jupiter.api.Assertions.assertEquals
+import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsningResolver
+import no.nav.k9.rapid.losning.somMelding
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -24,6 +27,7 @@ internal class OmsorgspengerRammemeldingerTest {
 
     @Test
     fun `Tar emot gyldigt behov `() {
+
         val (id, overføring) = Behovssekvens(
                 id = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
                 correlationId = UUID.randomUUID().toString(),
@@ -54,7 +58,16 @@ internal class OmsorgspengerRammemeldingerTest {
         rapid.sendTestMessage(overføring)
 
         assertEquals(1, rapid.inspektør.size)
+
+        assertTrue(rapid.inspektør.message(0).toString().somMelding().harLøsningPå(OverføreOmsorgsdagerLøsningResolver.Instance))
+
+        val løsning = rapid.inspektør.message(0).toString().somMelding()
+                .løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
+
+        assertNotNull(løsning)
+
     }
+
 
     @Test
     fun `Tar ikke emot ugyldigt behov`() {
@@ -66,6 +79,5 @@ internal class OmsorgspengerRammemeldingerTest {
 
         assertEquals(0, rapid.inspektør.size)
     }
-
 
 }
