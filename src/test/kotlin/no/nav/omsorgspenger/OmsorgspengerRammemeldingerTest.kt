@@ -16,7 +16,7 @@ import java.util.*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class OmsorgspengerRammemeldingerTest {
 
-    val rapid = TestRapid().apply {
+    private val rapid = TestRapid().apply {
         OmsorgspengerRammemeldinger(this)
     }
 
@@ -27,15 +27,11 @@ internal class OmsorgspengerRammemeldingerTest {
 
     @Test
     fun `Overfører dager avsender har tilgjengelig`() {
-        val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
-        val fra = "11111111111"
-        val til = "11111111112"
+        val id = "01EJ6M5B1YF1EGFABH2WC57KDC"
         val omsorgsdagerÅOverføre = 5
 
         val (behovssekvensId, behovssekvens) = behovssekvens(
             id = id,
-            fra = fra,
-            til = til,
             omsorgsdagerTattUtIÅr = 0,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
         )
@@ -44,15 +40,7 @@ internal class OmsorgspengerRammemeldingerTest {
 
         rapid.sendTestMessage(behovssekvens)
 
-        assertEquals(1, rapid.inspektør.size)
-
-        assertTrue(rapid.inspektør.message(0).toString().somMelding().harLøsningPå(OverføreOmsorgsdagerLøsningResolver.Instance))
-
-        val (løsningId, løsning) = rapid.inspektør
-            .message(0)
-            .toString()
-            .somMelding()
-            .løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
+        val (løsningId, løsning) = rapid.løsning()
 
         assertEquals(id, løsningId)
         assertTrue(løsning.erGjennomført())
@@ -65,15 +53,11 @@ internal class OmsorgspengerRammemeldingerTest {
 
     @Test
     fun `Forsøker å overføre fler dager enn avsender har tilgjengelig`() {
-        val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
-        val fra = "11111111111"
-        val til = "11111111112"
+        val id = "01EJ6M744H38HJCJVMKEJPQ9KP"
         val omsorgsdagerÅOverføre = 5
 
         val (behovssekvensId, behovssekvens) = behovssekvens(
             id = id,
-            fra = fra,
-            til = til,
             omsorgsdagerTattUtIÅr = 6,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
         )
@@ -96,15 +80,11 @@ internal class OmsorgspengerRammemeldingerTest {
 
     @Test
     fun `Forsøker å overføre fler enn 10 dager`() {
-        val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
-        val fra = "11111111111"
-        val til = "11111111112"
+        val id = "01EJ6M7E83DJQQR5ABS0XAKTC6"
         val omsorgsdagerÅOverføre = 11
 
         val (behovssekvensId, behovssekvens) = behovssekvens(
             id = id,
-            fra = fra,
-            til = til,
             omsorgsdagerTattUtIÅr = 0,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
         )
@@ -128,14 +108,10 @@ internal class OmsorgspengerRammemeldingerTest {
     @Test
     fun `Overfører dager med utvidet rett på barn`() {
         val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
-        val fra = "11111111111"
-        val til = "11111111112"
         val omsorgsdagerÅOverføre = 5
 
         val (behovssekvensId, behovssekvens) = behovssekvens(
             id = id,
-            fra = fra,
-            til = til,
             omsorgsdagerTattUtIÅr = 0,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre,
             utvidetRett = true
@@ -145,15 +121,7 @@ internal class OmsorgspengerRammemeldingerTest {
 
         rapid.sendTestMessage(behovssekvens)
 
-        assertEquals(1, rapid.inspektør.size)
-
-        assertTrue(rapid.inspektør.message(0).toString().somMelding().harLøsningPå(OverføreOmsorgsdagerLøsningResolver.Instance))
-
-        val (løsningId, løsning) = rapid.inspektør
-            .message(0)
-            .toString()
-            .somMelding()
-            .løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
+        val (løsningId, løsning) = rapid.løsning()
 
         assertEquals(id, løsningId)
         assertTrue(løsning.ikkeBehandlesAvNyttSystem())
@@ -198,10 +166,13 @@ internal class OmsorgspengerRammemeldingerTest {
     }
 
     internal companion object {
+        private val fra = "11111111111"
+        private val til = "11111111112"
+
         private fun behovssekvens(
             id: String,
-            fra: String,
-            til: String,
+            overføringFra: String = fra,
+            overføringTil: String = til,
             omsorgsdagerTattUtIÅr: Int,
             omsorgsdagerÅOverføre: Int,
             utvidetRett: Boolean = false
@@ -210,12 +181,12 @@ internal class OmsorgspengerRammemeldingerTest {
             correlationId = UUID.randomUUID().toString(),
             behov = arrayOf(OverføreOmsorgsdagerBehov(
                 fra = OverføreOmsorgsdagerBehov.OverførerFra(
-                    identitetsnummer = fra,
+                    identitetsnummer = overføringFra,
                     borINorge = true,
                     jobberINorge = true
                 ),
                 til = OverføreOmsorgsdagerBehov.OverførerTil(
-                    identitetsnummer = til,
+                    identitetsnummer = overføringTil,
                     relasjon = OverføreOmsorgsdagerBehov.Relasjon.NåværendeSamboer,
                     harBoddSammenMinstEttÅr = true
                 ),
