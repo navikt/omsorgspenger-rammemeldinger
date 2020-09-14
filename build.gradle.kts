@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val junitJupiterVersion = "5.6.2"
 val commonsTextVersion = "1.9"
 val jsonassertVersion = "1.5.0"
-val k9rapidVersion = "1.151be7f"
+val k9rapidVersion = "1.afe760e"
 val ulidVersion = "8.2.0"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
@@ -19,12 +19,12 @@ dependencies {
     implementation("org.apache.commons:commons-text:$commonsTextVersion")
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
     implementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
-    implementation("no.nav.k9.rapid:losning:$k9rapidVersion")
 
+
+    testImplementation("no.nav.k9.rapid:losning:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
     testImplementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
 

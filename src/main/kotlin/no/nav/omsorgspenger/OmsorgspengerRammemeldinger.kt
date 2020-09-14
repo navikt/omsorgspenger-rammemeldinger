@@ -1,19 +1,15 @@
 package no.nav.omsorgspenger
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.onEach
+import com.fasterxml.jackson.databind.JsonNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.k9.rapid.behov.Behovsformat
 import no.nav.k9.rapid.river.leggTilLøsning
+import no.nav.k9.rapid.river.sendMedId
 import no.nav.k9.rapid.river.skalLøseBehov
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
-import java.time.ZonedDateTime
 
 internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) : River.PacketListener {
 
@@ -22,51 +18,95 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
     init {
         River(rapidsConnection).apply {
             validate {
-                it.skalLøseBehov(behov)
+                it.skalLøseBehov(Behov)
+                it.requireAll(Behovsformat.Behovsrekkefølge, listOf(Behov))
+            }
+            validate {
+                it.require(OmsorgsdagerTattUtIÅr, JsonNode::asInt)
+                it.require(OmsorgsdagerÅOverføre, JsonNode::asInt)
+                it.require(OverførerFra, JsonNode::asText)
+                it.require(OverførerTil, JsonNode::asText)
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-        logger.info("Skall løse behov")
+        val id = packet["@id"].asText()
+        logger.info("Skal løse behov $Behov med id $id")
 
-        val json = jacksonObjectMapper.readTree(packet.toJson().toString())
-        val id = json.get("@id").asText()
+        val omsorgsdagerTattUtIÅr = packet[OmsorgsdagerTattUtIÅr].asInt()
+        val omsorgsdagerÅOverføre = packet[OmsorgsdagerÅOverføre].asInt()
+        val fra = packet[OverførerFra].asText()
+        val til = packet[OverførerTil].asText()
 
-        val behovFra = json.get("@behov").get(behov).get("fra")
-        val behovTil = json.get("@behov").get(behov).get("til")
+        val omsorgsdagerIgjen = 10 - omsorgsdagerTattUtIÅr
 
-        println("json: $json")
+        val (utfall, begrunnelser) = when {
+            omsorgsdagerÅOverføre !in 1..10 -> Pair("Avslått", listOf("Kan ikke overføre $omsorgsdagerÅOverføre dager. Må være melom 1 og 10 dager."))
+            omsorgsdagerIgjen < omsorgsdagerÅOverføre -> Pair("Avslått", listOf("Har kun $omsorgsdagerIgjen dager igjen i år. Kan ikke overføre $omsorgsdagerÅOverføre dager."))
+            else -> Pair("Gjennomført", listOf("Overføringen er effektuert."))
+        }
 
-        val behov = json.get("@behov").get(behov).asText()
+        logger.info("Utfall=$utfall, Begrunnelser=$begrunnelser")
 
-        val løsning = mapOf(
-                "løst" to ZonedDateTime.now().toString(),
-                "utfall" to "gjennomført",
-                "begrunnelser" to listOf("gjennomført."),
-                "øverføringer" to mapOf(
-                        "Gry" to mapOf(
-                                "fra" to mapOf(
-                                        "navn" to "Ola",
-                                        "fødselsdato" to behovFra.get("identitetsnummer")
-                                ),
-                                "antallDager" to "3",
-                                "gjelderFraOgMed" to LocalDate.now().toString(),
-                                "gjelderTilOgMed" to LocalDate.now().plusDays(50)
-                        )
-                )
-        )
-
-        packet.leggTilLøsning(behov, løsning)
-        context.send(id, packet.toJson())
+        packet.leggTilLøsning(Behov, mockLøsning(
+            utfall = utfall,
+            begrunnelser = begrunnelser,
+            fra = fra,
+            til = til,
+            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+        ))
+        context.sendMedId(packet)
     }
 
     internal companion object {
-        const val behov = "OverføreOmsorgsdager"
-        val jacksonObjectMapper = jacksonObjectMapper()
-                .registerModule(JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    }
+        const val Behov = "OverføreOmsorgsdager"
+        internal val OmsorgsdagerTattUtIÅr = "@behov.$Behov.omsorgsdagerTattUtIÅr"
+        internal val OmsorgsdagerÅOverføre = "@behov.$Behov.omsorgsdagerÅOverføre"
+        internal val OverførerFra = "@behov.$Behov.fra.identitetsnummer"
+        internal val OverførerTil = "@behov.$Behov.til.identitetsnummer"
 
+
+        private fun mockLøsning(
+            utfall: String,
+            begrunnelser: List<String>,
+            fra: String,
+            til: String,
+            omsorgsdagerÅOverføre: Int
+        ) = mapOf(
+            "utfall" to utfall,
+            "begrunnelser" to begrunnelser,
+            "overføringer" to mapOf(
+                fra to mapOf(
+                    "gitt" to listOf(
+                        mapOf(
+                            "antallDager" to omsorgsdagerÅOverføre,
+                            "gjelderFraOgMed" to LocalDate.now(),
+                            "gjelderTilOgMed" to LocalDate.now().plusYears(1),
+                            "til" to mapOf(
+                                "navn" to "Kari Nordmann",
+                                "fødselsdato" to LocalDate.now().minusYears(30)
+                            )
+                        )
+                    ),
+                    "fått" to emptyList()
+                ),
+                til to mapOf(
+                    "fått" to listOf(
+                        mapOf(
+                            "antallDager" to omsorgsdagerÅOverføre,
+                            "gjelderFraOgMed" to LocalDate.now(),
+                            "gjelderTilOgMed" to LocalDate.now().plusYears(1),
+                            "fra" to mapOf(
+                                "navn" to "Ola Nordmann",
+                                "fødselsdato" to LocalDate.now().minusYears(35)
+                            )
+                        )
+                    ),
+                    "gitt" to emptyList()
+                )
+            )
+        )
+
+    }
 }
