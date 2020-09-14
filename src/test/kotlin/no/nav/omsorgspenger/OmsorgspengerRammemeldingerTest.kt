@@ -125,6 +125,40 @@ internal class OmsorgspengerRammemeldingerTest {
         )
     }
 
+    @Test
+    fun `Overfører dager med utvidet rett på barn`() {
+        val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+        val fra = "11111111111"
+        val til = "11111111112"
+        val omsorgsdagerÅOverføre = 5
+
+        val (behovssekvensId, behovssekvens) = behovssekvens(
+            id = id,
+            fra = fra,
+            til = til,
+            omsorgsdagerTattUtIÅr = 0,
+            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre,
+            utvidetRett = true
+        )
+
+        assertEquals(id, behovssekvensId)
+
+        rapid.sendTestMessage(behovssekvens)
+
+        assertEquals(1, rapid.inspektør.size)
+
+        assertTrue(rapid.inspektør.message(0).toString().somMelding().harLøsningPå(OverføreOmsorgsdagerLøsningResolver.Instance))
+
+        val (løsningId, løsning) = rapid.inspektør
+            .message(0)
+            .toString()
+            .somMelding()
+            .løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
+
+        assertEquals(id, løsningId)
+        assertTrue(løsning.ikkeBehandlesAvNyttSystem())
+        assertTrue(løsning.overføringer.isEmpty())
+    }
 
     @Test
     fun `Melding som ikke inneholder behov for å overføre omsorgsdager`() {
@@ -169,7 +203,8 @@ internal class OmsorgspengerRammemeldingerTest {
             fra: String,
             til: String,
             omsorgsdagerTattUtIÅr: Int,
-            omsorgsdagerÅOverføre: Int
+            omsorgsdagerÅOverføre: Int,
+            utvidetRett: Boolean = false
         ) = Behovssekvens(
             id = id,
             correlationId = UUID.randomUUID().toString(),
@@ -190,7 +225,7 @@ internal class OmsorgspengerRammemeldingerTest {
                     identitetsnummer = "11111111113",
                     fødselsdato = LocalDate.now(),
                     aleneOmOmsorgen = true,
-                    utvidetRett = false
+                    utvidetRett = utvidetRett
                 )),
                 kilde = OverføreOmsorgsdagerBehov.Kilde.Brev,
                 journalpostIder = listOf()

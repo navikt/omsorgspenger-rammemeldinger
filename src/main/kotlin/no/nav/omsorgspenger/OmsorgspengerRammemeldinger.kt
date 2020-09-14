@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ArrayNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
@@ -8,6 +9,7 @@ import no.nav.k9.rapid.behov.Behovsformat
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.k9.rapid.river.sendMedId
 import no.nav.k9.rapid.river.skalLøseBehov
+import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
@@ -26,6 +28,7 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
                 it.require(OmsorgsdagerÅOverføre, JsonNode::asInt)
                 it.require(OverførerFra, JsonNode::asText)
                 it.require(OverførerTil, JsonNode::asText)
+                it.require(Barn, JsonNode::isArray)
             }
         }.register(this)
     }
@@ -38,12 +41,14 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
         val omsorgsdagerÅOverføre = packet[OmsorgsdagerÅOverføre].asInt()
         val fra = packet[OverførerFra].asText()
         val til = packet[OverførerTil].asText()
+        val barn = (packet[Barn] as ArrayNode).map { it.somBarn() }
 
         val omsorgsdagerIgjen = 10 - omsorgsdagerTattUtIÅr
 
         val (utfall, begrunnelser) = when {
             omsorgsdagerÅOverføre !in 1..10 -> Pair("Avslått", listOf("Kan ikke overføre $omsorgsdagerÅOverføre dager. Må være melom 1 og 10 dager."))
             omsorgsdagerIgjen < omsorgsdagerÅOverføre -> Pair("Avslått", listOf("Har kun $omsorgsdagerIgjen dager igjen i år. Kan ikke overføre $omsorgsdagerÅOverføre dager."))
+            barn.any { it.utvidetRett } -> Pair("OppgaveIGosysOgBehandlesIInfotrygd", listOf("Overføringen kan ikke behandles i nytt system."))
             else -> Pair("Gjennomført", listOf("Overføringen er effektuert."))
         }
 
@@ -65,7 +70,7 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
         internal val OmsorgsdagerÅOverføre = "@behov.$Behov.omsorgsdagerÅOverføre"
         internal val OverførerFra = "@behov.$Behov.fra.identitetsnummer"
         internal val OverførerTil = "@behov.$Behov.til.identitetsnummer"
-
+        internal val Barn = "@behov.$Behov.barn"
 
         private fun mockLøsning(
             utfall: String,
@@ -73,10 +78,8 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
             fra: String,
             til: String,
             omsorgsdagerÅOverføre: Int
-        ) = mapOf(
-            "utfall" to utfall,
-            "begrunnelser" to begrunnelser,
-            "overføringer" to mapOf(
+        ) : Map<String, Any?> {
+            val overføringer = mapOf(
                 fra to mapOf(
                     "gitt" to listOf(
                         mapOf(
@@ -106,7 +109,16 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
                     "gitt" to emptyList()
                 )
             )
-        )
+
+            return mapOf(
+                "utfall" to utfall,
+                "begrunnelser" to begrunnelser,
+                "overføringer" to when (utfall) {
+                    "Gjennomført", "Avslått" -> overføringer
+                    else -> emptyMap()
+                }
+            )
+        }
 
     }
 }
