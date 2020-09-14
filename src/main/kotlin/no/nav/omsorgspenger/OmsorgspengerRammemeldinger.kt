@@ -78,7 +78,7 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
             fra: String,
             til: String,
             omsorgsdagerÅOverføre: Int
-        ) : Map<String, Any?> {
+        ): Map<String, Any?> {
             val overføringer = mapOf(
                 fra to mapOf(
                     "gitt" to listOf(
@@ -119,6 +119,5 @@ internal class OmsorgspengerRammemeldinger(rapidsConnection: RapidsConnection) :
                 }
             )
         }
-
     }
 }

@@ -16,10 +16,11 @@ plugins {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+
+
     implementation("org.apache.commons:commons-text:$commonsTextVersion")
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
     implementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
-
 
     testImplementation("no.nav.k9.rapid:losning:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
