@@ -2,25 +2,19 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.6.2"
-val commonsTextVersion = "1.9"
 val jsonassertVersion = "1.5.0"
 val k9rapidVersion = "1.afe760e"
-val ulidVersion = "8.2.0"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version "1.4.10"
     id("com.github.johnrengelman.shadow") version "6.0.0"
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-
-
-    implementation("org.apache.commons:commons-text:$commonsTextVersion")
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
-    implementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
 
     testImplementation("no.nav.k9.rapid:losning:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
