@@ -16,7 +16,7 @@ dependencies {
 
     testImplementation("no.nav.k9.rapid:losning:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
-    testImplementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
+    testImplementation("org.skyscreamer:jsonassert:$jsonassertVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
@@ -36,25 +36,36 @@ repositories {
     maven("https://dl.bintray.com/kotlin/ktor")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
-    }
-}
+tasks {
 
-tasks.withType<ShadowJar> {
-    archiveBaseName.set("app")
-    archiveClassifier.set("")
-    manifest {
-        attributes(
-                mapOf(
-                        "Main-Class" to mainClass
-                )
-        )
+    compileKotlin {
+        kotlinOptions.jvmTarget = "12"
     }
-}
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "12"
+    }
 
-tasks.withType<Wrapper> {
-    gradleVersion = "6.6.1"
+    withType<Test> {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+
+    withType<ShadowJar> {
+        archiveBaseName.set("app")
+        archiveClassifier.set("")
+        manifest {
+            attributes(
+                    mapOf(
+                            "Main-Class" to mainClass
+                    )
+            )
+        }
+    }
+
+    withType<Wrapper> {
+        gradleVersion = "6.6.1"
+    }
+
 }
