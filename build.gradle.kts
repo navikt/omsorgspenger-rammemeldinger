@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.6.2"
 val jsonassertVersion = "1.5.0"
-val k9rapidVersion = "1.afe760e"
+val k9rapidVersion = "1.2d2610c"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 

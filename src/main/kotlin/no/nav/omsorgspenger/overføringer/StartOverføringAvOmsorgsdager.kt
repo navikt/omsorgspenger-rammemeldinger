@@ -5,15 +5,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.behov.Behovsformat
-import no.nav.k9.rapid.river.leggTilLøsning
-import no.nav.k9.rapid.river.sendMedId
-import no.nav.k9.rapid.river.skalLøseBehov
+import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.Barn.Companion.erBarn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
-import no.nav.omsorgspenger.requireArray
-import no.nav.omsorgspenger.requireInt
-import no.nav.omsorgspenger.requireText
+import no.nav.omsorgspenger.overføringer.Behov.HentOmsorgspengerSaksnummer
+import no.nav.omsorgspenger.overføringer.Behov.OverføreOmsorgsdager
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
@@ -24,8 +20,8 @@ internal class StartOverføringAvOmsorgsdager(rapidsConnection: RapidsConnection
     init {
         River(rapidsConnection).apply {
             validate {
-                it.skalLøseBehov(Behov)
-                it.requireAll(Behovsformat.Behovsrekkefølge, listOf(Behov))
+                it.skalLøseBehov(OverføreOmsorgsdager)
+                it.utenLøsningPåBehov(HentOmsorgspengerSaksnummer)
             }
             validate {
                 it.require(OmsorgsdagerTattUtIÅr, JsonNode::requireInt)
@@ -58,7 +54,7 @@ internal class StartOverføringAvOmsorgsdager(rapidsConnection: RapidsConnection
 
         logger.info("Utfall=$utfall, Begrunnelser=$begrunnelser")
 
-        packet.leggTilLøsning(Behov, mockLøsning(
+        packet.leggTilLøsning(OverføreOmsorgsdager, mockLøsning(
             utfall = utfall,
             begrunnelser = begrunnelser,
             fra = fra,
@@ -69,12 +65,11 @@ internal class StartOverføringAvOmsorgsdager(rapidsConnection: RapidsConnection
     }
 
     internal companion object {
-        const val Behov = "OverføreOmsorgsdager"
-        internal val OmsorgsdagerTattUtIÅr = "@behov.$Behov.omsorgsdagerTattUtIÅr"
-        internal val OmsorgsdagerÅOverføre = "@behov.$Behov.omsorgsdagerÅOverføre"
-        internal val OverførerFra = "@behov.$Behov.fra.identitetsnummer"
-        internal val OverførerTil = "@behov.$Behov.til.identitetsnummer"
-        internal val Barn = "@behov.$Behov.barn"
+        internal val OmsorgsdagerTattUtIÅr = "@behov.${OverføreOmsorgsdager}.omsorgsdagerTattUtIÅr"
+        internal val OmsorgsdagerÅOverføre = "@behov.${OverføreOmsorgsdager}.omsorgsdagerÅOverføre"
+        internal val OverførerFra = "@behov.${OverføreOmsorgsdager}.fra.identitetsnummer"
+        internal val OverførerTil = "@behov.${OverføreOmsorgsdager}.til.identitetsnummer"
+        internal val Barn = "@behov.${OverføreOmsorgsdager}.barn"
 
         private fun mockLøsning(
             utfall: String,
