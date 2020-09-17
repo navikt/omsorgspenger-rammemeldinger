@@ -5,17 +5,16 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.Barn.Companion.erBarn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
 import no.nav.omsorgspenger.overføringer.Behov.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.overføringer.Behov.OverføreOmsorgsdager
+import no.nav.omsorgspenger.overføringer.MockLøsning.mockLøsning
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
 
 internal class StartOverføringAvOmsorgsdager(rapidsConnection: RapidsConnection) : River.PacketListener {
-
-    private val logger = LoggerFactory.getLogger(this::class.java)
 
     init {
         River(rapidsConnection).apply {
@@ -35,7 +34,7 @@ internal class StartOverføringAvOmsorgsdager(rapidsConnection: RapidsConnection
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         val id = packet["@id"].asText()
-        logger.info("Skal løse behov $Behov med id $id")
+        logger.info("Skal løse behov $OverføreOmsorgsdager med id $id")
 
         val omsorgsdagerTattUtIÅr = packet[OmsorgsdagerTattUtIÅr].asInt()
         val omsorgsdagerÅOverføre = packet[OmsorgsdagerÅOverføre].asInt()
@@ -45,78 +44,43 @@ internal class StartOverføringAvOmsorgsdager(rapidsConnection: RapidsConnection
 
         val omsorgsdagerIgjen = 10 - omsorgsdagerTattUtIÅr
 
-        val (utfall, begrunnelser) = when {
+        when {
             omsorgsdagerÅOverføre !in 1..10 -> Pair("Avslått", listOf("Kan ikke overføre $omsorgsdagerÅOverføre dager. Må være melom 1 og 10 dager."))
             omsorgsdagerIgjen < omsorgsdagerÅOverføre -> Pair("Avslått", listOf("Har kun $omsorgsdagerIgjen dager igjen i år. Kan ikke overføre $omsorgsdagerÅOverføre dager."))
             barn.any { it.utvidetRett } -> Pair("OppgaveIGosysOgBehandlesIInfotrygd", listOf("Overføringen kan ikke behandles i nytt system."))
-            else -> Pair("Gjennomført", listOf("Overføringen er effektuert."))
+            else -> null
+        }?.also { (utfall, begrunnelser) ->
+            logger.info("Utfall=$utfall, Begrunnelser=$begrunnelser")
+
+            packet.leggTilLøsning(OverføreOmsorgsdager, mockLøsning(
+                utfall = utfall,
+                begrunnelser = begrunnelser,
+                fra = fra,
+                til = til,
+                omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+            ))
+            context.sendMedId(packet)
+            return
         }
 
-        logger.info("Utfall=$utfall, Begrunnelser=$begrunnelser")
+        logger.info("Legger til behov for å hente saksnummer for omsorgspenger.")
 
-        packet.leggTilLøsning(OverføreOmsorgsdager, mockLøsning(
-            utfall = utfall,
-            begrunnelser = begrunnelser,
-            fra = fra,
-            til = til,
-            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+        packet.leggTilBehov(aktueltBehov = OverføreOmsorgsdager, Behov(
+            navn = HentOmsorgspengerSaksnummer,
+            input = mapOf(
+                "identitetsnummer" to fra
+            )
         ))
+
         context.sendMedId(packet)
     }
 
     internal companion object {
-        internal val OmsorgsdagerTattUtIÅr = "@behov.${OverføreOmsorgsdager}.omsorgsdagerTattUtIÅr"
+        private val logger = LoggerFactory.getLogger(StartOverføringAvOmsorgsdager::class.java)
+        private val OmsorgsdagerTattUtIÅr = "@behov.${OverføreOmsorgsdager}.omsorgsdagerTattUtIÅr"
         internal val OmsorgsdagerÅOverføre = "@behov.${OverføreOmsorgsdager}.omsorgsdagerÅOverføre"
         internal val OverførerFra = "@behov.${OverføreOmsorgsdager}.fra.identitetsnummer"
         internal val OverførerTil = "@behov.${OverføreOmsorgsdager}.til.identitetsnummer"
-        internal val Barn = "@behov.${OverføreOmsorgsdager}.barn"
-
-        private fun mockLøsning(
-            utfall: String,
-            begrunnelser: List<String>,
-            fra: String,
-            til: String,
-            omsorgsdagerÅOverføre: Int
-        ): Map<String, Any?> {
-            val overføringer = mapOf(
-                fra to mapOf(
-                    "gitt" to listOf(
-                        mapOf(
-                            "antallDager" to omsorgsdagerÅOverføre,
-                            "gjelderFraOgMed" to LocalDate.now(),
-                            "gjelderTilOgMed" to LocalDate.now().plusYears(1),
-                            "til" to mapOf(
-                                "navn" to "Kari Nordmann",
-                                "fødselsdato" to LocalDate.now().minusYears(30)
-                            )
-                        )
-                    ),
-                    "fått" to emptyList()
-                ),
-                til to mapOf(
-                    "fått" to listOf(
-                        mapOf(
-                            "antallDager" to omsorgsdagerÅOverføre,
-                            "gjelderFraOgMed" to LocalDate.now(),
-                            "gjelderTilOgMed" to LocalDate.now().plusYears(1),
-                            "fra" to mapOf(
-                                "navn" to "Ola Nordmann",
-                                "fødselsdato" to LocalDate.now().minusYears(35)
-                            )
-                        )
-                    ),
-                    "gitt" to emptyList()
-                )
-            )
-
-            return mapOf(
-                "utfall" to utfall,
-                "begrunnelser" to begrunnelser,
-                "overføringer" to when (utfall) {
-                    "Gjennomført", "Avslått" -> overføringer
-                    else -> emptyMap()
-                }
-            )
-        }
+        private val Barn = "@behov.${OverføreOmsorgsdager}.barn"
     }
 }
