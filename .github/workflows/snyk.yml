@@ -2,9 +2,6 @@ name: Vulnerabilities scanning of dependencies
 on:
   schedule:
     - cron:  '0 3 * * *'
-  push:
-    branches:
-      - master
 jobs:
   security:
     runs-on: ubuntu-latest
