@@ -8,18 +8,29 @@ internal class PeriodiseringTest {
 
     @Test
     fun `Ingen eller en dato`() {
-        assertPerioder(listOf(), listOf())
-        assertPerioder(listOf(LocalDate.parse("2019-12-30")), listOf(Periode("2019-12-30/2019-12-30")))
+        assertPerioder(
+            datoer = listOf(),
+            overordnetPeriode = Periode("2020-01-01/2020-01-01"),
+            forventedePerioder = listOf(
+                Periode("2020-01-01/2020-01-01")
+            )
+        )
+        assertPerioder(
+            datoer = listOf(LocalDate.parse("2020-01-01")),
+            overordnetPeriode = Periode("2019-12-31/2020-01-02"),
+            forventedePerioder = listOf(
+                Periode("2019-12-31/2019-12-31"),
+                Periode("2020-01-01/2020-01-02")
+            )
+        )
     }
 
     @Test
     fun `Datoer kant i kant skal kun gi perioder på enkeltdager`() {
         val datoer = listOf(
-            LocalDate.parse("2019-12-30"),
             LocalDate.parse("2019-12-31"),
             LocalDate.parse("2020-01-01"),
-            LocalDate.parse("2020-01-02"),
-            LocalDate.parse("2020-01-03")
+            LocalDate.parse("2020-01-02")
         )
 
         val forventedePerioder = listOf(
@@ -29,18 +40,20 @@ internal class PeriodiseringTest {
             Periode("2020-01-02/2020-01-03")
         )
 
-        assertPerioder(datoer, forventedePerioder)
+        assertPerioder(
+            datoer = datoer,
+            overordnetPeriode = Periode("2019-12-30/2020-01-03"),
+            forventedePerioder = forventedePerioder
+        )
     }
 
     @Test
     fun `Datoer med mellomrom mellom`() {
         val datoer = listOf(
             LocalDate.parse("2019-12-30"),
-            LocalDate.parse("2022-01-10"),
             LocalDate.parse("2015-05-12"),
             LocalDate.parse("2015-05-13"),
-            LocalDate.parse("2015-05-14"),
-            LocalDate.parse("2013-01-01")
+            LocalDate.parse("2015-05-14")
         )
 
         val forventedePerioder = listOf(
@@ -51,13 +64,21 @@ internal class PeriodiseringTest {
             Periode("2019-12-30/2022-01-10")
         )
 
-        assertPerioder(datoer, forventedePerioder)
+        assertPerioder(
+            datoer = datoer,
+            overordnetPeriode = Periode("2013-01-01/2022-01-10"),
+            forventedePerioder = forventedePerioder
+        )
     }
 
-    private fun assertPerioder(datoer: List<LocalDate>, forventedePerioder: List<Periode>) {
+    private fun assertPerioder(
+        datoer: List<LocalDate>,
+        overordnetPeriode: Periode,
+        forventedePerioder: List<Periode>) {
+        println("OverordnetPeriode=$overordnetPeriode")
         println("Datoer=${datoer.sorted()}")
         println("ForventedePerioder=${forventedePerioder}")
-        val perioder = datoer.periodiser()
+        val perioder = datoer.periodiser(overordnetPeriode)
         println("Perioder=${perioder}")
         assertEquals(forventedePerioder, perioder)
     }

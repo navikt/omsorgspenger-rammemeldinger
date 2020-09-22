@@ -1,12 +1,23 @@
 package no.nav.omsorgspenger
 
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.omsorgspenger.overføringer.FerdigstillOverføringAvOmsorgsdager
-import no.nav.omsorgspenger.overføringer.StartOverføringAvOmsorgsdager
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.omsorgspenger.fordelinger.FordelingService
+import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
+import no.nav.omsorgspenger.overføringer.rivers.StartOverføringAvOmsorgsdager
+import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 
 fun main() {
     RapidApplication.create(System.getenv()).apply {
-        StartOverføringAvOmsorgsdager(this)
-        FerdigstillOverføringAvOmsorgsdager(this)
+        medAlleRivers()
     }.start()
+}
+
+internal fun RapidsConnection.medAlleRivers() {
+    StartOverføringAvOmsorgsdager(
+        rapidsConnection = this,
+        fordelingService = FordelingService(),
+        utvidetRettService = UtvidetRettService()
+    )
+    BehandleOverføringAvOmsorgsdager(this)
 }

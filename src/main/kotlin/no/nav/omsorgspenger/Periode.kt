@@ -11,17 +11,40 @@ internal data class Periode(
         require(tom.isAfter(fom) || fom.isEqual(tom)) {"Ugylidg periode. fom=$fom, tom=$tom"}
     }
 
+    internal fun inneholder(dato: LocalDate) = dato in fom..tom
     override fun toString() = "$fom/$tom"
 }
 
-internal fun Collection<LocalDate>.periodiser() : List<Periode> {
-    if (isEmpty()) return emptyList()
+internal fun MutableCollection<LocalDate>.leggTil(periode: Periode) : MutableCollection<LocalDate> {
+    add(periode.fom)
+    add(periode.tom)
+    return this
+}
 
-    if (size == 1) return listOf(Periode(fom = first(), tom = first()))
+internal fun Collection<LocalDate>.periodiser(
+    overordnetPeriode: Periode
+) : List<Periode> {
 
     val perioder = mutableListOf<Periode>()
 
-    val knekkpunkter = toMutableSet().sorted()
+    val knekkpunkter = toMutableList()
+        .leggTil(overordnetPeriode)
+        .filter { overordnetPeriode.inneholder(it) }
+        .toSet()
+        .sorted()
+
+    if (knekkpunkter.size == 1) {
+        return listOf(Periode(
+            fom = knekkpunkter.first(),
+            tom = knekkpunkter.first()
+        ))
+    }
+    if (knekkpunkter.size == 2) {
+        return listOf(Periode(
+            fom = knekkpunkter.first(),
+            tom = knekkpunkter[1]
+        ))
+    }
 
     var i = 0
     var forrigeTom : LocalDate? = null
@@ -49,7 +72,7 @@ internal fun Collection<LocalDate>.periodiser() : List<Periode> {
                         fom = forrigeTom!!.plusDays(1),
                         tom = knekkpunkter[i].minusDays(1)
                     )
-                } catch (ignore: Throwable) { null }
+                } catch (ignore: IllegalArgumentException) { null }
 
             }
         }?.also {

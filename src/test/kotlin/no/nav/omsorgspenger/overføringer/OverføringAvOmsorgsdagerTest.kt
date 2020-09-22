@@ -6,6 +6,7 @@ import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsning
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsningResolver
 import no.nav.k9.rapid.losning.somMelding
+import no.nav.omsorgspenger.medAlleRivers
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -19,8 +20,7 @@ import java.util.*
 internal class OverføringAvOmsorgsdagerTest {
 
     private val rapid = TestRapid().apply {
-        StartOverføringAvOmsorgsdager(this)
-        FerdigstillOverføringAvOmsorgsdager(this)
+        medAlleRivers()
     }
 
     @BeforeEach
@@ -42,9 +42,9 @@ internal class OverføringAvOmsorgsdagerTest {
         assertEquals(id, behovssekvensId)
 
         rapid.sendTestMessage(behovssekvens)
-        ventPå(antallMeldinger = 1)
+        ventPå(antallMeldinger = 1) // StartOverføringAvOmsorgsdager, HentFordelingGirMeldinger, HentUtvidetRettVedtak
         rapid.mockLøsningPåHenteOmsorgspengerSaksnummer(saksnummer = "123")
-        ventPå(antallMeldinger = 2)
+        ventPå(antallMeldinger = 2) // HentOmsorgspengerSaksnummer
 
         val (løsningId, løsning) = rapid.løsning()
 
@@ -164,7 +164,7 @@ internal class OverføringAvOmsorgsdagerTest {
 
     private fun TestRapid.løsning() = sisteMelding().somMelding().løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
 
-    private fun ventPå(antallMeldinger: Int) = await().atMost(Duration.ofSeconds(1)).until { rapid.inspektør.size == antallMeldinger }
+    private fun ventPå(antallMeldinger: Int) = await().atMost(Duration.ofSeconds(5)).until { rapid.inspektør.size == antallMeldinger }
 
     internal companion object {
         private val fra = "11111111111"

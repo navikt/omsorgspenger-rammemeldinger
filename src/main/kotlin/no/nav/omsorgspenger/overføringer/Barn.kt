@@ -1,6 +1,8 @@
 package no.nav.omsorgspenger.overføringer
 
 import com.fasterxml.jackson.databind.JsonNode
+import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import java.time.LocalDate
 
 internal data class Barn(
@@ -9,6 +11,19 @@ internal data class Barn(
     internal val aleneOmOmsorgen: Boolean,
     internal val utvidetRett: Boolean
 ) {
+
+    private val omsorgenForBarnetUtÅretBarnetFyller = when (utvidetRett) {
+        true -> 18
+        false -> 12
+    }
+
+    internal val omsorgenFor = Periode(
+        fom = fødselsdato,
+        tom = fødselsdato
+            .plusYears(omsorgenForBarnetUtÅretBarnetFyller.toLong())
+            .sisteDagIÅret()
+    )
+
     internal companion object {
         internal fun JsonNode.erBarn() = try {
             somBarn()
@@ -22,4 +37,7 @@ internal data class Barn(
             utvidetRett = get("utvidetRett").asBoolean()
         )
     }
+
 }
+internal fun List<Barn>.sisteDatoMedOmsorgenFor() =
+    maxByOrNull { it.omsorgenFor.tom }?.omsorgenFor?.tom

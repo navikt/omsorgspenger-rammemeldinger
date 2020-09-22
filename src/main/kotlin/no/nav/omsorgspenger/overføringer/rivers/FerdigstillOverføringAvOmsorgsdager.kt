@@ -1,18 +1,6 @@
-package no.nav.omsorgspenger.overføringer
+package no.nav.omsorgspenger.overføringer.rivers
 
-import com.fasterxml.jackson.databind.JsonNode
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.river.*
-import no.nav.omsorgspenger.overføringer.Behov.HentOmsorgspengerSaksnummer
-import no.nav.omsorgspenger.overføringer.Behov.OverføreOmsorgsdager
-import no.nav.omsorgspenger.overføringer.MockLøsning.mockLøsning
-import no.nav.omsorgspenger.overføringer.StartOverføringAvOmsorgsdager.Companion.OmsorgsdagerÅOverføre
-import no.nav.omsorgspenger.overføringer.StartOverføringAvOmsorgsdager.Companion.OverførerFra
-import no.nav.omsorgspenger.overføringer.StartOverføringAvOmsorgsdager.Companion.OverførerTil
-import org.slf4j.LoggerFactory
-
+/*
 internal class FerdigstillOverføringAvOmsorgsdager(rapidsConnection: RapidsConnection) : River.PacketListener {
 
     init {
@@ -57,7 +45,7 @@ internal class FerdigstillOverføringAvOmsorgsdager(rapidsConnection: RapidsConn
 
     private companion object {
         private val logger = LoggerFactory.getLogger(FerdigstillOverføringAvOmsorgsdager::class.java)
-        private const val Saksnummer = "@løsninger.${HentOmsorgspengerSaksnummer}.saksnummer"
+        private const val Saksnummer = "@løsninger.$HentOmsorgspengerSaksnummer.saksnummer"
     }
 
-}
+}*/

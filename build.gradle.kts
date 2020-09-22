@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.6.2"
 val jsonassertVersion = "1.5.0"
-val k9rapidVersion = "1.2d2610c"
+val k9rapidVersion = "1.8775282"
 val awaitilityVersion = "4.0.3"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
@@ -15,7 +15,7 @@ plugins {
 dependencies {
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
 
-    testImplementation("no.nav.k9.rapid:losning:$k9rapidVersion")
+    //testImplementation("no.nav.k9.rapid:losning:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
 
     testImplementation("org.awaitility:awaitility:$awaitilityVersion")
