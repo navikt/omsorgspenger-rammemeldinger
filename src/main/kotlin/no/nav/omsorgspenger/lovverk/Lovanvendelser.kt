@@ -3,25 +3,27 @@ package no.nav.omsorgspenger.lovverk
 import no.nav.omsorgspenger.Periode
 
 interface Lov {
-    val navn: String
-    val versjon: String
+    val id: String
 }
 
 interface Lovhenvisning {
     val lov : Lov
     val henvisning: String
+    fun id() = "${lov.id} $henvisning"
 }
 
 typealias Lovanvendelse = String
 
-internal typealias Lovanvendelser = Map<Periode, Map<Lovhenvisning, List<Lovanvendelse>>>
+internal class Lovanvendelser {
+    private val lovanvendelser : MutableMap<String, MutableMap<String, MutableList<Lovanvendelse>>> = mutableMapOf()
 
-internal class LovanvendelseBuilder {
-    private val lovanvendelser : MutableMap<Periode, MutableMap<Lovhenvisning, MutableList<Lovanvendelser>>> = mutableMapOf()
-
-    internal fun leggTil(periode: Periode, lovhenvisning: Lovhenvisning, anvendele: Lovanvendelse) {
-        lovanvendelser.replace(periode, lovanvendelser.getOrDefault(periode, mutableMapOf()).put())
+    internal fun leggTil(periode: Periode, lovhenvisning: Lovhenvisning, anvendelse: Lovanvendelse) : Lovanvendelser {
+        val innenforPeriode = lovanvendelser.getOrDefault(periode.toString(), mutableMapOf())
+        val innenforLovhenvisning = innenforPeriode.getOrDefault(lovhenvisning.id(), mutableListOf()).also { it.add(anvendelse) }
+        innenforPeriode[lovhenvisning.id()] = innenforLovhenvisning
+        lovanvendelser[periode.toString()] = innenforPeriode
+        return this
     }
 
-    internal fun build() = lovanvendelser.toMap()
+    internal fun somLøsning() = lovanvendelser.toMap()
 }

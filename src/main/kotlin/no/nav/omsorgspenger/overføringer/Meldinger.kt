@@ -55,11 +55,13 @@ internal class OverføreOmsorgsdagerMelding(private val packet: JsonMessage) : M
     data class Innhold(
         val barn : List<Barn>,
         val overførerFra: String,
+        val borINorge :Boolean = true, // TODO
+        val jobberINorge: Boolean = true, // TODO
+        val sendtPerBrev: Boolean = false, // TODO
         val overførerTil: String,
         val omsorgsdagerTattUtIÅr: Int,
         val omsorgsdagerÅOverføre: Int,
-        val mottaksdato: LocalDate
-    ) {
+        val mottaksdato: LocalDate) {
         val overordnetPeriode = Periode(
             fom = mottaksdato,
             tom = barn.sisteDatoMedOmsorgenFor() ?: mottaksdato
@@ -67,6 +69,9 @@ internal class OverføreOmsorgsdagerMelding(private val packet: JsonMessage) : M
     }
 }
 
+/**
+ * TODO: Skal vi her kun melde behovet `FerdigstillOmsorgspengerJournalpost` som i sin tur har dette behovet?
+ */
 internal class HentOmsorgspengerSaksnummerMelding(private val packet: JsonMessage) : Melding<HentOmsorgspengerSaksnummerMelding.Innhold> {
     override fun validate() {
         packet.require(Saksnummer, JsonNode::requireText)

@@ -3,6 +3,7 @@ package no.nav.omsorgspenger
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.omsorgspenger.fordelinger.FordelingService
+import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerService
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.StartOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
@@ -19,5 +20,8 @@ internal fun RapidsConnection.medAlleRivers() {
         fordelingService = FordelingService(),
         utvidetRettService = UtvidetRettService()
     )
-    BehandleOverføringAvOmsorgsdager(this)
+    BehandleOverføringAvOmsorgsdager(
+        rapidsConnection = this,
+        overføreOmsorgsdagerService = OverføreOmsorgsdagerService()
+    )
 }

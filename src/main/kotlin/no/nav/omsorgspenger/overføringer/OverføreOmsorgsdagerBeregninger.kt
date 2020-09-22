@@ -5,17 +5,20 @@ import no.nav.omsorgspenger.extensions.førsteDagNesteÅr
 import no.nav.omsorgspenger.periodiser
 import java.time.LocalDate
 
-internal object BeregnTilgjengeligeOmsorgsdager {
-    internal fun beregn(grunnlag: OverføreOmsorgsdagerGrunnlag) : Map<Periode, Resultat> {
-        val beregnet = mutableMapOf<Periode, Resultat>()
+internal object OverføreOmsorgsdagerBeregninger {
+    internal fun beregnOmsorgsdagerTilgjengeligForOverføring(
+        grunnlag: OverføreOmsorgsdagerGrunnlag,
+        context: OverføreOmsorgsdagerContext
+    ) : Map<Periode, OmsorgsdagerTilgjengeligForOverføring> {
+        val beregnet = mutableMapOf<Periode, OmsorgsdagerTilgjengeligForOverføring>()
         grunnlag.perioder().forEach { periode ->
             beregnet[periode] = beregn(grunnlag, periode)
         }
         return beregnet
     }
 
-    private fun beregn(grunnlag: OverføreOmsorgsdagerGrunnlag, periode: Periode) : Resultat {
-        return Resultat(dagerTilgjengelig = 10)
+    private fun beregn(grunnlag: OverføreOmsorgsdagerGrunnlag, periode: Periode) : OmsorgsdagerTilgjengeligForOverføring {
+        return OmsorgsdagerTilgjengeligForOverføring(dagerTilgjengelig = 10)
     }
 }
 
@@ -27,13 +30,11 @@ private fun OverføreOmsorgsdagerGrunnlag.perioder() : List<Periode>  {
     }
 
     overføreOmsorgsdager.barn.forEach { barn ->
-        datoer.add(barn.omsorgenFor.fom)
-        datoer.add(barn.omsorgenFor.tom.plusDays(1))
+        datoer.leggTilPeriode(barn.omsorgenFor)
     }
 
     fordelingGirMeldinger.meldinger.forEach { fordelingGirMelding ->
-        datoer.add(fordelingGirMelding.periode.fom)
-        datoer.add(fordelingGirMelding.periode.tom.plusDays(1))
+        datoer.leggTilPeriode(fordelingGirMelding.periode)
     }
 
     return datoer.periodiser(
@@ -41,7 +42,11 @@ private fun OverføreOmsorgsdagerGrunnlag.perioder() : List<Periode>  {
     )
 }
 
-internal data class Resultat(
-    internal val hjemler: List<String> = listOf(),
+private fun MutableList<LocalDate>.leggTilPeriode(periode: Periode) {
+    add(periode.fom)
+    add(periode.tom.plusDays(1))
+}
+
+internal data class OmsorgsdagerTilgjengeligForOverføring(
     internal val dagerTilgjengelig: Int
 )

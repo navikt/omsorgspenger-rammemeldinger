@@ -40,37 +40,34 @@ internal class StartOverføringAvOmsorgsdager(
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         val id = packet["@id"].asText()
-        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet)
+        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
 
         logger.info("$id -> StartOverføringAvOmsorgsdager")
 
-
-        overføreOmsorgsdager.barn().any { it.utvidetRett }
-        logger.info("Henter 'FordelingGirMeldinger'")
+        logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
-            identitetsnummer = overføreOmsorgsdager.overførerFra(),
-            periode = overføreOmsorgsdager.overordnetPeriode()
+            identitetsnummer = overføreOmsorgsdager.overførerFra,
+            periode = overføreOmsorgsdager.overordnetPeriode
         )
 
-        logger.info("Henter 'UtvidetRettVedtak'")
+        logger.info("hentUtvidetRettVedtak")
         val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
-            identitetsnummer = overføreOmsorgsdager.overførerFra(),
-            periode = overføreOmsorgsdager.overordnetPeriode()
+            identitetsnummer = overføreOmsorgsdager.overførerFra,
+            periode = overføreOmsorgsdager.overordnetPeriode
         )
 
-        // TODO: Verifisere UtvidetRett
         // Legg til  behov FerdigstillJournalføringOmsorgspenger
 
         val input = mapOf(
-            "identitetsnummer" to overføreOmsorgsdager.overførerFra(),
-            "periode" to overføreOmsorgsdager.overordnetPeriode().toString()
+            "identitetsnummer" to overføreOmsorgsdager.overførerFra,
+            "periode" to overføreOmsorgsdager.overordnetPeriode.toString()
 
         )
 
         packet.leggTilBehovMedLøsninger(
             OverføreOmsorgsdagerMelding.Navn,
-            Pair(Behov(navn = HentFordelingGirMeldingerMelding.Navn, input = input), fordelingGirMeldinger.somLøsning()),
-            Pair(Behov(navn = HentUtvidetRettVedtakMelding.Navn, input = input), utvidetRettVedtak.somLøsning())
+            Behov(navn = HentFordelingGirMeldingerMelding.Navn, input = input) to fordelingGirMeldinger.somLøsning(),
+            Behov(navn = HentUtvidetRettVedtakMelding.Navn, input = input) to utvidetRettVedtak.somLøsning()
         )
 
         logger.info("Legger til behov for '${HentOmsorgspengerSaksnummerMelding.Navn}'")
