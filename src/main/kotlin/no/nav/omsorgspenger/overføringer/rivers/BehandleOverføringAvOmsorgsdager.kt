@@ -9,15 +9,14 @@ import no.nav.omsorgspenger.overføringer.HentFordelingGirMeldingerMelding
 import no.nav.omsorgspenger.overføringer.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.overføringer.HentUtvidetRettVedtakMelding
 import no.nav.omsorgspenger.overføringer.MockLøsning.mockLøsning
-import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerBeregninger.beregnOmsorgsdagerTilgjengeligForOverføring
+import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
 import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerMelding
-import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerVurderinger.vurderInngangsvilkår
-import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerVurderinger.vurderOmsorgenFor
+import no.nav.omsorgspenger.overføringer.Vurderinger.vurderInngangsvilkår
+import no.nav.omsorgspenger.overføringer.Vurderinger.vurderOmsorgenFor
 import org.slf4j.LoggerFactory
 
 internal class BehandleOverføringAvOmsorgsdager (
-    rapidsConnection: RapidsConnection,
-    private val overføreOmsorgsdagerService: OverføreOmsorgsdagerService) : River.PacketListener {
+    rapidsConnection: RapidsConnection) : River.PacketListener {
 
     init {
         River(rapidsConnection).apply {
@@ -40,11 +39,14 @@ internal class BehandleOverføringAvOmsorgsdager (
 
     override fun onPacket(packet: JsonMessage, rapidContext: RapidsConnection.MessageContext) {
         val id = packet["@id"].asText()
-        val context = OverføreOmsorgsdagerContext()
 
-        logger.info("vurderOmsorgenFor'")
+        logger.info("$id -> BehandleOverføringAvOmsorgsdager")
+
+        val context = Context()
+
+        logger.info("vurderOmsorgenFor")
         val grunnlag = vurderOmsorgenFor(
-            grunnlag = OverføreOmsorgsdagerGrunnlag(
+            grunnlag = Grunnlag(
                 overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold(),
                 utvidetRettVedtak = HentUtvidetRettVedtakMelding(packet).innhold(),
                 fordelingGirMeldinger = HentFordelingGirMeldingerMelding(packet).innhold()
@@ -66,14 +68,18 @@ internal class BehandleOverføringAvOmsorgsdager (
 
         logger.info("karakteristikker = ${context.karakteristikker()}")
 
-        overføreOmsorgsdagerService.effektuerSomOverføringer(
-            grunnlag = grunnlag,
-            context = context,
-            omsorgsdagerTilgjengeligForOverføring = omsorgsdagerTilgjengeligForOverføring
+        val inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre = omsorgsdagerTilgjengeligForOverføring.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(
+            ønsketOmsorgsdagerÅOverføre = grunnlag.overføreOmsorgsdager.omsorgsdagerÅOverføre
         )
 
+        if (context.oppfyllerIkkeInngangsvilkår()) {
+            logger.info("** Avslå **")
+        }
 
-        logger.info("$id -> BehandleOverføringAvOmsorgsdager -> Legger til løsning")
+        if (inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre && context.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()) {
+            logger.info("** Sende til opprettelse av Gosys-oppgave **")
+        }
+
 
         packet.leggTilLøsning(OverføreOmsorgsdagerMelding.Navn, mockLøsning(
             utfall = "Gjennomført",

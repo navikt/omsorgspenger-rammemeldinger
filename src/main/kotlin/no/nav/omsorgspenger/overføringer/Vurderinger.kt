@@ -2,11 +2,11 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 
-internal object OverføreOmsorgsdagerVurderinger {
+internal object Vurderinger {
 
     internal fun vurderInngangsvilkår(
-        grunnlag: OverføreOmsorgsdagerGrunnlag,
-        context: OverføreOmsorgsdagerContext) {
+        grunnlag: Grunnlag,
+        context: Context) {
         val overordnetPeriode = grunnlag.overføreOmsorgsdager.overordnetPeriode
 
         if (!grunnlag.overføreOmsorgsdager.barn.any { it.aleneOmOmsorgen }) {
@@ -15,7 +15,7 @@ internal object OverføreOmsorgsdagerVurderinger {
                 lovhenvisning = AleneOmOmsorgenForBarnet,
                 anvendelse = "Må være alene om omsorgen for mist ett barn for å kunne overføre omsorgsdager."
             )
-            context.oppfyllerIkkeInngangsvilkår()
+            context.leggTilKarakteristikk(Context.Karakteristikk.OppfyllerIkkeInngangsvilkår)
         }
 
         if (!grunnlag.overføreOmsorgsdager.borINorge) {
@@ -24,7 +24,7 @@ internal object OverføreOmsorgsdagerVurderinger {
                 lovhenvisning = MedlemIFolketrygden,
                 anvendelse = "Må være bosatt i Norge for å overføre omsorgsdager."
             )
-            context.oppfyllerIkkeInngangsvilkår()
+            context.leggTilKarakteristikk(Context.Karakteristikk.OppfyllerIkkeInngangsvilkår)
         }
 
         if (!grunnlag.overføreOmsorgsdager.jobberINorge) {
@@ -33,19 +33,19 @@ internal object OverføreOmsorgsdagerVurderinger {
                 lovhenvisning = MedlemIFolketrygden,
                 anvendelse = "Må jobbe i Norge for å overføre omsorgsdager."
             )
-            context.oppfyllerIkkeInngangsvilkår()
+            context.leggTilKarakteristikk(Context.Karakteristikk.OppfyllerIkkeInngangsvilkår)
         }
 
         // TODO : samboer minst 1 år..
 
         if (grunnlag.overføreOmsorgsdager.sendtPerBrev) {
-            context.måBesvaresPerBrev()
+            context.leggTilKarakteristikk(Context.Karakteristikk.MåBesvaresPerBrev)
         }
     }
 
     internal fun vurderOmsorgenFor(
-        grunnlag: OverføreOmsorgsdagerGrunnlag,
-        context: OverføreOmsorgsdagerContext) : OverføreOmsorgsdagerGrunnlag {
+        grunnlag: Grunnlag,
+        context: Context) : Grunnlag {
         val overordnetPeriode = grunnlag.overføreOmsorgsdager.overordnetPeriode
         val utvidetRettVedtak = grunnlag.utvidetRettVedtak.vedtak
 
@@ -75,7 +75,7 @@ internal object OverføreOmsorgsdagerVurderinger {
                     true -> {
                         val utvidetRettVerifisert = utvidetRettVedtak.inneholderRammevedtakFor(it)
                         if (!utvidetRettVerifisert) {
-                            context.inneholderIkkeVerifiserbareOpplysninger()
+                            context.leggTilKarakteristikk(Context.Karakteristikk.InneholderIkkeVerifiserbareVedtakOmUtvidetRett)
                         }
                         utvidetRettVerifisert
                     }

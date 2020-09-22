@@ -40,9 +40,9 @@ internal class StartOverføringAvOmsorgsdager(
 
     override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
         val id = packet["@id"].asText()
-        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
-
         logger.info("$id -> StartOverføringAvOmsorgsdager")
+
+        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
 
         logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
@@ -56,21 +56,19 @@ internal class StartOverføringAvOmsorgsdager(
             periode = overføreOmsorgsdager.overordnetPeriode
         )
 
-        // Legg til  behov FerdigstillJournalføringOmsorgspenger
-
         val input = mapOf(
             "identitetsnummer" to overføreOmsorgsdager.overførerFra,
             "periode" to overføreOmsorgsdager.overordnetPeriode.toString()
-
         )
 
+        logger.info("legger til behov med løsninger [${HentFordelingGirMeldingerMelding.Navn}, ${HentUtvidetRettVedtakMelding.Navn}]")
         packet.leggTilBehovMedLøsninger(
             OverføreOmsorgsdagerMelding.Navn,
             Behov(navn = HentFordelingGirMeldingerMelding.Navn, input = input) to fordelingGirMeldinger.somLøsning(),
             Behov(navn = HentUtvidetRettVedtakMelding.Navn, input = input) to utvidetRettVedtak.somLøsning()
         )
 
-        logger.info("Legger til behov for '${HentOmsorgspengerSaksnummerMelding.Navn}'")
+        logger.info("legger til behov [${HentOmsorgspengerSaksnummerMelding.Navn}]")
         packet.leggTilBehov(
             OverføreOmsorgsdagerMelding.Navn,
             Behov(navn = HentOmsorgspengerSaksnummerMelding.Navn, input = input)

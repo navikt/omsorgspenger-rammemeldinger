@@ -5,10 +5,10 @@ import no.nav.omsorgspenger.extensions.førsteDagNesteÅr
 import no.nav.omsorgspenger.periodiser
 import java.time.LocalDate
 
-internal object OverføreOmsorgsdagerBeregninger {
+internal object Beregninger {
     internal fun beregnOmsorgsdagerTilgjengeligForOverføring(
-        grunnlag: OverføreOmsorgsdagerGrunnlag,
-        context: OverføreOmsorgsdagerContext
+        grunnlag: Grunnlag,
+        context: Context
     ) : Map<Periode, OmsorgsdagerTilgjengeligForOverføring> {
         val beregnet = mutableMapOf<Periode, OmsorgsdagerTilgjengeligForOverføring>()
         grunnlag.perioder().forEach { periode ->
@@ -17,12 +17,12 @@ internal object OverføreOmsorgsdagerBeregninger {
         return beregnet
     }
 
-    private fun beregn(grunnlag: OverføreOmsorgsdagerGrunnlag, periode: Periode) : OmsorgsdagerTilgjengeligForOverføring {
+    private fun beregn(grunnlag: Grunnlag, periode: Periode) : OmsorgsdagerTilgjengeligForOverføring {
         return OmsorgsdagerTilgjengeligForOverføring(dagerTilgjengelig = 10)
     }
 }
 
-private fun OverføreOmsorgsdagerGrunnlag.perioder() : List<Periode>  {
+private fun Grunnlag.perioder() : List<Periode>  {
     val datoer = mutableListOf<LocalDate>()
 
     if (overføreOmsorgsdager.omsorgsdagerTattUtIÅr > 0) {
@@ -50,3 +50,6 @@ private fun MutableList<LocalDate>.leggTilPeriode(periode: Periode) {
 internal data class OmsorgsdagerTilgjengeligForOverføring(
     internal val dagerTilgjengelig: Int
 )
+
+internal fun Map<Periode, OmsorgsdagerTilgjengeligForOverføring>.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(ønsketOmsorgsdagerÅOverføre: Int) =
+    any { (_, omsorgsdagerTilgjengeligForOverføring) -> omsorgsdagerTilgjengeligForOverføring.dagerTilgjengelig < ønsketOmsorgsdagerÅOverføre}
