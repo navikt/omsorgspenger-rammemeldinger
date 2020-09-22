@@ -18,6 +18,7 @@ internal object Beregninger {
     }
 
     private fun beregn(grunnlag: Grunnlag, periode: Periode) : OmsorgsdagerTilgjengeligForOverføring {
+        // TODO: Faktisk finne ut antall tilgjengelige dager..
         return OmsorgsdagerTilgjengeligForOverføring(dagerTilgjengelig = 10)
     }
 }

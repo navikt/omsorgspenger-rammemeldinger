@@ -49,15 +49,6 @@ internal object Vurderinger {
         val overordnetPeriode = grunnlag.overføreOmsorgsdager.overordnetPeriode
         val utvidetRettVedtak = grunnlag.utvidetRettVedtak.vedtak
 
-        if (!grunnlag.overføreOmsorgsdager.barn.any { it.aleneOmOmsorgen }) {
-            context.lovanvendelser.leggTil(
-                periode = overordnetPeriode,
-                lovhenvisning = AleneOmOmsorgenForBarnet,
-                anvendelse = "Må være alene om omsorgen for mist ett barn for å overføre omsorgsdager."
-            )
-            return grunnlag
-        }
-
         val barnMedOmsorgenFor = grunnlag
             .overføreOmsorgsdager
             .barn
@@ -76,6 +67,12 @@ internal object Vurderinger {
                         val utvidetRettVerifisert = utvidetRettVedtak.inneholderRammevedtakFor(it)
                         if (!utvidetRettVerifisert) {
                             context.leggTilKarakteristikk(Context.Karakteristikk.InneholderIkkeVerifiserbareVedtakOmUtvidetRett)
+                        } else {
+                            context.lovanvendelser.leggTil(
+                                periode = overordnetPeriode,
+                                lovhenvisning = UtvidetRettForBarnet,
+                                anvendelse = "Har utvidet rett for barnet født ${it.fødselsdato}."
+                            )
                         }
                         utvidetRettVerifisert
                     }
