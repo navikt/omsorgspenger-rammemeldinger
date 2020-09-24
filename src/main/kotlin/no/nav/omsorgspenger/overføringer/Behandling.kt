@@ -1,8 +1,9 @@
 package no.nav.omsorgspenger.overføringer
 
+import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
 
-internal class Context {
+internal class Behandling {
     internal val lovanvendelser = Lovanvendelser()
 
     private val karakteristikker = mutableSetOf<Karakteristikk>()
@@ -13,12 +14,18 @@ internal class Context {
 
     internal fun måBesvaresPerBrev() = karakteristikker.contains(Karakteristikk.MåBesvaresPerBrev)
 
-    internal fun leggTilKarakteristikk(karakteristikk: Karakteristikk) : Context {
+    internal fun leggTilKarakteristikk(karakteristikk: Karakteristikk) : Behandling {
         karakteristikker.add(karakteristikk)
         return this
     }
 
     internal fun karakteristikker() = karakteristikker.toSet()
+
+    internal fun somLøsning(nyeOverføringer: List<Overføring>) = mapOf(
+        "karakteristikker" to karakteristikker.map { it.name },
+        "lovanvendelser" to lovanvendelser.somLøsning(),
+        "nyeOverføringer" to nyeOverføringer.map { it.somLøsning() }
+    )
 
     internal enum class Karakteristikk {
         OppfyllerIkkeInngangsvilkår,

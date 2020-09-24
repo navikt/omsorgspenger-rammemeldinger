@@ -12,10 +12,18 @@ internal data class Periode(
     }
 
     internal fun inneholder(dato: LocalDate) = dato in fom..tom
+    internal fun erKantIKant(periode: Periode) = fom.minusDays(1) == periode.tom || tom.plusDays(1) == periode.fom
+    internal fun slåSammen(periode: Periode) : Periode {
+        require(erKantIKant(periode)) { "Kan ikke slå sammen $this og $periode da de ikke er kant i kant."}
+        return Periode(
+            fom = if (fom.isBefore(periode.fom)) fom else periode.fom,
+            tom = if (tom.isAfter(periode.tom)) tom else periode.tom
+        )
+    }
     override fun toString() = "$fom/$tom"
 }
 
-internal fun MutableCollection<LocalDate>.leggTil(periode: Periode) : MutableCollection<LocalDate> {
+private fun MutableCollection<LocalDate>.leggTil(periode: Periode) : MutableCollection<LocalDate> {
     add(periode.fom)
     add(periode.tom)
     return this

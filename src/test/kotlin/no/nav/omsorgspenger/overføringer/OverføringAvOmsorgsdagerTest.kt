@@ -42,9 +42,12 @@ internal class OverføringAvOmsorgsdagerTest {
         assertEquals(id, behovssekvensId)
 
         rapid.sendTestMessage(behovssekvens)
-        ventPå(antallMeldinger = 1) // StartOverføringAvOmsorgsdager, HentFordelingGirMeldinger, HentUtvidetRettVedtak
-        rapid.mockLøsningPåHenteOmsorgspengerSaksnummer(saksnummer = "123")
-        ventPå(antallMeldinger = 2) // HentOmsorgspengerSaksnummer
+        ventPå(antallMeldinger = 1)
+        rapid.mockLøsningPåHentePersonopplysninger(
+            fra = fra,
+            til = til
+        )
+        ventPå(antallMeldinger = 2)
 
         val (løsningId, løsning) = rapid.løsning()
 

@@ -23,16 +23,11 @@ internal class BehandleOverføringAvOmsorgsdager (
             validate {
                 it.skalLøseBehov(OverføreOmsorgsdagerMelding.Navn)
                 it.harLøsningPåBehov(
-                    HentOmsorgspengerSaksnummerMelding.Navn,
-                    HentUtvidetRettVedtakMelding.Navn,
-                    HentFordelingGirMeldingerMelding.Navn
+                    HentPersonopplysningerMelding.Navn,
                 )
             }
             validate {
                 OverføreOmsorgsdagerMelding(it).validate()
-                HentOmsorgspengerSaksnummerMelding(it).validate()
-                HentUtvidetRettVedtakMelding(it).validate()
-                HentFordelingGirMeldingerMelding(it).validate()
             }
         }.register(this)
     }
@@ -42,51 +37,15 @@ internal class BehandleOverføringAvOmsorgsdager (
 
         logger.info("$id -> BehandleOverføringAvOmsorgsdager")
 
-        val context = Context()
-
-        logger.info("vurderOmsorgenFor")
-        val grunnlag = vurderOmsorgenFor(
-            grunnlag = Grunnlag(
-                overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold(),
-                utvidetRettVedtak = HentUtvidetRettVedtakMelding(packet).innhold(),
-                fordelingGirMeldinger = HentFordelingGirMeldingerMelding(packet).innhold()
-            ),
-            context = context
-        )
-
-        logger.info("vurderInngangsvilkår")
-        vurderInngangsvilkår(
-            grunnlag = grunnlag,
-            context = context
-        )
-
-        logger.info("beregnOmsorgsdagerTilgjengeligForOverføring")
-        val omsorgsdagerTilgjengeligForOverføring = beregnOmsorgsdagerTilgjengeligForOverføring(
-            grunnlag = grunnlag,
-            context = context
-        )
-
-        logger.info("karakteristikker = ${context.karakteristikker()}")
-
-        val inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre = omsorgsdagerTilgjengeligForOverføring.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(
-            ønsketOmsorgsdagerÅOverføre = grunnlag.overføreOmsorgsdager.omsorgsdagerÅOverføre
-        )
-
-        if (context.oppfyllerIkkeInngangsvilkår()) {
-            logger.info("** Avslå **")
-        }
-
-        if (inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre && context.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()) {
-            logger.info("** Sende til opprettelse av Gosys-oppgave **")
-        }
+        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
 
 
         packet.leggTilLøsning(OverføreOmsorgsdagerMelding.Navn, mockLøsning(
             utfall = "Gjennomført",
             begrunnelser = listOf(),
-            fra = grunnlag.overføreOmsorgsdager.overførerFra,
-            til = grunnlag.overføreOmsorgsdager.overførerTil,
-            omsorgsdagerÅOverføre = grunnlag.overføreOmsorgsdager.omsorgsdagerÅOverføre
+            fra = overføreOmsorgsdager.overførerFra,
+            til = overføreOmsorgsdager.overførerTil,
+            omsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
         ))
 
         rapidContext.sendMedId(packet)

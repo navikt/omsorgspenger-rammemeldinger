@@ -8,18 +8,18 @@ import java.time.LocalDate
 internal object Beregninger {
     internal fun beregnOmsorgsdagerTilgjengeligForOverføring(
         grunnlag: Grunnlag,
-        context: Context
-    ) : Map<Periode, OmsorgsdagerTilgjengeligForOverføring> {
-        val beregnet = mutableMapOf<Periode, OmsorgsdagerTilgjengeligForOverføring>()
+        behandling: Behandling
+    ) : Map<Periode, Int> {
+        val beregnet = mutableMapOf<Periode, Int>()
         grunnlag.perioder().forEach { periode ->
             beregnet[periode] = beregn(grunnlag, periode)
         }
         return beregnet
     }
 
-    private fun beregn(grunnlag: Grunnlag, periode: Periode) : OmsorgsdagerTilgjengeligForOverføring {
+    private fun beregn(grunnlag: Grunnlag, periode: Periode) : Int {
         // TODO: Faktisk finne ut antall tilgjengelige dager..
-        return OmsorgsdagerTilgjengeligForOverføring(dagerTilgjengelig = 10)
+        return 10
     }
 }
 
@@ -34,7 +34,7 @@ private fun Grunnlag.perioder() : List<Periode>  {
         datoer.leggTilPeriode(barn.omsorgenFor)
     }
 
-    fordelingGirMeldinger.meldinger.forEach { fordelingGirMelding ->
+    fordelingGirMeldinger.forEach { fordelingGirMelding ->
         datoer.leggTilPeriode(fordelingGirMelding.periode)
     }
 
@@ -48,9 +48,6 @@ private fun MutableList<LocalDate>.leggTilPeriode(periode: Periode) {
     add(periode.tom.plusDays(1))
 }
 
-internal data class OmsorgsdagerTilgjengeligForOverføring(
-    internal val dagerTilgjengelig: Int
-)
 
-internal fun Map<Periode, OmsorgsdagerTilgjengeligForOverføring>.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(ønsketOmsorgsdagerÅOverføre: Int) =
-    any { (_, omsorgsdagerTilgjengeligForOverføring) -> omsorgsdagerTilgjengeligForOverføring.dagerTilgjengelig < ønsketOmsorgsdagerÅOverføre}
+internal fun Map<Periode, Int>.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(ønsketOmsorgsdagerÅOverføre: Int) =
+    any { (_, omsorgsdagerTilgjengeligForOverføring) -> omsorgsdagerTilgjengeligForOverføring < ønsketOmsorgsdagerÅOverføre}
