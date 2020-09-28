@@ -3,11 +3,11 @@ package no.nav.omsorgspenger.overføringer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.TextNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.k9.rapid.river.requireArray
 import no.nav.k9.rapid.river.requireInt
-import no.nav.k9.rapid.river.requireObject
 import no.nav.k9.rapid.river.requireText
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
@@ -16,7 +16,8 @@ import no.nav.omsorgspenger.fordelinger.FordelingGirMelding.Companion.erFordelin
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding.Companion.somFordelingGirMelding
 import no.nav.omsorgspenger.overføringer.Barn.Companion.erBarn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
-import no.nav.omsorgspenger.overføringer.Part.Companion.erPart
+import no.nav.omsorgspenger.overføringer.Overføring.Companion.erOverføring
+import no.nav.omsorgspenger.overføringer.Overføring.Companion.somOverføring
 import no.nav.omsorgspenger.overføringer.Part.Companion.somPart
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak.Companion.erUtvidetRettVedtak
@@ -36,6 +37,7 @@ internal class OverføreOmsorgsdagerMelding(private val packet: JsonMessage) : M
         packet.require(OmsorgsdagerTattUtIÅr, JsonNode::requireInt)
         packet.require(OmsorgsdagerÅOverføre, JsonNode::requireInt)
         packet.require(Mottaksdato, JsonNode::asLocalDate)
+        packet.require(JournalpostIder) { json -> json.requireArray { entry -> entry is TextNode }}
     }
 
     override fun innhold() = Innhold(
@@ -44,7 +46,8 @@ internal class OverføreOmsorgsdagerMelding(private val packet: JsonMessage) : M
         overførerTil = packet[OverførerTil].textValue(),
         omsorgsdagerTattUtIÅr = packet[OmsorgsdagerTattUtIÅr].asInt(),
         omsorgsdagerÅOverføre = packet[OmsorgsdagerÅOverføre].asInt(),
-        mottaksdato = packet[Mottaksdato].asLocalDate()
+        mottaksdato = packet[Mottaksdato].asLocalDate(),
+        journalpostIder = (packet[JournalpostIder] as ArrayNode).map { it.asText() }
     )
 
     internal companion object {
@@ -55,6 +58,7 @@ internal class OverføreOmsorgsdagerMelding(private val packet: JsonMessage) : M
         private val OmsorgsdagerTattUtIÅr = "@behov.$Navn.omsorgsdagerTattUtIÅr"
         private val OmsorgsdagerÅOverføre = "@behov.$Navn.omsorgsdagerÅOverføre"
         private val Mottaksdato = "@behov.$Navn.mottaksdato"
+        private val JournalpostIder = "@behov.$Navn.journalpostIder"
     }
 
     data class Innhold(
@@ -66,12 +70,20 @@ internal class OverføreOmsorgsdagerMelding(private val packet: JsonMessage) : M
         val overførerTil: String,
         val omsorgsdagerTattUtIÅr: Int,
         val omsorgsdagerÅOverføre: Int,
-        val mottaksdato: LocalDate) {
-        val overordnetPeriode = Periode(
+        val mottaksdato: LocalDate,
+        val journalpostIder: List<String>
+    )  {
+        internal fun periode() = Periode(
             fom = mottaksdato,
             tom = barn.sisteDatoMedOmsorgenFor() ?: mottaksdato
         )
+
+        internal fun ønskedeOverføringer() = listOf(Overføring(
+            periode = periode(),
+            antallDager = omsorgsdagerÅOverføre
+        ))
     }
+
 }
 
 /**
@@ -112,6 +124,10 @@ internal class FerdigstillJournalføringForOmsorgspengerMelding(private val pack
     internal companion object {
         internal const val Navn = "FerdigstillJournalføringForOmsorgspenger"
         private val Saksnummer = "@løsninger.$Navn.saksnummer"
+        internal fun input(identitetsnummer: Identitetsnummer, journalpostIder: List<String>) = mapOf(
+            "identitetsnummer" to identitetsnummer,
+            "journalpostIder" to journalpostIder
+        )
     }
 
     data class Innhold(
@@ -171,7 +187,8 @@ internal class HentFordelingGirMeldingerMelding(private val packet: JsonMessage)
 
 internal class HentPersonopplysningerMelding(private val packet: JsonMessage) : Melding<HentPersonopplysningerMelding.Innhold> {
     override fun validate() {
-        packet.require(Identitetsnummer) { json -> json.requireObject { entry -> entry.fields().asSequence().all { it.toPair().erPart() }} }
+        //packet.require(Identitetsnummer) { json -> json.requireObject { entry -> entry.fields().asSequence().all { it.toPair().erPart() }} }
+        packet.interestedIn(Identitetsnummer)
     }
 
     override fun innhold() = Innhold(
@@ -195,15 +212,37 @@ internal class HentPersonopplysningerMelding(private val packet: JsonMessage) : 
 
 internal class OverføreOmsorgsdagerBehandlingMelding(private val packet: JsonMessage) : Melding<OverføreOmsorgsdagerBehandlingMelding.Innhold> {
     override fun validate() {
+        packet.require(Overføringer) { json -> json.requireArray { entry -> entry.erOverføring() } }
+        packet.interestedIn(Karakteristikker)
     }
 
-    override fun innhold() = Innhold()
+    override fun innhold() = Innhold(
+        overføringer = (packet[Overføringer] as ArrayNode).map { it.somOverføring() },
+        karakteristikker = (packet[Karakteristikker] as ArrayNode).map { Behandling.Karakteristikk.valueOf(it.asText()) }.toSet()
+    )
 
     internal companion object {
         internal const val Navn = "OverføreOmsorgsdagerBehandling"
+        private const val Overføringer = "@løsninger.$Navn.overføringer"
+        private const val Karakteristikker = "@løsninger.$Navn.karakteristikker"
     }
 
     data class Innhold(
-        val todo: Boolean = true
+        val overføringer: List<Overføring>,
+        val karakteristikker: Set<Behandling.Karakteristikk>
     )
+}
+
+internal class OpprettGosysJournalføringsoppgaverMelding(private val packet: JsonMessage) : Melding<Any?> {
+    override fun validate() {}
+    override fun innhold() = null
+
+    internal companion object {
+        internal const val Navn = "OpprettGosysJournalføringsoppgaver"
+        private const val Overføringer = "@behov.$Navn.journalpostIder"
+
+        fun input(journalpostIder: List<String>) = mapOf(
+            "journalpostIder" to journalpostIder
+        )
+    }
 }

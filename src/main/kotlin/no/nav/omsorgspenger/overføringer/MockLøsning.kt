@@ -1,53 +1,57 @@
 package no.nav.omsorgspenger.overføringer
 
-import java.time.LocalDate
 
 internal object MockLøsning {
     internal fun mockLøsning(
-        utfall: String,
+        utfall: Utfall,
         begrunnelser: List<String>,
         fra: String,
         til: String,
-        omsorgsdagerÅOverføre: Int
+        overføringer: List<Overføring>,
+        parter: Set<Part>
     ): Map<String, Any?> {
-        val overføringer = mapOf(
+        val gitt = (parter.firstOrNull { it.identitetsnummer == til }?.let { overføringerTil(overføringer, it) })?: listOf()
+        val fått = (parter.firstOrNull { it.identitetsnummer == fra }?.let { overføringerFra(overføringer, it) })?: listOf()
+        val mappedOverføringer = mapOf<String, Any?>(
             fra to mapOf(
-                "gitt" to listOf(
-                    mapOf(
-                        "antallDager" to omsorgsdagerÅOverføre,
-                        "gjelderFraOgMed" to LocalDate.now(),
-                        "gjelderTilOgMed" to LocalDate.now().plusYears(1),
-                        "til" to mapOf(
-                            "navn" to "Kari Nordmann",
-                            "fødselsdato" to LocalDate.now().minusYears(30)
-                        )
-                    )
-                ),
+                "gitt" to gitt,
                 "fått" to emptyList()
             ),
             til to mapOf(
-                "fått" to listOf(
-                    mapOf(
-                        "antallDager" to omsorgsdagerÅOverføre,
-                        "gjelderFraOgMed" to LocalDate.now(),
-                        "gjelderTilOgMed" to LocalDate.now().plusYears(1),
-                        "fra" to mapOf(
-                            "navn" to "Ola Nordmann",
-                            "fødselsdato" to LocalDate.now().minusYears(35)
-                        )
-                    )
-                ),
+                "fått" to fått,
                 "gitt" to emptyList()
             )
         )
 
         return mapOf(
-            "utfall" to utfall,
+            "utfall" to utfall.name,
             "begrunnelser" to begrunnelser,
             "overføringer" to when (utfall) {
-                "Gjennomført", "Avslått" -> overføringer
+                Utfall.Gjennomført, Utfall.Avslått -> mappedOverføringer
                 else -> emptyMap()
             }
         )
     }
+
+
+
+    private fun overføringerTil(overføringer: List<Overføring>, til: Part) = overføringer.map { mapOf(
+        "antallDager" to it.antallDager,
+        "gjelderFraOgMed" to it.periode.fom,
+        "gjelderTilOgMed" to it.periode.tom,
+        "til" to mapOf(
+            "navn" to til.navn,
+            "fødselsdato" to til.fødselsdato
+        )
+    )}
+
+    private fun overføringerFra(overføringer: List<Overføring>, fra: Part) = overføringer.map { mapOf(
+        "antallDager" to it.antallDager,
+        "gjelderFraOgMed" to it.periode.fom,
+        "gjelderTilOgMed" to it.periode.tom,
+        "fra" to mapOf(
+            "navn" to fra.navn,
+            "fødselsdato" to fra.fødselsdato
+        )
+    )}
 }

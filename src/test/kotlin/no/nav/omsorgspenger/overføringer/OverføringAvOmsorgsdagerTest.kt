@@ -67,13 +67,19 @@ internal class OverføringAvOmsorgsdagerTest {
 
         val (behovssekvensId, behovssekvens) = behovssekvens(
             id = id,
-            omsorgsdagerTattUtIÅr = 6,
+            omsorgsdagerTattUtIÅr = 17,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
         )
 
         assertEquals(id, behovssekvensId)
 
         rapid.sendTestMessage(behovssekvens)
+        ventPå(antallMeldinger = 1)
+        rapid.mockLøsningPåHentePersonopplysninger(
+            fra = fra,
+            til = til
+        )
+        ventPå(antallMeldinger = 2)
 
         val (løsningId, løsning) = rapid.løsning()
 
@@ -101,27 +107,32 @@ internal class OverføringAvOmsorgsdagerTest {
         assertEquals(id, behovssekvensId)
 
         rapid.sendTestMessage(behovssekvens)
-
+        ventPå(antallMeldinger = 1)
+        rapid.mockLøsningPåHentePersonopplysninger(
+            fra = fra,
+            til = til
+        )
+        ventPå(antallMeldinger = 2)
         val (løsningId, løsning) = rapid.løsning()
 
         assertEquals(id, løsningId)
-        assertTrue(løsning.erAvslått())
+        assertTrue(løsning.erGjennomført())
 
         løsning.overføringer.assertOverføringer(
             fra = fra,
             til = til,
-            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+            omsorgsdagerÅOverføre = 10
         )
     }
 
     @Test
-    fun `Overfører dager med utvidet rett på barn`() {
+    fun `Overfører dager med utvidet rett på barn som ikke kan verifiseres`() {
         val id = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
         val omsorgsdagerÅOverføre = 5
 
         val (behovssekvensId, behovssekvens) = behovssekvens(
             id = id,
-            omsorgsdagerTattUtIÅr = 0,
+            omsorgsdagerTattUtIÅr = 16,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre,
             utvidetRett = true
         )
@@ -167,7 +178,7 @@ internal class OverføringAvOmsorgsdagerTest {
 
     private fun TestRapid.løsning() = sisteMelding().somMelding().løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
 
-    private fun ventPå(antallMeldinger: Int) = await().atMost(Duration.ofSeconds(5)).until { rapid.inspektør.size == antallMeldinger }
+    private fun ventPå(antallMeldinger: Int) = await().atMost(Duration.ofSeconds(1)).until { rapid.inspektør.size == antallMeldinger }
 
     internal companion object {
         private val fra = "11111111111"

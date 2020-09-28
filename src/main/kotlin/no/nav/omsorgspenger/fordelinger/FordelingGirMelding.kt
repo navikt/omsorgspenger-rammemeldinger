@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import no.nav.omsorgspenger.Periode
 
 internal data class FordelingGirMelding(
-    internal val periode: Periode
+    internal val periode: Periode,
+    internal val antallDager: Int
 ) {
     internal fun somLøsning() = mapOf(
-        "periode" to periode.toString()
+        "periode" to periode.toString(),
+        "antallDager" to antallDager
     )
 
     internal companion object {
@@ -17,7 +19,8 @@ internal data class FordelingGirMelding(
         } catch (cause: Throwable) { false }
 
         internal fun JsonNode.somFordelingGirMelding() = FordelingGirMelding(
-            periode = Periode(get("periode").asText())
+            periode = Periode(get("periode").asText()),
+            antallDager = get("antallDager").asInt()
         )
     }
 }

@@ -7,13 +7,13 @@ internal object Vurderinger {
     internal fun vurderInngangsvilkår(
         grunnlag: Grunnlag,
         behandling: Behandling) {
-        val overordnetPeriode = grunnlag.overføreOmsorgsdager.overordnetPeriode
+        val overordnetPeriode = behandling.periode
 
         if (!grunnlag.overføreOmsorgsdager.barn.any { it.aleneOmOmsorgen }) {
             behandling.lovanvendelser.leggTil(
                 periode = overordnetPeriode,
                 lovhenvisning = AleneOmOmsorgenForBarnet,
-                anvendelse = "Må være alene om omsorgen for mist ett barn for å kunne overføre omsorgsdager."
+                anvendelse = "Må være alene om omsorgen for minst ett barn for å kunne overføre omsorgsdager."
             )
             behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
         }
@@ -43,46 +43,31 @@ internal object Vurderinger {
         }
     }
 
-    internal fun vurderOmsorgenFor(
+    internal fun vurderGrunnlag(
         grunnlag: Grunnlag,
         behandling: Behandling) : Grunnlag {
-        val overordnetPeriode = grunnlag.overføreOmsorgsdager.overordnetPeriode
         val utvidetRettVedtak = grunnlag.utvidetRettVedtak
+        val alleBarn = grunnlag.overføreOmsorgsdager.barn
 
-        val barnMedOmsorgenFor = grunnlag
+        val barnMedUtvidetRettSomIkkeKanVerifiseres = grunnlag
             .overføreOmsorgsdager
             .barn
+            .filter { it.utvidetRett && !utvidetRettVedtak.inneholderRammevedtakFor(it) }
             .onEach {
-                if (it.aleneOmOmsorgen) {
-                    behandling.lovanvendelser.leggTil(
-                        periode = overordnetPeriode,
-                        lovhenvisning = AleneOmOmsorgenForBarnet,
-                        anvendelse = "Er alene om omsorgen for barnet født ${it.fødselsdato}."
-                    )
-                }
-            }
-            .filter {
-                when (it.utvidetRett) {
-                    true -> {
-                        val utvidetRettVerifisert = utvidetRettVedtak.inneholderRammevedtakFor(it)
-                        if (!utvidetRettVerifisert) {
-                            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.InneholderIkkeVerifiserbareVedtakOmUtvidetRett)
-                        } else {
-                            behandling.lovanvendelser.leggTil(
-                                periode = overordnetPeriode,
-                                lovhenvisning = UtvidetRettForBarnet,
-                                anvendelse = "Har utvidet rett for barnet født ${it.fødselsdato}."
-                            )
-                        }
-                        utvidetRettVerifisert
-                    }
-                    false -> true
+                behandling.lovanvendelser.leggTil(
+                    periode = it.omsorgenFor,
+                    lovhenvisning = UtvidetRettForBarnet,
+                    anvendelse = "Kunne ikke verifiser utvidet rett for barnet født ${it.fødselsdato}"
+                )
+            }.also {
+                if (it.isNotEmpty()) {
+                    behandling.leggTilKarakteristikk(Behandling.Karakteristikk.InneholderIkkeVerifiserbareVedtakOmUtvidetRett)
                 }
             }
 
         return grunnlag.copy(
             overføreOmsorgsdager = grunnlag.overføreOmsorgsdager.copy(
-                barn = barnMedOmsorgenFor,
+                barn = alleBarn.minus(barnMedUtvidetRettSomIkkeKanVerifiseres),
             )
         )
     }

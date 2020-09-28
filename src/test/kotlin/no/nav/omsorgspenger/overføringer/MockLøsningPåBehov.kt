@@ -29,11 +29,11 @@ internal fun TestRapid.mockLøsningPåHentePersonopplysninger(fra: Identitetsnum
                     "identitetsnummer" to mapOf(
                         fra to mapOf(
                             "navn" to "Ola",
-                            "fødseldato" to "1990-09-00"
+                            "fødselsdato" to "1990-09-01"
                         ),
                         til to mapOf(
                             "navn" to "Kari",
-                            "fødseldato" to "1992-09-00"
+                            "fødselsdato" to "1992-09-01"
                         )
                     )
                 )

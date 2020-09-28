@@ -42,20 +42,23 @@ internal class StartOverføringAvOmsorgsdager(
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
 
+        val behandling = Behandling(
+            periode = overføreOmsorgsdager.periode()
+        )
+
         logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = overføreOmsorgsdager.overordnetPeriode
+            periode = behandling.periode
         )
 
         logger.info("hentUtvidetRettVedtak")
         val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = overføreOmsorgsdager.overordnetPeriode
+            periode = behandling.periode
         )
 
-        val behandling = Behandling()
-        val grunnlag = Vurderinger.vurderOmsorgenFor(
+        val grunnlag = Vurderinger.vurderGrunnlag(
             grunnlag = Grunnlag(
                 overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold(),
                 utvidetRettVedtak = utvidetRettVedtak,
@@ -77,22 +80,11 @@ internal class StartOverføringAvOmsorgsdager(
         )
 
         logger.info("genererer overføringer")
-        val overføringer = omsorgsdagerTilgjengeligForOverføring.somOverføringer()
-
-
-        logger.info("karakteristikker = ${behandling.karakteristikker()}")
-
-        val inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre = omsorgsdagerTilgjengeligForOverføring.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(
-            ønsketOmsorgsdagerÅOverføre = grunnlag.overføreOmsorgsdager.omsorgsdagerÅOverføre
+        val overføringer = omsorgsdagerTilgjengeligForOverføring.somOverføringer(
+            ønsketOmsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
         )
 
-        if (behandling.oppfyllerIkkeInngangsvilkår()) {
-            logger.info("** Avslå **")
-        }
-
-        if (inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre && behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()) {
-            logger.info("** Sende til opprettelse av Gosys-oppgave **")
-        }
+        logger.info("karakteristikker = ${behandling.karakteristikker()}")
 
         logger.info("legger til behov med løsninger [${HentFordelingGirMeldingerMelding.Navn}, ${HentUtvidetRettVedtakMelding.Navn}, ${OverføreOmsorgsdagerBehandlingMelding.Navn}]")
         logger.warn("Løsning på behovet ${HentUtvidetRettVedtakMelding.Navn} bør flyttes til 'omsorgspenger-rammevedtak'")
@@ -100,18 +92,10 @@ internal class StartOverføringAvOmsorgsdager(
             aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
             behovMedLøsninger = arrayOf(
                 Behov(
-                    navn = HentFordelingGirMeldingerMelding.Navn,
-                    input = HentFordelingGirMeldingerMelding.input(
-                        identitetsnummer = overføreOmsorgsdager.overførerFra,
-                        periode = overføreOmsorgsdager.overordnetPeriode
-                    )
+                    navn = HentFordelingGirMeldingerMelding.Navn
                 ) to fordelingGirMeldinger.somLøsning(),
                 Behov(
-                    navn = HentUtvidetRettVedtakMelding.Navn,
-                    input = HentUtvidetRettVedtakMelding.input(
-                        identitetsnummer = overføreOmsorgsdager.overførerFra,
-                        periode = overføreOmsorgsdager.overordnetPeriode
-                    )
+                    navn = HentUtvidetRettVedtakMelding.Navn
                 ) to utvidetRettVedtak.somLøsning(),
                 Behov(
                     navn = OverføreOmsorgsdagerBehandlingMelding.Navn,
@@ -121,18 +105,48 @@ internal class StartOverføringAvOmsorgsdager(
             )
         )
 
-        logger.info("legger til behov [${HentPersonopplysningerMelding.Navn}]")
-        packet.leggTilBehov(
-            aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
-            behov = arrayOf(Behov(
-                navn = HentPersonopplysningerMelding.Navn,
-                input = HentPersonopplysningerMelding.input(
-                    identitetsnummer = setOf(overføreOmsorgsdager.overførerFra, overføreOmsorgsdager.overførerTil)
-                )
-            ))
+        val inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre = omsorgsdagerTilgjengeligForOverføring.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(
+            ønsketOmsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
         )
 
-        println(packet.toJson())
+        if (inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre && behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()) {
+            logger.info("legger til behov [${OpprettGosysJournalføringsoppgaverMelding.Navn}]")
+            packet.leggTilBehov(
+                aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
+                behov = arrayOf(Behov(
+                    navn = OpprettGosysJournalføringsoppgaverMelding.Navn,
+                    input = OpprettGosysJournalføringsoppgaverMelding.input(
+                        journalpostIder = overføreOmsorgsdager.journalpostIder
+                    )
+                ))
+            )
+            logger.info("Legger til løsning på behov [${OverføreOmsorgsdagerMelding.Navn}]")
+            packet.leggTilLøsning(
+                behov = OverføreOmsorgsdagerMelding.Navn,
+                løsning = MockLøsning.mockLøsning(
+                    utfall = Utfall.GosysJournalføringsoppgave,
+                    begrunnelser = listOf(),
+                    fra = overføreOmsorgsdager.overførerFra,
+                    til = overføreOmsorgsdager.overførerTil,
+                    overføringer = emptyList(),
+                    parter = emptySet()
+                )
+            )
+        } else {
+            logger.info("legger til behov [${HentPersonopplysningerMelding.Navn}]")
+            packet.leggTilBehov(
+                aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
+                behov = arrayOf(Behov(
+                    navn = HentPersonopplysningerMelding.Navn,
+                    input = HentPersonopplysningerMelding.input(
+                        identitetsnummer = setOf(
+                            overføreOmsorgsdager.overførerFra,
+                            overføreOmsorgsdager.overførerTil
+                        )
+                    )
+                ))
+            )
+        }
 
         context.sendMedId(packet)
     }

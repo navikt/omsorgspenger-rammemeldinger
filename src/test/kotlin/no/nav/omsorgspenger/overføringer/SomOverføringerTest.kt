@@ -3,13 +3,14 @@ package no.nav.omsorgspenger.overføringer
 import no.nav.omsorgspenger.Periode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.math.BigInteger
 
 internal class SomOverføringerTest {
 
     @Test
     fun `Alle periodene har samme antall dager tilgjengelig for overføring`() {
         val forventedeOverføringer = listOf(Overføring(periode = Periode("2020-05-01/2040-01-01"), antallDager = 10))
-        val overføringer = dagerTilgjengeligPerPeriode(10,10,10,10).somOverføringer()
+        val overføringer = dagerTilgjengeligPerPeriode(10,10,10,10).somOverføringer(10)
         assertEquals(forventedeOverføringer, overføringer)
     }
 
@@ -19,7 +20,26 @@ internal class SomOverføringerTest {
             Overføring(periode = Periode("2020-05-01/2020-12-31"), antallDager = 5),
             Overføring(periode = Periode("2021-01-01/2040-01-01"), antallDager = 10)
         )
-        val overføringer = dagerTilgjengeligPerPeriode(5,10,10,10).somOverføringer()
+        val overføringer = dagerTilgjengeligPerPeriode(5,10,10,10).somOverføringer(10)
+        assertEquals(forventedeOverføringer, overføringer)
+    }
+
+    @Test
+    fun `Perioder med hull i`() {
+        val forventedeOverføringer = listOf(
+            Overføring(periode = Periode("2020-05-01/2021-01-02"), antallDager = 10),
+            Overføring(periode = Periode("2021-01-10/2021-06-10"), antallDager = 5),
+            Overføring(periode = Periode("2021-07-01/2026-01-01"), antallDager = 10)
+        )
+
+        val perioder = mapOf(
+            Periode("2020-05-01/2020-12-31") to 10,
+            Periode("2021-01-01/2021-01-02") to 10,
+            Periode("2021-01-10/2021-06-10") to 5,
+            Periode("2021-07-01/2026-01-01") to 10
+        )
+        val overføringer = perioder.somOverføringer(10)
+
         assertEquals(forventedeOverføringer, overføringer)
     }
 
