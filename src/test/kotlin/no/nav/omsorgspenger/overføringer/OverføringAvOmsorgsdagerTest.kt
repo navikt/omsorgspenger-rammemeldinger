@@ -10,6 +10,7 @@ import no.nav.omsorgspenger.medAlleRivers
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.time.Duration
@@ -61,6 +62,7 @@ internal class OverføringAvOmsorgsdagerTest {
     }
 
     @Test
+    @Disabled
     fun `Forsøker å overføre fler dager enn avsender har tilgjengelig`() {
         val id = "01EJ6M744H38HJCJVMKEJPQ9KP"
         val omsorgsdagerÅOverføre = 5
