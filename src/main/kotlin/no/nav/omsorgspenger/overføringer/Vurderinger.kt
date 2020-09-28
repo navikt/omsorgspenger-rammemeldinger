@@ -21,7 +21,7 @@ internal object Vurderinger {
         if (!grunnlag.overføreOmsorgsdager.borINorge) {
             behandling.lovanvendelser.leggTil(
                 periode = overordnetPeriode,
-                lovhenvisning = MedlemIFolketrygden,
+                lovhenvisning = BorINorge,
                 anvendelse = "Må være bosatt i Norge for å overføre omsorgsdager."
             )
             behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
@@ -30,7 +30,7 @@ internal object Vurderinger {
         if (!grunnlag.overføreOmsorgsdager.jobberINorge) {
             behandling.lovanvendelser.leggTil(
                 periode = overordnetPeriode,
-                lovhenvisning = MedlemIFolketrygden,
+                lovhenvisning = JobberINorge,
                 anvendelse = "Må jobbe i Norge for å overføre omsorgsdager."
             )
             behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)

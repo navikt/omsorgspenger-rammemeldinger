@@ -47,14 +47,14 @@ internal object Beregninger {
                 behandling.lovanvendelser.leggTil(
                     periode = periode,
                     lovhenvisning = GrunnrettOppTilToBarn,
-                    anvendelse = "Omsorgen for ${barnMedOmsorgenFor.size} barn"
+                    anvendelse = "Har omsorgen for ${barnMedOmsorgenFor.size} barn"
                 )
             }
             else -> {
                 behandling.lovanvendelser.leggTil(
                     periode = periode,
                     lovhenvisning = GrunnrettTreEllerFlerBarn,
-                    anvendelse = "Omsorgen for ${barnMedOmsorgenFor.size} barn"
+                    anvendelse = "Har omsorgen for ${barnMedOmsorgenFor.size} barn"
                 )
             }
         }
@@ -63,21 +63,21 @@ internal object Beregninger {
             behandling.lovanvendelser.leggTil(
                 periode = periode,
                 lovhenvisning = AleneOmOmsorgenForBarnet,
-                anvendelse = "Alene om omsorgen for ${it.size} barn"
+                anvendelse = "Har aleneomsorg for ${it.size} barn"
             )
         }}
         val barnMedUtvidetRett = barnMedOmsorgenFor.filter { it.utvidetRett }.also { if (it.isNotEmpty()) {
             behandling.lovanvendelser.leggTil(
                 periode = periode,
                 lovhenvisning = UtvidetRettForBarnet,
-                anvendelse = "Utvidet rett for ${it.size} barn"
+                anvendelse = "Har utvidet rett for ${it.size} barn"
             )
         }}
         val barnMedUtvidetRettOgAleneOmOmsorgen = barnMedOmsorgenFor.filter { it.utvidetRett && it.aleneOmOmsorgen }.also { if(it.isNotEmpty())  {
             behandling.lovanvendelser.leggTil(
                 periode = periode,
                 lovhenvisning = UtvidetRettOgAleneOmOmsorgenForBarnet,
-                anvendelse = "Utvidet rett og alene om omsorgen for ${it.size} barn"
+                anvendelse = "Har aleneomsorg og utvidet rett for ${it.size} barn"
             )
         }}
 
@@ -99,7 +99,7 @@ internal object Beregninger {
                 behandling.lovanvendelser.leggTil(
                     periode = periode,
                     lovhenvisning = AlleredeForbrukteDager,
-                    anvendelse = "Allerede tatt ut $it dager"
+                    anvendelse = "Har allerede tatt ut $it dager i ${periode.tom.year}"
                 )
             }}
             false -> 0
@@ -109,7 +109,7 @@ internal object Beregninger {
             behandling.lovanvendelser.leggTil(
                 periode = periode,
                 lovhenvisning = FordeltBortOmsorgsdager,
-                anvendelse = "Har fordelt bort $it dager"
+                anvendelse = "Har fordelt $it dager til andre personer"
             )
         }}
 

@@ -45,20 +45,25 @@ object UtvidetRettOgAleneOmOmsorgenForBarnet: Lovhenvisning {
 
 object AlleredeForbrukteDager : Lovhenvisning {
     override val lov = Folketrygdeloven
-    override val henvisning = "§ Aner ikke"
+    override val henvisning = "§ 9-6"
 }
 
 object AntallOmsorgsdager : Lovhenvisning {
     override val lov = Folketrygdeloven
-    override val henvisning = "§ Aner ikke 2"
+    override val henvisning = "§ 9-6"
 }
 
 object FordeltBortOmsorgsdager : Lovhenvisning {
     override val lov = Folketrygdeloven
-    override val henvisning = "§ Aner ikke 3"
+    override val henvisning = "§ 9-6 femte ledd"
 }
 
-object MedlemIFolketrygden: Lovhenvisning {
+object JobberINorge: Lovhenvisning {
     override val lov = Folketrygdeloven
-    override val henvisning = "§ 2 MedlemIFolketrygden"
+    override val henvisning = "§ 2-2"
+}
+
+object BorINorge: Lovhenvisning {
+    override val lov = Folketrygdeloven
+    override val henvisning = "§ 2-1"
 }
