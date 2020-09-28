@@ -6,11 +6,11 @@ import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsning
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsningResolver
 import no.nav.k9.rapid.losning.somMelding
+import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.medAlleRivers
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.time.Duration
@@ -57,12 +57,13 @@ internal class OverføringAvOmsorgsdagerTest {
         løsning.overføringer.assertOverføringer(
             fra = fra,
             til = til,
-            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+            forventedeOverføringer = mapOf(
+                Periode("2020-09-29/2030-12-31") to omsorgsdagerÅOverføre
+            )
         )
     }
 
     @Test
-    @Disabled
     fun `Forsøker å overføre fler dager enn avsender har tilgjengelig`() {
         val id = "01EJ6M744H38HJCJVMKEJPQ9KP"
         val omsorgsdagerÅOverføre = 5
@@ -86,12 +87,15 @@ internal class OverføringAvOmsorgsdagerTest {
         val (løsningId, løsning) = rapid.løsning()
 
         assertEquals(id, løsningId)
-        assertTrue(løsning.erAvslått())
+        assertTrue(løsning.erGjennomført())
 
         løsning.overføringer.assertOverføringer(
             fra = fra,
             til = til,
-            omsorgsdagerÅOverføre = omsorgsdagerÅOverføre
+            forventedeOverføringer = mapOf(
+                Periode("2020-09-29/2020-12-31") to 3,
+                Periode("2021-01-01/2030-12-31") to 5
+            )
         )
     }
 
@@ -123,7 +127,9 @@ internal class OverføringAvOmsorgsdagerTest {
         løsning.overføringer.assertOverføringer(
             fra = fra,
             til = til,
-            omsorgsdagerÅOverføre = 10
+            forventedeOverføringer = mapOf(
+                Periode("2020-09-29/2030-12-31") to 10
+            )
         )
     }
 
@@ -164,18 +170,22 @@ internal class OverføringAvOmsorgsdagerTest {
     private fun Map<String, OverføreOmsorgsdagerLøsning.Overføringer>.assertOverføringer(
         fra: String,
         til: String,
-        omsorgsdagerÅOverføre: Int) {
+        forventedeOverføringer: Map<Periode, Int>) {
         // Skal inneholde overføringer for begge parter
         assertTrue(containsKey(fra))
         assertTrue(containsKey(til))
-        // Personen overføringen er fra har gitt 1 og fått 0 overføringer
-        assertEquals(1, getValue(fra).gitt.size)
-        assertEquals(omsorgsdagerÅOverføre,getValue(fra).gitt.first().antallDager)
+        // Personen overføringen er fra har gitt X og fått 0 overføringer
+        assertEquals(forventedeOverføringer.size, getValue(fra).gitt.size)
+        forventedeOverføringer.forEach { (periode, antallDager) ->
+            assertNotNull(getValue(fra).gitt.firstOrNull { it.antallDager == antallDager && periode == Periode(fom = it.gjelderFraOgMed, tom = it.gjelderTilOgMed)})
+        }
         assertEquals(0, getValue(fra).fått.size)
-        // Personen overføringen er til har fått 1 og gitt 0 overføringer
+        // Personen overføringen er til har fått X og gitt 0 overføringer
         assertEquals(0, getValue(til).gitt.size)
-        assertEquals(1, getValue(til).fått.size)
-        assertEquals(omsorgsdagerÅOverføre, getValue(til).fått.first().antallDager)
+        assertEquals(forventedeOverføringer.size, getValue(til).fått.size)
+        forventedeOverføringer.forEach { (periode, antallDager) ->
+            assertNotNull(getValue(til).fått.firstOrNull { it.antallDager == antallDager && periode == Periode(fom = it.gjelderFraOgMed, tom = it.gjelderTilOgMed)})
+        }
     }
 
     private fun TestRapid.løsning() = sisteMelding().somMelding().løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
@@ -192,6 +202,7 @@ internal class OverføringAvOmsorgsdagerTest {
             overføringTil: String = til,
             omsorgsdagerTattUtIÅr: Int,
             omsorgsdagerÅOverføre: Int,
+            mottaksdato: LocalDate = LocalDate.parse("2020-09-29"),
             utvidetRett: Boolean = false
         ) = Behovssekvens(
             id = id,
@@ -211,12 +222,13 @@ internal class OverføringAvOmsorgsdagerTest {
                 omsorgsdagerÅOverføre = omsorgsdagerÅOverføre,
                 barn = listOf(OverføreOmsorgsdagerBehov.Barn(
                     identitetsnummer = "11111111113",
-                    fødselsdato = LocalDate.now(),
+                    fødselsdato = mottaksdato.minusYears(2),
                     aleneOmOmsorgen = true,
                     utvidetRett = utvidetRett
                 )),
                 kilde = OverføreOmsorgsdagerBehov.Kilde.Brev,
-                journalpostIder = listOf()
+                journalpostIder = listOf(),
+                mottaksdato = mottaksdato
             ))
         ).keyValue
     }
