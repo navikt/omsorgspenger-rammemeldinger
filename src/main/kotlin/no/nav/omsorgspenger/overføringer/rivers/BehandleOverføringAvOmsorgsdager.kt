@@ -42,20 +42,18 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
 
-        val behandling = Behandling(
-            periode = overføreOmsorgsdager.periode()
-        )
+        val behandling = Behandling()
 
         logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = behandling.periode
+            periode = overføreOmsorgsdager.overordnetPeriode
         )
 
         logger.info("hentUtvidetRettVedtak")
         val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = behandling.periode
+            periode = overføreOmsorgsdager.overordnetPeriode
         )
 
         val grunnlag = Vurderinger.vurderGrunnlag(

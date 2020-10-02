@@ -71,19 +71,22 @@ internal class OverføreOmsorgsdagerMelding(private val packet: JsonMessage) : M
         val omsorgsdagerTattUtIÅr: Int,
         val omsorgsdagerÅOverføre: Int,
         val mottaksdato: LocalDate,
-        val journalpostIder: List<String>
-    )  {
-        internal fun periode() = Periode(
-            fom = mottaksdato,
-            tom = barn.sisteDatoMedOmsorgenFor() ?: mottaksdato
-        )
+        val journalpostIder: List<String>) {
 
-        internal fun ønskedeOverføringer() = listOf(Overføring(
-            periode = periode(),
+        internal val overordnetPeriode: Periode = {
+            val sisteDatoMedOmsorgenFor = barn.sisteDatoMedOmsorgenFor()
+            val tom = when {
+                sisteDatoMedOmsorgenFor?.isAfter(mottaksdato) ?: false -> sisteDatoMedOmsorgenFor!!
+                else -> mottaksdato
+            }
+            Periode(fom = mottaksdato, tom = tom)
+        }()
+
+        internal val ønskedeOverføringer = listOf(Overføring(
+            periode = overordnetPeriode,
             antallDager = omsorgsdagerÅOverføre
         ))
     }
-
 }
 
 /**

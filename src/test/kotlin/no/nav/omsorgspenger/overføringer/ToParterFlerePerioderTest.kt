@@ -1,0 +1,112 @@
+package no.nav.omsorgspenger.overføringer
+
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
+import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.extensions.sisteDagIÅret
+import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
+import no.nav.omsorgspenger.fordelinger.FordelingService
+import no.nav.omsorgspenger.medAlleRivers
+import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
+import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
+import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.time.LocalDate
+
+internal class ToParterFlerePerioderTest  {
+    private val fordelingService = mockk<FordelingService>()
+    private val utvidetRettService = mockk<UtvidetRettService>()
+
+    private val rapid = TestRapid().apply {
+        medAlleRivers(
+            fordelingService = fordelingService,
+            utvidetRettService = utvidetRettService
+        )
+    }
+
+    @BeforeEach
+    fun reset() {
+        rapid.reset()
+    }
+
+    @Test
+    fun `Brukt dager i år og fordeling som gir tre perioder & oveføringer`() {
+        val fra = identitetsnummer()
+        val til = identitetsnummer()
+        val mottaksdato = LocalDate.parse("2020-09-29")
+        val fødselsdatoBarnUtvidetRett= mottaksdato.minusYears(17)
+        val fødsesldatoYngsteBarn = mottaksdato.minusYears(5)
+
+        every { fordelingService.hentFordelingGirMeldinger(any(), any()) }
+            .returns(listOf(FordelingGirMelding(
+                periode = Periode(
+                    fom = fødsesldatoYngsteBarn.plusMonths(6),
+                    tom = fødsesldatoYngsteBarn.plusYears(12).sisteDagIÅret()
+                ),
+                antallDager = 15
+            )))
+
+
+        every { utvidetRettService.hentUtvidetRettVedtak(any(), any()) }
+            .returns(listOf(UtvidetRettVedtak(
+                periode = Periode(
+                    fom = fødselsdatoBarnUtvidetRett.plusWeeks(3),
+                    tom = fødselsdatoBarnUtvidetRett.plusDays(18).sisteDagIÅret()
+                ),
+                barnetsFødselsdato = fødselsdatoBarnUtvidetRett
+            )))
+
+        val barn = listOf(
+            OverføreOmsorgsdagerBehov.Barn(
+                identitetsnummer = identitetsnummer(),
+                fødselsdato = fødselsdatoBarnUtvidetRett,
+                utvidetRett = true,
+                aleneOmOmsorgen = false
+            ),
+            OverføreOmsorgsdagerBehov.Barn(
+                identitetsnummer = identitetsnummer(),
+                fødselsdato = mottaksdato.minusYears(11),
+                utvidetRett = false,
+                aleneOmOmsorgen = false
+            ),
+            OverføreOmsorgsdagerBehov.Barn(
+                identitetsnummer = identitetsnummer(),
+                fødselsdato = mottaksdato.minusYears(5),
+                aleneOmOmsorgen = true,
+                utvidetRett = false
+            )
+        )
+
+
+        val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
+            overføringFra = fra,
+            overføringTil = til,
+            omsorgsdagerTattUtIÅr = 17,
+            omsorgsdagerÅOverføre = 10,
+            mottaksdato = mottaksdato,
+            barn = barn
+        )
+
+        rapid.sendTestMessage(behovssekvens)
+        rapid.ventPå(antallMeldinger = 1)
+        rapid.mockLøsningPåHentePersonopplysninger(
+            fra = fra,
+            til = til
+        )
+        rapid.ventPå(antallMeldinger = 2)
+        val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
+
+        løsning.overføringer.assertOverføringer(
+            fra = fra,
+            til = til,
+            forventedeOverføringer = mapOf(
+                Periode("2020-09-29/2020-12-31") to 3, // 35 (omsorgsdager) - 15 (fordelt bort) - 17 (tatt ut i år) = 3
+                Periode("2021-01-01/2021-12-31") to 10, // 35 (omsorgdager) - 15 (fordelt bort) = 20, men kan maks overføre 10
+                Periode("2022-01-01/2027-12-31") to 5 // 20 (omsorgsdager) - 15 (fordelt bort) = 5
+            )
+        )
+    }
+}

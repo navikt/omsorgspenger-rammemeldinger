@@ -14,11 +14,14 @@ fun main() {
     }.start()
 }
 
-internal fun RapidsConnection.medAlleRivers() {
+internal fun RapidsConnection.medAlleRivers(
+    fordelingService: FordelingService = FordelingService(),
+    utvidetRettService: UtvidetRettService = UtvidetRettService()
+) {
     BehandleOverføringAvOmsorgsdager(
         rapidsConnection = this,
-        fordelingService = FordelingService(),
-        utvidetRettService = UtvidetRettService()
+        fordelingService = fordelingService,
+        utvidetRettService = utvidetRettService
     )
     PubliserOverføringAvOmsorgsdager(
         rapidsConnection = this

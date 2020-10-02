@@ -3,9 +3,8 @@ package no.nav.omsorgspenger.overføringer
 import no.nav.omsorgspenger.Periode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.math.BigInteger
 
-internal class SomOverføringerTest {
+internal class PeriodisertOmsorsgdagerTilgjengeligTilOverføringerTest {
 
     @Test
     fun `Alle periodene har samme antall dager tilgjengelig for overføring`() {

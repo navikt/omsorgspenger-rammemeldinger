@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.overføringer.rivers
 
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.behov.Behov
@@ -59,7 +60,7 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         val overføringer = when (utfall) {
             Utfall.Gjennomført -> behandling.overføringer
-            else -> overføreOmsorgsdager.ønskedeOverføringer()
+            else -> overføreOmsorgsdager.ønskedeOverføringer
         }
 
 

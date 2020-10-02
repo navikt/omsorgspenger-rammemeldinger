@@ -1,10 +1,8 @@
 package no.nav.omsorgspenger.overføringer
 
-import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
 
-internal class Behandling(
-    internal val periode: Periode) {
+internal class Behandling {
 
     internal val lovanvendelser = Lovanvendelser()
 
@@ -26,8 +24,7 @@ internal class Behandling(
     internal fun somLøsning(nyeOverføringer: List<Overføring>) = mapOf(
         "karakteristikker" to karakteristikker.map { it.name },
         "lovanvendelser" to lovanvendelser.somLøsning(),
-        "overføringer" to nyeOverføringer.map { it.somLøsning() },
-        "periode" to periode.toString()
+        "overføringer" to nyeOverføringer.map { it.somLøsning() }
     )
 
     internal enum class Karakteristikk {
