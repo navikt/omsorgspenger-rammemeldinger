@@ -22,7 +22,8 @@ internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
     private val fordelingService: FordelingService,
     private val utvidetRettService: UtvidetRettService
-) : River.PacketListener {
+) : BehovssekvensPacketListener(
+    logger = LoggerFactory.getLogger(BehandleOverføringAvOmsorgsdager::class.java)) {
 
     init {
         River(rapidsConnection).apply {
@@ -36,9 +37,12 @@ internal class BehandleOverføringAvOmsorgsdager(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-        val id = packet["@id"].asText()
-        logger.info("$id -> StartOverføringAvOmsorgsdager")
+    override fun onSent(id: String, packet: JsonMessage) {
+        logger.warn("TODO: Lagre at packet med id $id er håndtert.")
+    }
+
+    override fun handlePacket(id: String, packet: JsonMessage): Boolean {
+        logger.info("BehandleOverføringAvOmsorgsdager")
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
 
@@ -146,10 +150,6 @@ internal class BehandleOverføringAvOmsorgsdager(
             )
         }
 
-        context.sendMedId(packet)
-    }
-
-    private companion object {
-        private val logger = LoggerFactory.getLogger(BehandleOverføringAvOmsorgsdager::class.java)
+        return true
     }
 }

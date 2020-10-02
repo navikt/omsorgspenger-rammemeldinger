@@ -1,7 +1,6 @@
 package no.nav.omsorgspenger.overføringer.rivers
 
 import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.behov.Behov
@@ -12,8 +11,8 @@ import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerMelding
 import org.slf4j.LoggerFactory
 
 internal class PubliserOverføringAvOmsorgsdager (
-    rapidsConnection: RapidsConnection) : River.PacketListener {
-
+    rapidsConnection: RapidsConnection) : BehovssekvensPacketListener(
+    logger = LoggerFactory.getLogger(PubliserOverføringAvOmsorgsdager::class.java)) {
     init {
         River(rapidsConnection).apply {
             validate {
@@ -31,26 +30,16 @@ internal class PubliserOverføringAvOmsorgsdager (
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-        val id = packet["@id"].asText()
+    override fun onSent(id: String, packet: JsonMessage) {
+        logger.warn("TODO: Lagre at packet med id $id er håndtert.")
+    }
 
-        logger.info("$id -> BehandleOverføringAvOmsorgsdager")
+    override fun handlePacket(id: String, packet: JsonMessage): Boolean {
+        logger.info("PubliserOverføringAvOmsorgsdager")
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
         val behandling = OverføreOmsorgsdagerBehandlingMelding(packet).innhold()
         val personopplysninger = HentPersonopplysningerMelding(packet).innhold()
-
-
-        packet.leggTilBehov(
-            aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
-            behov = arrayOf(Behov(
-                navn = FerdigstillJournalføringForOmsorgspengerMelding.Navn,
-                input = FerdigstillJournalføringForOmsorgspengerMelding.input(
-                    identitetsnummer = overføreOmsorgsdager.overførerFra,
-                    journalpostIder = overføreOmsorgsdager.journalpostIder
-                )
-            ))
-        )
 
         val utfall = when {
             behandling.karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår) -> Utfall.Avslått
@@ -73,13 +62,19 @@ internal class PubliserOverføringAvOmsorgsdager (
             parter = personopplysninger.parter
         ))
 
-        println(packet.toJson())
+        packet.leggTilBehovEtter(
+            aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
+            behov = arrayOf(Behov(
+                navn = FerdigstillJournalføringForOmsorgspengerMelding.Navn,
+                input = FerdigstillJournalføringForOmsorgspengerMelding.input(
+                    identitetsnummer = overføreOmsorgsdager.overførerFra,
+                    journalpostIder = overføreOmsorgsdager.journalpostIder
+                )
+            ))
+        )
 
-        context.sendMedId(packet)
+        secureLogger.trace(packet.toJson())
 
-    }
-
-    private companion object {
-        private val logger = LoggerFactory.getLogger(PubliserOverføringAvOmsorgsdager::class.java)
+        return true
     }
 }

@@ -5,7 +5,6 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
-import no.nav.omsorgspenger.overføringer.rivers.FerdigstillOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 
 fun main() {
@@ -24,9 +23,6 @@ internal fun RapidsConnection.medAlleRivers(
         utvidetRettService = utvidetRettService
     )
     PubliserOverføringAvOmsorgsdager(
-        rapidsConnection = this
-    )
-    FerdigstillOverføringAvOmsorgsdager(
         rapidsConnection = this
     )
 }
