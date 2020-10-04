@@ -1,15 +1,16 @@
 package no.nav.omsorgspenger.overføringer.rivers
 
 import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
+import no.nav.omsorgspenger.overføringer.FerdigstillJournalføringForOmsorgspengerMelding.FerdigstillJournalføringForOmsorgspenger
 import no.nav.omsorgspenger.overføringer.MockLøsning.mockLøsning
 import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerMelding
 import org.slf4j.LoggerFactory
+import kotlin.IllegalStateException
 
 internal class PubliserOverføringAvOmsorgsdager (
     rapidsConnection: RapidsConnection) : BehovssekvensPacketListener(
@@ -58,7 +59,6 @@ internal class PubliserOverføringAvOmsorgsdager (
             else -> overføreOmsorgsdager.ønskedeOverføringer
         }
 
-
         packet.leggTilLøsning(OverføreOmsorgsdagerMelding.Navn, mockLøsning(
             utfall = utfall,
             begrunnelser = listOf(),
@@ -71,10 +71,13 @@ internal class PubliserOverføringAvOmsorgsdager (
         packet.leggTilBehovEtter(
             aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
             behov = arrayOf(Behov(
-                navn = FerdigstillJournalføringForOmsorgspengerMelding.Navn,
+                navn = FerdigstillJournalføringForOmsorgspenger,
                 input = FerdigstillJournalføringForOmsorgspengerMelding.input(
                     identitetsnummer = overføreOmsorgsdager.overførerFra,
-                    journalpostIder = overføreOmsorgsdager.journalpostIder
+                    journalpostIder = overføreOmsorgsdager.journalpostIder,
+                    saksnummer = saksnummer.getOrElse(overføreOmsorgsdager.overførerFra,{
+                        throw IllegalStateException("Mangler saksnummer for personen som overfører.")
+                    })
                 )
             ))
         )

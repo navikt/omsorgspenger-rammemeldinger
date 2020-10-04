@@ -117,30 +117,14 @@ internal class HentOmsorgspengerSaksnummerMelding(private val packet: JsonMessag
     )
 }
 
-internal class FerdigstillJournalføringForOmsorgspengerMelding(private val packet: JsonMessage) : Melding<FerdigstillJournalføringForOmsorgspengerMelding.Innhold> {
-    override fun validate() {
-        packet.require(Saksnummer, JsonNode::requireText)
-    }
-
-    override fun innhold() = Innhold(
-        saksnummer = packet[Saksnummer].asText()
-    )
-
-    fun input(journalpostIder: List<String>) = mapOf(
-        "journalpostIder" to journalpostIder
-    )
-
-    internal companion object {
-        internal const val Navn = "FerdigstillJournalføringForOmsorgspenger"
-        private val Saksnummer = "@løsninger.$Navn.saksnummer"
-        internal fun input(identitetsnummer: Identitetsnummer, journalpostIder: List<String>) = mapOf(
-            "identitetsnummer" to identitetsnummer,
-            "journalpostIder" to journalpostIder
-        )
-    }
-
-    data class Innhold(
-        val saksnummer: String
+internal object FerdigstillJournalføringForOmsorgspengerMelding {
+    internal const val FerdigstillJournalføringForOmsorgspenger = "FerdigstillJournalføringForOmsorgspenger"
+    internal fun input(identitetsnummer: Identitetsnummer,
+                       journalpostIder: List<String>,
+                       saksnummer: String) = mapOf(
+        "identitetsnummer" to identitetsnummer,
+        "journalpostIder" to journalpostIder,
+        "saksnummer" to saksnummer
     )
 }
 
