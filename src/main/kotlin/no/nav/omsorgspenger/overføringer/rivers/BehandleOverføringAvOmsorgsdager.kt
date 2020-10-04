@@ -7,12 +7,14 @@ import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.fordelinger.somLøsning
+import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Grunnlag
 import no.nav.omsorgspenger.overføringer.HentFordelingGirMeldingerMelding
 import no.nav.omsorgspenger.overføringer.HentUtvidetRettVedtakMelding
 import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.Vurderinger
+import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import no.nav.omsorgspenger.utvidetrett.somLøsning
 
@@ -21,7 +23,8 @@ import org.slf4j.LoggerFactory
 internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
     private val fordelingService: FordelingService,
-    private val utvidetRettService: UtvidetRettService
+    private val utvidetRettService: UtvidetRettService,
+    private val midlertidigAleneService: MidlertidigAleneService
 ) : BehovssekvensPacketListener(
     logger = LoggerFactory.getLogger(BehandleOverføringAvOmsorgsdager::class.java)) {
 
@@ -47,6 +50,7 @@ internal class BehandleOverføringAvOmsorgsdager(
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
 
         val behandling = Behandling()
+        // TODO: Legge tilbake periode i behandling?
 
         logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
@@ -60,11 +64,18 @@ internal class BehandleOverføringAvOmsorgsdager(
             periode = overføreOmsorgsdager.overordnetPeriode
         )
 
+        logger.info("hentMidlertidigAleneVedtal")
+        val midlertidigAleneVedtak = midlertidigAleneService.hentMidlertidigAleneVedtak(
+            identitetsnummer = overføreOmsorgsdager.overførerFra,
+            periode = overføreOmsorgsdager.overordnetPeriode
+        )
+
         val grunnlag = Vurderinger.vurderGrunnlag(
             grunnlag = Grunnlag(
                 overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold(),
                 utvidetRettVedtak = utvidetRettVedtak,
-                fordelingGirMeldinger = fordelingGirMeldinger
+                fordelingGirMeldinger = fordelingGirMeldinger,
+                midlertidigAleneVedtak = midlertidigAleneVedtak
             ),
             behandling = behandling
         )
@@ -100,6 +111,7 @@ internal class BehandleOverføringAvOmsorgsdager(
         packet.leggTilBehovMedLøsninger(
             aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
             behovMedLøsninger = arrayOf(
+                HentMidlertidigAleneVedtakMelding.behovMedLøsning(midlertidigAleneVedtak),
                 Behov(
                     navn = HentFordelingGirMeldingerMelding.Navn
                 ) to fordelingGirMeldinger.somLøsning(),

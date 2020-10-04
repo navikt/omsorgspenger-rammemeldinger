@@ -11,15 +11,6 @@ internal object Vurderinger {
         behandling: Behandling) {
         val overordnetPeriode = grunnlag.overføreOmsorgsdager.overordnetPeriode
 
-        if (!grunnlag.overføreOmsorgsdager.barn.any { it.aleneOmOmsorgen }) {
-            behandling.lovanvendelser.leggTil(
-                periode = overordnetPeriode,
-                lovhenvisning = AleneOmOmsorgenForBarnet,
-                anvendelse = "Må være alene om omsorgen for minst ett barn for å kunne overføre omsorgsdager."
-            )
-            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
-        }
-
         if (!grunnlag.overføreOmsorgsdager.borINorge) {
             behandling.lovanvendelser.leggTil(
                 periode = overordnetPeriode,

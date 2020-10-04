@@ -31,15 +31,30 @@ internal object Beregninger {
     private fun beregnPeriode(grunnlag: Grunnlag, periode: Periode, behandling: Behandling) : Int {
         val barnMedOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.omsorgenFor.inneholder(periode) }
         val fordelingGirMeldinger = grunnlag.fordelingGirMeldinger.filter { it.periode.inneholder(periode) }
+        val erMidlertidigAleneIPerioden = grunnlag.midlertidigAleneVedtak.any { it.periode.inneholder(periode) }
 
-        // TODO: Fjern?
-        if (barnMedOmsorgenFor.isEmpty()) {
+        val barnMedAleneOmOmsorgen = barnMedOmsorgenFor.filter {  it.aleneOmOmsorgen }.also { if (it.isNotEmpty()) {
             behandling.lovanvendelser.leggTil(
                 periode = periode,
-                lovhenvisning = GrunnrettOppTilToBarn,
-                anvendelse = "Ikke omsorgen for noen barn"
+                lovhenvisning = AleneOmOmsorgenForBarnet,
+                anvendelse = "Har aleneomsorg for ${it.size} barn"
             )
-            return 0
+        }}
+
+        if (barnMedAleneOmOmsorgen.isEmpty()) {
+            return behandling.lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = AleneOmOmsorgenForBarnet,
+                anvendelse = "Må være alene om omsorgen for minst ett barn for å kunne overføre omsorgsdager."
+            ).let { 0 }
+        }
+
+        if (erMidlertidigAleneIPerioden) {
+            return behandling.lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = ErMidlertidigAlenerOmOmsorgen,
+                anvendelse = "Har vedtak om midlertidig alene om omsorgen i perioden. Ingen dager kan overføres."
+            ).let { 0 }
         }
 
         when (barnMedOmsorgenFor.size) {
@@ -59,13 +74,6 @@ internal object Beregninger {
             }
         }
 
-        val barnMedAleneOmOmsorgen = barnMedOmsorgenFor.filter {  it.aleneOmOmsorgen }.also { if (it.isNotEmpty()) {
-            behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = AleneOmOmsorgenForBarnet,
-                anvendelse = "Har aleneomsorg for ${it.size} barn"
-            )
-        }}
         val barnMedUtvidetRett = barnMedOmsorgenFor.filter { it.utvidetRett }.also { if (it.isNotEmpty()) {
             behandling.lovanvendelser.leggTil(
                 periode = periode,
@@ -166,6 +174,10 @@ private fun Grunnlag.perioder(overordnetPeriode: Periode) : List<Periode>  {
 
     fordelingGirMeldinger.forEach { fordelingGirMelding ->
         datoer.leggTilPeriode(fordelingGirMelding.periode)
+    }
+
+    midlertidigAleneVedtak.forEach { midlertidigAleneVedtak ->
+        datoer.leggTilPeriode(midlertidigAleneVedtak.periode)
     }
 
     return datoer.periodiser(

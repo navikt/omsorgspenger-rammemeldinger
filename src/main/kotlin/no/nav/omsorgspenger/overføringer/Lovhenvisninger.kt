@@ -58,6 +58,11 @@ object FordeltBortOmsorgsdager : Lovhenvisning {
     override val henvisning = "§ 9-6 femte ledd"
 }
 
+object ErMidlertidigAlenerOmOmsorgen : Lovhenvisning { // TODO
+    override val lov = Folketrygdeloven
+    override val henvisning = "§ 9-6 ErMidlertidigAlenerOmOmsorgen"
+}
+
 object JobberINorge: Lovhenvisning {
     override val lov = Folketrygdeloven
     override val henvisning = "§ 2-2"
