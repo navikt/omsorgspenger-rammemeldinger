@@ -39,7 +39,7 @@ internal class FødseldatoPåBarnTest {
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåHentePersonopplysninger(
+        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
             fra = fra,
             til = til
         )
@@ -79,7 +79,7 @@ internal class FødseldatoPåBarnTest {
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåHentePersonopplysninger(
+        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
             fra = fra,
             til = til
         )

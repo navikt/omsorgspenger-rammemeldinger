@@ -44,7 +44,7 @@ internal class ToParterForskjelligAntallDagerTest {
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåHentePersonopplysninger(
+        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
             fra = fra,
             til = til
         )
@@ -87,7 +87,7 @@ internal class ToParterForskjelligAntallDagerTest {
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåHentePersonopplysninger(
+        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
             fra = fra,
             til = til
         )
@@ -132,7 +132,7 @@ internal class ToParterForskjelligAntallDagerTest {
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåHentePersonopplysninger(
+        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
             fra = fra,
             til = til
         )

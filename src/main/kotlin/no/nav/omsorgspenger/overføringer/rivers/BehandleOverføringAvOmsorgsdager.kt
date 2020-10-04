@@ -86,6 +86,13 @@ internal class BehandleOverføringAvOmsorgsdager(
             ønsketOmsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
         )
 
+        val berørteIdentitetsnummer = setOf(
+            overføreOmsorgsdager.overførerFra,
+            overføreOmsorgsdager.overførerTil
+        )
+
+        logger.info("${berørteIdentitetsnummer.size} berørte parter for overføringen.")
+
         logger.info("karakteristikker = ${behandling.karakteristikker()}")
 
         logger.info("legger til behov med løsninger [${HentFordelingGirMeldingerMelding.Navn}, ${HentUtvidetRettVedtakMelding.Navn}, ${OverføreOmsorgsdagerBehandlingMelding.Navn}]")
@@ -135,18 +142,23 @@ internal class BehandleOverføringAvOmsorgsdager(
                 )
             )
         } else {
-            logger.info("legger til behov [${HentPersonopplysningerMelding.Navn}]")
+            logger.info("legger til behov [${HentPersonopplysningerMelding.Navn},${HentOmsorgspengerSaksnummerMelding.Navn}]")
             packet.leggTilBehov(
                 aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
-                behov = arrayOf(Behov(
-                    navn = HentPersonopplysningerMelding.Navn,
-                    input = HentPersonopplysningerMelding.input(
-                        identitetsnummer = setOf(
-                            overføreOmsorgsdager.overførerFra,
-                            overføreOmsorgsdager.overførerTil
+                behov = arrayOf(
+                    Behov(
+                        navn = HentPersonopplysningerMelding.Navn,
+                        input = HentPersonopplysningerMelding.input(
+                            identitetsnummer = berørteIdentitetsnummer
+                        )
+                    ),
+                    Behov(
+                        navn = HentOmsorgspengerSaksnummerMelding.Navn,
+                        input = HentOmsorgspengerSaksnummerMelding.input(
+                            identitetsnummer = berørteIdentitetsnummer
                         )
                     )
-                ))
+                )
             )
         }
 

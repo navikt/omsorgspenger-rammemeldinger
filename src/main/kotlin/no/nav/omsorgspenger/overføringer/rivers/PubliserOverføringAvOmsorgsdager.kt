@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.overføringer.rivers
 
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.behov.Behov
@@ -19,13 +20,15 @@ internal class PubliserOverføringAvOmsorgsdager (
                 it.skalLøseBehov(OverføreOmsorgsdagerMelding.Navn)
                 it.harLøsningPåBehov(
                     HentPersonopplysningerMelding.Navn,
-                    OverføreOmsorgsdagerBehandlingMelding.Navn
+                    OverføreOmsorgsdagerBehandlingMelding.Navn,
+                    HentOmsorgspengerSaksnummerMelding.Navn
                 )
             }
             validate {
                 OverføreOmsorgsdagerMelding(it).validate()
                 OverføreOmsorgsdagerBehandlingMelding(it).validate()
                 HentPersonopplysningerMelding(it).validate()
+                HentOmsorgspengerSaksnummerMelding(it).validate()
             }
         }.register(this)
     }
@@ -40,6 +43,9 @@ internal class PubliserOverføringAvOmsorgsdager (
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
         val behandling = OverføreOmsorgsdagerBehandlingMelding(packet).innhold()
         val personopplysninger = HentPersonopplysningerMelding(packet).innhold()
+        val saksnummer = HentOmsorgspengerSaksnummerMelding(packet).innhold().saksnummer
+
+        logger.info("Saksnummer ${saksnummer.values}")
 
         val utfall = when {
             behandling.karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår) -> Utfall.Avslått

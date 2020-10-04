@@ -89,25 +89,31 @@ internal class OverføreOmsorgsdagerMelding(private val packet: JsonMessage) : M
     }
 }
 
-/**
- * TODO: Skal vi her kun melde behovet `FerdigstillOmsorgspengerJournalpost` som i sin tur har dette behovet?
- */
 internal class HentOmsorgspengerSaksnummerMelding(private val packet: JsonMessage) : Melding<HentOmsorgspengerSaksnummerMelding.Innhold> {
     override fun validate() {
-        packet.require(Saksnummer, JsonNode::requireText)
+        packet.interestedIn(Identitetsnummer)
     }
 
     override fun innhold() = Innhold(
-        saksnummer = packet[Saksnummer].asText()
+        saksnummer = (packet[Identitetsnummer] as ObjectNode)
+            .fields()
+            .asSequence()
+            .map { Pair(it.key, it.value.asText())}
+            .toMap()
+
     )
 
     internal companion object {
         internal const val Navn = "HentOmsorgspengerSaksnummer"
-        private val Saksnummer = "@løsninger.$Navn.saksnummer"
+        private val Identitetsnummer = "@løsninger.$Navn.identitetsnummer"
+
+        internal fun input(identitetsnummer: Set<Identitetsnummer>) = mapOf(
+            "identitetsnummer" to identitetsnummer
+        )
     }
 
     data class Innhold(
-        val saksnummer: String
+        val saksnummer: Map<Identitetsnummer, String>
     )
 }
 
