@@ -5,7 +5,6 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
-import no.nav.omsorgspenger.overføringer.meldinger.*
 import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
@@ -91,6 +90,9 @@ internal class PubliserOverføringAvOmsorgsdager (
                 )
             )
         )
+
+        // TODO: Send bestilling på formidling
+        // TODO: Send info om saksstatistikk
 
         secureLogger.trace(packet.toJson())
 
