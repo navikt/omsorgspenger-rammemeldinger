@@ -7,6 +7,8 @@ import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.FerdigstillJournalføringForOmsorgspengerMelding.FerdigstillJournalføringForOmsorgspenger
+import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
@@ -25,14 +27,14 @@ internal class PubliserOverføringAvOmsorgsdager (
                 it.harLøsningPåBehov(
                     HentPersonopplysninger,
                     OverføreOmsorgsdagerBehandlingMelding.Navn,
-                    HentOmsorgspengerSaksnummerMelding.Navn
+                    HentOmsorgspengerSaksnummer
                 )
             }
             validate {
                 OverføreOmsorgsdagerMelding.validateBehov(it)
                 OverføreOmsorgsdagerBehandlingMelding(it).validate()
                 HentPersonopplysningerMelding.validateLøsning(it)
-                HentOmsorgspengerSaksnummerMelding(it).validate()
+                HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
             }
         }.register(this)
     }
@@ -47,7 +49,7 @@ internal class PubliserOverføringAvOmsorgsdager (
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding(packet).innhold()
         val parter = HentPersonopplysningerMelding.hentLøsning(packet)
-        val saksnummer = HentOmsorgspengerSaksnummerMelding(packet).innhold().saksnummer
+        val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet)
 
         logger.info("Saksnummer ${saksnummer.values}")
 

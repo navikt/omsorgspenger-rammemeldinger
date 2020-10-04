@@ -11,39 +11,10 @@ import no.nav.omsorgspenger.fordelinger.FordelingGirMelding.Companion.erFordelin
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding.Companion.somFordelingGirMelding
 import no.nav.omsorgspenger.overføringer.Overføring.Companion.erOverføring
 import no.nav.omsorgspenger.overføringer.Overføring.Companion.somOverføring
-import no.nav.omsorgspenger.overføringer.Part.Companion.somPart
 
 interface Melding<Innhold> {
     fun validate()
     fun innhold() : Innhold
-}
-
-internal class HentOmsorgspengerSaksnummerMelding(private val packet: JsonMessage) : Melding<HentOmsorgspengerSaksnummerMelding.Innhold> {
-    override fun validate() {
-        packet.interestedIn(Identitetsnummer)
-    }
-
-    override fun innhold() = Innhold(
-        saksnummer = (packet[Identitetsnummer] as ObjectNode)
-            .fields()
-            .asSequence()
-            .map { Pair(it.key, it.value.asText())}
-            .toMap()
-
-    )
-
-    internal companion object {
-        internal const val Navn = "HentOmsorgspengerSaksnummer"
-        private val Identitetsnummer = "@løsninger.$Navn.identitetsnummer"
-
-        internal fun input(identitetsnummer: Set<Identitetsnummer>) = mapOf(
-            "identitetsnummer" to identitetsnummer
-        )
-    }
-
-    data class Innhold(
-        val saksnummer: Map<Identitetsnummer, String>
-    )
 }
 
 internal object FerdigstillJournalføringForOmsorgspengerMelding {
@@ -82,32 +53,6 @@ internal class HentFordelingGirMeldingerMelding(private val packet: JsonMessage)
     )
 }
 
-/*
-internal class HentPersonopplysningerMelding(private val packet: JsonMessage) : Melding<HentPersonopplysningerMelding.Innhold> {
-    override fun validate() {
-        //packet.require(Identitetsnummer) { json -> json.requireObject { entry -> entry.fields().asSequence().all { it.toPair().erPart() }} }
-        packet.interestedIn(Identitetsnummer)
-    }
-
-    override fun innhold() = Innhold(
-        parter = (packet[Identitetsnummer] as ObjectNode).fields().asSequence().map { it.toPair().somPart() }.toSet()
-    )
-
-    internal companion object {
-        internal const val Navn = "HentPersonopplysninger"
-        internal fun input(identitetsnummer: Set<Identitetsnummer>) = mapOf(
-            "identitetsnummer" to identitetsnummer,
-            "attributter" to setOf("navn", "fødseldato")
-        )
-
-        private const val Identitetsnummer = "@løsninger.$Navn.identitetsnummer"
-    }
-
-    data class Innhold(
-        internal val parter: Set<Part>
-    )
-}
-*/
 internal class OverføreOmsorgsdagerBehandlingMelding(private val packet: JsonMessage) : Melding<OverføreOmsorgsdagerBehandlingMelding.Innhold> {
     override fun validate() {
         packet.require(Overføringer) { json -> json.requireArray { entry -> entry.erOverføring() } }

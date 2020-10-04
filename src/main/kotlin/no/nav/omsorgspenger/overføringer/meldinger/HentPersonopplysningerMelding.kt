@@ -13,7 +13,6 @@ internal object HentPersonopplysningerMelding :
     internal const val HentPersonopplysninger = "HentPersonopplysninger"
     private const val IdentitetsnummerKey = "@løsninger.$HentPersonopplysninger.identitetsnummer"
 
-
     override fun behov(behovInput: BehovInput) = Behov(
         navn = HentPersonopplysninger,
         input = mapOf(

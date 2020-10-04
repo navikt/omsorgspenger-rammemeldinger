@@ -5,6 +5,7 @@ import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.Identitetsnummer
+import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 
 internal fun TestRapid.mockLøsningPåPersonopplysningerOgSaksnummer(fra: Identitetsnummer, til: Identitetsnummer) {
@@ -19,7 +20,7 @@ internal fun TestRapid.mockLøsningPåPersonopplysningerOgSaksnummer(fra: Identi
 
 private fun JsonMessage.mockLøsningPåHenteOmsorgspengerSaksnummer(
     fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
-        behov = HentOmsorgspengerSaksnummerMelding.Navn,
+        behov = HentOmsorgspengerSaksnummer,
         løsning = mapOf(
             "identitetsnummer" to mapOf(
                 fra to "foo",
