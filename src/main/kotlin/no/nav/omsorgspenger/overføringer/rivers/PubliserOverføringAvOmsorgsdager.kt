@@ -5,11 +5,14 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
+import no.nav.omsorgspenger.overføringer.meldinger.*
 import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
@@ -24,14 +27,14 @@ internal class PubliserOverføringAvOmsorgsdager (
             validate {
                 it.skalLøseBehov(OverføreOmsorgsdager)
                 it.harLøsningPåBehov(
+                    OverføreOmsorgsdagerBehandling,
                     HentPersonopplysninger,
-                    OverføreOmsorgsdagerBehandlingMelding.Navn,
                     HentOmsorgspengerSaksnummer
                 )
             }
             validate {
                 OverføreOmsorgsdagerMelding.validateBehov(it)
-                OverføreOmsorgsdagerBehandlingMelding(it).validate()
+                OverføreOmsorgsdagerBehandlingMelding.validateLøsning(it)
                 HentPersonopplysningerMelding.validateLøsning(it)
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
             }
@@ -46,7 +49,7 @@ internal class PubliserOverføringAvOmsorgsdager (
         logger.info("PubliserOverføringAvOmsorgsdager")
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
-        val behandling = OverføreOmsorgsdagerBehandlingMelding(packet).innhold()
+        val behandling = OverføreOmsorgsdagerBehandlingMelding.hentLøsning(packet)
         val parter = HentPersonopplysningerMelding.hentLøsning(packet)
         val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet)
 

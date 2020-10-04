@@ -3,7 +3,6 @@ package no.nav.omsorgspenger.overføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
@@ -20,6 +19,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMeldin
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding.HentUtvidetRettVedtak
 import no.nav.omsorgspenger.overføringer.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
@@ -39,7 +39,7 @@ internal class BehandleOverføringAvOmsorgsdager(
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(OverføreOmsorgsdager)
-                it.utenLøsningPåBehov(OverføreOmsorgsdagerBehandlingMelding.Navn)
+                it.utenLøsningPåBehov(OverføreOmsorgsdagerBehandling)
             }
             validate {
                 OverføreOmsorgsdagerMelding.validateBehov(it)
@@ -113,18 +113,19 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         logger.info("karakteristikker = ${behandling.karakteristikker()}")
 
-        logger.info("legger til behov med løsninger [$HentFordelingGirMeldinger, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak, ${OverføreOmsorgsdagerBehandlingMelding.Navn}]")
+        logger.info("legger til behov med løsninger [$HentFordelingGirMeldinger, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak, $OverføreOmsorgsdagerBehandling]")
         logger.warn("Løsning på behov [$HentUtvidetRettVedtak,$HentMidlertidigAleneVedtak] bør flyttes til 'omsorgspenger-rammevedtak'")
         packet.leggTilBehovMedLøsninger(
             aktueltBehov = OverføreOmsorgsdager,
             behovMedLøsninger = arrayOf(
-                HentMidlertidigAleneVedtakMelding.behovMedLøsning(midlertidigAleneVedtak),
-                HentUtvidetRettVedtakMelding.behovMedLøsning(utvidetRettVedtak),
                 HentFordelingGirMeldingerMelding.behovMedLøsning(fordelingGirMeldinger),
-                Behov(
-                    navn = OverføreOmsorgsdagerBehandlingMelding.Navn,
-                ) to behandling.somLøsning(
-                    nyeOverføringer = overføringer
+                HentUtvidetRettVedtakMelding.behovMedLøsning(utvidetRettVedtak),
+                HentMidlertidigAleneVedtakMelding.behovMedLøsning(midlertidigAleneVedtak),
+                OverføreOmsorgsdagerBehandlingMelding.behovMedLøsning(
+                    OverføreOmsorgsdagerBehandlingMelding.HeleBehandling(
+                        behandling = behandling,
+                        overføringer = overføringer
+                    )
                 )
             )
         )
