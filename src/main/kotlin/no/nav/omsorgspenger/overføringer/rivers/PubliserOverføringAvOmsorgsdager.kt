@@ -3,10 +3,9 @@ package no.nav.omsorgspenger.overføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
-import no.nav.omsorgspenger.overføringer.FerdigstillJournalføringForOmsorgspengerMelding.FerdigstillJournalføringForOmsorgspenger
+import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
@@ -77,16 +76,17 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         packet.leggTilBehovEtter(
             aktueltBehov = OverføreOmsorgsdager,
-            behov = arrayOf(Behov(
-                navn = FerdigstillJournalføringForOmsorgspenger,
-                input = FerdigstillJournalføringForOmsorgspengerMelding.input(
-                    identitetsnummer = overføreOmsorgsdager.overførerFra,
-                    journalpostIder = overføreOmsorgsdager.journalpostIder,
-                    saksnummer = saksnummer.getOrElse(overføreOmsorgsdager.overførerFra,{
-                        throw IllegalStateException("Mangler saksnummer for personen som overfører.")
-                    })
+            behov = arrayOf(
+                FerdigstillJournalføringForOmsorgspengerMelding.behov(
+                    FerdigstillJournalføringForOmsorgspengerMelding.BehovInput(
+                        identitetsnummer = overføreOmsorgsdager.overførerFra,
+                        journalpostIder = overføreOmsorgsdager.journalpostIder,
+                        saksnummer = saksnummer.getOrElse(overføreOmsorgsdager.overførerFra,{
+                            throw IllegalStateException("Mangler saksnummer for personen som overfører.")
+                        })
+                    )
                 )
-            ))
+            )
         )
 
         secureLogger.trace(packet.toJson())

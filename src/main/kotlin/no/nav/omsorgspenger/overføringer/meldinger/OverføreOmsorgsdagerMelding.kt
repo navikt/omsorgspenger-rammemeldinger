@@ -36,7 +36,7 @@ internal object OverføreOmsorgsdagerMelding :
         omsorgsdagerTattUtIÅr = packet[BehovKeys.OmsorgsdagerTattUtIÅr].asInt(),
         omsorgsdagerÅOverføre = packet[BehovKeys.OmsorgsdagerÅOverføre].asInt(),
         mottaksdato = packet[BehovKeys.Mottaksdato].asLocalDate(),
-        journalpostIder = (packet[BehovKeys.JournalpostIder] as ArrayNode).map { it.asText() }
+        journalpostIder = (packet[BehovKeys.JournalpostIder] as ArrayNode).map { it.asText() }.toSet()
     )
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
@@ -93,7 +93,7 @@ internal object OverføreOmsorgsdagerMelding :
         val omsorgsdagerTattUtIÅr: Int,
         val omsorgsdagerÅOverføre: Int,
         val mottaksdato: LocalDate,
-        val journalpostIder: List<String>) {
+        val journalpostIder: Set<String>) {
         internal val overordnetPeriode: Periode = {
             val sisteDatoMedOmsorgenFor = barn.sisteDatoMedOmsorgenFor()
             val tom = when {

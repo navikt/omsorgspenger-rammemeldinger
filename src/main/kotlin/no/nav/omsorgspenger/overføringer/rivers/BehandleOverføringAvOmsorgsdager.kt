@@ -6,13 +6,12 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.fordelinger.FordelingService
-import no.nav.omsorgspenger.fordelinger.somLøsning
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Grunnlag
-import no.nav.omsorgspenger.overføringer.HentFordelingGirMeldingerMelding
 import no.nav.omsorgspenger.overføringer.Vurderinger
 import no.nav.omsorgspenger.overføringer.meldinger.*
+import no.nav.omsorgspenger.overføringer.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding.HentMidlertidigAleneVedtak
 import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
@@ -20,6 +19,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMeldin
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding.HentUtvidetRettVedtak
+import no.nav.omsorgspenger.overføringer.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
@@ -113,16 +113,14 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         logger.info("karakteristikker = ${behandling.karakteristikker()}")
 
-        logger.info("legger til behov med løsninger [${HentFordelingGirMeldingerMelding.Navn}, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak, ${OverføreOmsorgsdagerBehandlingMelding.Navn}]")
+        logger.info("legger til behov med løsninger [$HentFordelingGirMeldinger, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak, ${OverføreOmsorgsdagerBehandlingMelding.Navn}]")
         logger.warn("Løsning på behov [$HentUtvidetRettVedtak,$HentMidlertidigAleneVedtak] bør flyttes til 'omsorgspenger-rammevedtak'")
         packet.leggTilBehovMedLøsninger(
             aktueltBehov = OverføreOmsorgsdager,
             behovMedLøsninger = arrayOf(
                 HentMidlertidigAleneVedtakMelding.behovMedLøsning(midlertidigAleneVedtak),
                 HentUtvidetRettVedtakMelding.behovMedLøsning(utvidetRettVedtak),
-                Behov(
-                    navn = HentFordelingGirMeldingerMelding.Navn
-                ) to fordelingGirMeldinger.somLøsning(),
+                HentFordelingGirMeldingerMelding.behovMedLøsning(fordelingGirMeldinger),
                 Behov(
                     navn = OverføreOmsorgsdagerBehandlingMelding.Navn,
                 ) to behandling.somLøsning(
@@ -136,16 +134,6 @@ internal class BehandleOverføringAvOmsorgsdager(
         )
 
         if (inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre && behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()) {
-            logger.info("legger til behov [${OpprettGosysJournalføringsoppgaverMelding.Navn}]")
-            packet.leggTilBehov(
-                aktueltBehov = OverføreOmsorgsdager,
-                behov = arrayOf(Behov(
-                    navn = OpprettGosysJournalføringsoppgaverMelding.Navn,
-                    input = OpprettGosysJournalføringsoppgaverMelding.input(
-                        journalpostIder = overføreOmsorgsdager.journalpostIder
-                    )
-                ))
-            )
             logger.info("Legger til løsning på behov [$OverføreOmsorgsdager]")
             packet.leggTilLøsningPar(
                 OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
@@ -156,6 +144,18 @@ internal class BehandleOverføringAvOmsorgsdager(
                     overføringer = emptyList(),
                     parter = emptySet()
                 ))
+            )
+            logger.info("legger til behov [$OpprettGosysJournalføringsoppgaver]")
+            packet.leggTilBehovEtter(
+                aktueltBehov = OverføreOmsorgsdager,
+                behov = arrayOf(
+                    OpprettGosysJournalføringsoppgaverMelding.behov(
+                        OpprettGosysJournalføringsoppgaverMelding.BehovInput(
+                            identitetsnummer = overføreOmsorgsdager.overførerFra,
+                            journalpostIder = overføreOmsorgsdager.journalpostIder
+                        )
+                    )
+                )
             )
         } else {
             logger.info("legger til behov [$HentPersonopplysninger,$HentOmsorgspengerSaksnummer]")
