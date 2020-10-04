@@ -82,6 +82,7 @@ internal class HentFordelingGirMeldingerMelding(private val packet: JsonMessage)
     )
 }
 
+/*
 internal class HentPersonopplysningerMelding(private val packet: JsonMessage) : Melding<HentPersonopplysningerMelding.Innhold> {
     override fun validate() {
         //packet.require(Identitetsnummer) { json -> json.requireObject { entry -> entry.fields().asSequence().all { it.toPair().erPart() }} }
@@ -106,7 +107,7 @@ internal class HentPersonopplysningerMelding(private val packet: JsonMessage) : 
         internal val parter: Set<Part>
     )
 }
-
+*/
 internal class OverføreOmsorgsdagerBehandlingMelding(private val packet: JsonMessage) : Melding<OverføreOmsorgsdagerBehandlingMelding.Innhold> {
     override fun validate() {
         packet.require(Overføringer) { json -> json.requireArray { entry -> entry.erOverføring() } }

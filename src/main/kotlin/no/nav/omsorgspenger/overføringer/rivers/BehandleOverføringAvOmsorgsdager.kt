@@ -12,8 +12,11 @@ import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Grunnlag
 import no.nav.omsorgspenger.overføringer.HentFordelingGirMeldingerMelding
 import no.nav.omsorgspenger.overføringer.Vurderinger
+import no.nav.omsorgspenger.overføringer.meldinger.*
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding.HentMidlertidigAleneVedtak
+import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding.HentUtvidetRettVedtak
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
@@ -154,13 +157,12 @@ internal class BehandleOverføringAvOmsorgsdager(
                 ))
             )
         } else {
-            logger.info("legger til behov [${HentPersonopplysningerMelding.Navn},${HentOmsorgspengerSaksnummerMelding.Navn}]")
+            logger.info("legger til behov [$HentPersonopplysninger,${HentOmsorgspengerSaksnummerMelding.Navn}]")
             packet.leggTilBehov(
                 aktueltBehov = OverføreOmsorgsdager,
                 behov = arrayOf(
-                    Behov(
-                        navn = HentPersonopplysningerMelding.Navn,
-                        input = HentPersonopplysningerMelding.input(
+                    HentPersonopplysningerMelding.behov(
+                        HentPersonopplysningerMelding.BehovInput(
                             identitetsnummer = berørteIdentitetsnummer
                         )
                     ),

@@ -4,6 +4,10 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.leggTilLøsning
 
+internal interface LeggTilBehov<BehovInput> {
+    fun behov(behovInput: BehovInput) : Behov
+}
+
 internal interface HentBehov<Behovet> {
     fun validateBehov(packet: JsonMessage)
     fun hentBehov(packet: JsonMessage) : Behovet

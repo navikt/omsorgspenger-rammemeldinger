@@ -12,11 +12,6 @@ internal data class Part(
     internal val navn: String
 ) {
     internal companion object {
-        internal fun Pair<String, JsonNode>.erPart() = try {
-            somPart()
-            true
-        } catch (cause: Throwable) { false }
-
         internal fun Pair<String, JsonNode>.somPart() : Part {
             val navn = second["navn"] as ObjectNode
             val fornavn = navn["fornavn"].asText()

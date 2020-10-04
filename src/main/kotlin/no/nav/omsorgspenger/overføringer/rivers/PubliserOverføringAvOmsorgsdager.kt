@@ -7,6 +7,8 @@ import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.FerdigstillJournalføringForOmsorgspengerMelding.FerdigstillJournalføringForOmsorgspenger
+import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
@@ -21,7 +23,7 @@ internal class PubliserOverføringAvOmsorgsdager (
             validate {
                 it.skalLøseBehov(OverføreOmsorgsdager)
                 it.harLøsningPåBehov(
-                    HentPersonopplysningerMelding.Navn,
+                    HentPersonopplysninger,
                     OverføreOmsorgsdagerBehandlingMelding.Navn,
                     HentOmsorgspengerSaksnummerMelding.Navn
                 )
@@ -29,7 +31,7 @@ internal class PubliserOverføringAvOmsorgsdager (
             validate {
                 OverføreOmsorgsdagerMelding.validateBehov(it)
                 OverføreOmsorgsdagerBehandlingMelding(it).validate()
-                HentPersonopplysningerMelding(it).validate()
+                HentPersonopplysningerMelding.validateLøsning(it)
                 HentOmsorgspengerSaksnummerMelding(it).validate()
             }
         }.register(this)
@@ -44,7 +46,7 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding(packet).innhold()
-        val personopplysninger = HentPersonopplysningerMelding(packet).innhold()
+        val parter = HentPersonopplysningerMelding.hentLøsning(packet)
         val saksnummer = HentOmsorgspengerSaksnummerMelding(packet).innhold().saksnummer
 
         logger.info("Saksnummer ${saksnummer.values}")
@@ -67,7 +69,7 @@ internal class PubliserOverføringAvOmsorgsdager (
                 fra = overføreOmsorgsdager.overførerFra,
                 til = overføreOmsorgsdager.overførerTil,
                 overføringer = overføringer,
-                parter = personopplysninger.parter
+                parter = parter
             ))
         )
 
