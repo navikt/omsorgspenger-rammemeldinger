@@ -7,8 +7,9 @@ import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.FerdigstillJournalføringForOmsorgspengerMelding.FerdigstillJournalføringForOmsorgspenger
-import no.nav.omsorgspenger.overføringer.MockLøsning.mockLøsning
-import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
+import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
 import org.slf4j.LoggerFactory
 import kotlin.IllegalStateException
 
@@ -18,7 +19,7 @@ internal class PubliserOverføringAvOmsorgsdager (
     init {
         River(rapidsConnection).apply {
             validate {
-                it.skalLøseBehov(OverføreOmsorgsdagerMelding.Navn)
+                it.skalLøseBehov(OverføreOmsorgsdager)
                 it.harLøsningPåBehov(
                     HentPersonopplysningerMelding.Navn,
                     OverføreOmsorgsdagerBehandlingMelding.Navn,
@@ -26,7 +27,7 @@ internal class PubliserOverføringAvOmsorgsdager (
                 )
             }
             validate {
-                OverføreOmsorgsdagerMelding(it).validate()
+                OverføreOmsorgsdagerMelding.validateBehov(it)
                 OverføreOmsorgsdagerBehandlingMelding(it).validate()
                 HentPersonopplysningerMelding(it).validate()
                 HentOmsorgspengerSaksnummerMelding(it).validate()
@@ -41,7 +42,7 @@ internal class PubliserOverføringAvOmsorgsdager (
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("PubliserOverføringAvOmsorgsdager")
 
-        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
+        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding(packet).innhold()
         val personopplysninger = HentPersonopplysningerMelding(packet).innhold()
         val saksnummer = HentOmsorgspengerSaksnummerMelding(packet).innhold().saksnummer
@@ -59,17 +60,19 @@ internal class PubliserOverføringAvOmsorgsdager (
             else -> overføreOmsorgsdager.ønskedeOverføringer
         }
 
-        packet.leggTilLøsning(OverføreOmsorgsdagerMelding.Navn, mockLøsning(
-            utfall = utfall,
-            begrunnelser = listOf(),
-            fra = overføreOmsorgsdager.overførerFra,
-            til = overføreOmsorgsdager.overførerTil,
-            overføringer = overføringer,
-            parter = personopplysninger.parter
-        ))
+        packet.leggTilLøsningPar(
+            OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
+                utfall = utfall,
+                begrunnelser = listOf(),
+                fra = overføreOmsorgsdager.overførerFra,
+                til = overføreOmsorgsdager.overførerTil,
+                overføringer = overføringer,
+                parter = personopplysninger.parter
+            ))
+        )
 
         packet.leggTilBehovEtter(
-            aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
+            aktueltBehov = OverføreOmsorgsdager,
             behov = arrayOf(Behov(
                 navn = FerdigstillJournalføringForOmsorgspenger,
                 input = FerdigstillJournalføringForOmsorgspengerMelding.input(

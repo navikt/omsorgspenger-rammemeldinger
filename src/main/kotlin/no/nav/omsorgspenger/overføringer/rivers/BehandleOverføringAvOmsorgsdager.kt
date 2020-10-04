@@ -11,12 +11,15 @@ import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Grunnlag
 import no.nav.omsorgspenger.overføringer.HentFordelingGirMeldingerMelding
-import no.nav.omsorgspenger.overføringer.HentUtvidetRettVedtakMelding
-import no.nav.omsorgspenger.overføringer.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.Vurderinger
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding
+import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding.HentMidlertidigAleneVedtak
+import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding
+import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding.HentUtvidetRettVedtak
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
+import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
-import no.nav.omsorgspenger.utvidetrett.somLøsning
 
 import org.slf4j.LoggerFactory
 
@@ -31,11 +34,11 @@ internal class BehandleOverføringAvOmsorgsdager(
     init {
         River(rapidsConnection).apply {
             validate {
-                it.skalLøseBehov(OverføreOmsorgsdagerMelding.Navn)
+                it.skalLøseBehov(OverføreOmsorgsdager)
                 it.utenLøsningPåBehov(OverføreOmsorgsdagerBehandlingMelding.Navn)
             }
             validate {
-                OverføreOmsorgsdagerMelding(it).validate()
+                OverføreOmsorgsdagerMelding.validateBehov(it)
             }
         }.register(this)
     }
@@ -47,7 +50,7 @@ internal class BehandleOverføringAvOmsorgsdager(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("BehandleOverføringAvOmsorgsdager")
 
-        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold()
+        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
 
         val behandling = Behandling()
         // TODO: Legge tilbake periode i behandling?
@@ -64,7 +67,7 @@ internal class BehandleOverføringAvOmsorgsdager(
             periode = overføreOmsorgsdager.overordnetPeriode
         )
 
-        logger.info("hentMidlertidigAleneVedtal")
+        logger.info("hentMidlertidigAleneVedtak")
         val midlertidigAleneVedtak = midlertidigAleneService.hentMidlertidigAleneVedtak(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
             periode = overføreOmsorgsdager.overordnetPeriode
@@ -72,7 +75,7 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         val grunnlag = Vurderinger.vurderGrunnlag(
             grunnlag = Grunnlag(
-                overføreOmsorgsdager = OverføreOmsorgsdagerMelding(packet).innhold(),
+                overføreOmsorgsdager = overføreOmsorgsdager,
                 utvidetRettVedtak = utvidetRettVedtak,
                 fordelingGirMeldinger = fordelingGirMeldinger,
                 midlertidigAleneVedtak = midlertidigAleneVedtak
@@ -106,18 +109,16 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         logger.info("karakteristikker = ${behandling.karakteristikker()}")
 
-        logger.info("legger til behov med løsninger [${HentFordelingGirMeldingerMelding.Navn}, ${HentUtvidetRettVedtakMelding.Navn}, ${OverføreOmsorgsdagerBehandlingMelding.Navn}]")
-        logger.warn("Løsning på behovet ${HentUtvidetRettVedtakMelding.Navn} bør flyttes til 'omsorgspenger-rammevedtak'")
+        logger.info("legger til behov med løsninger [${HentFordelingGirMeldingerMelding.Navn}, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak, ${OverføreOmsorgsdagerBehandlingMelding.Navn}]")
+        logger.warn("Løsning på behov [$HentUtvidetRettVedtak,$HentMidlertidigAleneVedtak] bør flyttes til 'omsorgspenger-rammevedtak'")
         packet.leggTilBehovMedLøsninger(
-            aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
+            aktueltBehov = OverføreOmsorgsdager,
             behovMedLøsninger = arrayOf(
                 HentMidlertidigAleneVedtakMelding.behovMedLøsning(midlertidigAleneVedtak),
+                HentUtvidetRettVedtakMelding.behovMedLøsning(utvidetRettVedtak),
                 Behov(
                     navn = HentFordelingGirMeldingerMelding.Navn
                 ) to fordelingGirMeldinger.somLøsning(),
-                Behov(
-                    navn = HentUtvidetRettVedtakMelding.Navn
-                ) to utvidetRettVedtak.somLøsning(),
                 Behov(
                     navn = OverføreOmsorgsdagerBehandlingMelding.Navn,
                 ) to behandling.somLøsning(
@@ -133,7 +134,7 @@ internal class BehandleOverføringAvOmsorgsdager(
         if (inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre && behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()) {
             logger.info("legger til behov [${OpprettGosysJournalføringsoppgaverMelding.Navn}]")
             packet.leggTilBehov(
-                aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
+                aktueltBehov = OverføreOmsorgsdager,
                 behov = arrayOf(Behov(
                     navn = OpprettGosysJournalføringsoppgaverMelding.Navn,
                     input = OpprettGosysJournalføringsoppgaverMelding.input(
@@ -141,22 +142,21 @@ internal class BehandleOverføringAvOmsorgsdager(
                     )
                 ))
             )
-            logger.info("Legger til løsning på behov [${OverføreOmsorgsdagerMelding.Navn}]")
-            packet.leggTilLøsning(
-                behov = OverføreOmsorgsdagerMelding.Navn,
-                løsning = MockLøsning.mockLøsning(
+            logger.info("Legger til løsning på behov [$OverføreOmsorgsdager]")
+            packet.leggTilLøsningPar(
+                OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
                     utfall = Utfall.GosysJournalføringsoppgave,
                     begrunnelser = listOf(),
                     fra = overføreOmsorgsdager.overførerFra,
                     til = overføreOmsorgsdager.overførerTil,
                     overføringer = emptyList(),
                     parter = emptySet()
-                )
+                ))
             )
         } else {
             logger.info("legger til behov [${HentPersonopplysningerMelding.Navn},${HentOmsorgspengerSaksnummerMelding.Navn}]")
             packet.leggTilBehov(
-                aktueltBehov = OverføreOmsorgsdagerMelding.Navn,
+                aktueltBehov = OverføreOmsorgsdager,
                 behov = arrayOf(
                     Behov(
                         navn = HentPersonopplysningerMelding.Navn,
