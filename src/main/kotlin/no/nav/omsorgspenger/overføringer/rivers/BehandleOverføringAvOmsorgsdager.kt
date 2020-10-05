@@ -60,7 +60,7 @@ internal class BehandleOverføringAvOmsorgsdager(
             sendtPerBrev = overføreOmsorgsdager.sendtPerBrev,
             periode = overføreOmsorgsdager.overordnetPeriode
         )
-        
+
         logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
