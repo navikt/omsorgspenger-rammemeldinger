@@ -163,13 +163,13 @@ internal class BehandleOverføringAvOmsorgsdager(
             packet.leggTilBehov(
                 aktueltBehov = OverføreOmsorgsdager,
                 behov = arrayOf(
-                    HentPersonopplysningerMelding.behov(
-                        HentPersonopplysningerMelding.BehovInput(
+                    HentOmsorgspengerSaksnummerMelding.behov(
+                        HentOmsorgspengerSaksnummerMelding.BehovInput(
                             identitetsnummer = berørteIdentitetsnummer
                         )
                     ),
-                    HentOmsorgspengerSaksnummerMelding.behov(
-                        HentOmsorgspengerSaksnummerMelding.BehovInput(
+                    HentPersonopplysningerMelding.behov(
+                        HentPersonopplysningerMelding.BehovInput(
                             identitetsnummer = berørteIdentitetsnummer
                         )
                     )
