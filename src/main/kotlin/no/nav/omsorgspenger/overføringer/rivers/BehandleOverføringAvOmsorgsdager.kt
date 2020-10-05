@@ -60,9 +60,7 @@ internal class BehandleOverføringAvOmsorgsdager(
             sendtPerBrev = overføreOmsorgsdager.sendtPerBrev,
             periode = overføreOmsorgsdager.overordnetPeriode
         )
-
-        // TODO: Legge tilbake periode i behandling https://github.com/navikt/omsorgspenger-rammemeldinger/issues/13
-
+        
         logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
