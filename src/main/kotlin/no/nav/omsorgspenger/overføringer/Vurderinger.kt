@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.overføringer
 
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -10,30 +11,45 @@ internal object Vurderinger {
         grunnlag: Grunnlag,
         behandling: Behandling) {
         val overordnetPeriode = grunnlag.overføreOmsorgsdager.overordnetPeriode
+        val relasjon = grunnlag.overføreOmsorgsdager.relasjon
+        val harBoddSammenMinstEtterÅr = grunnlag.overføreOmsorgsdager.harBoddSammentMinstEttÅr
 
-        if (!grunnlag.overføreOmsorgsdager.borINorge) {
-            behandling.lovanvendelser.leggTil(
-                periode = overordnetPeriode,
-                lovhenvisning = BorINorge,
-                anvendelse = "Må være bosatt i Norge for å overføre omsorgsdager."
-            )
-            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
-        }
+        behandling.lovanvendelser.leggTil(
+            periode = overordnetPeriode,
+            lovhenvisning = BorINorge,
+            anvendelse = when (grunnlag.overføreOmsorgsdager.borINorge) {
+                true -> "Er bosatt i Norge."
+                false -> "Må være bosatt i Norge for å overføre omsorgsdager.".also {
+                    behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
+                }
+            }
+        )
 
-        if (!grunnlag.overføreOmsorgsdager.jobberINorge) {
-            behandling.lovanvendelser.leggTil(
-                periode = overordnetPeriode,
-                lovhenvisning = JobberINorge,
-                anvendelse = "Må jobbe i Norge for å overføre omsorgsdager."
-            )
-            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
-        }
+        behandling.lovanvendelser.leggTil(
+            periode = overordnetPeriode,
+            lovhenvisning = JobberINorge,
+            anvendelse = when (grunnlag.overføreOmsorgsdager.jobberINorge) {
+                true -> "Jobber i Norge."
+                false -> "Må jobbe i Norge for å overføre omsorgsdager.".also {
+                    behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
+                }
+            }
+        )
 
-        // TODO : https://github.com/navikt/omsorgspenger-rammemeldinger/issues/10
-
-        if (grunnlag.overføreOmsorgsdager.sendtPerBrev) {
-            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.MåBesvaresPerBrev)
-        }
+        behandling.lovanvendelser.leggTil(
+            periode = overordnetPeriode,
+            lovhenvisning = EktefelleEllerSamboer,
+            anvendelse = when {
+                OverføreOmsorgsdagerMelding.Relasjon.NåværendeEktefelle == relasjon ->
+                    "Overfører dager til ektefelle."
+                OverføreOmsorgsdagerMelding.Relasjon.NåværendeSamboer == relasjon && harBoddSammenMinstEtterÅr == true ->
+                    "Overfører dager til samboer som har vart i minst minst 12 måneder."
+                else ->
+                    "Må ha bodd sammen minst 12 måneder for å overføre dager til samboer.".also {
+                        behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
+                    }
+            }
+        )
     }
 
     internal fun vurderGrunnlag(

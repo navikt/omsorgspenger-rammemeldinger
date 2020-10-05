@@ -56,7 +56,10 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
 
-        val behandling = Behandling()
+        val behandling = Behandling(
+            sendtPerBrev = overføreOmsorgsdager.sendtPerBrev
+        )
+
         // TODO: Legge tilbake periode i behandling https://github.com/navikt/omsorgspenger-rammemeldinger/issues/13
 
         logger.info("hentFordelingGirMeldinger")

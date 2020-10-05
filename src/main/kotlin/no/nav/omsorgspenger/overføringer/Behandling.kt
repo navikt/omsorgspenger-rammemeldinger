@@ -2,7 +2,13 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
 
-internal class Behandling {
+internal class Behandling(sendtPerBrev: Boolean) {
+
+    init {
+        if (sendtPerBrev) {
+            leggTilKarakteristikk(Karakteristikk.MåBesvaresPerBrev)
+        }
+    }
 
     internal val lovanvendelser = Lovanvendelser()
 
@@ -20,12 +26,6 @@ internal class Behandling {
     }
 
     internal fun karakteristikker() = karakteristikker.toSet()
-
-    internal fun somLøsning(nyeOverføringer: List<Overføring>) = mapOf(
-        "karakteristikker" to karakteristikker.map { it.name },
-        "lovanvendelser" to lovanvendelser.somLøsning(),
-        "overføringer" to nyeOverføringer.map { it.somLøsning() }
-    )
 
     internal enum class Karakteristikk {
         OppfyllerIkkeInngangsvilkår,

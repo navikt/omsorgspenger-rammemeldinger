@@ -18,26 +18,43 @@ internal object OverføreOmsorgsdagerMelding :
     internal const val OverføreOmsorgsdager = "OverføreOmsorgsdager"
 
     override fun validateBehov(packet: JsonMessage) {
-        packet.interestedIn(
+        packet.requireKey(
             BehovKeys.Barn,
             BehovKeys.OverførerFra,
             BehovKeys.OverførerTil,
             BehovKeys.OmsorgsdagerTattUtIÅr,
             BehovKeys.OmsorgsdagerÅOverføre,
             BehovKeys.Mottaksdato,
-            BehovKeys.JournalpostIder
+            BehovKeys.JournalpostIder,
+            BehovKeys.JobberINorge,
+            BehovKeys.BorINorge,
+            BehovKeys.Kilde
+        )
+        packet.requireAny(BehovKeys.Relasjon, gyldigeRelasjoner)
+        packet.interestedIn(
+            BehovKeys.HarBoddSammenMinstEttÅr // Kun satt om relasjon er NåværendeSamboer
         )
     }
 
-    override fun hentBehov(packet: JsonMessage) = Behovet(
-        barn = (packet[BehovKeys.Barn] as ArrayNode).map { it.somBarn() },
-        overførerFra = packet[BehovKeys.OverførerFra].textValue(),
-        overførerTil = packet[BehovKeys.OverførerTil].textValue(),
-        omsorgsdagerTattUtIÅr = packet[BehovKeys.OmsorgsdagerTattUtIÅr].asInt(),
-        omsorgsdagerÅOverføre = packet[BehovKeys.OmsorgsdagerÅOverføre].asInt(),
-        mottaksdato = packet[BehovKeys.Mottaksdato].asLocalDate(),
-        journalpostIder = (packet[BehovKeys.JournalpostIder] as ArrayNode).map { it.asText() }.toSet()
-    )
+    override fun hentBehov(packet: JsonMessage) = Relasjon.valueOf(packet[BehovKeys.Relasjon].asText()).let { relasjon ->
+        Behovet(
+            barn = (packet[BehovKeys.Barn] as ArrayNode).map { it.somBarn() },
+            overførerFra = packet[BehovKeys.OverførerFra].textValue(),
+            overførerTil = packet[BehovKeys.OverførerTil].textValue(),
+            omsorgsdagerTattUtIÅr = packet[BehovKeys.OmsorgsdagerTattUtIÅr].asInt(),
+            omsorgsdagerÅOverføre = packet[BehovKeys.OmsorgsdagerÅOverføre].asInt(),
+            mottaksdato = packet[BehovKeys.Mottaksdato].asLocalDate(),
+            journalpostIder = (packet[BehovKeys.JournalpostIder] as ArrayNode).map { it.asText() }.toSet(),
+            jobberINorge = packet[BehovKeys.JobberINorge].asBoolean(),
+            borINorge = packet[BehovKeys.BorINorge].asBoolean(),
+            sendtPerBrev = packet[BehovKeys.Kilde].asText().equals(other = "Brev", ignoreCase = true),
+            relasjon = relasjon,
+            harBoddSammentMinstEttÅr = when (relasjon) {
+                Relasjon.NåværendeSamboer -> packet[BehovKeys.HarBoddSammenMinstEttÅr].asBoolean()
+                else -> null
+            }
+        )
+    }
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
         val gitt = (løsning.parter.firstOrNull { it.identitetsnummer == løsning.til }?.let { overføringerTil(løsning.overføringer, it) })?: listOf()
@@ -86,15 +103,16 @@ internal object OverføreOmsorgsdagerMelding :
     internal data class Behovet(
         val barn : List<Barn>,
         val overførerFra: String,
-        // TODO: https://github.com/navikt/omsorgspenger-rammemeldinger/issues/10
-        val borINorge :Boolean = true,
-        val jobberINorge: Boolean = true,
-        val sendtPerBrev: Boolean = false,
+        val borINorge: Boolean,
+        val jobberINorge: Boolean,
+        val sendtPerBrev: Boolean,
         val overførerTil: String,
         val omsorgsdagerTattUtIÅr: Int,
         val omsorgsdagerÅOverføre: Int,
         val mottaksdato: LocalDate,
-        val journalpostIder: Set<String>) {
+        val journalpostIder: Set<String>,
+        val relasjon: Relasjon,
+        val harBoddSammentMinstEttÅr: Boolean?) {
         internal val overordnetPeriode: Periode = {
             val sisteDatoMedOmsorgenFor = barn.sisteDatoMedOmsorgenFor()
             val tom = when {
@@ -119,13 +137,24 @@ internal object OverføreOmsorgsdagerMelding :
         internal val parter: Set<Part>
     )
 
+    internal enum class Relasjon {
+        NåværendeEktefelle,
+        NåværendeSamboer
+    }
+    private val gyldigeRelasjoner = Relasjon.values().map { it.name }
+
     private object BehovKeys {
         val Barn = "@behov.$OverføreOmsorgsdager.barn"
         val OverførerFra = "@behov.$OverføreOmsorgsdager.fra.identitetsnummer"
+        val BorINorge = "@behov.$OverføreOmsorgsdager.fra.borINorge"
+        val JobberINorge = "@behov.$OverføreOmsorgsdager.fra.jobberINorge"
         val OverførerTil = "@behov.$OverføreOmsorgsdager.til.identitetsnummer"
         val OmsorgsdagerTattUtIÅr = "@behov.$OverføreOmsorgsdager.omsorgsdagerTattUtIÅr"
         val OmsorgsdagerÅOverføre = "@behov.$OverføreOmsorgsdager.omsorgsdagerÅOverføre"
         val Mottaksdato = "@behov.$OverføreOmsorgsdager.mottaksdato"
         val JournalpostIder = "@behov.$OverføreOmsorgsdager.journalpostIder"
+        val Kilde = "@behov.$OverføreOmsorgsdager.kilde"
+        val Relasjon = "@behov.$OverføreOmsorgsdager.til.relasjon"
+        val HarBoddSammenMinstEttÅr = "@behov.$OverføreOmsorgsdager.til.harBoddSammenMinstEttÅr"
     }
 }
