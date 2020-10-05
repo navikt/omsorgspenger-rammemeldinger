@@ -56,14 +56,19 @@ internal object Vurderinger {
         behandling: Behandling) : Grunnlag {
         val utvidetRettVedtak = grunnlag.utvidetRettVedtak
         val alleBarn = grunnlag.overføreOmsorgsdager.barn
+        val mottaksdato = grunnlag.overføreOmsorgsdager.mottaksdato
 
         val barnMedUtvidetRettSomIkkeKanVerifiseres = grunnlag
             .overføreOmsorgsdager
             .barn
-            .filter { it.utvidetRett && !utvidetRettVedtak.inneholderRammevedtakFor(it, grunnlag.overføreOmsorgsdager.mottaksdato) }
+            .filter { it.utvidetRett && !utvidetRettVedtak.inneholderRammevedtakFor(it, mottaksdato) }
             .onEach {
+                val periode = when (it.omsorgenFor.fom.isBefore(mottaksdato)) {
+                    true -> it.omsorgenFor.copy(fom = mottaksdato)
+                    false -> it.omsorgenFor
+                }
                 behandling.lovanvendelser.leggTil(
-                    periode = it.omsorgenFor,
+                    periode = periode,
                     lovhenvisning = UtvidetRettForBarnet,
                     anvendelse = "Kunne ikke verifiser utvidet rett for barnet født ${it.fødselsdato}"
                 )
