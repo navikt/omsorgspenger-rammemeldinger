@@ -134,11 +134,13 @@ internal class BehandleOverføringAvOmsorgsdager(
             )
         )
 
-        val inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre = omsorgsdagerTilgjengeligForOverføring.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(
-            ønsketOmsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
+        val måBehandlesSomGosysJournalføringsoppgaver = RoutingVurderinger.måBehandlesSomGosysJournalføringsoppgaver(
+            behandling = behandling,
+            overføreOmsorgsdager = grunnlag.overføreOmsorgsdager,
+            omsorgsdagerTilgjengeligForOverføring = omsorgsdagerTilgjengeligForOverføring
         )
 
-        if (inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre && behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()) {
+        if (måBehandlesSomGosysJournalføringsoppgaver) {
             logger.info("Legger til løsning på behov [$OverføreOmsorgsdager]")
             packet.leggTilLøsningPar(
                 OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
