@@ -4,19 +4,57 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.river.leggTilLøsning
-import no.nav.omsorgspenger.overføringer.Behov.HentOmsorgspengerSaksnummer
+import no.nav.omsorgspenger.Identitetsnummer
+import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
+import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 
-internal fun TestRapid.sisteMelding() = inspektør.message(inspektør.size - 1).toString()
-
-internal fun TestRapid.mockLøsningPåHenteOmsorgspengerSaksnummer(saksnummer: String) {
+internal fun TestRapid.mockLøsningPåPersonopplysningerOgSaksnummer(fra: Identitetsnummer, til: Identitetsnummer) {
     sendTestMessage(
         sisteMelding()
             .somJsonMessage()
-            .leggTilLøsning(
-                behov = HentOmsorgspengerSaksnummer,
-                løsning = mapOf("saksnummer" to saksnummer)
-            ).toJson()
+            .mockLøsningPåHenteOmsorgspengerSaksnummer(fra, til)
+            .mockLøsningPåHentePersonopplysninger(fra, til)
+            .toJson()
     )
 }
+
+private fun JsonMessage.mockLøsningPåHenteOmsorgspengerSaksnummer(
+    fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
+        behov = HentOmsorgspengerSaksnummer,
+        løsning = mapOf(
+            "saksnummer" to mapOf(
+                fra to "foo",
+                til to "bar"
+            )
+        )
+    )
+
+private fun JsonMessage.mockLøsningPåHentePersonopplysninger(
+    fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
+        behov = HentPersonopplysninger,
+        løsning = mapOf(
+            "personopplysninger" to mapOf(
+                fra to mapOf(
+                    "navn" to mapOf(
+                        "fornavn" to "Ola",
+                        "etternavn" to "Nordmann"
+                    ),
+                    "fødselsdato" to "1990-09-01",
+                    "aktørId" to "33"
+                ),
+                til to mapOf(
+                    "navn" to mapOf(
+                        "fornavn" to "Kari",
+                        "mellomnavn" to "Persdatter",
+                        "etternavn" to "Nordmann"
+                    ),
+                    "fødselsdato" to "1992-09-01",
+                    "aktørId" to "44"
+                )
+            )
+        )
+    )
+
+internal fun TestRapid.sisteMelding() = inspektør.message(inspektør.size - 1).toString()
 
 private fun String.somJsonMessage() = JsonMessage(toString(), MessageProblems(this)).also { it.interestedIn("@løsninger") }

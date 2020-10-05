@@ -1,17 +1,14 @@
 <configuration>
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
-            </Pattern>
-        </layout>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d %level %logger %mdc] - %m%n</pattern>
+        </encoder>
     </appender>
 
-    <logger name="kafka" level="ERROR" />
-    <logger name="org.apache.zookeeper" level="ERROR" />
-    <logger name="org.apache.kafka" level="ERROR" />
+    <logger name="tjenestekall" level="TRACE" />
 
-    <root level="info">
-        <appender-ref ref="CONSOLE"/>
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
     </root>
+
 </configuration>
