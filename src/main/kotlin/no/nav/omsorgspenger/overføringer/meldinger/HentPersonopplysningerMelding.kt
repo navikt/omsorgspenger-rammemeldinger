@@ -11,22 +11,22 @@ internal object HentPersonopplysningerMelding :
     LeggTilBehov<HentPersonopplysningerMelding.BehovInput>,
     HentLøsning<Set<Part>> {
     internal const val HentPersonopplysninger = "HentPersonopplysninger"
-    private const val IdentitetsnummerKey = "@løsninger.$HentPersonopplysninger.identitetsnummer"
+    private const val PersonopplysningerKey = "@løsninger.$HentPersonopplysninger.personopplysninger"
 
     override fun behov(behovInput: BehovInput) = Behov(
         navn = HentPersonopplysninger,
         input = mapOf(
             "identitetsnummer" to behovInput.identitetsnummer,
-            "attributter" to setOf("navn", "fødseldato")
+            "attributter" to setOf("navn", "fødseldato", "aktørId")
         )
     )
 
     override fun validateLøsning(packet: JsonMessage) {
-        packet.interestedIn(IdentitetsnummerKey)
+        packet.interestedIn(PersonopplysningerKey)
     }
 
     override fun hentLøsning(packet: JsonMessage): Set<Part> {
-         return(packet[IdentitetsnummerKey] as ObjectNode)
+         return(packet[PersonopplysningerKey] as ObjectNode)
              .fields()
              .asSequence()
              .map { it.toPair().somPart() }

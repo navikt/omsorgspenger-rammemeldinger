@@ -10,7 +10,7 @@ internal object HentOmsorgspengerSaksnummerMelding :
     LeggTilBehov<HentOmsorgspengerSaksnummerMelding.BehovInput>,
     HentLøsning<Map<Identitetsnummer,Saksnummer>> {
     internal const val HentOmsorgspengerSaksnummer = "HentOmsorgspengerSaksnummer"
-    private const val IdentitetsnummerKey = "@løsninger.$HentOmsorgspengerSaksnummer.identitetsnummer"
+    private const val SaksnummerKey = "@løsninger.$HentOmsorgspengerSaksnummer.saksnummer"
 
     override fun behov(behovInput: BehovInput)  = Behov(
         navn = HentOmsorgspengerSaksnummer,
@@ -20,11 +20,11 @@ internal object HentOmsorgspengerSaksnummerMelding :
     )
 
     override fun validateLøsning(packet: JsonMessage) {
-        packet.interestedIn(IdentitetsnummerKey)
+        packet.interestedIn(SaksnummerKey)
     }
 
     override fun hentLøsning(packet: JsonMessage): Map<Identitetsnummer, Saksnummer> {
-        return (packet[IdentitetsnummerKey] as ObjectNode)
+        return (packet[SaksnummerKey] as ObjectNode)
             .fields()
             .asSequence()
             .map { Pair(it.key, it.value.asText())}

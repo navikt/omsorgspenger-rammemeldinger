@@ -22,7 +22,7 @@ private fun JsonMessage.mockLøsningPåHenteOmsorgspengerSaksnummer(
     fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
         behov = HentOmsorgspengerSaksnummer,
         løsning = mapOf(
-            "identitetsnummer" to mapOf(
+            "saksnummer" to mapOf(
                 fra to "foo",
                 til to "bar"
             )
@@ -33,13 +33,14 @@ private fun JsonMessage.mockLøsningPåHentePersonopplysninger(
     fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
         behov = HentPersonopplysninger,
         løsning = mapOf(
-            "identitetsnummer" to mapOf(
+            "personopplysninger" to mapOf(
                 fra to mapOf(
                     "navn" to mapOf(
                         "fornavn" to "Ola",
                         "etternavn" to "Nordmann"
                     ),
-                    "fødselsdato" to "1990-09-01"
+                    "fødselsdato" to "1990-09-01",
+                    "aktørId" to "33"
                 ),
                 til to mapOf(
                     "navn" to mapOf(
@@ -47,7 +48,8 @@ private fun JsonMessage.mockLøsningPåHentePersonopplysninger(
                         "mellomnavn" to "Persdatter",
                         "etternavn" to "Nordmann"
                     ),
-                    "fødselsdato" to "1992-09-01"
+                    "fødselsdato" to "1992-09-01",
+                    "aktørId" to "44"
                 )
             )
         )
