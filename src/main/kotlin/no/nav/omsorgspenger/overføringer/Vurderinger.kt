@@ -10,12 +10,11 @@ internal object Vurderinger {
     internal fun vurderInngangsvilkår(
         grunnlag: Grunnlag,
         behandling: Behandling) {
-        val overordnetPeriode = grunnlag.overføreOmsorgsdager.overordnetPeriode
         val relasjon = grunnlag.overføreOmsorgsdager.relasjon
         val harBoddSammenMinstEtterÅr = grunnlag.overføreOmsorgsdager.harBoddSammentMinstEttÅr
 
         behandling.lovanvendelser.leggTil(
-            periode = overordnetPeriode,
+            periode = behandling.periode,
             lovhenvisning = BorINorge,
             anvendelse = when (grunnlag.overføreOmsorgsdager.borINorge) {
                 true -> "Er bosatt i Norge."
@@ -26,7 +25,7 @@ internal object Vurderinger {
         )
 
         behandling.lovanvendelser.leggTil(
-            periode = overordnetPeriode,
+            periode = behandling.periode,
             lovhenvisning = JobberINorge,
             anvendelse = when (grunnlag.overføreOmsorgsdager.jobberINorge) {
                 true -> "Jobber i Norge."
@@ -37,7 +36,7 @@ internal object Vurderinger {
         )
 
         behandling.lovanvendelser.leggTil(
-            periode = overordnetPeriode,
+            periode = behandling.periode,
             lovhenvisning = EktefelleEllerSamboer,
             anvendelse = when {
                 OverføreOmsorgsdagerMelding.Relasjon.NåværendeEktefelle == relasjon ->

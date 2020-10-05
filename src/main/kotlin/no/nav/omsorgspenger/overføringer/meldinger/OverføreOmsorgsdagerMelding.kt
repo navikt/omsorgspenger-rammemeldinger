@@ -113,6 +113,7 @@ internal object OverføreOmsorgsdagerMelding :
         val journalpostIder: Set<String>,
         val relasjon: Relasjon,
         val harBoddSammentMinstEttÅr: Boolean?) {
+
         internal val overordnetPeriode: Periode = {
             val sisteDatoMedOmsorgenFor = barn.sisteDatoMedOmsorgenFor()
             val tom = when {
@@ -121,11 +122,6 @@ internal object OverføreOmsorgsdagerMelding :
             }
             Periode(fom = mottaksdato, tom = tom)
         }()
-
-        internal val ønskedeOverføringer = listOf(Overføring(
-            periode = overordnetPeriode,
-            antallDager = omsorgsdagerÅOverføre
-        ))
     }
 
     internal data class Løsningen(

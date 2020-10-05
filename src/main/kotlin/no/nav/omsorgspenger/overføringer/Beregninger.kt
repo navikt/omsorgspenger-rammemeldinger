@@ -22,7 +22,7 @@ internal object Beregninger {
         behandling: Behandling
     ) : Map<Periode, Int> {
         val beregnet = mutableMapOf<Periode, Int>()
-        grunnlag.perioder(grunnlag.overføreOmsorgsdager.overordnetPeriode).forEach { periode ->
+        grunnlag.perioder(behandling.periode).forEach { periode ->
             beregnet[periode] = beregnPeriode(grunnlag, periode, behandling)
         }
         return beregnet

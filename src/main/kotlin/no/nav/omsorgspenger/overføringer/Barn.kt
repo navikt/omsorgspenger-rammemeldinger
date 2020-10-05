@@ -25,11 +25,6 @@ internal data class Barn(
     )
 
     internal companion object {
-        internal fun JsonNode.erBarn() = try {
-            somBarn()
-            true
-        } catch (cause: Throwable) { false }
-
          internal fun JsonNode.somBarn() = Barn(
             identitetsnummer = get("identitetsnummer").asText(),
             fødselsdato = LocalDate.parse(get("fødselsdato").asText()),

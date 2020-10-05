@@ -1,8 +1,12 @@
 package no.nav.omsorgspenger.overføringer
 
+import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
 
-internal class Behandling(sendtPerBrev: Boolean) {
+internal class Behandling(
+    sendtPerBrev: Boolean,
+    internal val periode: Periode
+) {
 
     init {
         if (sendtPerBrev) {

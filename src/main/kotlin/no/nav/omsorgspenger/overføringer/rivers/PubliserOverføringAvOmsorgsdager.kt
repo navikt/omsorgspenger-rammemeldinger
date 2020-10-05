@@ -62,7 +62,10 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         val overføringer = when (utfall) {
             Utfall.Gjennomført -> behandling.overføringer
-            else -> overføreOmsorgsdager.ønskedeOverføringer
+            else -> listOf(Overføring(
+                antallDager = overføreOmsorgsdager.omsorgsdagerÅOverføre,
+                periode = behandling.periode
+            ))
         }
 
         packet.leggTilLøsningPar(
