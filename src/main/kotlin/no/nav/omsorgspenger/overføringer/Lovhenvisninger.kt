@@ -41,7 +41,7 @@ object UtvidetRettOgAleneOmOmsorgenForBarnet: Lovhenvisning {
 }
 
 
-// TODO
+// TODO https://github.com/navikt/omsorgspenger-rammemeldinger/issues/9
 
 object AlleredeForbrukteDager : Lovhenvisning {
     override val lov = Folketrygdeloven
@@ -58,7 +58,7 @@ object FordeltBortOmsorgsdager : Lovhenvisning {
     override val henvisning = "§ 9-6 femte ledd"
 }
 
-object ErMidlertidigAlenerOmOmsorgen : Lovhenvisning { // TODO
+object ErMidlertidigAlenerOmOmsorgen : Lovhenvisning {
     override val lov = Folketrygdeloven
     override val henvisning = "§ 9-6 ErMidlertidigAlenerOmOmsorgen"
 }

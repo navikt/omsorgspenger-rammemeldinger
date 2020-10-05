@@ -86,9 +86,10 @@ internal object OverføreOmsorgsdagerMelding :
     internal data class Behovet(
         val barn : List<Barn>,
         val overførerFra: String,
-        val borINorge :Boolean = true, // TODO
-        val jobberINorge: Boolean = true, // TODO
-        val sendtPerBrev: Boolean = false, // TODO
+        // TODO: https://github.com/navikt/omsorgspenger-rammemeldinger/issues/10
+        val borINorge :Boolean = true,
+        val jobberINorge: Boolean = true,
+        val sendtPerBrev: Boolean = false,
         val overførerTil: String,
         val omsorgsdagerTattUtIÅr: Int,
         val omsorgsdagerÅOverføre: Int,

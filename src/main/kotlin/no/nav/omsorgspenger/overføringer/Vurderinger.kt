@@ -29,7 +29,7 @@ internal object Vurderinger {
             behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
         }
 
-        // TODO : samboer minst 1 år..
+        // TODO : https://github.com/navikt/omsorgspenger-rammemeldinger/issues/10
 
         if (grunnlag.overføreOmsorgsdager.sendtPerBrev) {
             behandling.leggTilKarakteristikk(Behandling.Karakteristikk.MåBesvaresPerBrev)

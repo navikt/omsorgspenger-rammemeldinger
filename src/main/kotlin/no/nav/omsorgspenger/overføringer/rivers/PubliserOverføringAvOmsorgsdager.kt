@@ -41,7 +41,7 @@ internal class PubliserOverføringAvOmsorgsdager (
     }
 
     override fun onSent(id: String, packet: JsonMessage) {
-        logger.warn("TODO: Lagre at packet med id $id er håndtert.")
+        logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
     }
 
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
@@ -91,8 +91,8 @@ internal class PubliserOverføringAvOmsorgsdager (
             )
         )
 
-        // TODO: Send bestilling på formidling
-        // TODO: Send info om saksstatistikk
+        // TODO: Send bestilling på formidling https://github.com/navikt/omsorgspenger-rammemeldinger/issues/14
+        // TODO: Send info om saksstatistikk https://github.com/navikt/omsorgspenger-rammemeldinger/issues/15
 
         secureLogger.trace(packet.toJson())
 

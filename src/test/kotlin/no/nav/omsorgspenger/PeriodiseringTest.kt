@@ -49,7 +49,7 @@ internal class PeriodiseringTest {
     }
 
     @Test
-    @Disabled("TODO: Burde denne testen fungere?")
+    @Disabled("TODO: https://github.com/navikt/omsorgspenger-rammemeldinger/issues/11")
     fun `Forskjellige perioder om tom i overordnet periode også er et knekkpunkt`() {
         val overordnetPeriode = Periode("2019-12-31/2020-01-02")
 

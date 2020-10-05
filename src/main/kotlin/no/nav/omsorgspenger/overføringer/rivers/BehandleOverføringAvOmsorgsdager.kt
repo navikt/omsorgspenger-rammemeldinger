@@ -48,7 +48,7 @@ internal class BehandleOverføringAvOmsorgsdager(
     }
 
     override fun onSent(id: String, packet: JsonMessage) {
-        logger.warn("TODO: Lagre at packet med id $id er håndtert.")
+        logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
     }
 
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
@@ -57,7 +57,7 @@ internal class BehandleOverføringAvOmsorgsdager(
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
 
         val behandling = Behandling()
-        // TODO: Legge tilbake periode i behandling?
+        // TODO: Legge tilbake periode i behandling https://github.com/navikt/omsorgspenger-rammemeldinger/issues/13
 
         logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
