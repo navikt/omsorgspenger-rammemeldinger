@@ -8,18 +8,14 @@ metadata:
 spec:
   image: {{ image }}
   port: 8080
+  azure:
+    application:
+      enabled: true
+      tenant: {{azureTenant}}
   accessPolicy:
     outbound:
       external:
         - host: login.microsoftonline.com
-      {{#each kafkaBootstrapServers as |server|}}
-        - host: {{server}}
-      ports:
-        - port: 8443
-          name: kafka
-          protocol: TLS
-      {{/each}}
-
       rules: []
   liveness:
     path: isalive
