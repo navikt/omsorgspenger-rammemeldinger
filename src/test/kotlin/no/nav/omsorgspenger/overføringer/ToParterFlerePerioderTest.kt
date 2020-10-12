@@ -12,6 +12,7 @@ import no.nav.omsorgspenger.medAlleRivers
 import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -99,6 +100,7 @@ internal class ToParterFlerePerioderTest  {
         rapid.ventPå(antallMeldinger = 2)
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
+        assertTrue(løsning.erGjennomført())
         løsning.overføringer.assertOverføringer(
             fra = fra,
             til = til,
