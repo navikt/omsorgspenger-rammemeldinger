@@ -30,9 +30,9 @@ internal class AppBuilder(
     internal fun build(rapidsConnection: RapidsConnection) : RapidsConnection {
         val benyttetEnv = env?:System.getenv()
         val benyttetAccessTokenClient = accessTokenClient?:ClientSecretAccessTokenClient(
-            clientId = benyttetEnv.hentRequiredEnv("AZURE_CLIENT_ID"),
-            clientSecret = benyttetEnv.hentRequiredEnv("AZURE_CLIENT_SECRET"),
-            tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_TOKEN_ENDPOINT"))
+            clientId = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
+            clientSecret = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_SECRET"),
+            tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_APP_TOKEN_ENDPOINT"))
         )
         val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway?:OmsorgspengerInfotrygdRammevedtakGateway(
             accessTokenClient = benyttetAccessTokenClient,
