@@ -3,6 +3,10 @@ package no.nav.omsorgspenger.infotrygd
 import com.github.kittinunf.fuel.httpPost
 import io.ktor.http.*
 import io.ktor.utils.io.charsets.Charsets
+import no.nav.helse.dusseldorf.ktor.health.HealthCheck
+import no.nav.helse.dusseldorf.ktor.health.Healthy
+import no.nav.helse.dusseldorf.ktor.health.Result
+import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
 import no.nav.omsorgspenger.CorrelationId
@@ -19,7 +23,7 @@ import java.time.LocalDate
 internal class OmsorgspengerInfotrygdRammevedtakGateway(
     private val accessTokenClient: AccessTokenClient,
     private val hentRammevedtakFraInfotrygdScopes: Set<String>,
-    private val hentRammevedtakFraInfotrygdUrl: URI) {
+    private val hentRammevedtakFraInfotrygdUrl: URI) : HealthCheck {
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
 
@@ -76,7 +80,15 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
     private fun authorizationHeader() =
         cachedAccessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).asAuthoriationHeader()
 
+    override suspend fun check(): Result {
+        return kotlin.runCatching { accessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes) }.fold(
+            onSuccess = { Healthy(Navn, "Henting av access token OK!") },
+            onFailure = { UnHealthy(Navn, it.message?:"Feil ved henting av access token") }
+        )
+    }
+
     private companion object {
+        private const val Navn = "OmsorgspengerInfotrygdRammevedtakGateway"
         private val logger = LoggerFactory.getLogger(OmsorgspengerInfotrygdRammevedtakGateway::class.java)
         private fun JSONObject.getArray(key: String) = when (has(key) && get(key) is JSONArray) {
             true -> getJSONArray(key)

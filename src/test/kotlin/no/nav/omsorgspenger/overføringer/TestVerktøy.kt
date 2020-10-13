@@ -5,14 +5,13 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenResponse
-import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsning
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsningResolver
 import no.nav.k9.rapid.losning.somMelding
-import no.nav.omsorgspenger.AppBuilder
+import no.nav.omsorgspenger.ApplicationContext
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
@@ -108,7 +107,7 @@ internal fun Map<String, OverføreOmsorgsdagerLøsning.Overføringer>.assertOver
     }
 }
 
-internal fun AppBuilderMedDefaultMocks() = AppBuilder(
+internal fun TestAppliationContextBuilder() = ApplicationContext.Builder(
     accessTokenClient = mockk<AccessTokenClient>().also {
         every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
     },

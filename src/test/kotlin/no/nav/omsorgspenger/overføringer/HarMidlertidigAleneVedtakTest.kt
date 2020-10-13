@@ -6,6 +6,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneVedtak
+import no.nav.omsorgspenger.registerApplicationContext
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,9 +16,9 @@ internal class HarMidlertidigAleneVedtakTest {
     private val midlertidigAleneService = mockk<MidlertidigAleneService>()
 
     private val rapid = TestRapid().apply {
-        AppBuilderMedDefaultMocks().also { appBuilder ->
-            appBuilder.midlertidigAleneService = midlertidigAleneService
-        }.build(this)
+        this.registerApplicationContext(TestAppliationContextBuilder().also { builder ->
+            builder.midlertidigAleneService = midlertidigAleneService
+        }.build())
     }
 
     @BeforeEach
