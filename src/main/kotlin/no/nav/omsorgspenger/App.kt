@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger
 
-import io.ktor.application.*
 import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.dusseldorf.ktor.health.HealthService
@@ -21,9 +20,7 @@ fun main() {
     val applicationContext = ApplicationContext.Builder().build()
     RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(applicationContext.env))
         .withKtorModule {
-            install(Routing) {
-                HealthRoute(healthService = applicationContext.healthService)
-            }
+            routing { HealthRoute(healthService = applicationContext.healthService) }
         }
         .build()
         .apply { registerApplicationContext(applicationContext) }
