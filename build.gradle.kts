@@ -16,11 +16,14 @@ plugins {
 
 dependencies {
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
 
     // Test
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
+    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
+
     testImplementation("org.awaitility:awaitility:$awaitilityVersion")
     testImplementation("org.skyscreamer:jsonassert:$jsonassertVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")

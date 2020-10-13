@@ -41,7 +41,7 @@ internal class ToParterFlerePerioderTest  {
         val fødselsdatoBarnUtvidetRett= mottaksdato.minusYears(17)
         val fødsesldatoYngsteBarn = mottaksdato.minusYears(5)
 
-        every { fordelingService.hentFordelingGirMeldinger(any(), any()) }
+        every { fordelingService.hentFordelingGirMeldinger(any(), any(), any()) }
             .returns(listOf(FordelingGirMelding(
                 periode = Periode(
                     fom = fødsesldatoYngsteBarn.plusMonths(6),
@@ -52,7 +52,7 @@ internal class ToParterFlerePerioderTest  {
             )))
 
 
-        every { utvidetRettService.hentUtvidetRettVedtak(any(), any()) }
+        every { utvidetRettService.hentUtvidetRettVedtak(any(), any(), any()) }
             .returns(listOf(UtvidetRettVedtak(
                 periode = Periode(
                     fom = fødselsdatoBarnUtvidetRett.plusWeeks(3),

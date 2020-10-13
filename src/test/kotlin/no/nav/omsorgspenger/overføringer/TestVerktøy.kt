@@ -113,6 +113,6 @@ internal fun AppBuilderMedDefaultMocks() = AppBuilder(
         every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
     },
     omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
-        every { it.hent(any(), any())}.returns(listOf())
+        every { it.hent(any(), any(), any())}.returns(listOf())
     }
 )

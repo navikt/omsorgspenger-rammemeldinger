@@ -33,7 +33,7 @@ internal class HarMidlertidigAleneVedtakTest {
         val mottaksdato = LocalDate.parse("2016-09-29")
         val barnetsFødselsdato = LocalDate.parse("2016-04-29")
 
-        every { midlertidigAleneService.hentMidlertidigAleneVedtak(any(), any()) }
+        every { midlertidigAleneService.hentMidlertidigAleneVedtak(any(), any(), any()) }
             .returns(listOf(MidlertidigAleneVedtak(
                 periode = Periode("2017-02-15/2025-04-04"),
                 kilder = setOf()
@@ -76,7 +76,7 @@ internal class HarMidlertidigAleneVedtakTest {
         val mottaksdato = LocalDate.parse("2016-09-29")
         val barnetsFødselsdato = LocalDate.parse("2016-04-29")
 
-        every { midlertidigAleneService.hentMidlertidigAleneVedtak(any(), any()) }
+        every { midlertidigAleneService.hentMidlertidigAleneVedtak(any(), any(), any()) }
             .returns(listOf(MidlertidigAleneVedtak(
                 periode = Periode("2016-09-29/2028-12-31"),
                 kilder = setOf()
