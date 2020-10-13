@@ -1,8 +1,10 @@
 package no.nav.omsorgspenger.overføringer
 
 import de.huxhorn.sulky.ulid.ULID
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenResponse
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -113,5 +115,6 @@ internal fun TestAppliationContextBuilder() = ApplicationContext.Builder(
     },
     omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
         every { it.hent(any(), any(), any())}.returns(listOf())
+        coEvery { it.check() }.returns(Healthy("OmsorgspengerInfotrygdRammevedtakGateway", "Mock helsesjekk OK!"))
     }
 )

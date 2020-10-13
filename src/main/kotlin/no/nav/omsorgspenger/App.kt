@@ -1,5 +1,8 @@
 package no.nav.omsorgspenger
 
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.jackson.*
 import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.dusseldorf.ktor.health.HealthService
@@ -19,9 +22,7 @@ import java.net.URI
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
     RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(applicationContext.env))
-        .withKtorModule {
-            routing { HealthRoute(healthService = applicationContext.healthService) }
-        }
+        .withKtorModule { omsorgspengerRammemeldinger(applicationContext) }
         .build()
         .apply { registerApplicationContext(applicationContext) }
         .start()
@@ -45,6 +46,15 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
             applicationContext.stop()
         }
     })
+}
+
+internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {
+    install(ContentNegotiation) {
+        jackson()
+    }
+    routing {
+        HealthRoute(healthService = applicationContext.healthService)
+    }
 }
 
 internal class ApplicationContext(

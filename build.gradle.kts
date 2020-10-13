@@ -6,6 +6,7 @@ val k9rapidVersion = "1.fe10445"
 val awaitilityVersion = "4.0.3"
 val mockkVersion = "1.10.0"
 val ulidVersion = "8.2.0"
+val ktorVersion = "1.4.1"
 val dusseldorfVersion = "1.4.1.dcb9ddd"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
@@ -16,6 +17,7 @@ plugins {
 
 dependencies {
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
+    implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
 
@@ -24,6 +26,9 @@ dependencies {
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
 
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
+        exclude(group = "org.eclipse.jetty")
+    }
     testImplementation("org.awaitility:awaitility:$awaitilityVersion")
     testImplementation("org.skyscreamer:jsonassert:$jsonassertVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
