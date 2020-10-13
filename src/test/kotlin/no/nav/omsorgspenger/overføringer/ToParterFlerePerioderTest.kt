@@ -15,6 +15,7 @@ import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.LocalDate
 
 internal class ToParterFlerePerioderTest  {
@@ -47,7 +48,8 @@ internal class ToParterFlerePerioderTest  {
                     fom = fødsesldatoYngsteBarn.plusMonths(6),
                     tom = fødsesldatoYngsteBarn.plusYears(12).sisteDagIÅret()
                 ),
-                antallDager = 15
+                lengde = Duration.ofDays(15),
+                kilder = setOf()
             )))
 
 
@@ -57,7 +59,8 @@ internal class ToParterFlerePerioderTest  {
                     fom = fødselsdatoBarnUtvidetRett.plusWeeks(3),
                     tom = fødselsdatoBarnUtvidetRett.plusDays(18).sisteDagIÅret()
                 ),
-                barnetsFødselsdato = fødselsdatoBarnUtvidetRett
+                barnetsFødselsdato = fødselsdatoBarnUtvidetRett,
+                kilder = setOf()
             )))
 
         val barn = listOf(

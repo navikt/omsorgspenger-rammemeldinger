@@ -36,7 +36,8 @@ internal class HarMidlertidigAleneVedtakTest {
 
         every { midlertidigAleneService.hentMidlertidigAleneVedtak(any(), any()) }
             .returns(listOf(MidlertidigAleneVedtak(
-                periode = Periode("2017-02-15/2025-04-04")
+                periode = Periode("2017-02-15/2025-04-04"),
+                kilder = setOf()
             )))
 
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
@@ -78,7 +79,8 @@ internal class HarMidlertidigAleneVedtakTest {
 
         every { midlertidigAleneService.hentMidlertidigAleneVedtak(any(), any()) }
             .returns(listOf(MidlertidigAleneVedtak(
-                periode = Periode("2016-09-29/2028-12-31")
+                periode = Periode("2016-09-29/2028-12-31"),
+                kilder = setOf()
             )))
 
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(

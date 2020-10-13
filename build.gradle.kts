@@ -6,7 +6,7 @@ val k9rapidVersion = "1.fe10445"
 val awaitilityVersion = "4.0.3"
 val mockkVersion = "1.10.0"
 val ulidVersion = "8.2.0"
-
+val dusseldorfVersion = "1.4.1.dcb9ddd"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
@@ -16,6 +16,7 @@ plugins {
 
 dependencies {
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
+    implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
 
     // Test
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
