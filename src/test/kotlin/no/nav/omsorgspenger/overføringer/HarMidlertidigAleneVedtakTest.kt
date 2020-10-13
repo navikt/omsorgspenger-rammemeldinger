@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
-import no.nav.omsorgspenger.medAlleRivers
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneVedtak
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -16,9 +15,9 @@ internal class HarMidlertidigAleneVedtakTest {
     private val midlertidigAleneService = mockk<MidlertidigAleneService>()
 
     private val rapid = TestRapid().apply {
-        medAlleRivers(
-            midlertidigAleneService = midlertidigAleneService
-        )
+        AppBuilderMedDefaultMocks().also { appBuilder ->
+            appBuilder.midlertidigAleneService = midlertidigAleneService
+        }.build(this)
     }
 
     @BeforeEach

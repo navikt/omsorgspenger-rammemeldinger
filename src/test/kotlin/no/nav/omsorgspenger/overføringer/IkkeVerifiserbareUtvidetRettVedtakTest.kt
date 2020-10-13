@@ -2,7 +2,6 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
-import no.nav.omsorgspenger.medAlleRivers
 import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -12,7 +11,7 @@ import java.time.LocalDate
 internal class IkkeVerifiserbareUtvidetRettVedtakTest {
 
     private val rapid = TestRapid().apply {
-        medAlleRivers()
+        AppBuilderMedDefaultMocks().build(this)
     }
 
     @BeforeEach

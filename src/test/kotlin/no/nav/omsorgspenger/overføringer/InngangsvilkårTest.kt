@@ -2,7 +2,6 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
-import no.nav.omsorgspenger.medAlleRivers
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -10,7 +9,7 @@ import org.junit.jupiter.api.Test
 internal class InngangsvilkårTest {
 
     private val rapid = TestRapid().apply {
-        medAlleRivers()
+        AppBuilderMedDefaultMocks().build(this)
     }
 
     private val fra = IdentitetsnummerGenerator.identitetsnummer()

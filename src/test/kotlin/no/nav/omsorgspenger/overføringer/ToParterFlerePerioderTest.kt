@@ -8,7 +8,6 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.fordelinger.FordelingService
-import no.nav.omsorgspenger.medAlleRivers
 import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
@@ -23,10 +22,10 @@ internal class ToParterFlerePerioderTest  {
     private val utvidetRettService = mockk<UtvidetRettService>()
 
     private val rapid = TestRapid().apply {
-        medAlleRivers(
-            fordelingService = fordelingService,
-            utvidetRettService = utvidetRettService
-        )
+        AppBuilderMedDefaultMocks().also { appBuilder ->
+            appBuilder.fordelingService = fordelingService
+            appBuilder.utvidetRettService = utvidetRettService
+        }.build(this)
     }
 
     @BeforeEach
