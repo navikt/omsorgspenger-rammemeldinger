@@ -13,7 +13,7 @@ internal object HentFordelingGirMeldingerMelding :
         behov to mapOf(
             "meldinger" to løsning.map { mapOf(
                 "periode" to it.periode.toString(),
-                "antallDager" to it.antallDager
+                "lengde" to it.lengde.toString()
             )}
         )
 }

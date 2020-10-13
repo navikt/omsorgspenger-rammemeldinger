@@ -1,16 +1,24 @@
 package no.nav.omsorgspenger.overføringer
 
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
+import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneVedtak
 import no.nav.omsorgspenger.registerApplicationContext
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-internal class FødseldatoPåBarnTest {
+internal class HarMidlertidigAleneVedtakTest {
+    private val midlertidigAleneService = mockk<MidlertidigAleneService>()
+
     private val rapid = TestRapid().apply {
-        this.registerApplicationContext(TestAppliationContextBuilder().build())
+        this.registerApplicationContext(TestAppliationContextBuilder().also { builder ->
+            builder.midlertidigAleneService = midlertidigAleneService
+        }.build())
     }
 
     @BeforeEach
@@ -18,22 +26,27 @@ internal class FødseldatoPåBarnTest {
         rapid.reset()
     }
 
+
     @Test
-    fun `Barn født etter mottaksdato`() {
+    fun `Har midlertidig alene vedtak i deler av perioden`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
-        val mottaksdato = LocalDate.parse("2020-09-29")
-        val barnetsFødselsdato = LocalDate.parse("2021-02-15")
+        val mottaksdato = LocalDate.parse("2016-09-29")
+        val barnetsFødselsdato = LocalDate.parse("2016-04-29")
+
+        every { midlertidigAleneService.hentMidlertidigAleneVedtak(any(), any(), any()) }
+            .returns(listOf(MidlertidigAleneVedtak(
+                periode = Periode("2017-02-15/2025-04-04"),
+                kilder = setOf()
+            )))
 
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
-            mottaksdato = mottaksdato,
             overføringFra = fra,
             overføringTil = til,
-            omsorgsdagerTattUtIÅr = 0,
-            omsorgsdagerÅOverføre = 10,
+            mottaksdato = mottaksdato,
             barn = listOf(overføreOmsorgsdagerBarn(
-                fødselsdato = barnetsFødselsdato,
-                aleneOmOmsorgen = true
+                aleneOmOmsorgen = true,
+                fødselsdato = barnetsFødselsdato
             ))
         )
 
@@ -44,7 +57,6 @@ internal class FødseldatoPåBarnTest {
             til = til
         )
         rapid.ventPå(antallMeldinger = 2)
-
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
         assertTrue(løsning.erGjennomført())
@@ -52,29 +64,33 @@ internal class FødseldatoPåBarnTest {
             fra = fra,
             til = til,
             forventedeOverføringer = mapOf(
-                Periode("2021-02-15/2033-12-31") to 10 // Fra barnet er født til ut året det fyller 12
+                Periode("2016-09-29/2017-02-14") to 10, // Fra mottaksdato til dagen før midl.alene vedtak gjelder fom
+                Periode("2025-04-05/2028-12-31") to 10 // Fra dagen etter midl.alene vetak gjelder tom til ut året barnet fyller 12
             )
         )
     }
 
     @Test
-    fun `Barn utenfor periode for omsorgen for`() {
+    fun `Har midlertidig alene vedtak i hele perioden`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
-        val mottaksdato = LocalDate.parse("2020-09-29")
+        val mottaksdato = LocalDate.parse("2016-09-29")
+        val barnetsFødselsdato = LocalDate.parse("2016-04-29")
+
+        every { midlertidigAleneService.hentMidlertidigAleneVedtak(any(), any(), any()) }
+            .returns(listOf(MidlertidigAleneVedtak(
+                periode = Periode("2016-09-29/2028-12-31"),
+                kilder = setOf()
+            )))
 
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
-            mottaksdato = mottaksdato,
             overføringFra = fra,
             overføringTil = til,
-            omsorgsdagerTattUtIÅr = 0,
-            omsorgsdagerÅOverføre = 10,
-            barn = listOf(
-                overføreOmsorgsdagerBarn(
-                    fødselsdato = mottaksdato.minusYears(13),
-                    aleneOmOmsorgen = true
-                )
-            )
+            mottaksdato = mottaksdato,
+            barn = listOf(overføreOmsorgsdagerBarn(
+                aleneOmOmsorgen = true,
+                fødselsdato = barnetsFødselsdato
+            ))
         )
 
         rapid.sendTestMessage(behovssekvens)
@@ -84,7 +100,6 @@ internal class FødseldatoPåBarnTest {
             til = til
         )
         rapid.ventPå(antallMeldinger = 2)
-
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
         assertTrue(løsning.erAvslått())

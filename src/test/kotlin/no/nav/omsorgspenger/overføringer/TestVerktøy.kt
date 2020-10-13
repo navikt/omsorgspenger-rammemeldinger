@@ -1,14 +1,20 @@
 package no.nav.omsorgspenger.overføringer
 
 import de.huxhorn.sulky.ulid.ULID
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
+import no.nav.helse.dusseldorf.oauth2.client.AccessTokenResponse
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsning
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsningResolver
 import no.nav.k9.rapid.losning.somMelding
+import no.nav.omsorgspenger.ApplicationContext
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -33,8 +39,8 @@ internal fun behovssekvensOverføreOmsorgsdager(
     id: String = ULID().nextValue().toString(),
     overføringFra: Identitetsnummer = identitetsnummer(),
     overføringTil: Identitetsnummer = identitetsnummer(),
-    omsorgsdagerTattUtIÅr: Int,
-    omsorgsdagerÅOverføre: Int,
+    omsorgsdagerTattUtIÅr: Int = 0,
+    omsorgsdagerÅOverføre: Int = 10,
     mottaksdato: LocalDate = LocalDate.now(),
     barn: List<OverføreOmsorgsdagerBehov.Barn> = emptyList(),
     borINorge: Boolean = true,
@@ -100,3 +106,12 @@ internal fun Map<String, OverføreOmsorgsdagerLøsning.Overføringer>.assertOver
         assertNotNull(getValue(til).fått.firstOrNull { it.antallDager == antallDager && periode == Periode(fom = it.gjelderFraOgMed, tom = it.gjelderTilOgMed) })
     }
 }
+
+internal fun TestAppliationContextBuilder() = ApplicationContext.Builder(
+    accessTokenClient = mockk<AccessTokenClient>().also {
+        every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
+    },
+    omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
+        every { it.hent(any(), any(), any())}.returns(listOf())
+    }
+)

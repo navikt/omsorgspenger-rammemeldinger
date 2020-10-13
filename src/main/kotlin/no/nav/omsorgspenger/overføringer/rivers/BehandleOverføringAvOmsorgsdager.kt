@@ -3,7 +3,9 @@ package no.nav.omsorgspenger.overføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.k9.rapid.behov.Behovsformat
 import no.nav.k9.rapid.river.*
+import no.nav.omsorgspenger.correlationId
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.*
@@ -53,6 +55,7 @@ internal class BehandleOverføringAvOmsorgsdager(
 
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("BehandleOverføringAvOmsorgsdager")
+        val correlationId = packet.correlationId()
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
 
@@ -61,22 +64,27 @@ internal class BehandleOverføringAvOmsorgsdager(
             periode = overføreOmsorgsdager.overordnetPeriode
         )
 
+        packet[Behovsformat.CorrelationId].asText()
+
         logger.info("hentFordelingGirMeldinger")
         val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = behandling.periode
+            periode = behandling.periode,
+            correlationId = correlationId
         )
 
         logger.info("hentUtvidetRettVedtak")
         val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = behandling.periode
+            periode = behandling.periode,
+            correlationId = correlationId
         )
 
         logger.info("hentMidlertidigAleneVedtak")
         val midlertidigAleneVedtak = midlertidigAleneService.hentMidlertidigAleneVedtak(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = behandling.periode
+            periode = behandling.periode,
+            correlationId = correlationId
         )
 
         val grunnlag = Vurderinger.vurderGrunnlag(

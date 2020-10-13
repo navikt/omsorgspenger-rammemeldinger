@@ -113,7 +113,8 @@ internal object Beregninger {
             false -> 0
         }
 
-        val fordeltBort = fordelingGirMeldinger.sumBy { it.antallDager }.also { if (it > 0) {
+        // TODO: Bør kanskje bare regne med duration hele vegen..
+        val fordeltBort = fordelingGirMeldinger.sumBy { it.lengde.toDays().toInt() }.also { if (it > 0) {
             behandling.lovanvendelser.leggTil(
                 periode = periode,
                 lovhenvisning = FordeltBortOmsorgsdager,

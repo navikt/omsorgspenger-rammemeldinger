@@ -8,12 +8,14 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.fordelinger.FordelingService
-import no.nav.omsorgspenger.medAlleRivers
 import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
+import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.Duration
 import java.time.LocalDate
 
 internal class ToParterFlerePerioderTest  {
@@ -21,10 +23,10 @@ internal class ToParterFlerePerioderTest  {
     private val utvidetRettService = mockk<UtvidetRettService>()
 
     private val rapid = TestRapid().apply {
-        medAlleRivers(
-            fordelingService = fordelingService,
-            utvidetRettService = utvidetRettService
-        )
+        this.registerApplicationContext(TestAppliationContextBuilder().also { builder ->
+            builder.fordelingService = fordelingService
+            builder.utvidetRettService = utvidetRettService
+        }.build())
     }
 
     @BeforeEach
@@ -40,23 +42,25 @@ internal class ToParterFlerePerioderTest  {
         val fødselsdatoBarnUtvidetRett= mottaksdato.minusYears(17)
         val fødsesldatoYngsteBarn = mottaksdato.minusYears(5)
 
-        every { fordelingService.hentFordelingGirMeldinger(any(), any()) }
+        every { fordelingService.hentFordelingGirMeldinger(any(), any(), any()) }
             .returns(listOf(FordelingGirMelding(
                 periode = Periode(
                     fom = fødsesldatoYngsteBarn.plusMonths(6),
                     tom = fødsesldatoYngsteBarn.plusYears(12).sisteDagIÅret()
                 ),
-                antallDager = 15
+                lengde = Duration.ofDays(15),
+                kilder = setOf()
             )))
 
 
-        every { utvidetRettService.hentUtvidetRettVedtak(any(), any()) }
+        every { utvidetRettService.hentUtvidetRettVedtak(any(), any(), any()) }
             .returns(listOf(UtvidetRettVedtak(
                 periode = Periode(
                     fom = fødselsdatoBarnUtvidetRett.plusWeeks(3),
                     tom = fødselsdatoBarnUtvidetRett.plusDays(18).sisteDagIÅret()
                 ),
-                barnetsFødselsdato = fødselsdatoBarnUtvidetRett
+                barnetsFødselsdato = fødselsdatoBarnUtvidetRett,
+                kilder = setOf()
             )))
 
         val barn = listOf(
@@ -99,6 +103,7 @@ internal class ToParterFlerePerioderTest  {
         rapid.ventPå(antallMeldinger = 2)
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
+        assertTrue(løsning.erGjennomført())
         løsning.overføringer.assertOverføringer(
             fra = fra,
             til = til,
