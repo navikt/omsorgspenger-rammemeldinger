@@ -85,33 +85,8 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
     private fun authorizationHeader() =
         cachedAccessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).asAuthoriationHeader()
 
-    override suspend fun check(): Result {
-        val accessTokenCheck = accessTokenCheck()
-        val pingOmsorgspengerInfotrygdRammevedktaCheck = pingOmsorgspengerInfotrygdRammevetakCheck()
-        return merge("OmsorgspengerInfotrygdRammevedtakGateway", accessTokenCheck, pingOmsorgspengerInfotrygdRammevedktaCheck)
-    }
-
-    // TODO: Flytt dette merge-funksjonen
-    private fun merge(name: String, vararg results: Result) : Result {
-        val healthy = mutableListOf<Map<String, Any?>>()
-        val unHealthy = mutableListOf<Map<String, Any?>>()
-
-        results.forEach { result -> when (result) {
-            is Healthy -> healthy.add(result.result())
-            else -> unHealthy.add(result.result())
-        }}
-
-        val combined = mapOf(
-            "name" to name,
-            "healthy" to healthy,
-            "unhealthy" to unHealthy
-        )
-
-        return when (unHealthy.isEmpty()) {
-            true -> Healthy(combined)
-            false -> UnHealthy(combined)
-        }
-    }
+    override suspend fun check() =
+        Result.merge("OmsorgspengerInfotrygdRammevedtakGateway", accessTokenCheck(), pingOmsorgspengerInfotrygdRammevetakCheck())
 
     private fun accessTokenCheck() = kotlin.runCatching {
         accessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).let {
