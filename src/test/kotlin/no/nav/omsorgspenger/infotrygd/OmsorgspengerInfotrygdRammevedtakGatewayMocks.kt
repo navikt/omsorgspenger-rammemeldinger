@@ -8,9 +8,9 @@ import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import org.intellij.lang.annotations.Language
 
-private const val hentRammevedtakPath = "/omsorgspenger-infotrygd-rammevedtak-mock/rammevedtak"
+private const val omsorgspengerInfotrygdRammevedtakBasePath = "/omsorgspenger-infotrygd-rammevedtak-mock"
 
-internal fun WireMockServer.omsorgspengerInfotrygdRammevedtakHentRammevedtakUrl() = baseUrl() + hentRammevedtakPath
+internal fun WireMockServer.omsorgspengerInfotrygdRammevedtakBaseUrl() = baseUrl() + omsorgspengerInfotrygdRammevedtakBasePath
 internal fun WireMockServer.mockOmsorgspengerInfotrygdRammevedtakHentRammevedtak(identitetsnummer: Identitetsnummer, periode: Periode, response: String = AlleTypeRammevedtak) {
     val expectedBody = """
         {
@@ -19,7 +19,7 @@ internal fun WireMockServer.mockOmsorgspengerInfotrygdRammevedtakHentRammevedtak
             "tom": "${periode.tom}"
         }
         """.trimIndent()
-    stubFor(WireMock.post(hentRammevedtakPath)
+    stubFor(WireMock.post("$omsorgspengerInfotrygdRammevedtakBasePath/rammevedtak")
         .withRequestBody(WireMock.equalToJson(expectedBody))
         .withHeader("Authorization", RegexPattern("^Bearer .+$"))
         .withHeader("X-Correlation-ID", AnythingPattern())
@@ -30,6 +30,13 @@ internal fun WireMockServer.mockOmsorgspengerInfotrygdRammevedtakHentRammevedtak
             .withHeader("Content-Type", "application/json")
             .withBody(response))
     )
+}
+internal fun WireMockServer.mockOmsorgspengerInfotrygdRammevedtakIsReady() : WireMockServer {
+    stubFor(WireMock.get("$omsorgspengerInfotrygdRammevedtakBasePath/isready")
+        .willReturn(WireMock.aResponse()
+            .withStatus(200)
+    ))
+    return this
 }
 
 @Language("JSON")

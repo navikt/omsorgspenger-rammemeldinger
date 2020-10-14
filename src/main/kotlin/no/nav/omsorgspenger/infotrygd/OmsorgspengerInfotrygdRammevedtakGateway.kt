@@ -1,6 +1,9 @@
 package no.nav.omsorgspenger.infotrygd
 
+import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
+import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
+import com.nimbusds.jwt.SignedJWT
 import io.ktor.http.*
 import io.ktor.utils.io.charsets.Charsets
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
@@ -23,12 +26,14 @@ import java.time.LocalDate
 internal class OmsorgspengerInfotrygdRammevedtakGateway(
     private val accessTokenClient: AccessTokenClient,
     private val hentRammevedtakFraInfotrygdScopes: Set<String>,
-    private val hentRammevedtakFraInfotrygdUrl: URI) : HealthCheck {
+    omsorgspengerInfotrygdRammevedtakBaseUrl: URI) : HealthCheck {
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
+    private val pingUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/isready"
+    private val rammevedtakUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/rammevedtak"
 
     internal fun hent(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) : List<InfotrygdRamme> {
-        val (_, response, result) = hentRammevedtakFraInfotrygdUrl.toString()
+        val (_, response, result) = rammevedtakUrl
             .httpPost()
             .header(HttpHeaders.Authorization, authorizationHeader())
             .header(HttpHeaders.Accept, "application/json")
@@ -81,14 +86,53 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         cachedAccessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).asAuthoriationHeader()
 
     override suspend fun check(): Result {
-        return kotlin.runCatching { accessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes) }.fold(
-            onSuccess = { Healthy(Navn, "Henting av access token OK!") },
-            onFailure = { UnHealthy(Navn, it.message?:"Feil ved henting av access token") }
-        )
+        val accessTokenCheck = accessTokenCheck()
+        val pingOmsorgspengerInfotrygdRammevedktaCheck = pingOmsorgspengerInfotrygdRammevetakCheck()
+        return merge("OmsorgspengerInfotrygdRammevedtakGateway", accessTokenCheck, pingOmsorgspengerInfotrygdRammevedktaCheck)
     }
 
+    // TODO: Flytt dette merge-funksjonen
+    private fun merge(name: String, vararg results: Result) : Result {
+        val healthy = mutableListOf<Map<String, Any?>>()
+        val unHealthy = mutableListOf<Map<String, Any?>>()
+
+        results.forEach { result -> when (result) {
+            is Healthy -> healthy.add(result.result())
+            else -> unHealthy.add(result.result())
+        }}
+
+        val combined = mapOf(
+            "name" to name,
+            "healthy" to healthy,
+            "unhealthy" to unHealthy
+        )
+
+        return when (unHealthy.isEmpty()) {
+            true -> Healthy(combined)
+            false -> UnHealthy(combined)
+        }
+    }
+
+    private fun accessTokenCheck() = kotlin.runCatching {
+        accessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).let {
+            (SignedJWT.parse(it.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()?: emptyList()).contains("access_as_application")
+        }}.fold(
+            onSuccess = { when (it) {
+                true -> Healthy("AccessTokenCheck", "OK")
+                false -> UnHealthy("AccessTokenCheck", "Feil: Mangler rettigheter")
+            }},
+            onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
+        )
+
+
+    private suspend fun pingOmsorgspengerInfotrygdRammevetakCheck() =
+        pingUrl.httpGet().awaitStringResponseResult().third.fold(
+            success = { Healthy("PingOmsorgspengerInfotrygdRammevetak", "OK: $it") },
+            failure = { UnHealthy("PingOmsorgspengerInfotrygdRammevetak", "Feil: ${it.message}") }
+        )
+
+
     private companion object {
-        private const val Navn = "OmsorgspengerInfotrygdRammevedtakGateway"
         private val logger = LoggerFactory.getLogger(OmsorgspengerInfotrygdRammevedtakGateway::class.java)
         private fun JSONObject.getArray(key: String) = when (has(key) && get(key) is JSONArray) {
             true -> getJSONArray(key)

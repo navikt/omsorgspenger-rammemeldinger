@@ -1,5 +1,7 @@
 package no.nav.omsorgspenger.infotrygd
 
+import kotlinx.coroutines.runBlocking
+import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
@@ -17,7 +19,7 @@ import java.util.*
 internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
 
     @Test
-    fun `foo bar`() {
+    fun `Hente rammevedtak fra infotrygd`() {
         val identitetsnummer = "11111111111"
         val periode = Periode("2020-01-01/2020-12-31")
 
@@ -78,11 +80,19 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
         assertTrue(infotrygdRammer.containsAll(forventedeInfotrygdRammer))
     }
 
+    @Test
+    fun `Helsesjekk for å hente ramemvedtak fra infotrygd`() {
+        runBlocking { gateway.check() }.also { result ->
+            assertTrue(result is Healthy)
+        }
+    }
+
     private companion object {
 
         private val wiremock = WireMockBuilder()
             .withAzureSupport()
             .build()
+            .mockOmsorgspengerInfotrygdRammevedtakIsReady()
 
         private val gateway = OmsorgspengerInfotrygdRammevedtakGateway(
             accessTokenClient = ClientSecretAccessTokenClient(
@@ -91,7 +101,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
                 tokenEndpoint = URI(wiremock.getAzureV2TokenUrl())
             ),
             hentRammevedtakFraInfotrygdScopes = setOf("omsorgspenger-infotrygd-rammevedtak/.default"),
-            hentRammevedtakFraInfotrygdUrl = URI(wiremock.omsorgspengerInfotrygdRammevedtakHentRammevedtakUrl())
+            omsorgspengerInfotrygdRammevedtakBaseUrl = URI(wiremock.omsorgspengerInfotrygdRammevedtakBaseUrl())
         )
 
         @JvmStatic

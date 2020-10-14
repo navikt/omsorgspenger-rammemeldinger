@@ -88,7 +88,7 @@ internal class ApplicationContext(
             val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway?:OmsorgspengerInfotrygdRammevedtakGateway(
                 accessTokenClient = benyttetAccessTokenClient,
                 hentRammevedtakFraInfotrygdScopes = benyttetEnv.hentRequiredEnvSet("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES"),
-                hentRammevedtakFraInfotrygdUrl = URI(benyttetEnv.hentRequiredEnv("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_URL"))
+                omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
             )
             val benyttetInfotrygdRammeService = infotrygdRammeService?:InfotrygdRammeService(
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
