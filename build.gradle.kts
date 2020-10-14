@@ -12,7 +12,12 @@ val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
     kotlin("jvm") version "1.4.10"
-    id("com.github.johnrengelman.shadow") version "6.0.0"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_12
+    targetCompatibility = JavaVersion.VERSION_12
 }
 
 dependencies {
@@ -52,13 +57,6 @@ repositories {
 }
 
 tasks {
-
-    compileKotlin {
-        kotlinOptions.jvmTarget = "12"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "12"
-    }
 
     withType<Test> {
         useJUnitPlatform()
