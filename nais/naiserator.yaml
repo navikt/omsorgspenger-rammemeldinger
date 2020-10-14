@@ -15,8 +15,9 @@ spec:
   accessPolicy:
     outbound:
       external:
-        - host: login.microsoftonline.com
-      rules: []
+      {{#each externalHosts as |host|}}
+        - host: {{host}}
+      {{/each}}
   liveness:
     path: isalive
     initialDelay: 20

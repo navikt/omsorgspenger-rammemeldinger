@@ -8,6 +8,10 @@
   "ingresses": [
     "https://omsorgspenger-rammemeldinger.dev.adeo.no"
   ],
+  "externalHosts": [
+    "omsorgspenger-infotrygd-rammevedtak.dev-fss-pub.nais.io",
+    "login.microsoftonline.com"
+  ],
   "azureTenant": "trygdeetaten.no",
   "env": {
     "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
