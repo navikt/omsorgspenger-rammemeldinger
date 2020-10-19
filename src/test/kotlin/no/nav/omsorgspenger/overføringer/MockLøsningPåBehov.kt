@@ -8,17 +8,17 @@ import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 
-internal fun TestRapid.mockLøsningPåPersonopplysningerOgSaksnummer(fra: Identitetsnummer, til: Identitetsnummer) {
+internal fun TestRapid.mockLøsningPåHenteOmsorgspengerSaksnummer(
+    fra: Identitetsnummer, til: Identitetsnummer) {
     sendTestMessage(
         sisteMelding()
             .somJsonMessage()
-            .mockLøsningPåHenteOmsorgspengerSaksnummer(fra, til)
-            .mockLøsningPåHentePersonopplysninger(fra, til)
+            .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra, til)
             .toJson()
     )
 }
 
-private fun JsonMessage.mockLøsningPåHenteOmsorgspengerSaksnummer(
+private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
     fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
         behov = HentOmsorgspengerSaksnummer,
         løsning = mapOf(
@@ -29,7 +29,17 @@ private fun JsonMessage.mockLøsningPåHenteOmsorgspengerSaksnummer(
         )
     )
 
-private fun JsonMessage.mockLøsningPåHentePersonopplysninger(
+internal fun TestRapid.mockLøsningPåHentePersonopplysninger(
+    fra: Identitetsnummer, til: Identitetsnummer) {
+    sendTestMessage(
+        sisteMelding()
+            .somJsonMessage()
+            .leggTilLøsningPåHentePersonopplysninger(fra, til)
+            .toJson()
+    )
+}
+
+private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
     fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
         behov = HentPersonopplysninger,
         løsning = mapOf(

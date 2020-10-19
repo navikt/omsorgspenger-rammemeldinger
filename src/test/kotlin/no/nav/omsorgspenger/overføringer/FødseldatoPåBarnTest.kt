@@ -37,13 +37,11 @@ internal class FødseldatoPåBarnTest {
             ))
         )
 
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
+        rapid.ventPåLøsning(
+            behovssekvens = behovssekvens,
             fra = fra,
             til = til
         )
-        rapid.ventPå(antallMeldinger = 2)
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
@@ -77,13 +75,11 @@ internal class FødseldatoPåBarnTest {
             )
         )
 
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
+        rapid.ventPåLøsning(
+            behovssekvens = behovssekvens,
             fra = fra,
             til = til
         )
-        rapid.ventPå(antallMeldinger = 2)
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 

@@ -6,8 +6,6 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
@@ -16,7 +14,6 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
 import org.slf4j.LoggerFactory
-import kotlin.IllegalStateException
 
 internal class PubliserOverføringAvOmsorgsdager (
     rapidsConnection: RapidsConnection) : BehovssekvensPacketListener(
@@ -27,57 +24,41 @@ internal class PubliserOverføringAvOmsorgsdager (
                 it.skalLøseBehov(OverføreOmsorgsdager)
                 it.harLøsningPåBehov(
                     OverføreOmsorgsdagerBehandling,
-                    HentPersonopplysninger,
-                    HentOmsorgspengerSaksnummer
+                    HentPersonopplysninger
                 )
             }
             validate {
                 OverføreOmsorgsdagerMelding.validateBehov(it)
                 OverføreOmsorgsdagerBehandlingMelding.validateLøsning(it)
                 HentPersonopplysningerMelding.validateLøsning(it)
-                HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
             }
         }.register(this)
     }
 
-    override fun onSent(id: String, packet: JsonMessage) {
-        logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
-    }
-
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
-        logger.info("PubliserOverføringAvOmsorgsdager")
+        logger.info("PubliserOverføringAvOmsorgsdager for $id")
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding.hentLøsning(packet)
         val parter = HentPersonopplysningerMelding.hentLøsning(packet)
-        val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet)
-
-        logger.info("Saksnummer ${saksnummer.values}")
 
         val utfall = when {
             behandling.karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår) -> Utfall.Avslått
-            behandling.overføringer.isEmpty() -> Utfall.Avslått.also { logger.warn("Oppfyller inngangsvilkår, men ingen overføringer som kan gjennomføres.") }
+            behandling.overføringer.isEmpty() -> Utfall.Avslått
             else -> Utfall.Gjennomført
-        }
-
-        val overføringer = when (utfall) {
-            Utfall.Gjennomført -> behandling.overføringer
-            else -> listOf(Overføring(
-                antallDager = overføreOmsorgsdager.omsorgsdagerÅOverføre,
-                periode = behandling.periode
-            ))
         }
 
         packet.leggTilLøsningPar(
             OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
                 utfall = utfall,
-                begrunnelser = listOf(),
-                fra = overføreOmsorgsdager.overførerFra,
-                til = overføreOmsorgsdager.overførerTil,
-                overføringer = overføringer,
+                gjeldendeOverføringer = behandling.gjeldendeOverføringer,
                 parter = parter
             ))
         )
+
+        val saksnummer = behandling.gjeldendeOverføringer.entries.first {
+            it.key == overføreOmsorgsdager.overførerFra
+        }.value.saksnummer
 
         packet.leggTilBehovEtter(
             aktueltBehov = OverføreOmsorgsdager,
@@ -86,9 +67,7 @@ internal class PubliserOverføringAvOmsorgsdager (
                     FerdigstillJournalføringForOmsorgspengerMelding.BehovInput(
                         identitetsnummer = overføreOmsorgsdager.overførerFra,
                         journalpostIder = overføreOmsorgsdager.journalpostIder,
-                        saksnummer = saksnummer.getOrElse(overføreOmsorgsdager.overførerFra,{
-                            throw IllegalStateException("Mangler saksnummer for personen som overfører.")
-                        })
+                        saksnummer = saksnummer
                     )
                 )
             )
@@ -100,5 +79,9 @@ internal class PubliserOverføringAvOmsorgsdager (
         secureLogger.trace(packet.toJson())
 
         return true
+    }
+
+    override fun onSent(id: String, packet: JsonMessage) {
+        logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
     }
 }

@@ -2,7 +2,6 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
-import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import org.slf4j.LoggerFactory
 
 internal object RoutingVurderinger {
@@ -41,3 +40,6 @@ internal object RoutingVurderinger {
         )
     }
 }
+
+private fun Map<Periode, Int>.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(ønsketOmsorgsdagerÅOverføre: Int) =
+    any { (_, omsorgsdagerTilgjengeligForOverføring) -> omsorgsdagerTilgjengeligForOverføring < ønsketOmsorgsdagerÅOverføre}

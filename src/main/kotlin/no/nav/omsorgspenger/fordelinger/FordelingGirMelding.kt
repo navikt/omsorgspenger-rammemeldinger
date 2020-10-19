@@ -5,7 +5,7 @@ import no.nav.omsorgspenger.Periode
 import java.time.Duration
 
 internal data class FordelingGirMelding(
-    internal val periode: Periode,
-    internal val lengde: Duration,
-    internal val kilder: Set<Kilde>
+    val periode: Periode,
+    val lengde: Duration, // TODO: Serialieres feil.
+    val kilder: Set<Kilde>
 )

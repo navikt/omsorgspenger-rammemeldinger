@@ -36,6 +36,17 @@ internal object IdentitetsnummerGenerator {
 }
 internal fun TestRapid.løsningOverføreOmsorgsdager() = sisteMelding().somMelding().løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
 internal fun TestRapid.ventPå(antallMeldinger: Int) = Awaitility.await().atMost(Duration.ofSeconds(1)).until { inspektør.size == antallMeldinger }
+internal fun TestRapid.ventPåLøsning(
+    behovssekvens: String,
+    fra: Identitetsnummer,
+    til: Identitetsnummer) {
+    sendTestMessage(behovssekvens)
+    ventPå(antallMeldinger = 1)
+    mockLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
+    ventPå(antallMeldinger = 2)
+    mockLøsningPåHentePersonopplysninger(fra = fra, til = til)
+    ventPå(antallMeldinger = 3)
+}
 
 internal fun behovssekvensOverføreOmsorgsdager(
     id: String = ULID().nextValue().toString(),

@@ -42,13 +42,11 @@ internal class ToParterForskjelligAntallDagerTest {
 
         assertEquals(id, behovssekvensId)
 
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
+        rapid.ventPåLøsning(
+            behovssekvens = behovssekvens,
             fra = fra,
             til = til
         )
-        rapid.ventPå(antallMeldinger = 2)
 
         val (løsningId, løsning) = rapid.løsningOverføreOmsorgsdager()
 
@@ -85,13 +83,11 @@ internal class ToParterForskjelligAntallDagerTest {
 
         assertEquals(id, behovssekvensId)
 
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
+        rapid.ventPåLøsning(
+            behovssekvens = behovssekvens,
             fra = fra,
             til = til
         )
-        rapid.ventPå(antallMeldinger = 2)
 
         val (løsningId, løsning) = rapid.løsningOverføreOmsorgsdager()
 
@@ -130,13 +126,12 @@ internal class ToParterForskjelligAntallDagerTest {
 
         assertEquals(id, behovssekvensId)
 
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
+        rapid.ventPåLøsning(
+            behovssekvens = behovssekvens,
             fra = fra,
             til = til
         )
-        rapid.ventPå(antallMeldinger = 2)
+
         val (løsningId, løsning) = rapid.løsningOverføreOmsorgsdager()
 
         assertEquals(id, løsningId)
@@ -150,5 +145,4 @@ internal class ToParterForskjelligAntallDagerTest {
             )
         )
     }
-
 }
