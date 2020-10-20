@@ -6,6 +6,6 @@ import java.time.Duration
 
 internal data class FordelingGirMelding(
     val periode: Periode,
-    val lengde: Duration, // TODO: Serialieres feil.
+    val lengde: Duration,
     val kilder: Set<Kilde>
 )

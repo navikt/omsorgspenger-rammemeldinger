@@ -5,7 +5,6 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
-import no.nav.omsorgspenger.Saksreferanse
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Barn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
@@ -31,7 +30,6 @@ internal object OverføreOmsorgsdagerMelding :
             BehovKeys.BorINorge,
             BehovKeys.Kilde
         )
-        packet.requireAny(BehovKeys.Relasjon, gyldigeRelasjoner) // TODO: Fjerne?
         packet.interestedIn(
             BehovKeys.HarBoddSammenMinstEttÅr // Kun satt om relasjon er NåværendeSamboer
         )

@@ -16,6 +16,7 @@ internal object SerDes {
         .registerModule(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
         .registerModule(SimpleModule().also { simpleModule ->
             simpleModule.addSerializer(Periode::class.java, PeriodeSerializer())
             simpleModule.addDeserializer(Periode::class.java, PeriodeDeserializer())
