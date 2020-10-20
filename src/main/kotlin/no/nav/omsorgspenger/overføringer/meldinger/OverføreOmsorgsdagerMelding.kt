@@ -28,7 +28,8 @@ internal object OverføreOmsorgsdagerMelding :
             BehovKeys.JournalpostIder,
             BehovKeys.JobberINorge,
             BehovKeys.BorINorge,
-            BehovKeys.Kilde
+            BehovKeys.Kilde,
+            BehovKeys.Relasjon
         )
         packet.interestedIn(
             BehovKeys.HarBoddSammenMinstEttÅr // Kun satt om relasjon er NåværendeSamboer
