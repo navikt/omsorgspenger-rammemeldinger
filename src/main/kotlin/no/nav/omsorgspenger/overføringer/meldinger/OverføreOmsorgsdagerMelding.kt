@@ -3,11 +3,11 @@ package no.nav.omsorgspenger.overføringer.meldinger
 import com.fasterxml.jackson.databind.node.ArrayNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.asLocalDate
+import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Barn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
-import no.nav.omsorgspenger.overføringer.Overføring
 import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.overføringer.sisteDatoMedOmsorgenFor
 import java.time.LocalDate
@@ -28,9 +28,9 @@ internal object OverføreOmsorgsdagerMelding :
             BehovKeys.JournalpostIder,
             BehovKeys.JobberINorge,
             BehovKeys.BorINorge,
-            BehovKeys.Kilde
+            BehovKeys.Kilde,
+            BehovKeys.Relasjon
         )
-        packet.requireAny(BehovKeys.Relasjon, gyldigeRelasjoner)
         packet.interestedIn(
             BehovKeys.HarBoddSammenMinstEttÅr // Kun satt om relasjon er NåværendeSamboer
         )
@@ -57,48 +57,37 @@ internal object OverføreOmsorgsdagerMelding :
     }
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
-        val gitt = (løsning.parter.firstOrNull { it.identitetsnummer == løsning.til }?.let { overføringerTil(løsning.overføringer, it) })?: listOf()
-        val fått = (løsning.parter.firstOrNull { it.identitetsnummer == løsning.fra }?.let { overføringerFra(løsning.overføringer, it) })?: listOf()
-        val mappedOverføringer = mapOf<String, Any?>(
-            løsning.fra to mapOf(
-                "gitt" to gitt,
-                "fått" to emptyList()
-            ),
-            løsning.til to mapOf(
-                "fått" to fått,
-                "gitt" to emptyList()
-            )
-        )
+        val personopplysninger = løsning.parter.associateBy { it.identitetsnummer }
+        val overføringer = løsning.gjeldendeOverføringer
+            .mapValues { (_,gjeldendeOverføringer) ->
+                mapOf(
+                    "gitt" to gjeldendeOverføringer.gitt.map { gitt -> mapOf(
+                        "antallDager" to gitt.antallDager,
+                        "gjelderFraOgMed" to gitt.periode.fom,
+                        "gjelderTilOgMed" to gitt.periode.tom,
+                        "til" to mapOf(
+                            "navn" to personopplysninger.getValue(gitt.til.identitetsnummer).navn,
+                            "fødselsdato" to personopplysninger.getValue(gitt.til.identitetsnummer).fødselsdato.toString()
+                        )
+                    )},
+                    "fått" to gjeldendeOverføringer.fått.map { fått -> mapOf(
+                        "antallDager" to fått.antallDager,
+                        "gjelderFraOgMed" to fått.periode.fom,
+                        "gjelderTilOgMed" to fått.periode.tom,
+                        "fra" to mapOf(
+                            "navn" to personopplysninger.getValue(fått.fra.identitetsnummer).navn,
+                            "fødselsdato" to personopplysninger.getValue(fått.fra.identitetsnummer).fødselsdato.toString()
+                        )
+                    )}
+                )
+            }
 
         return OverføreOmsorgsdager to mapOf(
             "utfall" to løsning.utfall.name,
-            "begrunnelser" to løsning.begrunnelser,
-            "overføringer" to when (løsning.utfall) {
-                Utfall.Gjennomført, Utfall.Avslått -> mappedOverføringer
-                else -> emptyMap()
-            }
+            "begrunnelser" to listOf<String>(),
+            "overføringer" to overføringer
         )
     }
-
-    private fun overføringerTil(overføringer: List<Overføring>, til: Part) = overføringer.map { mapOf(
-        "antallDager" to it.antallDager,
-        "gjelderFraOgMed" to it.periode.fom,
-        "gjelderTilOgMed" to it.periode.tom,
-        "til" to mapOf(
-            "navn" to til.navn,
-            "fødselsdato" to til.fødselsdato
-        )
-    )}
-
-    private fun overføringerFra(overføringer: List<Overføring>, fra: Part) = overføringer.map { mapOf(
-        "antallDager" to it.antallDager,
-        "gjelderFraOgMed" to it.periode.fom,
-        "gjelderTilOgMed" to it.periode.tom,
-        "fra" to mapOf(
-            "navn" to fra.navn,
-            "fødselsdato" to fra.fødselsdato
-        )
-    )}
 
     internal data class Behovet(
         val barn : List<Barn>,
@@ -126,10 +115,7 @@ internal object OverføreOmsorgsdagerMelding :
 
     internal data class Løsningen(
         internal val utfall: Utfall,
-        internal val begrunnelser: List<String>,
-        internal val fra: String,
-        internal val til: String,
-        internal val overføringer: List<Overføring>,
+        internal val gjeldendeOverføringer: Map<Identitetsnummer, GjeldendeOverføringer>,
         internal val parter: Set<Part>
     )
 

@@ -11,6 +11,11 @@ typealias CorrelationId = String
 internal fun JsonMessage.correlationId() : CorrelationId = get(Behovsformat.CorrelationId).asText()
 
 internal data class Kilde(
-    internal val id: String,
-    internal val type: String
+    val id: String,
+    val type: String
+)
+
+internal data class Saksreferanse(
+    val saksnummer: Saksnummer,
+    val identitetsnummer: Identitetsnummer
 )

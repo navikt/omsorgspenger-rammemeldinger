@@ -14,8 +14,10 @@ import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
+import no.nav.omsorgspenger.overføringer.OverføringService
 import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
+import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import java.net.URI
 
@@ -29,11 +31,15 @@ fun main() {
 }
 
 internal fun RapidsConnection.registerApplicationContext(applicationContext: ApplicationContext) {
-    BehandleOverføringAvOmsorgsdager(
+    InitierOverføringAvOmsorgsdager(
         rapidsConnection = this,
         fordelingService = applicationContext.fordelingService,
         utvidetRettService = applicationContext.utvidetRettService,
         midlertidigAleneService = applicationContext.midlertidigAleneService
+    )
+    BehandleOverføringAvOmsorgsdager(
+        rapidsConnection = this,
+        overføringService = applicationContext.overføringService
     )
     PubliserOverføringAvOmsorgsdager(
         rapidsConnection = this
@@ -65,6 +71,7 @@ internal class ApplicationContext(
     internal val fordelingService: FordelingService,
     internal val utvidetRettService: UtvidetRettService,
     internal val midlertidigAleneService: MidlertidigAleneService,
+    internal val overføringService: OverføringService,
     internal val healthService: HealthService) {
 
     internal fun start() {}
@@ -77,7 +84,8 @@ internal class ApplicationContext(
         internal var infotrygdRammeService: InfotrygdRammeService? = null,
         internal var fordelingService: FordelingService? = null,
         internal var utvidetRettService: UtvidetRettService? = null,
-        internal var midlertidigAleneService: MidlertidigAleneService? = null) {
+        internal var midlertidigAleneService: MidlertidigAleneService? = null,
+        internal var overføringService: OverføringService? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
             val benyttetAccessTokenClient = accessTokenClient?:ClientSecretAccessTokenClient(
@@ -108,6 +116,7 @@ internal class ApplicationContext(
                 midlertidigAleneService = midlertidigAleneService ?: MidlertidigAleneService(
                     infotrygdRammeService = benyttetInfotrygdRammeService
                 ),
+                overføringService = overføringService ?: OverføringService(),
                 healthService = HealthService(healthChecks = setOf(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
                 ))

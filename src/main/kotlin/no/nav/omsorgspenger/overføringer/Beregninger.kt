@@ -1,9 +1,6 @@
 package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
-import no.nav.omsorgspenger.extensions.førsteDagNesteÅr
-import no.nav.omsorgspenger.periodiser
-import java.time.LocalDate
 
 internal object Beregninger {
     private const val DagerMaksForOverføring = 10
@@ -20,10 +17,10 @@ internal object Beregninger {
     internal fun beregnOmsorgsdagerTilgjengeligForOverføring(
         grunnlag: Grunnlag,
         behandling: Behandling
-    ) : Map<Periode, Int> {
-        val beregnet = mutableMapOf<Periode, Int>()
-        grunnlag.perioder(behandling.periode).forEach { periode ->
-            beregnet[periode] = beregnPeriode(grunnlag, periode, behandling)
+    ) : Map<KnektPeriode, Int> {
+        val beregnet = mutableMapOf<KnektPeriode, Int>()
+        grunnlag.knekk(behandling.periode).forEach { knektPeriode ->
+            beregnet[knektPeriode] = beregnPeriode(grunnlag, knektPeriode.periode, behandling)
         }
         return beregnet
     }
@@ -161,39 +158,3 @@ internal object Beregninger {
         return grunnrett + aleneOmsorg + utvidetRett + utvidetRettOgAleneOmsorg
     }
 }
-
-private fun Grunnlag.perioder(overordnetPeriode: Periode) : List<Periode>  {
-    val datoer = mutableListOf<LocalDate>()
-
-    if (overføreOmsorgsdager.omsorgsdagerTattUtIÅr > 0) {
-        datoer.add(overføreOmsorgsdager.mottaksdato.førsteDagNesteÅr())
-    }
-
-    overføreOmsorgsdager.barn.forEach { barn ->
-        datoer.leggTilPeriode(barn.omsorgenFor)
-    }
-
-    fordelingGirMeldinger.forEach { fordelingGirMelding ->
-        datoer.leggTilPeriode(fordelingGirMelding.periode)
-    }
-
-    midlertidigAleneVedtak.forEach { midlertidigAleneVedtak ->
-        datoer.leggTilPeriode(midlertidigAleneVedtak.periode)
-    }
-
-    return datoer.periodiser(
-        overordnetPeriode = overordnetPeriode
-    )
-}
-
-private fun MutableList<LocalDate>.leggTilPeriode(periode: Periode) {
-    add(periode.fom)
-    add(periode.tom.plusDays(1))
-}
-
-
-internal fun Map<Periode, Int>.inneholderMinstEnPeriodeMedFærreDagerEnnØnsketOmsorgsdagerÅOverføre(ønsketOmsorgsdagerÅOverføre: Int) =
-    any { (_, omsorgsdagerTilgjengeligForOverføring) -> omsorgsdagerTilgjengeligForOverføring < ønsketOmsorgsdagerÅOverføre}
-
-internal fun Map<Periode, Int>.ingenDagerTilgjengeligForOverføring() =
-    all { it.value == 0 }

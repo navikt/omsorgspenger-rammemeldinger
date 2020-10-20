@@ -1,16 +1,17 @@
 package no.nav.omsorgspenger.overføringer.rivers
 
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.behov.Behovsformat
 import no.nav.k9.rapid.river.*
-import no.nav.omsorgspenger.correlationId
-import no.nav.omsorgspenger.fordelinger.FordelingService
-import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
+import no.nav.omsorgspenger.Saksreferanse
 import no.nav.omsorgspenger.overføringer.*
+import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
 import no.nav.omsorgspenger.overføringer.Grunnlag
+import no.nav.omsorgspenger.overføringer.RoutingVurderinger.måBehandlesSomGosysJournalføringsoppgaver
 import no.nav.omsorgspenger.overføringer.Vurderinger
+import no.nav.omsorgspenger.overføringer.Vurderinger.vurderInngangsvilkår
 import no.nav.omsorgspenger.overføringer.meldinger.*
 import no.nav.omsorgspenger.overføringer.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding
@@ -25,66 +26,49 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandl
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
-import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 
 import org.slf4j.LoggerFactory
 
 internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
-    private val fordelingService: FordelingService,
-    private val utvidetRettService: UtvidetRettService,
-    private val midlertidigAleneService: MidlertidigAleneService
-) : BehovssekvensPacketListener(
+    private val overføringService: OverføringService) : BehovssekvensPacketListener(
     logger = LoggerFactory.getLogger(BehandleOverføringAvOmsorgsdager::class.java)) {
 
     init {
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(OverføreOmsorgsdager)
-                it.utenLøsningPåBehov(OverføreOmsorgsdagerBehandling)
+                it.harLøsningPåBehov(
+                    HentOmsorgspengerSaksnummer,
+                    HentFordelingGirMeldinger,
+                    HentUtvidetRettVedtak,
+                    HentMidlertidigAleneVedtak
+                )
+                it.utenLøsningPåBehov(
+                    OverføreOmsorgsdagerBehandling
+                )
             }
             validate {
                 OverføreOmsorgsdagerMelding.validateBehov(it)
+                HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
+                HentFordelingGirMeldingerMelding.validateLøsning(it)
+                HentUtvidetRettVedtakMelding.validateLøsning(it)
+                HentMidlertidigAleneVedtakMelding.validateLøsning(it)
             }
         }.register(this)
     }
 
-    override fun onSent(id: String, packet: JsonMessage) {
-        logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
-    }
-
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
-        logger.info("BehandleOverføringAvOmsorgsdager")
-        val correlationId = packet.correlationId()
-
+        logger.info("BehandleOverføringAvOmsorgsdager for $id")
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
+        val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet)
+        val fordelingGirMeldinger = HentFordelingGirMeldingerMelding.hentLøsning(packet)
+        val utvidetRettVedtak = HentUtvidetRettVedtakMelding.hentLøsning(packet)
+        val midlertidigAleneVedtak = HentMidlertidigAleneVedtakMelding.hentLøsning(packet)
 
         val behandling = Behandling(
             sendtPerBrev = overføreOmsorgsdager.sendtPerBrev,
             periode = overføreOmsorgsdager.overordnetPeriode
-        )
-
-        packet[Behovsformat.CorrelationId].asText()
-
-        logger.info("hentFordelingGirMeldinger")
-        val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
-            identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = behandling.periode,
-            correlationId = correlationId
-        )
-
-        logger.info("hentUtvidetRettVedtak")
-        val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
-            identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = behandling.periode,
-            correlationId = correlationId
-        )
-
-        logger.info("hentMidlertidigAleneVedtak")
-        val midlertidigAleneVedtak = midlertidigAleneService.hentMidlertidigAleneVedtak(
-            identitetsnummer = overføreOmsorgsdager.overførerFra,
-            periode = behandling.periode,
-            correlationId = correlationId
         )
 
         val grunnlag = Vurderinger.vurderGrunnlag(
@@ -97,64 +81,64 @@ internal class BehandleOverføringAvOmsorgsdager(
             behandling = behandling
         )
 
-        logger.info("vurderInngangsvilkår")
-        Vurderinger.vurderInngangsvilkår(
+        vurderInngangsvilkår(
             grunnlag = grunnlag,
             behandling = behandling
         )
 
-        logger.info("beregnOmsorgsdagerTilgjengeligForOverføring")
-        val omsorgsdagerTilgjengeligForOverføring = Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring(
+        val omsorgsdagerTilgjengeligForOverføring = beregnOmsorgsdagerTilgjengeligForOverføring(
             grunnlag = grunnlag,
             behandling = behandling
         )
 
-        logger.info("genererer overføringer")
+        logger.info("identifiserer overføringer som skal gjennomføres.")
         val overføringer = omsorgsdagerTilgjengeligForOverføring.somOverføringer(
             ønsketOmsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
         )
 
-        val berørteIdentitetsnummer = setOf(
-            overføreOmsorgsdager.overførerFra,
-            overføreOmsorgsdager.overførerTil
-        )
-
-        logger.info("${berørteIdentitetsnummer.size} berørte parter for overføringen.")
-
         logger.info("karakteristikker = ${behandling.karakteristikker()}")
 
-        logger.info("legger til behov med løsninger [$HentFordelingGirMeldinger, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak, $OverføreOmsorgsdagerBehandling]")
-        logger.warn("Løsning på behov [$HentUtvidetRettVedtak,$HentMidlertidigAleneVedtak] bør flyttes til 'omsorgspenger-rammevedtak'")
+        val måBehandlesSomGosysJournalføringsoppgaver = måBehandlesSomGosysJournalføringsoppgaver(
+            behandling = behandling,
+            overføreOmsorgsdager = grunnlag.overføreOmsorgsdager,
+            omsorgsdagerTilgjengeligForOverføring = omsorgsdagerTilgjengeligForOverføring.mapKeys {
+                it.key.periode
+            }
+        )
+
+        val gjeldendeOverføringer = gjeldendeOverføringer(
+            fra = Saksreferanse(
+                identitetsnummer = overføreOmsorgsdager.overførerFra,
+                saksnummer = saksnummer[overføreOmsorgsdager.overførerFra] ?: error("Mangler saksnummer for 'fra'")
+            ),
+            til = Saksreferanse(
+                identitetsnummer = overføreOmsorgsdager.overførerTil,
+                saksnummer = saksnummer[overføreOmsorgsdager.overførerTil] ?: error("Mangler saksnummer for 'til'")
+            ),
+            overføringer = overføringer,
+            måBehandlesSomGosysJournalføringsoppgaver = måBehandlesSomGosysJournalføringsoppgaver
+        )
+
+        logger.info("legger til behov med løsninger [$OverføreOmsorgsdagerBehandling]")
         packet.leggTilBehovMedLøsninger(
             aktueltBehov = OverføreOmsorgsdager,
             behovMedLøsninger = arrayOf(
-                HentFordelingGirMeldingerMelding.behovMedLøsning(fordelingGirMeldinger),
-                HentUtvidetRettVedtakMelding.behovMedLøsning(utvidetRettVedtak),
-                HentMidlertidigAleneVedtakMelding.behovMedLøsning(midlertidigAleneVedtak),
                 OverføreOmsorgsdagerBehandlingMelding.behovMedLøsning(
                     OverføreOmsorgsdagerBehandlingMelding.HeleBehandling(
                         behandling = behandling,
-                        overføringer = overføringer
+                        overføringer = overføringer,
+                        gjeldendeOverføringer = gjeldendeOverføringer
                     )
                 )
             )
         )
 
-        val måBehandlesSomGosysJournalføringsoppgaver = RoutingVurderinger.måBehandlesSomGosysJournalføringsoppgaver(
-            behandling = behandling,
-            overføreOmsorgsdager = grunnlag.overføreOmsorgsdager,
-            omsorgsdagerTilgjengeligForOverføring = omsorgsdagerTilgjengeligForOverføring
-        )
-
         if (måBehandlesSomGosysJournalføringsoppgaver) {
-            logger.info("Legger til løsning på behov [$OverføreOmsorgsdager]")
+            logger.info("Legger til løsning på $OverføreOmsorgsdager")
             packet.leggTilLøsningPar(
                 OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
-                    utfall = Utfall.GosysJournalføringsoppgave,
-                    begrunnelser = listOf(),
-                    fra = overføreOmsorgsdager.overførerFra,
-                    til = overføreOmsorgsdager.overførerTil,
-                    overføringer = emptyList(),
+                    utfall = Utfall.GosysJournalføringsoppgaver,
+                    gjeldendeOverføringer = mapOf(),
                     parter = emptySet()
                 ))
             )
@@ -171,18 +155,13 @@ internal class BehandleOverføringAvOmsorgsdager(
                 )
             )
         } else {
-            logger.info("legger til behov [$HentPersonopplysninger,$HentOmsorgspengerSaksnummer]")
+            logger.info("legger til behov [$HentPersonopplysninger]")
             packet.leggTilBehov(
                 aktueltBehov = OverføreOmsorgsdager,
                 behov = arrayOf(
-                    HentOmsorgspengerSaksnummerMelding.behov(
-                        HentOmsorgspengerSaksnummerMelding.BehovInput(
-                            identitetsnummer = berørteIdentitetsnummer
-                        )
-                    ),
                     HentPersonopplysningerMelding.behov(
                         HentPersonopplysningerMelding.BehovInput(
-                            identitetsnummer = berørteIdentitetsnummer
+                            identitetsnummer = gjeldendeOverføringer.berørteIdentitetsnummer()
                         )
                     )
                 )
@@ -190,5 +169,25 @@ internal class BehandleOverføringAvOmsorgsdager(
         }
 
         return true
+    }
+
+    override fun onSent(id: String, packet: JsonMessage) {
+        logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
+    }
+
+    private fun gjeldendeOverføringer(
+        fra: Saksreferanse,
+        til: Saksreferanse,
+        overføringer: List<Overføring>,
+        måBehandlesSomGosysJournalføringsoppgaver: Boolean) = when (måBehandlesSomGosysJournalføringsoppgaver) {
+        true -> mapOf(
+            fra.identitetsnummer to GjeldendeOverføringer(gitt = overføringer.gitt(til), saksnummer = fra.saksnummer),
+            til.identitetsnummer to GjeldendeOverføringer(fått = overføringer.fått(fra), saksnummer = til.saksnummer)
+        )
+        false -> overføringService.gjennomførOverføringer(
+            fra = fra,
+            til = til,
+            overføringer = overføringer
+        )
     }
 }

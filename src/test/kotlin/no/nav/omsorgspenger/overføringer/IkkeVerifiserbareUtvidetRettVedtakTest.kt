@@ -38,7 +38,9 @@ internal class IkkeVerifiserbareUtvidetRettVedtakTest {
         )
 
         rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(1)
+        rapid.ventPå(antallMeldinger = 1)
+        rapid.mockLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
+        rapid.ventPå(antallMeldinger = 2)
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
@@ -67,13 +69,11 @@ internal class IkkeVerifiserbareUtvidetRettVedtakTest {
             ))
         )
 
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåPersonopplysningerOgSaksnummer(
+        rapid.ventPåLøsning(
+            behovssekvens = behovssekvens,
             fra = fra,
             til = til
         )
-        rapid.ventPå(antallMeldinger = 2)
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
