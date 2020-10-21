@@ -7,7 +7,8 @@ import no.nav.omsorgspenger.Saksreferanse
 internal data class Overføring(
     val antallDager: Int,
     val periode: Periode,
-    val knekkpunkt: Set<Knekkpunkt>
+    val starterGrunnet: Set<Knekkpunkt>,
+    val slutterGrunnet: Set<Knekkpunkt>
 )
 
 internal fun List<Overføring>.gitt(til: Saksreferanse) = map { OverføringGitt(
@@ -54,7 +55,8 @@ internal fun Map<KnektPeriode, Int>.somOverføringer(
                 overføringer.add(Overføring(
                     antallDager = antallDager,
                     periode = knektPeriode.periode,
-                    knekkpunkt = knektPeriode.knekkpunkt
+                    starterGrunnet = knektPeriode.starterGrunnet,
+                    slutterGrunnet = knektPeriode.slutterGrunnet
                 ))
             }
             else -> {
@@ -62,9 +64,10 @@ internal fun Map<KnektPeriode, Int>.somOverføringer(
                 overføringer.add(Overføring(
                     antallDager = antallDager,
                     periode = knektPeriode.periode.slåSammen(overføring.periode),
-                    // Beholder de tidligere knekkpunktene ettersom disse knekkpuntene
-                    // (knektPeriode.knekkpunkt) ikke skaper en ny overføring.
-                    knekkpunkt = overføring.knekkpunkt
+                    // 'starterGrunnet' beholdes
+                    // 'slutterGrunnet' erstattes
+                    starterGrunnet = overføring.starterGrunnet,
+                    slutterGrunnet = knektPeriode.slutterGrunnet
                 ))
             }
         }

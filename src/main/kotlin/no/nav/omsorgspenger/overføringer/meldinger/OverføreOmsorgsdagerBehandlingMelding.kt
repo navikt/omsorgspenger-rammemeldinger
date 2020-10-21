@@ -55,7 +55,6 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
         internal val periode: Periode) {
         internal fun oppfyllerIkkeInngangsvilkår() = karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
         internal fun måBesvaresPerBrev() = karakteristikker.contains(Behandling.Karakteristikk.MåBesvaresPerBrev)
-        internal fun varighetPåOverføringUtledetFraBarnMedUtvidetRett() = karakteristikker.contains(Behandling.Karakteristikk.VarighetPåOverføringUtledetFraBarnMedUtvidetRett)
     }
 
     private object LøsningKeys {

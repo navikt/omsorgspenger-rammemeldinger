@@ -30,8 +30,7 @@ internal class Behandling(
     internal enum class Karakteristikk {
         OppfyllerIkkeInngangsvilkår,
         InneholderIkkeVerifiserbareVedtakOmUtvidetRett,
-        MåBesvaresPerBrev,
-        VarighetPåOverføringUtledetFraBarnMedUtvidetRett
+        MåBesvaresPerBrev
     }
 }
 

@@ -7,7 +7,8 @@ import java.time.LocalDate
 
 internal data class KnektPeriode(
     internal val periode: Periode,
-    internal val knekkpunkt: Set<Knekkpunkt>
+    internal val starterGrunnet: Set<Knekkpunkt>,
+    internal val slutterGrunnet: Set<Knekkpunkt>
 )
 
 internal enum class Knekkpunkt {
@@ -19,15 +20,20 @@ internal enum class Knekkpunkt {
     FordelingGirSlutter,
     MidlertidigAleneStarter,
     MidlertidigAleneSlutter,
-    OmsorgenForSlutter
+    OmsorgenForSlutter,
+    OmsorgenForUtvidetRettSlutter
 }
 
 internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
+    this.overføreOmsorgsdager.overordnetPeriodeUtledetFraBarnMedUtvidetRett
     val knekkpunkt = mutableMapOf<LocalDate, MutableSet<Knekkpunkt>>().also {
         it.leggTil(
             periode = overordnetPeriode,
             fomKnekkpunkt = Knekkpunkt.Mottaksdato,
-            tomKnekkpunkt = Knekkpunkt.OmsorgenForSlutter
+            tomKnekkpunkt = when (overføreOmsorgsdager.overordnetPeriodeUtledetFraBarnMedUtvidetRett) {
+                true -> Knekkpunkt.OmsorgenForUtvidetRettSlutter
+                false -> Knekkpunkt.OmsorgenForSlutter
+            }
         )
     }
 
@@ -41,7 +47,7 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
     overføreOmsorgsdager.barn.forEach { barn ->
         knekkpunkt.leggTil(
             periode = barn.omsorgenFor,
-            fomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnStarter, // HMM forskjell på 12 og 18
+            fomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnStarter,
             tomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnSlutter
         )
     }
@@ -66,7 +72,10 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
         overordnetPeriode = overordnetPeriode
     ).map { KnektPeriode(
         periode = it,
-        knekkpunkt = knekkpunkt[it.fom] ?: error("Mangler knekkpunkt for ${it.fom}")
+        starterGrunnet = knekkpunkt[it.fom] ?: error("Mangler knekkpunkt for ${it.fom}"),
+        slutterGrunnet = it.tom.plusDays(1).let { førsteDagINestePeriode ->
+            knekkpunkt[førsteDagINestePeriode] ?: error("Mangler knekkpunt for $førsteDagINestePeriode")
+        }
     )}
 }
 

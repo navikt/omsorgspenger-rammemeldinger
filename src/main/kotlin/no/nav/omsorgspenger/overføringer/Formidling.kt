@@ -33,8 +33,7 @@ internal object Fordmidling {
             val melding = when (identitetsnummer) {
                 overføreOmsorgsdager.overførerFra -> GittDager(
                     til = personopplysninger.getValue(overføreOmsorgsdager.overførerTil),
-                    overføringer = behandling.overføringer,
-                    varighetPåOverføringUtledetFraBarnMedUtvidetRett = behandling.varighetPåOverføringUtledetFraBarnMedUtvidetRett()
+                    overføringer = behandling.overføringer
                 )
                 overføreOmsorgsdager.overførerTil -> MottattDager(
                     fra = personopplysninger.getValue(overføreOmsorgsdager.overførerFra),
@@ -61,7 +60,6 @@ internal object Fordmidling {
 
 internal class GittDager(
     val til: Personopplysninger,
-    val varighetPåOverføringUtledetFraBarnMedUtvidetRett: Boolean,
     val overføringer: List<Overføring>
 ) : Melding {
     override val mal = "OVERFORE_GITT_DAGER"

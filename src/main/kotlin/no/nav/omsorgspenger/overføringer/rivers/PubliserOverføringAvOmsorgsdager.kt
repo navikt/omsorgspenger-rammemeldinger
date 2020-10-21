@@ -74,13 +74,14 @@ internal class PubliserOverføringAvOmsorgsdager (
             )
         )
 
+        secureLogger.trace("Bestillinger til formidling")
         opprettMeldingsBestillinger(
             behovssekvensId = id,
             personopplysninger = personopplysninger,
             overføreOmsorgsdager = overføreOmsorgsdager,
             behandling = behandling
         ).forEach {
-            logger.info(it.keyValue.second)
+            secureLogger.trace(it.keyValue.second)
         }
 
         // TODO: Send bestilling på formidling https://github.com/navikt/omsorgspenger-rammemeldinger/issues/14
