@@ -7,6 +7,8 @@ import no.nav.omsorgspenger.formidling.Meldingsbestilling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import org.intellij.lang.annotations.Language
+import org.json.JSONArray
+import org.json.JSONObject
 import java.time.LocalDate
 
 internal object Fordmidling {
@@ -26,6 +28,10 @@ internal object Fordmidling {
             "Mismatch mellom saksnummer og personopplysninger."
         }
 
+        require(personopplysninger.containsKey(overføreOmsorgsdager.overførerFra) && personopplysninger.containsKey(overføreOmsorgsdager.overførerTil)) {
+            "Mangler personopplysninger om 'overførerFra' og 'overførerTil'"
+        }
+
         val bestillinger = mutableListOf<Meldingsbestilling>()
 
         saksnummer.forEach { (identitetsnummer, saksnummer) ->
@@ -33,7 +39,8 @@ internal object Fordmidling {
             val melding = when (identitetsnummer) {
                 overføreOmsorgsdager.overførerFra -> GittDager(
                     til = personopplysninger.getValue(overføreOmsorgsdager.overførerTil),
-                    overføringer = behandling.overføringer
+                    overføringer = behandling.overføringer,
+                    antallDagerØnsketOverført = overføreOmsorgsdager.omsorgsdagerÅOverføre
                 )
                 overføreOmsorgsdager.overførerTil -> MottattDager(
                     fra = personopplysninger.getValue(overføreOmsorgsdager.overførerFra),
@@ -60,16 +67,36 @@ internal object Fordmidling {
 
 internal class GittDager(
     val til: Personopplysninger,
+    val antallDagerØnsketOverført: Int,
     val overføringer: List<Overføring>
 ) : Melding {
     override val mal = "OVERFORE_GITT_DAGER"
     override val data = {
-        @Language("JSON")
-        val json = """
-            {
+        val overføringerJSONArray = JSONArray().also {
+            overføringer.forEach { overføring ->
+                it.put(mapOf(
+                    "gjelderFraOgMed" to "${overføring.periode.fom}",
+                    "gjelderTilOgMed" to "${overføring.periode.tom}",
+                    "antallDager" to overføring.antallDager,
+                    "starterGrunnet" to overføring.starterGrunnet.map { knekk -> knekk.name },
+                    "slutterGrunnet" to overføring.slutterGrunnet.map { knekk -> knekk.name }
+                ))
             }
-        """.trimIndent()
-        json
+        }
+        val overførerTilJSONObject = JSONObject().also {
+            it.put("navn", mapOf(
+                "fornavn" to til.navn,
+                "mellomnavn" to "TODO: Struktuerer navn",
+                "etternavn" to "TODO: navn må være optional"
+            ))
+            it.put("fødselsdato", til.fødselsdato.toString())
+        }
+
+        JSONObject().also { root ->
+            root.put("antallDagerØnsketOverført", antallDagerØnsketOverført)
+            root.put("overføringer", overføringerJSONArray)
+            root.put("overførerTil", overførerTilJSONObject)
+        }.toString()
     }()
 }
 

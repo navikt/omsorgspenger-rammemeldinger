@@ -7,8 +7,8 @@ import java.time.LocalDate
 
 internal data class KnektPeriode(
     internal val periode: Periode,
-    internal val starterGrunnet: Set<Knekkpunkt>,
-    internal val slutterGrunnet: Set<Knekkpunkt>
+    internal val starterGrunnet: List<Knekkpunkt>,
+    internal val slutterGrunnet: List<Knekkpunkt>
 )
 
 internal enum class Knekkpunkt {
@@ -21,17 +21,17 @@ internal enum class Knekkpunkt {
     MidlertidigAleneStarter,
     MidlertidigAleneSlutter,
     OmsorgenForSlutter,
-    OmsorgenForUtvidetRettSlutter
+    OmsorgenForMedUtvidetRettSlutter
 }
 
 internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
     this.overføreOmsorgsdager.overordnetPeriodeUtledetFraBarnMedUtvidetRett
-    val knekkpunkt = mutableMapOf<LocalDate, MutableSet<Knekkpunkt>>().also {
+    val knekkpunkt = mutableMapOf<LocalDate, MutableList<Knekkpunkt>>().also {
         it.leggTil(
             periode = overordnetPeriode,
             fomKnekkpunkt = Knekkpunkt.Mottaksdato,
             tomKnekkpunkt = when (overføreOmsorgsdager.overordnetPeriodeUtledetFraBarnMedUtvidetRett) {
-                true -> Knekkpunkt.OmsorgenForUtvidetRettSlutter
+                true -> Knekkpunkt.OmsorgenForMedUtvidetRettSlutter
                 false -> Knekkpunkt.OmsorgenForSlutter
             }
         )
@@ -72,19 +72,26 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
         overordnetPeriode = overordnetPeriode
     ).map { KnektPeriode(
         periode = it,
-        starterGrunnet = knekkpunkt[it.fom] ?: error("Mangler knekkpunkt for ${it.fom}"),
-        slutterGrunnet = it.tom.plusDays(1).let { førsteDagINestePeriode ->
-            knekkpunkt[førsteDagINestePeriode] ?: error("Mangler knekkpunt for $førsteDagINestePeriode")
-        }
+        starterGrunnet = knekkpunkt.hentKnekkpunktFor(it.fom),
+        slutterGrunnet = knekkpunkt.hentKnekkpunktFor(it.tom.plusDays(1))
     )}
 }
 
-private fun MutableMap<LocalDate, MutableSet<Knekkpunkt>>.leggTil(
-    dato: LocalDate, knekkpunkt: Knekkpunkt) {
-    put(dato, getOrDefault(dato, mutableSetOf()).also { it.add(knekkpunkt) })
+private fun Map<LocalDate, List<Knekkpunkt>>.hentKnekkpunktFor(dato: LocalDate) : List<Knekkpunkt> {
+    val knekkpunkt = get(dato) ?: error("Mangler knekkpunkt for $dato")
+    return when {
+        knekkpunkt.contains(Knekkpunkt.OmsorgenForSlutter) -> listOf(Knekkpunkt.OmsorgenForSlutter)
+        knekkpunkt.contains(Knekkpunkt.OmsorgenForMedUtvidetRettSlutter) -> listOf(Knekkpunkt.OmsorgenForMedUtvidetRettSlutter)
+        else -> knekkpunkt
+    }
 }
 
-private fun MutableMap<LocalDate, MutableSet<Knekkpunkt>>.leggTil(
+private fun MutableMap<LocalDate, MutableList<Knekkpunkt>>.leggTil(
+    dato: LocalDate, knekkpunkt: Knekkpunkt) {
+    put(dato, getOrDefault(dato, mutableListOf()).also { it.add(knekkpunkt) })
+}
+
+private fun MutableMap<LocalDate, MutableList<Knekkpunkt>>.leggTil(
     periode: Periode, fomKnekkpunkt: Knekkpunkt, tomKnekkpunkt: Knekkpunkt) {
     leggTil(periode.fom, fomKnekkpunkt)
     leggTil(periode.tom.plusDays(1), tomKnekkpunkt)

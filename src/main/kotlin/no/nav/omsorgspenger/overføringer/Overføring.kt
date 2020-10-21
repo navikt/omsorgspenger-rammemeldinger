@@ -7,8 +7,8 @@ import no.nav.omsorgspenger.Saksreferanse
 internal data class Overføring(
     val antallDager: Int,
     val periode: Periode,
-    val starterGrunnet: Set<Knekkpunkt>,
-    val slutterGrunnet: Set<Knekkpunkt>
+    val starterGrunnet: List<Knekkpunkt>,
+    val slutterGrunnet: List<Knekkpunkt>
 )
 
 internal fun List<Overføring>.gitt(til: Saksreferanse) = map { OverføringGitt(
