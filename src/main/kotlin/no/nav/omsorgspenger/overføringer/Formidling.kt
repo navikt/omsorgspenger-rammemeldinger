@@ -36,6 +36,9 @@ internal object Fordmidling {
             "Mangler personopplysninger for 'overførerTil'"
         }
 
+        // TODO: Håndtere avslag i egen funksjon hvor det kun sendes bestilling på melding til den som forsøkte å overføre.
+        // require(behandling.overføringer.isNotEmpty()) { "Skal ikke sende bestilling til alle parter ved avslag." }
+
         val bestillinger = mutableListOf<Meldingsbestilling>()
 
         saksnummer.forEach { (identitetsnummer, saksnummer) ->
@@ -51,7 +54,7 @@ internal object Fordmidling {
                     overføringer = behandling.overføringer
                 )
                 else -> TidligerePartner(
-                    fraOgMed = overføreOmsorgsdager.mottaksdato.plusDays(1)
+                    fraOgMed = overføreOmsorgsdager.mottaksdato
                 )
             }
 

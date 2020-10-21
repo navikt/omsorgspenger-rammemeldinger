@@ -25,7 +25,6 @@ internal enum class Knekkpunkt {
 }
 
 internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
-    this.overføreOmsorgsdager.overordnetPeriodeUtledetFraBarnMedUtvidetRett
     val knekkpunkt = mutableMapOf<LocalDate, MutableList<Knekkpunkt>>().also {
         it.leggTil(
             periode = overordnetPeriode,
