@@ -83,7 +83,11 @@ internal object Vurderinger {
                 barn = alleBarn
                     .minus(barnMedUtvidetRettSomIkkeKanVerifiseres)
                     .plus(barnMedUtvidetRettSomIkkeKanVerifiseres.map { it.copy(utvidetRett = false) }),
-            )
+            ).also {
+                if (it.overordnetPeriodeUtledetFraBarnMedUtvidetRett) {
+                    behandling.leggTilKarakteristikk(Behandling.Karakteristikk.VarighetPåOverføringUtledetFraBarnMedUtvidetRett)
+                }
+            }
         )
     }
 

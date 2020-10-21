@@ -1,7 +1,6 @@
 package no.nav.omsorgspenger.overføringer.rivers
 
 import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
@@ -10,7 +9,7 @@ import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
 import no.nav.omsorgspenger.overføringer.Grunnlag
 import no.nav.omsorgspenger.overføringer.RoutingVurderinger.måBehandlesSomGosysJournalføringsoppgaver
-import no.nav.omsorgspenger.overføringer.Vurderinger
+import no.nav.omsorgspenger.overføringer.Vurderinger.vurderGrunnlag
 import no.nav.omsorgspenger.overføringer.Vurderinger.vurderInngangsvilkår
 import no.nav.omsorgspenger.overføringer.meldinger.*
 import no.nav.omsorgspenger.overføringer.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
@@ -71,7 +70,7 @@ internal class BehandleOverføringAvOmsorgsdager(
             periode = overføreOmsorgsdager.overordnetPeriode
         )
 
-        val grunnlag = Vurderinger.vurderGrunnlag(
+        val grunnlag = vurderGrunnlag(
             grunnlag = Grunnlag(
                 overføreOmsorgsdager = overføreOmsorgsdager,
                 utvidetRettVedtak = utvidetRettVedtak,
@@ -139,7 +138,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
                     utfall = Utfall.GosysJournalføringsoppgaver,
                     gjeldendeOverføringer = mapOf(),
-                    parter = emptySet()
+                    personopplysninger = mapOf()
                 ))
             )
             logger.info("legger til behov [$OpprettGosysJournalføringsoppgaver]")

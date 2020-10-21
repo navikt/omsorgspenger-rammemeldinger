@@ -7,14 +7,14 @@ import no.nav.omsorgspenger.AktørId
 import no.nav.omsorgspenger.Identitetsnummer
 import java.time.LocalDate
 
-internal data class Part(
+internal data class Personopplysninger(
     internal val identitetsnummer: Identitetsnummer,
     internal val fødselsdato: LocalDate,
     internal val navn: String,
     internal val aktørId: AktørId
 ) {
     internal companion object {
-        internal fun Pair<String, JsonNode>.somPart() : Part {
+        internal fun Pair<String, JsonNode>.somPersonopplysninger() : Personopplysninger {
             val navn = second["navn"] as ObjectNode
             val fornavn = navn["fornavn"].asText()
             val mellomnavn = when (navn.hasNonNull("mellomnavn")) {
@@ -22,7 +22,7 @@ internal data class Part(
                 false -> " "
             }
             val etternavn = navn["etternavn"].asText()
-            return Part(
+            return Personopplysninger(
                 identitetsnummer = first,
                 fødselsdato = second["fødselsdato"].asLocalDate(),
                 navn = "$fornavn$mellomnavn$etternavn",

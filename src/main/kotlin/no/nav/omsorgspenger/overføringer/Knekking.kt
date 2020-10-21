@@ -41,7 +41,7 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
     overføreOmsorgsdager.barn.forEach { barn ->
         knekkpunkt.leggTil(
             periode = barn.omsorgenFor,
-            fomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnStarter,
+            fomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnStarter, // HMM forskjell på 12 og 18
             tomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnSlutter
         )
     }

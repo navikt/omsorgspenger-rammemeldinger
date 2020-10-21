@@ -18,11 +18,7 @@ internal class Behandling(
 
     private val karakteristikker = mutableSetOf<Karakteristikk>()
 
-    internal fun oppfyllerIkkeInngangsvilkår() = karakteristikker.contains(Karakteristikk.OppfyllerIkkeInngangsvilkår)
-
     internal fun inneholderIkkeVerifiserbareVedtakOmUtvidetRett() = karakteristikker.contains(Karakteristikk.InneholderIkkeVerifiserbareVedtakOmUtvidetRett)
-
-    internal fun måBesvaresPerBrev() = karakteristikker.contains(Karakteristikk.MåBesvaresPerBrev)
 
     internal fun leggTilKarakteristikk(karakteristikk: Karakteristikk) : Behandling {
         karakteristikker.add(karakteristikk)
@@ -34,7 +30,8 @@ internal class Behandling(
     internal enum class Karakteristikk {
         OppfyllerIkkeInngangsvilkår,
         InneholderIkkeVerifiserbareVedtakOmUtvidetRett,
-        MåBesvaresPerBrev
+        MåBesvaresPerBrev,
+        VarighetPåOverføringUtledetFraBarnMedUtvidetRett
     }
 }
 

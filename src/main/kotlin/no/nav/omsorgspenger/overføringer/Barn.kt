@@ -9,8 +9,7 @@ internal data class Barn(
     internal val identitetsnummer: String,
     internal val fødselsdato: LocalDate,
     internal val aleneOmOmsorgen: Boolean,
-    internal val utvidetRett: Boolean
-) {
+    internal val utvidetRett: Boolean) {
 
     private val omsorgenForBarnetUtÅretBarnetFyller = when (utvidetRett) {
         true -> 18
@@ -31,8 +30,9 @@ internal data class Barn(
             aleneOmOmsorgen = get("aleneOmOmsorgen").asBoolean(),
             utvidetRett = get("utvidetRett").asBoolean()
         )
+        internal fun List<Barn>.sisteDatoMedOmsorgenFor() =
+            maxByOrNull { it.omsorgenFor.tom }?.let { barn ->
+                barn.omsorgenFor.tom to barn.utvidetRett
+            }
     }
-
 }
-internal fun List<Barn>.sisteDatoMedOmsorgenFor() =
-    maxByOrNull { it.omsorgenFor.tom }?.omsorgenFor?.tom
