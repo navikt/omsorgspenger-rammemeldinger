@@ -73,17 +73,12 @@ internal class PubliserOverføringAvOmsorgsdager (
                 )
             )
         )
-        
+
         opprettMeldingsBestillinger(
             behovssekvensId = id,
             personopplysninger = personopplysninger,
-            saksnummer = behandling.gjeldendeOverføringer.entries.map { it.key to it.value.saksnummer }.toMap(),
-            overføringFra = overføreOmsorgsdager.overførerFra,
-            overføringTil = overføreOmsorgsdager.overførerTil,
-            overføringer = behandling.overføringer,
-            mottaksdato = overføreOmsorgsdager.mottaksdato,
-            måSendesSomBrev = behandling.måBesvaresPerBrev(),
-            varighetPåOverføringUtledetFraBarnMedUtvidetRett = behandling.varighetPåOverføringUtledetFraBarnMedUtvidetRett()
+            overføreOmsorgsdager = overføreOmsorgsdager,
+            behandling = behandling
         ).forEach {
             logger.info(it.keyValue.second)
         }

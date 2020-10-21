@@ -18,17 +18,17 @@ internal class Meldingsbestilling(
             """
             {
                 "eksternReferanse": "$behovssekvensId",
-                "dokumentbestillingId": "$behovssekvensId-$aktørId",
+                "dokumentbestillingId": "$$behovssekvensId-$aktørId",
                 "aktørId": "$aktørId",
                 "ytelseType": "OMSORGSPENGER",
                 "saksnummer": "$saksnummer",
                 "dokumentMal": "${melding.mal}",
                 "avsenderApplikasjon": "OMSORGSPENGER_RAMMEMELDINGER",
-                "måSendesSomBrev" : $måSendesSomBrev
+                "distribuere" : $måSendesSomBrev
             }
             """.trimEnd()
 
-        behovssekvensId to JSONObject(bestilling).also {
+        "$behovssekvensId-$aktørId" to JSONObject(bestilling).also {
             it.put("dokumentdata", JSONObject(melding.data))
         }.toString()
     }()

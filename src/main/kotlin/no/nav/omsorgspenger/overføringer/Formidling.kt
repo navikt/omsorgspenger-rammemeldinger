@@ -2,22 +2,25 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.BehovssekvensId
 import no.nav.omsorgspenger.Identitetsnummer
-import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.formidling.Melding
 import no.nav.omsorgspenger.formidling.Meldingsbestilling
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
+import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 
 internal object Fordmidling {
     internal fun opprettMeldingsBestillinger(
         behovssekvensId: BehovssekvensId,
         personopplysninger: Map<Identitetsnummer, Personopplysninger>,
-        saksnummer: Map<Identitetsnummer, Saksnummer>,
-        overføringFra: Identitetsnummer,
-        overføringTil: Identitetsnummer,
-        måSendesSomBrev: Boolean,
-        varighetPåOverføringUtledetFraBarnMedUtvidetRett: Boolean,
-        mottaksdato: LocalDate,
-        overføringer: List<Overføring>) : List<Meldingsbestilling> {
+        overføreOmsorgsdager: OverføreOmsorgsdagerMelding.Behovet,
+        behandling: OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling) : List<Meldingsbestilling> {
+
+        val saksnummer = behandling
+            .gjeldendeOverføringer
+            .entries
+            .map { it.key to it.value.saksnummer }
+            .toMap()
 
         require(personopplysninger.size == saksnummer.size && personopplysninger.keys.containsAll(saksnummer.keys)) {
             "Mismatch mellom saksnummer og personopplysninger."
@@ -28,17 +31,17 @@ internal object Fordmidling {
         saksnummer.forEach { (identitetsnummer, saksnummer) ->
 
             val melding = when (identitetsnummer) {
-                overføringFra -> GittDager(
-                    til = personopplysninger.getValue(overføringTil),
-                    overføringer = overføringer,
-                    varighetPåOverføringUtledetFraBarnMedUtvidetRett = varighetPåOverføringUtledetFraBarnMedUtvidetRett
+                overføreOmsorgsdager.overførerFra -> GittDager(
+                    til = personopplysninger.getValue(overføreOmsorgsdager.overførerTil),
+                    overføringer = behandling.overføringer,
+                    varighetPåOverføringUtledetFraBarnMedUtvidetRett = behandling.varighetPåOverføringUtledetFraBarnMedUtvidetRett()
                 )
-                overføringTil -> MottattDager(
-                    fra = personopplysninger.getValue(overføringFra),
-                    overføringer = overføringer
+                overføreOmsorgsdager.overførerTil -> MottattDager(
+                    fra = personopplysninger.getValue(overføreOmsorgsdager.overførerFra),
+                    overføringer = behandling.overføringer
                 )
                 else -> TidligerePartner(
-                    fom = mottaksdato.plusDays(1)
+                    fraOgMed = overføreOmsorgsdager.mottaksdato.plusDays(1)
                 )
             }
 
@@ -49,7 +52,7 @@ internal object Fordmidling {
                 melding = melding,
                 // Alle parter får svaret i brev om den som overfører dager
                 // sendte inn per brev...
-                måSendesSomBrev = måSendesSomBrev
+                måSendesSomBrev = behandling.måBesvaresPerBrev()
             ))
         }
         return bestillinger
@@ -62,11 +65,14 @@ internal class GittDager(
     val overføringer: List<Overføring>
 ) : Melding {
     override val mal = "OVERFORE_GITT_DAGER"
-    override val data: String
-        get() = """
+    override val data = {
+        @Language("JSON")
+        val json = """
             {
             }
         """.trimIndent()
+        json
+    }()
 }
 
 internal class MottattDager(
@@ -74,20 +80,27 @@ internal class MottattDager(
     val overføringer: List<Overføring>
 ) : Melding {
     override val mal = "OVERFORE_MOTTATT_DAGER"
-    override val data: String
-        get() = """
+    override val data = {
+        @Language("JSON")
+        val json = """
             {
             }
         """.trimIndent()
+        json
+    }()
 }
 
 internal class TidligerePartner(
-    val fom: LocalDate
+    val fraOgMed: LocalDate
 ) : Melding {
     override val mal = "OVERFORE_TIDLIGERE_PARTNER"
-    override val data: String
-        get() = """
+    override val data = {
+        @Language("JSON")
+        val json = """
             {
+              "fraOgMed": "$fraOgMed"
             }
         """.trimIndent()
+        json
+    }()
 }
