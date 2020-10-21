@@ -28,8 +28,12 @@ internal object Fordmidling {
             "Mismatch mellom saksnummer og personopplysninger."
         }
 
-        require(personopplysninger.containsKey(overføreOmsorgsdager.overførerFra) && personopplysninger.containsKey(overføreOmsorgsdager.overførerTil)) {
-            "Mangler personopplysninger om 'overførerFra' og 'overførerTil'"
+        require(personopplysninger.containsKey(overføreOmsorgsdager.overførerFra)) {
+            "Mangler personopplysninger for 'overførerFra'"
+        }
+
+        require(personopplysninger.containsKey(overføreOmsorgsdager.overførerTil)) {
+            "Mangler personopplysninger for 'overførerTil'"
         }
 
         val bestillinger = mutableListOf<Meldingsbestilling>()
@@ -83,19 +87,11 @@ internal class GittDager(
                 ))
             }
         }
-        val overførerTilJSONObject = JSONObject().also {
-            it.put("navn", mapOf(
-                "fornavn" to til.navn,
-                "mellomnavn" to "TODO: Struktuerer navn",
-                "etternavn" to "TODO: navn må være optional"
-            ))
-            it.put("fødselsdato", til.fødselsdato.toString())
-        }
 
         JSONObject().also { root ->
             root.put("antallDagerØnsketOverført", antallDagerØnsketOverført)
             root.put("overføringer", overføringerJSONArray)
-            root.put("overførerTil", overførerTilJSONObject)
+            root.put("til", til.somJSONObject())
         }.toString()
     }()
 }
@@ -106,12 +102,20 @@ internal class MottattDager(
 ) : Melding {
     override val mal = "OVERFORE_MOTTATT_DAGER"
     override val data = {
-        @Language("JSON")
-        val json = """
-            {
+        val overføringerJSONArray = JSONArray().also {
+            overføringer.forEach { overføring ->
+                it.put(mapOf(
+                    "gjelderFraOgMed" to "${overføring.periode.fom}",
+                    "gjelderTilOgMed" to "${overføring.periode.tom}",
+                    "antallDager" to overføring.antallDager
+                ))
             }
-        """.trimIndent()
-        json
+        }
+
+        JSONObject().also { root ->
+            root.put("overføringer", overføringerJSONArray)
+            root.put("fra", fra.somJSONObject())
+        }.toString()
     }()
 }
 
@@ -128,4 +132,15 @@ internal class TidligerePartner(
         """.trimIndent()
         json
     }()
+}
+
+private fun Personopplysninger.somJSONObject() : JSONObject? {
+    return JSONObject().also {
+        it.put("navn", mapOf(
+            "fornavn" to navn,
+            "mellomnavn" to "TODO: Struktuerer navn",
+            "etternavn" to "TODO: navn må være optional"
+        ))
+        it.put("fødselsdato", fødselsdato.toString())
+    }
 }
