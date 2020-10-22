@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer
-import no.nav.omsorgspenger.overføringer.Part
-import no.nav.omsorgspenger.overføringer.Part.Companion.somPart
+import no.nav.omsorgspenger.overføringer.Personopplysninger
+import no.nav.omsorgspenger.overføringer.Personopplysninger.Companion.somPersonopplysninger
 
 internal object HentPersonopplysningerMelding :
     LeggTilBehov<HentPersonopplysningerMelding.BehovInput>,
-    HentLøsning<Set<Part>> {
+    HentLøsning<Map<Identitetsnummer, Personopplysninger>> {
     internal const val HentPersonopplysninger = "HentPersonopplysninger"
     private const val PersonopplysningerKey = "@løsninger.$HentPersonopplysninger.personopplysninger"
 
@@ -25,12 +25,12 @@ internal object HentPersonopplysningerMelding :
         packet.interestedIn(PersonopplysningerKey)
     }
 
-    override fun hentLøsning(packet: JsonMessage): Set<Part> {
+    override fun hentLøsning(packet: JsonMessage): Map<Identitetsnummer, Personopplysninger> {
          return(packet[PersonopplysningerKey] as ObjectNode)
              .fields()
              .asSequence()
-             .map { it.toPair().somPart() }
-             .toSet()
+             .map { it.key to it.toPair().somPersonopplysninger() }
+             .toMap()
     }
 
     internal data class BehovInput(

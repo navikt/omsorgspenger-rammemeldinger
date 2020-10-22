@@ -52,8 +52,10 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
         internal val karakteristikker: Set<Behandling.Karakteristikk>,
         internal val overføringer: List<Overføring>,
         internal val gjeldendeOverføringer: Map<Identitetsnummer, GjeldendeOverføringer>,
-        internal val periode: Periode
-    )
+        internal val periode: Periode) {
+        internal fun oppfyllerIkkeInngangsvilkår() = karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
+        internal fun måBesvaresPerBrev() = karakteristikker.contains(Behandling.Karakteristikk.MåBesvaresPerBrev)
+    }
 
     private object LøsningKeys {
         const val Karakteristikker = "@løsninger.$OverføreOmsorgsdagerBehandling.karakteristikker"

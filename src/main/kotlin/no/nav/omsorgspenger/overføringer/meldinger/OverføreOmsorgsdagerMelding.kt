@@ -7,9 +7,9 @@ import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Barn
+import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenFor
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
 import no.nav.omsorgspenger.overføringer.Utfall
-import no.nav.omsorgspenger.overføringer.sisteDatoMedOmsorgenFor
 import java.time.LocalDate
 
 internal object OverføreOmsorgsdagerMelding :
@@ -57,7 +57,6 @@ internal object OverføreOmsorgsdagerMelding :
     }
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
-        val personopplysninger = løsning.parter.associateBy { it.identitetsnummer }
         val overføringer = løsning.gjeldendeOverføringer
             .mapValues { (_,gjeldendeOverføringer) ->
                 mapOf(
@@ -66,8 +65,8 @@ internal object OverføreOmsorgsdagerMelding :
                         "gjelderFraOgMed" to gitt.periode.fom,
                         "gjelderTilOgMed" to gitt.periode.tom,
                         "til" to mapOf(
-                            "navn" to personopplysninger.getValue(gitt.til.identitetsnummer).navn,
-                            "fødselsdato" to personopplysninger.getValue(gitt.til.identitetsnummer).fødselsdato.toString()
+                            "navn" to løsning.personopplysninger.getValue(gitt.til.identitetsnummer).navn,
+                            "fødselsdato" to løsning.personopplysninger.getValue(gitt.til.identitetsnummer).fødselsdato.toString()
                         )
                     )},
                     "fått" to gjeldendeOverføringer.fått.map { fått -> mapOf(
@@ -75,8 +74,8 @@ internal object OverføreOmsorgsdagerMelding :
                         "gjelderFraOgMed" to fått.periode.fom,
                         "gjelderTilOgMed" to fått.periode.tom,
                         "fra" to mapOf(
-                            "navn" to personopplysninger.getValue(fått.fra.identitetsnummer).navn,
-                            "fødselsdato" to personopplysninger.getValue(fått.fra.identitetsnummer).fødselsdato.toString()
+                            "navn" to løsning.personopplysninger.getValue(fått.fra.identitetsnummer).navn,
+                            "fødselsdato" to løsning.personopplysninger.getValue(fått.fra.identitetsnummer).fødselsdato.toString()
                         )
                     )}
                 )
@@ -102,28 +101,36 @@ internal object OverføreOmsorgsdagerMelding :
         val journalpostIder: Set<String>,
         val relasjon: Relasjon,
         val harBoddSammentMinstEttÅr: Boolean?) {
+        val overordnetPeriode : Periode
+        val overordnetPeriodeUtledetFraBarnMedUtvidetRett : Boolean
 
-        internal val overordnetPeriode: Periode = {
-            val sisteDatoMedOmsorgenFor = barn.sisteDatoMedOmsorgenFor()
-            val tom = when {
-                sisteDatoMedOmsorgenFor?.isAfter(mottaksdato) ?: false -> sisteDatoMedOmsorgenFor!!
-                else -> mottaksdato
+        init {
+            val (sisteDatoMedOmsorgenFor, utledetFraBarnMedUtvidetRett) =
+                barn.sisteDatoMedOmsorgenFor()?:(mottaksdato to false)
+
+            when {
+                sisteDatoMedOmsorgenFor.isBefore(mottaksdato) -> {
+                    overordnetPeriode = Periode(fom = mottaksdato, tom = mottaksdato)
+                    overordnetPeriodeUtledetFraBarnMedUtvidetRett = false
+                }
+                else -> {
+                    overordnetPeriode = Periode(fom = mottaksdato, tom = sisteDatoMedOmsorgenFor)
+                    overordnetPeriodeUtledetFraBarnMedUtvidetRett = utledetFraBarnMedUtvidetRett
+                }
             }
-            Periode(fom = mottaksdato, tom = tom)
-        }()
+        }
     }
 
     internal data class Løsningen(
         internal val utfall: Utfall,
         internal val gjeldendeOverføringer: Map<Identitetsnummer, GjeldendeOverføringer>,
-        internal val parter: Set<Part>
+        internal val personopplysninger: Map<Identitetsnummer, Personopplysninger>
     )
 
     internal enum class Relasjon {
         NåværendeEktefelle,
         NåværendeSamboer
     }
-    private val gyldigeRelasjoner = Relasjon.values().map { it.name }
 
     private object BehovKeys {
         val Barn = "@behov.$OverføreOmsorgsdager.barn"

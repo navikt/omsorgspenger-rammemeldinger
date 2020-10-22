@@ -8,6 +8,7 @@ typealias Identitetsnummer = String
 typealias Saksnummer = String
 typealias JournalpostId = String
 typealias CorrelationId = String
+typealias BehovssekvensId = String
 internal fun JsonMessage.correlationId() : CorrelationId = get(Behovsformat.CorrelationId).asText()
 
 internal data class Kilde(

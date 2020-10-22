@@ -46,6 +46,8 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
+  secureLogs:
+    enabled: true
   filesFrom:
     - secret: omsorgspenger-meldinger-srvusercredentials
       mountPath: /var/run/secrets/nais.io/service_user

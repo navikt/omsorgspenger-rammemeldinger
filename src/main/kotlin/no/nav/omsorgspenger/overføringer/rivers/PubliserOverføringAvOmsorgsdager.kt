@@ -5,6 +5,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
+import no.nav.omsorgspenger.overføringer.Fordmidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
@@ -40,10 +41,10 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding.hentLøsning(packet)
-        val parter = HentPersonopplysningerMelding.hentLøsning(packet)
+        val personopplysninger = HentPersonopplysningerMelding.hentLøsning(packet)
 
         val utfall = when {
-            behandling.karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår) -> Utfall.Avslått
+            behandling.oppfyllerIkkeInngangsvilkår() -> Utfall.Avslått
             behandling.overføringer.isEmpty() -> Utfall.Avslått
             else -> Utfall.Gjennomført
         }
@@ -52,7 +53,7 @@ internal class PubliserOverføringAvOmsorgsdager (
             OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
                 utfall = utfall,
                 gjeldendeOverføringer = behandling.gjeldendeOverføringer,
-                parter = parter
+                personopplysninger = personopplysninger
             ))
         )
 
@@ -72,6 +73,16 @@ internal class PubliserOverføringAvOmsorgsdager (
                 )
             )
         )
+
+        secureLogger.trace("Bestillinger til formidling")
+        opprettMeldingsBestillinger(
+            behovssekvensId = id,
+            personopplysninger = personopplysninger,
+            overføreOmsorgsdager = overføreOmsorgsdager,
+            behandling = behandling
+        ).forEach {
+            secureLogger.trace(it.keyValue.second)
+        }
 
         // TODO: Send bestilling på formidling https://github.com/navikt/omsorgspenger-rammemeldinger/issues/14
         // TODO: Send info om saksstatistikk https://github.com/navikt/omsorgspenger-rammemeldinger/issues/15
