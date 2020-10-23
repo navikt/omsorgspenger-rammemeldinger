@@ -5,18 +5,14 @@ import no.nav.omsorgspenger.lovverk.Lovanvendelser
 
 internal class Behandling(
     sendtPerBrev: Boolean,
-    internal val periode: Periode
-) {
-
-    init {
+    internal val periode: Periode) {
+    private val karakteristikker = mutableSetOf<Karakteristikk>().also {
         if (sendtPerBrev) {
-            leggTilKarakteristikk(Karakteristikk.MåBesvaresPerBrev)
+            it.add(Karakteristikk.MåBesvaresPerBrev)
         }
     }
 
     internal val lovanvendelser = Lovanvendelser()
-
-    private val karakteristikker = mutableSetOf<Karakteristikk>()
 
     internal fun inneholderIkkeVerifiserbareVedtakOmUtvidetRett() = karakteristikker.contains(Karakteristikk.InneholderIkkeVerifiserbareVedtakOmUtvidetRett)
 
@@ -33,4 +29,3 @@ internal class Behandling(
         MåBesvaresPerBrev
     }
 }
-
