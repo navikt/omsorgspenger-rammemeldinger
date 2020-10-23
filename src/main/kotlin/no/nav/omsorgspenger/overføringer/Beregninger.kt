@@ -127,7 +127,7 @@ internal object Beregninger {
         }
     }
 
-    private fun beregnOmsorgsdager(
+    internal fun beregnOmsorgsdager(
         antallBarnMedOmsorgenFor: Int,
         antallBarnMedAleneOmOmsorgen: Int,
         antallBarnMedUtvidetRett: Int,
