@@ -8,6 +8,14 @@ import java.time.LocalDate
 internal class BeregningerTest {
 
     @Test
+    internal fun `Ingen barn gir 0 dager`() {
+        val nå = LocalDate.now()
+        val omsorgsdagerResultat = Beregninger.beregnOmsorgsdager(listOf(), Periode(nå, nå))
+
+        assertEquals(omsorgsdagerResultat.antallOmsorgsdager(), 0)
+    }
+
+    @Test
     internal fun `1 til 2 barn gir 10 dager`() {
         val nå = LocalDate.now()
         val etBarn = Barn(
