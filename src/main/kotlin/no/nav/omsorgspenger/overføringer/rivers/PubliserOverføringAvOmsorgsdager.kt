@@ -45,7 +45,7 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         val utfall = when {
             behandling.oppfyllerIkkeInngangsvilkår() -> Utfall.Avslått
-            behandling.overføringer.isEmpty() -> Utfall.Avslått
+            behandling.ingenOverføringer() -> Utfall.Avslått
             else -> Utfall.Gjennomført
         }
 

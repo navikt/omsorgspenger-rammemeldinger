@@ -186,7 +186,7 @@ internal class BehandleOverføringAvOmsorgsdager(
         false -> overføringService.gjennomførOverføringer(
             fra = fra,
             til = til,
-            overføringer = overføringer
+            overføringer = overføringer.fjernOverføringerUtenDager()
         )
     }
 }

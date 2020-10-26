@@ -6,6 +6,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Behandling
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.Overføring
@@ -55,6 +56,7 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
         internal val periode: Periode) {
         internal fun oppfyllerIkkeInngangsvilkår() = karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
         internal fun måBesvaresPerBrev() = karakteristikker.contains(Behandling.Karakteristikk.MåBesvaresPerBrev)
+        internal fun ingenOverføringer() = overføringer.fjernOverføringerUtenDager().isEmpty()
     }
 
     private object LøsningKeys {

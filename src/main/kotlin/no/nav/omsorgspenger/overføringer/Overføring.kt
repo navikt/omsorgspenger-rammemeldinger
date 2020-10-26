@@ -72,5 +72,7 @@ internal fun Map<KnektPeriode, Int>.somOverføringer(
             }
         }
     }
-    return overføringer.filterNot { it.antallDager == 0 }.toList()
+    return overføringer
 }
+
+internal fun List<Overføring>.fjernOverføringerUtenDager() = filterNot { it.antallDager <= 0 }
