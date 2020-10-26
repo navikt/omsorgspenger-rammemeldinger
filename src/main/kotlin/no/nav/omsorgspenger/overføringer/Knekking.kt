@@ -25,6 +25,11 @@ internal enum class Knekkpunkt {
 }
 
 internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
+    val boundary = Periode(
+        fom = overordnetPeriode.fom,
+        tom = overordnetPeriode.tom.plusDays(1)
+    )
+
     val knekkpunkt = mutableMapOf<LocalDate, MutableList<Knekkpunkt>>().also {
         it.leggTil(
             periode = overordnetPeriode,
@@ -32,14 +37,16 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
             tomKnekkpunkt = when (overføreOmsorgsdager.overordnetPeriodeUtledetFraBarnMedUtvidetRett) {
                 true -> Knekkpunkt.OmsorgenForMedUtvidetRettSlutter
                 false -> Knekkpunkt.OmsorgenForSlutter
-            }
+            },
+            boundary = boundary
         )
     }
 
     if (overføreOmsorgsdager.omsorgsdagerTattUtIÅr > 0) {
         knekkpunkt.leggTil(
             dato = overføreOmsorgsdager.mottaksdato.førsteDagNesteÅr(),
-            knekkpunkt = Knekkpunkt.NullstillingAvForbrukteDager
+            knekkpunkt = Knekkpunkt.NullstillingAvForbrukteDager,
+            boundary = boundary
         )
     }
 
@@ -47,7 +54,8 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
         knekkpunkt.leggTil(
             periode = barn.omsorgenFor,
             fomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnStarter,
-            tomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnSlutter
+            tomKnekkpunkt = Knekkpunkt.OmsorgenForEtBarnSlutter,
+            boundary = boundary
         )
     }
 
@@ -55,7 +63,8 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
         knekkpunkt.leggTil(
             periode = fordelingGirMelding.periode,
             fomKnekkpunkt = Knekkpunkt.FordelingGirStarter,
-            tomKnekkpunkt = Knekkpunkt.FordelingGirSlutter
+            tomKnekkpunkt = Knekkpunkt.FordelingGirSlutter,
+            boundary = boundary
         )
     }
 
@@ -63,7 +72,8 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
         knekkpunkt.leggTil(
             periode = midlertidigAleneVedtak.periode,
             fomKnekkpunkt = Knekkpunkt.MidlertidigAleneStarter,
-            tomKnekkpunkt = Knekkpunkt.MidlertidigAleneSlutter
+            tomKnekkpunkt = Knekkpunkt.MidlertidigAleneSlutter,
+            boundary = boundary
         )
     }
 
@@ -76,22 +86,26 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
     )}
 }
 
-private fun Map<LocalDate, List<Knekkpunkt>>.hentKnekkpunktFor(dato: LocalDate) : List<Knekkpunkt> {
-    val knekkpunkt = get(dato) ?: error("Mangler knekkpunkt for $dato")
-    return when {
-        knekkpunkt.contains(Knekkpunkt.OmsorgenForSlutter) -> listOf(Knekkpunkt.OmsorgenForSlutter)
-        knekkpunkt.contains(Knekkpunkt.OmsorgenForMedUtvidetRettSlutter) -> listOf(Knekkpunkt.OmsorgenForMedUtvidetRettSlutter)
-        else -> knekkpunkt
+private fun Map<LocalDate, List<Knekkpunkt>>.hentKnekkpunktFor(dato: LocalDate) =
+    get(dato) ?: error("Mangler knekkpunkt for $dato")
+
+private fun MutableMap<LocalDate, MutableList<Knekkpunkt>>.leggTil(
+    dato: LocalDate,
+    knekkpunkt: Knekkpunkt,
+    boundary: Periode) {
+    val benyttetDato = when {
+        dato.isBefore(boundary.fom) -> boundary.fom
+        dato.isAfter(boundary.tom) -> boundary.tom
+        else -> dato
     }
+    put(benyttetDato, getOrDefault(benyttetDato, mutableListOf()).also { it.add(knekkpunkt) })
 }
 
 private fun MutableMap<LocalDate, MutableList<Knekkpunkt>>.leggTil(
-    dato: LocalDate, knekkpunkt: Knekkpunkt) {
-    put(dato, getOrDefault(dato, mutableListOf()).also { it.add(knekkpunkt) })
-}
-
-private fun MutableMap<LocalDate, MutableList<Knekkpunkt>>.leggTil(
-    periode: Periode, fomKnekkpunkt: Knekkpunkt, tomKnekkpunkt: Knekkpunkt) {
-    leggTil(periode.fom, fomKnekkpunkt)
-    leggTil(periode.tom.plusDays(1), tomKnekkpunkt)
+    periode: Periode,
+    fomKnekkpunkt: Knekkpunkt,
+    tomKnekkpunkt: Knekkpunkt,
+    boundary: Periode) {
+    leggTil(periode.fom, fomKnekkpunkt, boundary)
+    leggTil(periode.tom.plusDays(1), tomKnekkpunkt, boundary)
 }

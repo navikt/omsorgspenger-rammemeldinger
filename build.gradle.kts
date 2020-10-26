@@ -7,6 +7,7 @@ val awaitilityVersion = "4.0.3"
 val mockkVersion = "1.10.0"
 val ulidVersion = "8.2.0"
 val ktorVersion = "1.4.1"
+val assertjVersion = "3.18.0"
 val dusseldorfVersion = "1.4.1.4754df6"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
@@ -39,6 +40,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+    testImplementation("org.assertj:assertj-core:$assertjVersion")
 }
 
 repositories {
