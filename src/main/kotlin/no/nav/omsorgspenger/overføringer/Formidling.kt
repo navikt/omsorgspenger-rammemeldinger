@@ -54,7 +54,7 @@ internal object Fordmidling {
                 )
                 overføreOmsorgsdager.overførerTil -> MottattDager(
                     fra = personopplysninger.getValue(overføreOmsorgsdager.overførerFra),
-                    overføringer = behandling.overføringer,
+                    overføringer = overføringerMedDager, // Mottaker får ingen 0-Overføringer.
                     mottaksdato = overføreOmsorgsdager.mottaksdato
                 )
                 else -> TidligerePartner(
