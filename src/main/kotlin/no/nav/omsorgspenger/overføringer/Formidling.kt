@@ -36,8 +36,10 @@ internal object Fordmidling {
             "Mangler personopplysninger for 'overførerTil'"
         }
 
+        val overføringerMedDager = behandling.overføringer.fjernOverføringerUtenDager()
         // TODO: Håndtere avslag i egen funksjon hvor det kun sendes bestilling på melding til den som forsøkte å overføre.
-        // require(behandling.overføringer.isNotEmpty()) { "Skal ikke sende bestilling til alle parter ved avslag." }
+        // require(overføringerMedDager.isNotEmpty()) { "Skal ikke sende bestilling til alle parter ved avslag." }
+        if (overføringerMedDager.isEmpty()) return listOf()
 
         val bestillinger = mutableListOf<Meldingsbestilling>()
 
@@ -47,14 +49,17 @@ internal object Fordmidling {
                 overføreOmsorgsdager.overførerFra -> GittDager(
                     til = personopplysninger.getValue(overføreOmsorgsdager.overførerTil),
                     overføringer = behandling.overføringer,
-                    antallDagerØnsketOverført = overføreOmsorgsdager.omsorgsdagerÅOverføre
+                    antallDagerØnsketOverført = overføreOmsorgsdager.omsorgsdagerÅOverføre,
+                    mottaksdato = overføreOmsorgsdager.mottaksdato
                 )
                 overføreOmsorgsdager.overførerTil -> MottattDager(
                     fra = personopplysninger.getValue(overføreOmsorgsdager.overførerFra),
-                    overføringer = behandling.overføringer
+                    overføringer = behandling.overføringer,
+                    mottaksdato = overføreOmsorgsdager.mottaksdato
                 )
                 else -> TidligerePartner(
-                    fraOgMed = overføreOmsorgsdager.mottaksdato
+                    mottaksdato = overføreOmsorgsdager.mottaksdato,
+                    fraOgMed = overføringerMedDager.first().periode.fom
                 )
             }
 
@@ -74,26 +79,16 @@ internal object Fordmidling {
 
 internal class GittDager(
     val til: Personopplysninger,
+    val mottaksdato: LocalDate,
     val antallDagerØnsketOverført: Int,
     val overføringer: List<Overføring>
 ) : Melding {
     override val mal = "OVERFORE_GITT_DAGER"
     override val data = {
-        val overføringerJSONArray = JSONArray().also {
-            overføringer.forEach { overføring ->
-                it.put(mapOf(
-                    "gjelderFraOgMed" to "${overføring.periode.fom}",
-                    "gjelderTilOgMed" to "${overføring.periode.tom}",
-                    "antallDager" to overføring.antallDager,
-                    "starterGrunnet" to overføring.starterGrunnet.map { knekk -> knekk.dto() },
-                    "slutterGrunnet" to overføring.slutterGrunnet.map { knekk -> knekk.dto() }
-                ))
-            }
-        }
-
         JSONObject().also { root ->
+            root.put("mottaksdato", mottaksdato.toString())
             root.put("antallDagerØnsketOverført", antallDagerØnsketOverført)
-            root.put("overføringer", overføringerJSONArray)
+            root.put("overføringer", overføringer.somJSONArray())
             root.put("til", til.somJSONObject())
         }.toString()
     }()
@@ -101,38 +96,30 @@ internal class GittDager(
 
 internal class MottattDager(
     val fra: Personopplysninger,
+    val mottaksdato: LocalDate,
     val overføringer: List<Overføring>
 ) : Melding {
     override val mal = "OVERFORE_MOTTATT_DAGER"
     override val data = {
-        val overføringerJSONArray = JSONArray().also {
-            overføringer.forEach { overføring ->
-                it.put(mapOf(
-                    "gjelderFraOgMed" to "${overføring.periode.fom}",
-                    "gjelderTilOgMed" to "${overføring.periode.tom}",
-                    "antallDager" to overføring.antallDager,
-                    "starterGrunnet" to overføring.starterGrunnet.map { knekk -> knekk.dto() },
-                    "slutterGrunnet" to overføring.slutterGrunnet.map { knekk -> knekk.dto() }
-                ))
-            }
-        }
-
         JSONObject().also { root ->
-            root.put("overføringer", overføringerJSONArray)
+            root.put("mottaksdato", mottaksdato.toString())
+            root.put("overføringer", overføringer.somJSONArray())
             root.put("fra", fra.somJSONObject())
         }.toString()
     }()
 }
 
 internal class TidligerePartner(
-    val fraOgMed: LocalDate
+    val fraOgMed: LocalDate,
+    val mottaksdato: LocalDate
 ) : Melding {
     override val mal = "OVERFORE_TIDLIGERE_PARTNER"
     override val data = {
         @Language("JSON")
         val json = """
             {
-              "fraOgMed": "$fraOgMed"
+              "fraOgMed": "$fraOgMed",
+              "mottaksdato": "$mottaksdato"
             }
         """.trimIndent()
         json
@@ -147,6 +134,17 @@ private fun Personopplysninger.somJSONObject() : JSONObject? {
             "etternavn" to "TODO: navn må være optional"
         ))
         it.put("fødselsdato", fødselsdato.toString())
+    }
+}
+private fun List<Overføring>.somJSONArray() = JSONArray().also {
+    forEach { overføring ->
+        it.put(mapOf(
+            "gjelderFraOgMed" to "${overføring.periode.fom}",
+            "gjelderTilOgMed" to "${overføring.periode.tom}",
+            "antallDager" to overføring.antallDager,
+            "starterGrunnet" to overføring.starterGrunnet.map { knekk -> knekk.dto() },
+            "slutterGrunnet" to overføring.slutterGrunnet.map { knekk -> knekk.dto() }
+        ))
     }
 }
 private fun Knekkpunkt.dto() = when(this) {
