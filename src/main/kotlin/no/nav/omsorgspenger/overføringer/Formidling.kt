@@ -85,8 +85,8 @@ internal class GittDager(
                     "gjelderFraOgMed" to "${overføring.periode.fom}",
                     "gjelderTilOgMed" to "${overføring.periode.tom}",
                     "antallDager" to overføring.antallDager,
-                    "starterGrunnet" to overføring.starterGrunnet.map { knekk -> knekk.name },
-                    "slutterGrunnet" to overføring.slutterGrunnet.map { knekk -> knekk.name }
+                    "starterGrunnet" to overføring.starterGrunnet.map { knekk -> knekk.dto() },
+                    "slutterGrunnet" to overføring.slutterGrunnet.map { knekk -> knekk.dto() }
                 ))
             }
         }
@@ -110,7 +110,9 @@ internal class MottattDager(
                 it.put(mapOf(
                     "gjelderFraOgMed" to "${overføring.periode.fom}",
                     "gjelderTilOgMed" to "${overføring.periode.tom}",
-                    "antallDager" to overføring.antallDager
+                    "antallDager" to overføring.antallDager,
+                    "starterGrunnet" to overføring.starterGrunnet.map { knekk -> knekk.dto() },
+                    "slutterGrunnet" to overføring.slutterGrunnet.map { knekk -> knekk.dto() }
                 ))
             }
         }
@@ -146,4 +148,18 @@ private fun Personopplysninger.somJSONObject() : JSONObject? {
         ))
         it.put("fødselsdato", fødselsdato.toString())
     }
+}
+private fun Knekkpunkt.dto() = when(this) {
+    // Vil alltid være i listen 'starterGrunnet' for første overføring
+    Knekkpunkt.Mottaksdato -> "MOTTAKSDATO"
+    Knekkpunkt.NullstillingAvForbrukteDager -> "NULLSTILLING_AV_FORBRUKTE_DAGER"
+    Knekkpunkt.OmsorgenForEtBarnStarter -> "OMSORGEN_FOR_ET_BARN_STARTER"
+    Knekkpunkt.OmsorgenForEtBarnSlutter -> "OMSORGEN_FOR_ET_BARN_SLUTTER"
+    Knekkpunkt.FordelingGirStarter -> "FORDELING_GIR_STARTER"
+    Knekkpunkt.FordelingGirSlutter -> "FORDELING_GIR_SLUTTER"
+    Knekkpunkt.MidlertidigAleneStarter -> "MIDLERTIDIG_ALENE_STARTER"
+    Knekkpunkt.MidlertidigAleneSlutter -> "MIDLERTIDIG_ALENE_SLUTTER"
+    // Vil alltid være en av disse to i 'sluttetGrunnet' for siste overføring
+    Knekkpunkt.OmsorgenForSlutter -> "OMSORGEN_FOR_SLUTTER"
+    Knekkpunkt.OmsorgenForMedUtvidetRettSlutter -> "OMSORGEN_FOR_MED_UTVIDET_RETT_SLUTTER"
 }

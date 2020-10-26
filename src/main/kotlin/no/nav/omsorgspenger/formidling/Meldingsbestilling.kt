@@ -18,7 +18,7 @@ internal class Meldingsbestilling(
             """
             {
                 "eksternReferanse": "$behovssekvensId",
-                "dokumentbestillingId": "$$behovssekvensId-$aktørId",
+                "dokumentbestillingId": "$behovssekvensId-$aktørId",
                 "aktørId": "$aktørId",
                 "ytelseType": "OMSORGSPENGER",
                 "saksnummer": "$saksnummer",
