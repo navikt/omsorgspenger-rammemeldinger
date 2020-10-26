@@ -17,7 +17,7 @@ internal object Beregninger {
     internal fun beregnOmsorgsdagerTilgjengeligForOverføring(
         grunnlag: Grunnlag,
         behandling: Behandling
-    ) : Map<KnektPeriode, Int> {
+    ): Map<KnektPeriode, Int> {
         val beregnet = mutableMapOf<KnektPeriode, Int>()
         grunnlag.knekk(behandling.periode).forEach { knektPeriode ->
             beregnet[knektPeriode] = beregnPeriode(grunnlag, knektPeriode.periode, behandling)
@@ -25,26 +25,8 @@ internal object Beregninger {
         return beregnet
     }
 
-    private fun beregnPeriode(grunnlag: Grunnlag, periode: Periode, behandling: Behandling) : Int {
-        val barnMedOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.omsorgenFor.inneholder(periode) }
-        val fordelingGirMeldinger = grunnlag.fordelingGirMeldinger.filter { it.periode.inneholder(periode) }
+    private fun beregnPeriode(grunnlag: Grunnlag, periode: Periode, behandling: Behandling): Int {
         val erMidlertidigAleneIPerioden = grunnlag.midlertidigAleneVedtak.any { it.periode.inneholder(periode) }
-
-        val barnMedAleneOmOmsorgen = barnMedOmsorgenFor.filter {  it.aleneOmOmsorgen }.also { if (it.isNotEmpty()) {
-            behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = AleneOmOmsorgenForBarnet,
-                anvendelse = "Har aleneomsorg for ${it.size} barn"
-            )
-        }}
-
-        if (barnMedAleneOmOmsorgen.isEmpty()) {
-            return behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = AleneOmOmsorgenForBarnet,
-                anvendelse = "Må være alene om omsorgen for minst ett barn for å kunne overføre omsorgsdager."
-            ).let { 0 }
-        }
 
         if (erMidlertidigAleneIPerioden) {
             return behandling.lovanvendelser.leggTil(
@@ -54,72 +36,96 @@ internal object Beregninger {
             ).let { 0 }
         }
 
-        when (barnMedOmsorgenFor.size) {
+        val fordelingGirMeldinger = grunnlag.fordelingGirMeldinger.filter { it.periode.inneholder(periode) }
+        val omsorgsdagerResultat = beregnOmsorgsdager(grunnlag.overføreOmsorgsdager.barn, periode)
+        val (
+            grunnrettsdager,
+            aleneomsorgsdager,
+            utvidetRettDager,
+            aleneomsorgOgUtvidetRettDager
+        ) = omsorgsdagerResultat
+
+        when (grunnrettsdager.antallBarn) {
+            0 -> {
+                return behandling.lovanvendelser.leggTil(
+                    periode = periode,
+                    lovhenvisning = AleneOmOmsorgenForBarnet,
+                    anvendelse = "Må være alene om omsorgen for minst ett barn for å kunne overføre omsorgsdager."
+                ).let { 0 }
+            }
             in 1..2 -> {
                 behandling.lovanvendelser.leggTil(
                     periode = periode,
                     lovhenvisning = GrunnrettOppTilToBarn,
-                    anvendelse = "Har omsorgen for ${barnMedOmsorgenFor.size} barn"
+                    anvendelse = "Har omsorgen for ${grunnrettsdager.antallBarn} barn"
                 )
             }
             else -> {
                 behandling.lovanvendelser.leggTil(
                     periode = periode,
                     lovhenvisning = GrunnrettTreEllerFlerBarn,
-                    anvendelse = "Har omsorgen for ${barnMedOmsorgenFor.size} barn"
+                    anvendelse = "Har omsorgen for ${grunnrettsdager.antallBarn} barn"
                 )
             }
         }
 
-        val barnMedUtvidetRett = barnMedOmsorgenFor.filter { it.utvidetRett }.also { if (it.isNotEmpty()) {
+        if (aleneomsorgsdager.antallBarn > 0) {
             behandling.lovanvendelser.leggTil(
                 periode = periode,
-                lovhenvisning = UtvidetRettForBarnet,
-                anvendelse = "Har utvidet rett for ${it.size} barn"
-            )
-        }}
-        val barnMedUtvidetRettOgAleneOmOmsorgen = barnMedOmsorgenFor.filter { it.utvidetRett && it.aleneOmOmsorgen }.also { if(it.isNotEmpty())  {
-            behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = UtvidetRettOgAleneOmOmsorgenForBarnet,
-                anvendelse = "Har aleneomsorg og utvidet rett for ${it.size} barn"
-            )
-        }}
-
-        val omsorgsdager = beregnOmsorgsdager(
-            antallBarnMedOmsorgenFor = barnMedOmsorgenFor.size,
-            antallBarnMedAleneOmOmsorgen = barnMedAleneOmOmsorgen.size,
-            antallBarnMedUtvidetRett = barnMedUtvidetRett.size,
-            antallBarnMedUtvidetRettOgAleneOmOmsorgen = barnMedUtvidetRettOgAleneOmOmsorgen.size
-        ).also {
-            behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = AntallOmsorgsdager,
-                anvendelse = "Har $it omsorgsdager"
+                lovhenvisning = AleneOmOmsorgenForBarnet,
+                anvendelse = "Har aleneomsorg for ${aleneomsorgsdager.antallBarn} barn"
             )
         }
 
+        if (utvidetRettDager.antallBarn > 0) {
+            behandling.lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = UtvidetRettForBarnet,
+                anvendelse = "Har utvidet rett for ${utvidetRettDager.antallBarn} barn"
+            )
+        }
+
+        if (aleneomsorgOgUtvidetRettDager.antallBarn > 0) {
+            behandling.lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = UtvidetRettOgAleneOmOmsorgenForBarnet,
+                anvendelse = "Har aleneomsorg og utvidet rett for ${aleneomsorgOgUtvidetRettDager.antallBarn} barn"
+            )
+        }
+
+        val antallOmsorgsdager = omsorgsdagerResultat.antallOmsorgsdager()
+
+        behandling.lovanvendelser.leggTil(
+            periode = periode,
+            lovhenvisning = AntallOmsorgsdager,
+            anvendelse = "Har $antallOmsorgsdager omsorgsdager"
+        )
+
         val dagerTattUt = when (grunnlag.overføreOmsorgsdager.mottaksdato.year == periode.tom.year) {
-            true -> grunnlag.overføreOmsorgsdager.omsorgsdagerTattUtIÅr.also { if (it > 0) {
-                behandling.lovanvendelser.leggTil(
-                    periode = periode,
-                    lovhenvisning = AlleredeForbrukteDager,
-                    anvendelse = "Har allerede tatt ut $it dager i ${periode.tom.year}"
-                )
-            }}
+            true -> grunnlag.overføreOmsorgsdager.omsorgsdagerTattUtIÅr.also {
+                if (it > 0) {
+                    behandling.lovanvendelser.leggTil(
+                        periode = periode,
+                        lovhenvisning = AlleredeForbrukteDager,
+                        anvendelse = "Har allerede tatt ut $it dager i ${periode.tom.year}"
+                    )
+                }
+            }
             false -> 0
         }
 
         // TODO: Bør kanskje bare regne med duration hele vegen..
-        val fordeltBort = fordelingGirMeldinger.sumBy { it.lengde.toDays().toInt() }.also { if (it > 0) {
-            behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = FordeltBortOmsorgsdager,
-                anvendelse = "Har fordelt $it dager til andre personer"
-            )
-        }}
+        val fordeltBort = fordelingGirMeldinger.sumBy { it.lengde.toDays().toInt() }.also {
+            if (it > 0) {
+                behandling.lovanvendelser.leggTil(
+                    periode = periode,
+                    lovhenvisning = FordeltBortOmsorgsdager,
+                    anvendelse = "Har fordelt $it dager til andre personer"
+                )
+            }
+        }
 
-        val tilgjengeligeDager = omsorgsdager - dagerTattUt - fordeltBort
+        val tilgjengeligeDager = antallOmsorgsdager - dagerTattUt - fordeltBort
 
         return when (tilgjengeligeDager > DagerMaksForOverføring) {
             true -> DagerMaksForOverføring
@@ -127,34 +133,60 @@ internal object Beregninger {
         }
     }
 
-    private fun beregnOmsorgsdager(
-        antallBarnMedOmsorgenFor: Int,
-        antallBarnMedAleneOmOmsorgen: Int,
-        antallBarnMedUtvidetRett: Int,
-        antallBarnMedUtvidetRettOgAleneOmOmsorgen : Int
-    ) : Int {
-        val grunnrett = when (antallBarnMedOmsorgenFor) {
-            0 -> return 0
-            in 1..2 -> DagerMedGrunnrettOppTilToBarn
-            else -> DagerMedGrunnrettTreEllerFlerBarn
+    internal fun beregnOmsorgsdager(barn: List<Barn>, periode: Periode): OmsorgsdagerResultat {
+        val barnMedOmsorgenFor = barn.filter { it.omsorgenFor.inneholder(periode) }
+        val barnMedAleneOmOmsorgen = barnMedOmsorgenFor.filter { it.aleneOmOmsorgen }
+        val barnMedKunUtvidetRett = barnMedOmsorgenFor.filter { it.utvidetRett && !it.aleneOmOmsorgen }
+        val barnMedUtvidetRettOgAleneOmOmsorgen = barnMedOmsorgenFor.filter { it.utvidetRett && it.aleneOmOmsorgen }
+
+        val grunnrett = when (barnMedOmsorgenFor.size) {
+            0 -> DagerForBarn(antallBarn = 0, antallDager = 0)
+            in 1..2 -> DagerForBarn(antallBarn = barnMedOmsorgenFor.size, antallDager = DagerMedGrunnrettOppTilToBarn)
+            else -> DagerForBarn(antallBarn = barnMedOmsorgenFor.size, antallDager = DagerMedGrunnrettTreEllerFlerBarn)
         }
 
-        val aleneOmsorg = when (antallBarnMedAleneOmOmsorgen) {
-            0 -> 0
-            in 1..2 -> DagerMedAleneOmsorgOppTilToBarn
-            else -> DagerMedAleneOmsorgTreEllerFlerBarn
+        val aleneOmsorg = when (barnMedAleneOmOmsorgen.size) {
+            0 -> DagerForBarn(antallBarn = 0, antallDager = 0)
+            in 1..2 -> DagerForBarn(antallBarn = barnMedAleneOmOmsorgen.size, antallDager = DagerMedAleneOmsorgOppTilToBarn)
+            else -> DagerForBarn(antallBarn = barnMedAleneOmOmsorgen.size, antallDager = DagerMedAleneOmsorgTreEllerFlerBarn)
         }
 
-        val utvidetRett = when (antallBarnMedUtvidetRett) {
-            0 -> 0
-            else -> DagerMedUtvidetRettPerBarn * antallBarnMedUtvidetRett
+        val utvidetRett = when (barnMedKunUtvidetRett.size) {
+            0 -> DagerForBarn(antallBarn = 0, antallDager = 0)
+            else -> DagerForBarn(antallBarn = barnMedKunUtvidetRett.size, antallDager = DagerMedUtvidetRettPerBarn * barnMedKunUtvidetRett.size)
         }
 
-        val utvidetRettOgAleneOmsorg = when (antallBarnMedUtvidetRettOgAleneOmOmsorgen) {
-            0 -> 0
-            else -> DagerMedUtvidetRettOgAleneOmsorgPerBarn * antallBarnMedUtvidetRettOgAleneOmOmsorgen
+        val aleneomsorgOgUtvidetRett = when (barnMedUtvidetRettOgAleneOmOmsorgen.size) {
+            0 -> DagerForBarn(antallBarn = 0, antallDager = 0)
+            else -> DagerForBarn(
+                antallBarn = barnMedUtvidetRettOgAleneOmOmsorgen.size,
+                antallDager = DagerMedUtvidetRettOgAleneOmsorgPerBarn * barnMedUtvidetRettOgAleneOmOmsorgen.size
+            )
         }
 
-        return grunnrett + aleneOmsorg + utvidetRett + utvidetRettOgAleneOmsorg
+        return OmsorgsdagerResultat(
+            grunnrettsdager = grunnrett,
+            aleneomsorgsdager = aleneOmsorg,
+            utvidetRettDager = utvidetRett,
+            aleneomsorgOgUtvidetRettDager = aleneomsorgOgUtvidetRett
+        )
     }
 }
+
+data class DagerForBarn(
+    val antallBarn: Int,
+    val antallDager: Int
+)
+
+data class OmsorgsdagerResultat(
+    val grunnrettsdager: DagerForBarn,
+    val aleneomsorgsdager: DagerForBarn,
+    val utvidetRettDager: DagerForBarn,
+    val aleneomsorgOgUtvidetRettDager: DagerForBarn,
+)
+
+fun OmsorgsdagerResultat.antallOmsorgsdager(): Int =
+    grunnrettsdager.antallDager +
+        aleneomsorgsdager.antallDager +
+        utvidetRettDager.antallDager +
+        aleneomsorgOgUtvidetRettDager.antallDager
