@@ -153,6 +153,7 @@ private fun Knekkpunkt.dto() = when(this) {
     // Vil alltid være i listen 'starterGrunnet' for første overføring
     Knekkpunkt.Mottaksdato -> "MOTTAKSDATO"
     Knekkpunkt.NullstillingAvForbrukteDager -> "NULLSTILLING_AV_FORBRUKTE_DAGER"
+    Knekkpunkt.ForbrukteDagerIÅr -> "FORBRUKTE_DAGER_I_AAR"
     Knekkpunkt.OmsorgenForEtBarnStarter -> "OMSORGEN_FOR_ET_BARN_STARTER"
     Knekkpunkt.OmsorgenForEtBarnSlutter -> "OMSORGEN_FOR_ET_BARN_SLUTTER"
     Knekkpunkt.FordelingGirStarter -> "FORDELING_GIR_STARTER"

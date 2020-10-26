@@ -13,6 +13,7 @@ internal data class KnektPeriode(
 
 internal enum class Knekkpunkt {
     Mottaksdato,
+    ForbrukteDagerIÅr,
     NullstillingAvForbrukteDager,
     OmsorgenForEtBarnStarter,
     OmsorgenForEtBarnSlutter,
@@ -27,7 +28,7 @@ internal enum class Knekkpunkt {
 internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
     val boundary = Periode(
         fom = overordnetPeriode.fom,
-        tom = overordnetPeriode.tom.plusDays(1)
+        tom = overordnetPeriode.tom.nesteDag()
     )
 
     val knekkpunkt = mutableMapOf<LocalDate, MutableList<Knekkpunkt>>().also {
@@ -43,6 +44,11 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
     }
 
     if (overføreOmsorgsdager.omsorgsdagerTattUtIÅr > 0) {
+        knekkpunkt.leggTil(
+            dato = overordnetPeriode.fom,
+            knekkpunkt = Knekkpunkt.ForbrukteDagerIÅr,
+            boundary = boundary
+        )
         knekkpunkt.leggTil(
             dato = overføreOmsorgsdager.mottaksdato.førsteDagNesteÅr(),
             knekkpunkt = Knekkpunkt.NullstillingAvForbrukteDager,
@@ -82,7 +88,7 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
     ).map { KnektPeriode(
         periode = it,
         starterGrunnet = knekkpunkt.hentKnekkpunktFor(it.fom),
-        slutterGrunnet = knekkpunkt.hentKnekkpunktFor(it.tom.plusDays(1))
+        slutterGrunnet = knekkpunkt.hentKnekkpunktFor(it.tom.nesteDag())
     )}
 }
 
@@ -107,5 +113,7 @@ private fun MutableMap<LocalDate, MutableList<Knekkpunkt>>.leggTil(
     tomKnekkpunkt: Knekkpunkt,
     boundary: Periode) {
     leggTil(periode.fom, fomKnekkpunkt, boundary)
-    leggTil(periode.tom.plusDays(1), tomKnekkpunkt, boundary)
+    leggTil(periode.tom.nesteDag(), tomKnekkpunkt, boundary)
 }
+
+private fun LocalDate.nesteDag() = plusDays(1)
