@@ -41,7 +41,11 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding.hentLøsning(packet)
-        val personopplysninger = HentPersonopplysningerMelding.hentLøsning(packet)
+        val personopplysninger = HentPersonopplysningerMelding.hentLøsning(packet).also {
+            require(it.keys.containsAll(behandling.gjeldendeOverføringer.keys)) {
+                "Mangler personopplysninger for en eller fler av personene berørt av overføringen."
+            }
+        }
 
         val utfall = when {
             behandling.oppfyllerIkkeInngangsvilkår() -> Utfall.Avslått
