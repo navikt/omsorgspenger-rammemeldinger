@@ -9,9 +9,10 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import org.intellij.lang.annotations.Language
 import org.json.JSONArray
 import org.json.JSONObject
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
-internal object Fordmidling {
+internal object Formidling {
     internal fun opprettMeldingsBestillinger(
         behovssekvensId: BehovssekvensId,
         personopplysninger: Map<Identitetsnummer, Personopplysninger>,
@@ -37,9 +38,10 @@ internal object Fordmidling {
         }
 
         val overføringerMedDager = behandling.overføringer.fjernOverføringerUtenDager()
-        // TODO: Håndtere avslag i egen funksjon hvor det kun sendes bestilling på melding til den som forsøkte å overføre.
-        // require(overføringerMedDager.isNotEmpty()) { "Skal ikke sende bestilling til alle parter ved avslag." }
-        if (overføringerMedDager.isEmpty()) return listOf()
+
+        if (!overføringerMedDager.støtterAutomatiskMelding()) {
+            return listOf()
+        }
 
         val bestillinger = mutableListOf<Meldingsbestilling>()
 
@@ -70,11 +72,23 @@ internal object Fordmidling {
                 melding = melding,
                 // Alle parter får svaret i brev om den som overfører dager
                 // sendte inn per brev...
-                måSendesSomBrev = behandling.måBesvaresPerBrev()
+                måBesvaresPerBrev = behandling.måBesvaresPerBrev()
             ))
         }
         return bestillinger
     }
+
+
+    private fun List<Overføring>.støtterAutomatiskMelding() = when {
+        isEmpty() -> meldingMåSendesManuelt("avslag")
+        size !in 1..2 -> meldingMåSendesManuelt("$size overføringer")
+        else -> true
+    }
+
+    private fun meldingMåSendesManuelt(karakteristikk: String) =
+        logger.warn("Melding(er) må sendes manuelt. Støtter ikke melding for $karakteristikk. Se sikker logg for informasjon til melding(ene)").let { false }
+
+    private val logger = LoggerFactory.getLogger(Formidling::class.java)
 }
 
 internal class GittDager(

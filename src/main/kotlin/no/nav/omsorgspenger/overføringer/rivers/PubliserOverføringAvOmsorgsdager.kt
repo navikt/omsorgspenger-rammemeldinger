@@ -5,7 +5,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
-import no.nav.omsorgspenger.overføringer.Fordmidling.opprettMeldingsBestillinger
+import no.nav.omsorgspenger.overføringer.Formidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
@@ -74,14 +74,15 @@ internal class PubliserOverføringAvOmsorgsdager (
             )
         )
 
-        secureLogger.trace("Bestillinger til formidling")
-        opprettMeldingsBestillinger(
+        val meldingsbestillinger = opprettMeldingsBestillinger(
             behovssekvensId = id,
             personopplysninger = personopplysninger,
             overføreOmsorgsdager = overføreOmsorgsdager,
             behandling = behandling
-        ).forEach {
-            secureLogger.trace(it.keyValue.second)
+        ).also { bestillinger -> bestillinger.forEach { bestilling -> secureLogger.info(bestilling.keyValue.second) } }
+
+        if (meldingsbestillinger.isEmpty()) {
+            secureLogger.warn("Melding(er) må sendes manuelt. Packet=${packet.toJson()}")
         }
 
         // TODO: Send bestilling på formidling https://github.com/navikt/omsorgspenger-rammemeldinger/issues/14

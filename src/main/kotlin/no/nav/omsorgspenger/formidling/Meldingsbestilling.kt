@@ -11,7 +11,7 @@ internal class Meldingsbestilling(
     val aktørId: AktørId,
     val saksnummer: Saksnummer,
     val melding: Melding,
-    val måSendesSomBrev: Boolean) {
+    val måBesvaresPerBrev: Boolean) {
     internal val keyValue: Pair<String, String> = {
         @Language("JSON")
         val bestilling =
@@ -24,7 +24,7 @@ internal class Meldingsbestilling(
                 "saksnummer": "$saksnummer",
                 "dokumentMal": "${melding.mal}",
                 "avsenderApplikasjon": "OMSORGSPENGER_RAMMEMELDINGER",
-                "distribuere" : $måSendesSomBrev
+                "distribuere" : $måBesvaresPerBrev
             }
             """.trimEnd()
 
