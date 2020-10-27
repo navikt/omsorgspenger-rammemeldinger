@@ -54,9 +54,9 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
         internal val overføringer: List<Overføring>,
         internal val gjeldendeOverføringer: Map<Identitetsnummer, GjeldendeOverføringer>,
         internal val periode: Periode) {
-        internal fun oppfyllerIkkeInngangsvilkår() = karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
-        internal fun måBesvaresPerBrev() = karakteristikker.contains(Behandling.Karakteristikk.MåBesvaresPerBrev)
-        internal fun ingenOverføringer() = overføringer.fjernOverføringerUtenDager().isEmpty()
+        internal val oppfyllerIkkeInngangsvilkår = karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
+        internal val måBesvaresPerBrev = karakteristikker.contains(Behandling.Karakteristikk.MåBesvaresPerBrev)
+        internal val ingenOverføringer = overføringer.fjernOverføringerUtenDager().isEmpty()
     }
 
     private object LøsningKeys {

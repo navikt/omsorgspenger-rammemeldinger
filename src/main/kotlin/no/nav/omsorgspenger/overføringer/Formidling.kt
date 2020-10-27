@@ -25,24 +25,11 @@ internal object Formidling {
             .map { it.key to it.value.saksnummer }
             .toMap()
 
-        require(personopplysninger.size == saksnummer.size && personopplysninger.keys.containsAll(saksnummer.keys)) {
-            "Mismatch mellom saksnummer og personopplysninger."
-        }
-
-        require(personopplysninger.containsKey(overføreOmsorgsdager.overførerFra)) {
-            "Mangler personopplysninger for 'overførerFra'"
-        }
-
-        require(personopplysninger.containsKey(overføreOmsorgsdager.overførerTil)) {
-            "Mangler personopplysninger for 'overførerTil'"
-        }
-
-        val overføringerMedDager = behandling.overføringer.fjernOverføringerUtenDager()
-
-        if (!overføringerMedDager.støtterAutomatiskMelding()) {
+        if (!behandling.støtterAutomatiskMelding()) {
             return listOf()
         }
 
+        val overføringerMedDager = behandling.overføringer.fjernOverføringerUtenDager()
         val bestillinger = mutableListOf<Meldingsbestilling>()
 
         saksnummer.forEach { (identitetsnummer, saksnummer) ->
@@ -72,21 +59,21 @@ internal object Formidling {
                 melding = melding,
                 // Alle parter får svaret i brev om den som overfører dager
                 // sendte inn per brev...
-                måBesvaresPerBrev = behandling.måBesvaresPerBrev()
+                måBesvaresPerBrev = behandling.måBesvaresPerBrev
             ))
         }
         return bestillinger
     }
 
 
-    private fun List<Overføring>.støtterAutomatiskMelding() = when {
-        isEmpty() -> meldingMåSendesManuelt("avslag")
-        size !in 1..2 -> meldingMåSendesManuelt("$size overføringer")
+    private fun OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling.støtterAutomatiskMelding() = when {
+        ingenOverføringer -> meldingMåSendesManuelt("avslag")
+        overføringer.size !in 1..2 -> meldingMåSendesManuelt("${overføringer.size} overføringer")
         else -> true
     }
 
     private fun meldingMåSendesManuelt(karakteristikk: String) =
-        logger.warn("Melding(er) må sendes manuelt. Støtter ikke melding for $karakteristikk. Se sikker logg for informasjon til melding(ene)").let { false }
+        logger.warn("Melding(er) må sendes manuelt. Støtter ikke melding(er) for $karakteristikk. Se sikker logg for informasjon til melding(ene)").let { false }
 
     private val logger = LoggerFactory.getLogger(Formidling::class.java)
 }
@@ -100,7 +87,7 @@ internal class GittDager(
     override val mal = "OVERFORE_GITT_DAGER"
     override val data = {
         JSONObject().also { root ->
-            root.put("mottaksdato", mottaksdato.toString())
+            root.put("mottaksdato", "$mottaksdato")
             root.put("antallDagerØnsketOverført", antallDagerØnsketOverført)
             root.put("overføringer", overføringer.somJSONArray())
             root.put("til", til.somJSONObject())
@@ -116,7 +103,7 @@ internal class MottattDager(
     override val mal = "OVERFORE_MOTTATT_DAGER"
     override val data = {
         JSONObject().also { root ->
-            root.put("mottaksdato", mottaksdato.toString())
+            root.put("mottaksdato", "$mottaksdato")
             root.put("overføringer", overføringer.somJSONArray())
             root.put("fra", fra.somJSONObject())
         }.toString()

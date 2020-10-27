@@ -48,8 +48,8 @@ internal class PubliserOverføringAvOmsorgsdager (
         }
 
         val utfall = when {
-            behandling.oppfyllerIkkeInngangsvilkår() -> Utfall.Avslått
-            behandling.ingenOverføringer() -> Utfall.Avslått
+            behandling.oppfyllerIkkeInngangsvilkår -> Utfall.Avslått
+            behandling.ingenOverføringer -> Utfall.Avslått
             else -> Utfall.Gjennomført
         }
 
