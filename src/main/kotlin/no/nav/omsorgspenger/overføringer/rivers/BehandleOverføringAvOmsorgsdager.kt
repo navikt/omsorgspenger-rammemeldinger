@@ -60,7 +60,10 @@ internal class BehandleOverføringAvOmsorgsdager(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("BehandleOverføringAvOmsorgsdager for $id")
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
-        val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet)
+        val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet).also {
+            require(it.containsKey(overføreOmsorgsdager.overførerFra)) { "Mangler saksnummer for 'overførerFra'"}
+            require(it.containsKey(overføreOmsorgsdager.overførerTil)) { "Mangler saksnummer for 'overførerTil'"}
+        }
         val fordelingGirMeldinger = HentFordelingGirMeldingerMelding.hentLøsning(packet)
         val utvidetRettVedtak = HentUtvidetRettVedtakMelding.hentLøsning(packet)
         val midlertidigAleneVedtak = HentMidlertidigAleneVedtakMelding.hentLøsning(packet)
@@ -108,11 +111,11 @@ internal class BehandleOverføringAvOmsorgsdager(
         val gjeldendeOverføringer = gjeldendeOverføringer(
             fra = Saksreferanse(
                 identitetsnummer = overføreOmsorgsdager.overførerFra,
-                saksnummer = saksnummer[overføreOmsorgsdager.overførerFra] ?: error("Mangler saksnummer for 'fra'")
+                saksnummer = saksnummer.getValue(overføreOmsorgsdager.overførerFra)
             ),
             til = Saksreferanse(
                 identitetsnummer = overføreOmsorgsdager.overførerTil,
-                saksnummer = saksnummer[overføreOmsorgsdager.overførerTil] ?: error("Mangler saksnummer for 'til'")
+                saksnummer = saksnummer.getValue(overføreOmsorgsdager.overførerTil)
             ),
             overføringer = overføringer,
             måBehandlesSomGosysJournalføringsoppgaver = måBehandlesSomGosysJournalføringsoppgaver
