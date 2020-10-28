@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
+import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Formidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
@@ -17,7 +18,8 @@ import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
 import org.slf4j.LoggerFactory
 
 internal class PubliserOverføringAvOmsorgsdager (
-    rapidsConnection: RapidsConnection) : BehovssekvensPacketListener(
+    rapidsConnection: RapidsConnection,
+    private val formidlingService: FormidlingService) : BehovssekvensPacketListener(
     logger = LoggerFactory.getLogger(PubliserOverføringAvOmsorgsdager::class.java)) {
     init {
         River(rapidsConnection).apply {
@@ -78,18 +80,16 @@ internal class PubliserOverføringAvOmsorgsdager (
             )
         )
 
-        val meldingsbestillinger = opprettMeldingsBestillinger(
+        opprettMeldingsBestillinger(
             behovssekvensId = id,
             personopplysninger = personopplysninger,
             overføreOmsorgsdager = overføreOmsorgsdager,
             behandling = behandling
-        ).also { bestillinger -> bestillinger.forEach { bestilling -> secureLogger.info(bestilling.keyValue.second) } }
+        ).also { when {
+            it.isEmpty() -> secureLogger.warn("Melding(er) må sendes manuelt. Packet=${packet.toJson()}")
+            else -> formidlingService.sendMeldingsbestillinger(it)
+        }}
 
-        if (meldingsbestillinger.isEmpty()) {
-            secureLogger.warn("Melding(er) må sendes manuelt. Packet=${packet.toJson()}")
-        }
-
-        // TODO: Send bestilling på formidling https://github.com/navikt/omsorgspenger-rammemeldinger/issues/14
         // TODO: Send info om saksstatistikk https://github.com/navikt/omsorgspenger-rammemeldinger/issues/15
 
         secureLogger.trace(packet.toJson())

@@ -10,7 +10,12 @@ import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.k9.rapid.river.Environment
+import no.nav.k9.rapid.river.KafkaBuilder.kafkaProducer
+import no.nav.k9.rapid.river.csvTilSet
+import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgspenger.fordelinger.FordelingService
+import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
@@ -19,6 +24,7 @@ import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdag
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
+import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 
 fun main() {
@@ -42,7 +48,8 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         overføringService = applicationContext.overføringService
     )
     PubliserOverføringAvOmsorgsdager(
-        rapidsConnection = this
+        rapidsConnection = this,
+        formidlingService = applicationContext.formidlingService
     )
     register(object : RapidsConnection.StatusListener {
         override fun onStartup(rapidsConnection: RapidsConnection) {
@@ -72,6 +79,7 @@ internal class ApplicationContext(
     internal val utvidetRettService: UtvidetRettService,
     internal val midlertidigAleneService: MidlertidigAleneService,
     internal val overføringService: OverføringService,
+    internal val formidlingService: FormidlingService,
     internal val healthService: HealthService) {
 
     internal fun start() {}
@@ -85,7 +93,9 @@ internal class ApplicationContext(
         internal var fordelingService: FordelingService? = null,
         internal var utvidetRettService: UtvidetRettService? = null,
         internal var midlertidigAleneService: MidlertidigAleneService? = null,
-        internal var overføringService: OverføringService? = null) {
+        internal var overføringService: OverføringService? = null,
+        internal var kafkaProducer: KafkaProducer<String, String>? = null,
+        internal var formidlingService: FormidlingService? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
             val benyttetAccessTokenClient = accessTokenClient?:ClientSecretAccessTokenClient(
@@ -95,12 +105,14 @@ internal class ApplicationContext(
             )
             val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway?:OmsorgspengerInfotrygdRammevedtakGateway(
                 accessTokenClient = benyttetAccessTokenClient,
-                hentRammevedtakFraInfotrygdScopes = benyttetEnv.hentRequiredEnvSet("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES"),
+                hentRammevedtakFraInfotrygdScopes = benyttetEnv.hentRequiredEnv("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES").csvTilSet(),
                 omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
             )
             val benyttetInfotrygdRammeService = infotrygdRammeService?:InfotrygdRammeService(
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
             )
+
+            val benyttetKafkaProducer =  kafkaProducer ?: benyttetEnv.kafkaProducer()
 
             return ApplicationContext(
                 env = benyttetEnv,
@@ -119,7 +131,10 @@ internal class ApplicationContext(
                 overføringService = overføringService ?: OverføringService(),
                 healthService = HealthService(healthChecks = setOf(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
-                ))
+                )),
+                formidlingService = formidlingService ?: FormidlingService(
+                    kafkaProducer = benyttetKafkaProducer
+                )
             )
         }
     }

@@ -1,9 +1,9 @@
 package no.nav.omsorgspenger.overføringer
 
-import junit.framework.Assert.assertTrue
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.registerApplicationContext
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -17,7 +17,6 @@ internal class IngenDagerTilgjengeligInneværendeÅrTest {
     fun reset(){
         rapid.reset()
     }
-
 
     @Test
     fun `Ingen dager tilgjengelige for overføring inneværende år`() {
