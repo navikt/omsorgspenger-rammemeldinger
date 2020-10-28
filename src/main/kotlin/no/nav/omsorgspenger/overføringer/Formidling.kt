@@ -129,10 +129,11 @@ internal class TidligerePartner(
 
 private fun Personopplysninger.somJSONObject() : JSONObject? {
     return JSONObject().also {
+        // TODO: Navn må være optional
         it.put("navn", mapOf(
-            "fornavn" to navn,
-            "mellomnavn" to "TODO: Struktuerer navn",
-            "etternavn" to "TODO: navn må være optional"
+            "fornavn" to navn.fornavn,
+            "mellomnavn" to navn.mellomnavn,
+            "etternavn" to navn.etternavn
         ))
         it.put("fødselsdato", fødselsdato.toString())
     }
