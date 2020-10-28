@@ -79,11 +79,14 @@ internal class ApplicationContext(
     internal val utvidetRettService: UtvidetRettService,
     internal val midlertidigAleneService: MidlertidigAleneService,
     internal val overføringService: OverføringService,
+    internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
     internal val healthService: HealthService) {
 
     internal fun start() {}
-    internal fun stop() {}
+    internal fun stop() {
+        kafkaProducer.close()
+    }
 
     internal class Builder(
         internal var env: Environment? = null,
@@ -132,6 +135,7 @@ internal class ApplicationContext(
                 healthService = HealthService(healthChecks = setOf(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
                 )),
+                kafkaProducer = benyttetKafkaProducer,
                 formidlingService = formidlingService ?: FormidlingService(
                     kafkaProducer = benyttetKafkaProducer
                 )
