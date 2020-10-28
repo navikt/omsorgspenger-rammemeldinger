@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.extensions.AntallDager.antallDager
 
 internal object Beregninger {
     private const val DagerMaksForOverføring = 10
@@ -114,8 +115,7 @@ internal object Beregninger {
             false -> 0
         }
 
-        // TODO: Bør kanskje bare regne med duration hele vegen..
-        val fordeltBort = fordelingGirMeldinger.sumBy { it.lengde.toDays().toInt() }.also {
+        val fordeltBort = fordelingGirMeldinger.sumBy { it.lengde.antallDager() }.also {
             if (it > 0) {
                 behandling.lovanvendelser.leggTil(
                     periode = periode,
