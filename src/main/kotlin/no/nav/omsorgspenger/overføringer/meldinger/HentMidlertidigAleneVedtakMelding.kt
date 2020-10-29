@@ -11,11 +11,10 @@ internal object HentMidlertidigAleneVedtakMelding :
     BehovMedLøsning<List<MidlertidigAleneVedtak>>,
     HentLøsning<List<MidlertidigAleneVedtak>> {
     internal const val HentMidlertidigAleneVedtak = "HentMidlertidigAleneVedtak"
-    private val behov = Behov(navn = HentMidlertidigAleneVedtak)
     private const val VedtakKey = "@løsninger.$HentMidlertidigAleneVedtak.vedtak"
 
-    override fun behovMedLøsning(løsning: List<MidlertidigAleneVedtak>) =
-        behov to mapOf(
+    override fun behovMedLøsning(behovInput: Map<String, *>, løsning: List<MidlertidigAleneVedtak>) =
+        Behov(navn = HentMidlertidigAleneVedtak, input = behovInput) to mapOf(
             "vedtak" to JacksonObjectMapper.convertValue<List<*>>(løsning)
         )
 

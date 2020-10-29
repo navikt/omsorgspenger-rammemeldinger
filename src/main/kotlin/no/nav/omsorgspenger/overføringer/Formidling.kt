@@ -130,6 +130,7 @@ internal class TidligerePartner(
 private fun Personopplysninger.somJSONObject() : JSONObject? {
     return JSONObject().also {
         // TODO: Navn må være optional
+        // https://github.com/navikt/omsorgspenger-rammemeldinger/issues/30
         it.put("navn", mapOf(
             "fornavn" to navn.fornavn,
             "mellomnavn" to navn.mellomnavn,

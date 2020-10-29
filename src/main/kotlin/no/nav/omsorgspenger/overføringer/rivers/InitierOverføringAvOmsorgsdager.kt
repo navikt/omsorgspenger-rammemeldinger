@@ -74,13 +74,16 @@ internal class InitierOverføringAvOmsorgsdager(
 
         logger.info("legger til behov med løsninger [$HentFordelingGirMeldinger, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak]")
         logger.warn("Løsning på behov [$HentUtvidetRettVedtak,$HentMidlertidigAleneVedtak] bør flyttes til 'omsorgspenger-rammevedtak'")
+        val inputHentingAvRammer = mapOf(
+            "periode" to "$periode",
+            "identitetsnummer" to overføreOmsorgsdager.overførerFra
+        )
         packet.leggTilBehovMedLøsninger(
             aktueltBehov = OverføreOmsorgsdager,
-            // TODO: input på meldingene..
             behovMedLøsninger = arrayOf(
-                HentFordelingGirMeldingerMelding.behovMedLøsning(fordelingGirMeldinger),
-                HentUtvidetRettVedtakMelding.behovMedLøsning(utvidetRettVedtak),
-                HentMidlertidigAleneVedtakMelding.behovMedLøsning(midlertidigAleneVedtak)
+                HentFordelingGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, fordelingGirMeldinger),
+                HentUtvidetRettVedtakMelding.behovMedLøsning(inputHentingAvRammer, utvidetRettVedtak),
+                HentMidlertidigAleneVedtakMelding.behovMedLøsning(inputHentingAvRammer, midlertidigAleneVedtak)
             )
         )
 

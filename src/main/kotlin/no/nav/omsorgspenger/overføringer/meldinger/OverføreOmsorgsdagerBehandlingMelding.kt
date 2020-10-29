@@ -16,10 +16,9 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
     BehovMedLøsning<OverføreOmsorgsdagerBehandlingMelding.HeleBehandling>,
     HentLøsning<OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling> {
     internal const val OverføreOmsorgsdagerBehandling = "OverføreOmsorgsdagerBehandling"
-    private val behov = Behov(navn = OverføreOmsorgsdagerBehandling)
 
-    override fun behovMedLøsning(løsning: HeleBehandling) =
-        behov to mapOf(
+    override fun behovMedLøsning(behovInput: Map<String, *>, løsning: HeleBehandling) =
+        Behov(navn = OverføreOmsorgsdagerBehandling, input = behovInput) to mapOf(
             "karakteristikker" to løsning.behandling.karakteristikker().map { it.name },
             "lovanvendelser" to løsning.behandling.lovanvendelser.somLøsning(),
             "overføringer" to JacksonObjectMapper.convertValue(løsning.overføringer),

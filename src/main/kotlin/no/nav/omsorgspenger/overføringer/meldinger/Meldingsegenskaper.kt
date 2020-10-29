@@ -23,7 +23,7 @@ internal interface LeggTilLøsning<Løsning> {
 }
 
 internal interface BehovMedLøsning<Løsning> {
-    fun behovMedLøsning(løsning: Løsning) : Pair<Behov, Map<String,*>>
+    fun behovMedLøsning(behovInput: Map<String,*> = mapOf<String,Any>(), løsning: Løsning) : Pair<Behov, Map<String,*>>
 }
 
 internal fun JsonMessage.leggTilLøsningPar(pair: Pair<String, Map<String,*>>) =

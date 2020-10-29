@@ -126,7 +126,7 @@ internal class BehandleOverføringAvOmsorgsdager(
             aktueltBehov = OverføreOmsorgsdager,
             behovMedLøsninger = arrayOf(
                 OverføreOmsorgsdagerBehandlingMelding.behovMedLøsning(
-                    OverføreOmsorgsdagerBehandlingMelding.HeleBehandling(
+                    løsning = OverføreOmsorgsdagerBehandlingMelding.HeleBehandling(
                         behandling = behandling,
                         overføringer = overføringer,
                         gjeldendeOverføringer = gjeldendeOverføringer

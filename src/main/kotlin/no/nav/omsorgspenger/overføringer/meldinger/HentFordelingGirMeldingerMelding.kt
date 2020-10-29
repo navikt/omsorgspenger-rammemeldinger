@@ -11,11 +11,10 @@ internal object HentFordelingGirMeldingerMelding :
     BehovMedLøsning<List<FordelingGirMelding>>,
     HentLøsning<List<FordelingGirMelding>> {
     internal const val HentFordelingGirMeldinger = "HentFordelingGirMeldinger"
-    private val behov = Behov(navn = HentFordelingGirMeldinger)
     private const val MeldingerKey = "@løsninger.$HentFordelingGirMeldinger.meldinger"
 
-    override fun behovMedLøsning(løsning: List<FordelingGirMelding>) =
-        behov to mapOf(
+    override fun behovMedLøsning(behovInput: Map<String, *>, løsning: List<FordelingGirMelding>) =
+        Behov(navn = HentFordelingGirMeldinger, input = behovInput) to mapOf(
             "meldinger" to JacksonObjectMapper.convertValue<List<*>>(løsning)
         )
 
@@ -26,4 +25,6 @@ internal object HentFordelingGirMeldingerMelding :
     override fun hentLøsning(packet: JsonMessage): List<FordelingGirMelding> {
         return JacksonObjectMapper.readValue(packet[MeldingerKey].toString())
     }
+
+
 }
