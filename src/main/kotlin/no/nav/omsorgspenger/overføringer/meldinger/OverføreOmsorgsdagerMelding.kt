@@ -65,7 +65,7 @@ internal object OverføreOmsorgsdagerMelding :
                         "gjelderFraOgMed" to gitt.periode.fom,
                         "gjelderTilOgMed" to gitt.periode.tom,
                         "til" to mapOf(
-                            "navn" to løsning.personopplysninger.getValue(gitt.til.identitetsnummer).navn.toString(),
+                            "navn" to løsning.personopplysninger.getValue(gitt.til.identitetsnummer).navnTilLøsning(),
                             "fødselsdato" to løsning.personopplysninger.getValue(gitt.til.identitetsnummer).fødselsdato.toString()
                         )
                     )},
@@ -74,7 +74,7 @@ internal object OverføreOmsorgsdagerMelding :
                         "gjelderFraOgMed" to fått.periode.fom,
                         "gjelderTilOgMed" to fått.periode.tom,
                         "fra" to mapOf(
-                            "navn" to løsning.personopplysninger.getValue(fått.fra.identitetsnummer).navn.toString(),
+                            "navn" to løsning.personopplysninger.getValue(fått.fra.identitetsnummer).navnTilLøsning(),
                             "fødselsdato" to løsning.personopplysninger.getValue(fått.fra.identitetsnummer).fødselsdato.toString()
                         )
                     )}
@@ -87,6 +87,9 @@ internal object OverføreOmsorgsdagerMelding :
             "overføringer" to overføringer
         )
     }
+
+    // TODO: https://github.com/navikt/k9-rapid/issues/6
+    private fun Personopplysninger.navnTilLøsning() = navn?.toString()?:""
 
     internal data class Behovet(
         val barn : List<Barn>,

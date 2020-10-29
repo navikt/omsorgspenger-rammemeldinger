@@ -10,25 +10,26 @@ import java.time.LocalDate
 internal data class Personopplysninger(
     internal val identitetsnummer: Identitetsnummer,
     internal val fødselsdato: LocalDate,
-    internal val navn: Navn,
+    internal val navn: Navn?,
     internal val aktørId: AktørId) {
     internal companion object {
         internal fun Pair<String, JsonNode>.somPersonopplysninger() : Personopplysninger {
-            val navn = second["navn"] as ObjectNode
-            val fornavn = navn["fornavn"].asText()
-            val mellomnavn = when (navn.hasNonNull("mellomnavn")) {
-                true -> " ${navn["mellomnavn"].asText()} "
-                false -> null
+            val adressebeskyttet = second["adressebeskyttelse"]?.asText() != "UGRADERT"
+            val navn = when (adressebeskyttet) {
+                true -> null
+                false -> (second["navn"] as ObjectNode).let { Navn(
+                    fornavn = it["fornavn"].asText(),
+                    mellomnavn = when (it.hasNonNull("mellomnavn")) {
+                        true -> it["mellomnavn"].asText()
+                        false -> null
+                    },
+                    etternavn = it["etternavn"].asText()
+                )}
             }
-            val etternavn = navn["etternavn"].asText()
             return Personopplysninger(
                 identitetsnummer = first,
                 fødselsdato = second["fødselsdato"].asLocalDate(),
-                navn = Navn(
-                    fornavn = fornavn,
-                    mellomnavn = mellomnavn,
-                    etternavn = etternavn
-                ),
+                navn = navn,
                 aktørId = second["aktørId"].asText()
             )
         }

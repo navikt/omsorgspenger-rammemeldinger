@@ -50,7 +50,8 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
                         "etternavn" to "Nordmann"
                     ),
                     "fødselsdato" to "1990-09-01",
-                    "aktørId" to "33"
+                    "aktørId" to "33",
+                    "adressebeskyttelse" to "UGRADERT"
                 ),
                 til to mapOf(
                     "navn" to mapOf(

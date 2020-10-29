@@ -128,15 +128,15 @@ internal class TidligerePartner(
 }
 
 private fun Personopplysninger.somJSONObject() : JSONObject? {
-    return JSONObject().also {
-        // TODO: Navn må være optional
-        // https://github.com/navikt/omsorgspenger-rammemeldinger/issues/30
-        it.put("navn", mapOf(
-            "fornavn" to navn.fornavn,
-            "mellomnavn" to navn.mellomnavn,
-            "etternavn" to navn.etternavn
-        ))
-        it.put("fødselsdato", fødselsdato.toString())
+    return JSONObject().also { root ->
+        navn?.also {
+            root.put("navn", mapOf(
+                "fornavn" to it.fornavn,
+                "mellomnavn" to it.mellomnavn,
+                "etternavn" to it.etternavn
+            ))
+        }
+        root.put("fødselsdato", "$fødselsdato")
     }
 }
 private fun List<Overføring>.somJSONArray() = JSONArray().also {
