@@ -1,20 +1,20 @@
-package no.nav.omsorgspenger.overføringer
+package no.nav.omsorgspenger.aleneom
 
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgspenger.omsorgspengerRammemeldinger
+import no.nav.omsorgspenger.overføringer.TestAppliationContextBuilder
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
-import kotlin.test.assertEquals
 
-internal class OverføringerApiKtTest {
+internal class AleneOmApiKtTest {
     @Test
-    internal fun `hent overføringer`() {
+    internal fun `hent alene om omsorgen`() {
         withTestApplication({
             omsorgspengerRammemeldinger(TestAppliationContextBuilder().build())
         }) {
-            handleRequest(HttpMethod.Post, "/hentOverfoeringer") {
+            handleRequest(HttpMethod.Post, "/hentAleneOmOmsorgen") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
 
                 @Language("JSON")
@@ -27,14 +27,13 @@ internal class OverføringerApiKtTest {
                 """.trimIndent()
                 setBody(body)
             }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
+                kotlin.test.assertEquals(HttpStatusCode.OK, response.status())
+                kotlin.test.assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
 
                 @Language("JSON")
                 val forventetResponse = """
                     {
-                      "gitt": [],
-                      "fått": []
+                      "aleneOmOmsorgen": []
                     }
                 """.trimIndent()
 

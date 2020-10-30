@@ -32,6 +32,7 @@ import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.omsorgspenger.aleneom.AleneOmApi
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -80,6 +81,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     routing {
         HealthRoute(healthService = applicationContext.healthService)
         OverføringerApi() // todo: autentisering
+        AleneOmApi() // todo: autentisering
     }
 }
 

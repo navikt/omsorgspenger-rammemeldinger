@@ -15,13 +15,6 @@ fun Route.OverføringerApi() {
 
         call.respond(status = HttpStatusCode.OK, message = OverføringResponseDto(gitt = listOf(), fått = listOf()))
     }
-
-    post("/hentAleneOmOmsorgen") {
-        val request = call.receive<RammemeldingerRequest>()
-        // todo: hent faktiske data
-
-        call.respond(status = HttpStatusCode.OK, message = AleneOmOmsorgenResponseDto(aleneOmOmsorgen = listOf()))
-    }
 }
 
 
@@ -35,6 +28,7 @@ private data class OverføringGittDto(
         val til: PersonDto,
         val lengde: Duration
 )
+
 private data class OverføringFåttDto(
         val gjennomført: LocalDate,
         val gyldigFraOgMed: LocalDate,
@@ -44,11 +38,3 @@ private data class OverføringFåttDto(
 )
 
 private data class PersonDto(val id: String, val type: String, val fødselsdato: LocalDate)
-
-private data class AleneOmOmsorgenResponseDto(val aleneOmOmsorgen: List<AleneOmOmsorgenDto>)
-private data class AleneOmOmsorgenDto(
-        val gjennomført: LocalDate,
-        val gyldigFraOgMed: LocalDate,
-        val gyldigTilOgMed: LocalDate,
-        val barn: PersonDto
-)
