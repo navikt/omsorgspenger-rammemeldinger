@@ -1,5 +1,8 @@
 package no.nav.omsorgspenger
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.jackson.*
@@ -20,12 +23,16 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.OverføringService
+import no.nav.omsorgspenger.overføringer.OverføringerApi
+import no.nav.omsorgspenger.overføringer.meldinger.SerDes
 import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import no.nav.omsorgspenger.aleneom.AleneOmApi
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -63,10 +70,18 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
 
 internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {
     install(ContentNegotiation) {
-        jackson()
+        jackson() {
+            registerKotlinModule()
+            registerModule(JavaTimeModule())
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+        }
     }
     routing {
         HealthRoute(healthService = applicationContext.healthService)
+        OverføringerApi() // todo: autentisering
+        AleneOmApi() // todo: autentisering
     }
 }
 
