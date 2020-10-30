@@ -18,7 +18,7 @@ fun Route.OverføringerApi() {
 }
 
 
-private data class RammemeldingerRequest(val personIdent: String, val fom: LocalDate, val tom: LocalDate)
+private data class RammemeldingerRequest(val identitetsnummer: String, val fom: LocalDate, val tom: LocalDate)
 
 private data class OverføringResponseDto(val gitt: List<OverføringGittDto>, val fått: List<OverføringFåttDto>)
 private data class OverføringGittDto(

@@ -20,7 +20,7 @@ internal class AleneOmApiKtTest {
                 @Language("JSON")
                 val body = """
                     {
-                        "personIdent": "12345678900",
+                        "identitetsnummer": "12345678900",
                         "fom": "2020-01-01",
                         "tom": "2020-12-31"
                     }

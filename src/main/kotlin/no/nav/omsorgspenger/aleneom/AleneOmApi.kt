@@ -16,7 +16,7 @@ fun Route.AleneOmApi() {
     }
 }
 
-private data class RammemeldingerRequest(val personIdent: String, val fom: LocalDate, val tom: LocalDate)
+private data class RammemeldingerRequest(val identitetsnummer: String, val fom: LocalDate, val tom: LocalDate)
 
 private data class PersonDto(val id: String, val type: String, val fødselsdato: LocalDate)
 
