@@ -17,7 +17,7 @@ internal object HentPersonopplysningerMelding :
         navn = HentPersonopplysninger,
         input = mapOf(
             "identitetsnummer" to behovInput.identitetsnummer,
-            "attributter" to setOf("navn", "fødseldato", "aktørId", "adressebeskyttelse")
+            "attributter" to setOf("navn", "fødselsdato", "aktørId", "adressebeskyttelse")
         )
     )
 
