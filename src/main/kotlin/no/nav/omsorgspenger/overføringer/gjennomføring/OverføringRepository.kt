@@ -39,7 +39,15 @@ internal class OverføringRepository(
         til: Saksnummer,
         overføringer: List<Overføring>) : Map<Saksnummer, GjennomførteOverføringer> {
         val overføringerMedDager = overføringer.fjernOverføringerUtenDager()
+
+        if (overføringerMedDager.isEmpty()) {
+            return using(sessionOf(dataSource)) { it.hentAktiveOverføringer(
+                saksnummer = setOf(fra, til)
+            )}
+        }
+
         val fraOgMed = overføringerMedDager.map { it.periode }.minByOrNull { it.fom }!!.fom
+
         return using(sessionOf(dataSource)) { session ->
             session.transaction { transactionalSession ->
                 val berørteOverføringer = transactionalSession.berørteOverføringer(
