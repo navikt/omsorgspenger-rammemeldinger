@@ -1,11 +1,16 @@
 package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.overføringer.gjennomføring.GjennomførtOverføring
 import no.nav.omsorgspenger.overføringer.gjennomføring.OverføringRepository
 import no.nav.omsorgspenger.testutils.DataSourceExtension
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import javax.sql.DataSource
+import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class)
 internal class OverføringRepositoryTest(
@@ -16,35 +21,112 @@ internal class OverføringRepositoryTest(
     )
 
     @Test
-    fun `Gjennomfør overføringer`() {
-        val res = overføringRepository.gjennomførOverføringer(
-            fra = "sak1",
-            til = "sak2",
+    fun `Håndtere overføringer gjennom samlivsbrudd`() {
+        val År2020 = Periode("2020-01-01/2020-12-31")
+
+        var gjennomførte = overføringRepository.gjennomførOverføringer(
+            fra = Ola,
+            til = Kari,
             overføringer = listOf(
-                Overføring(
-                    antallDager = 1,
-                    periode = Periode("2020-01-01/2021-01-01"),
-                    starterGrunnet = listOf(),
-                    slutterGrunnet = listOf()
-                )
+                (År2020 to 1).somOverføring()
+            )
+        )
+        assertThat(setOf(Ola, Kari)).hasSameElementsAs(gjennomførte.keys)
+
+        assertTrue(gjennomførte.getValue(Kari).gitt.isEmpty())
+        assertThat(setOf(fått(1, År2020, Ola))).hasSameElementsAs(gjennomførte.getValue(Kari).fått)
+
+        assertThat(setOf(gitt(1, År2020, Kari))).hasSameElementsAs(gjennomførte.getValue(Ola).gitt)
+        assertTrue(gjennomførte.getValue(Ola).fått.isEmpty())
+
+        gjennomførte = overføringRepository.gjennomførOverføringer(
+            fra = Kari,
+            til = Ola,
+            overføringer = listOf(
+                (År2020 to 5).somOverføring()
             )
         )
 
-        println(res)
+        assertThat(setOf(Ola, Kari)).hasSameElementsAs(gjennomførte.keys)
 
-        val res2 = overføringRepository.gjennomførOverføringer(
-            fra = "sak1",
-            til = "sak2",
+        assertThat(setOf(gitt(5, År2020, Ola))).hasSameElementsAs(gjennomførte.getValue(Kari).gitt)
+        assertThat(setOf(fått(1, År2020, Ola))).hasSameElementsAs(gjennomførte.getValue(Kari).fått)
+
+        assertThat(setOf(gitt(1, År2020, Kari))).hasSameElementsAs(gjennomførte.getValue(Ola).gitt)
+        assertThat(setOf(fått(5, År2020, Kari))).hasSameElementsAs(gjennomførte.getValue(Ola).fått)
+
+        assertEquals(setOf(Kari), overføringRepository.hentBerørteSaksnummer(
+            fra = Trond,
+            til = Ola,
+            fraOgMed = År2020.tom
+        ))
+        assertEquals(emptySet(), overføringRepository.hentBerørteSaksnummer(
+            fra = Trond,
+            til = Ola,
+            fraOgMed = År2020.tom.plusDays(1)
+        ))
+
+        val November2020 = Periode("2020-11-01/2020-11-30")
+        gjennomførte = overføringRepository.gjennomførOverføringer(
+            fra = Trond,
+            til = Ola,
             overføringer = listOf(
-                Overføring(
-                    antallDager = 5,
-                    periode = Periode("2020-05-01/2021-01-01"),
-                    starterGrunnet = listOf(),
-                    slutterGrunnet = listOf()
-                )
+                (November2020 to 7).somOverføring()
             )
         )
 
-        println(res2)
+        assertThat(setOf(Ola, Kari, Trond)).hasSameElementsAs(gjennomførte.keys)
+        assertThat(setOf(gitt(7, November2020, Ola))).hasSameElementsAs(gjennomførte.getValue(Trond).gitt)
+        assertTrue(gjennomførte.getValue(Trond).fått.isEmpty())
+
+        val nyPeriodeForOverføringMellomOlaOgKari = Periode(
+            fom = År2020.fom,
+            tom = November2020.fom.minusDays(1)
+        )
+
+        assertThat(setOf(
+            gitt(1, nyPeriodeForOverføringMellomOlaOgKari, Kari)
+        )).hasSameElementsAs(gjennomførte.getValue(Ola).gitt)
+        assertThat(setOf(
+            fått(5, nyPeriodeForOverføringMellomOlaOgKari, Kari),
+            fått(7, November2020, Trond)
+        )).hasSameElementsAs(gjennomførte.getValue(Ola).fått)
+
+        assertThat(setOf(
+            gitt(5, nyPeriodeForOverføringMellomOlaOgKari, Ola)
+        )).hasSameElementsAs(gjennomførte.getValue(Kari).gitt)
+        assertThat(setOf(
+            fått(1, nyPeriodeForOverføringMellomOlaOgKari, Ola),
+        )).hasSameElementsAs(gjennomførte.getValue(Kari).fått)
+    }
+
+    private companion object {
+        private const val Ola = "Ola"
+        private const val Kari = "Kari"
+        private const val Trond = "Trond"
+        private const val Hege = "Hege"
+
+        private fun Pair<Periode, Int>.somOverføring() = Overføring(
+            antallDager = second,
+            periode = first,
+            starterGrunnet = listOf(),
+            slutterGrunnet = listOf()
+        )
+
+        private fun fått(antallDager: Int, periode: Periode, fra: Saksnummer) = GjennomførtOverføring(
+            antallDager = antallDager,
+            periode = periode,
+            status = GjennomførtOverføring.Status.Aktiv,
+            type = GjennomførtOverføring.Type.Fått,
+            saksnummerMotpart = fra
+        )
+
+        private fun gitt(antallDager: Int, periode: Periode, til: Saksnummer) = GjennomførtOverføring(
+            antallDager = antallDager,
+            periode = periode,
+            status = GjennomførtOverføring.Status.Aktiv,
+            type = GjennomførtOverføring.Type.Gitt,
+            saksnummerMotpart = til
+        )
     }
 }

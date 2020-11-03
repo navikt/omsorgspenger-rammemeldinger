@@ -20,7 +20,8 @@ internal class OverføringRepository(
             session.berørteOverføringer(
                 fra = fra,
                 til = til,
-                fraOgMed = fraOgMed).saksnummer()
+                fraOgMed = fraOgMed
+            ).saksnummer().minus(setOf(fra, til))
         }
     }
 
@@ -54,7 +55,15 @@ internal class OverføringRepository(
                     fra = fra,
                     til = til,
                     fraOgMed = fraOgMed
+                ).utenOverføringer(
+                    /**
+                     * De eventuelle overføringene som finnes mellom de samme partene, men som har
+                     * gått motsatt veg skal forbli urørte.
+                     */
+                    fra = til,
+                    til = fra
                 )
+
                 val overlapper = berørteOverføringer.overlapper(
                     fraOgMed = fraOgMed
                 )
@@ -74,7 +83,7 @@ internal class OverføringRepository(
                     overføringer = overføringerMedDager
                 )
                 transactionalSession.hentAktiveOverføringer(
-                    saksnummer = berørteOverføringer.saksnummer().plus(fra).plus(til)
+                    saksnummer = berørteOverføringer.saksnummer().plus(setOf(fra, til))
                 )
             }
         }
@@ -100,10 +109,23 @@ internal class OverføringRepository(
         overføringer: Set<OverføringDb>,
         fraOgMed: LocalDate) {
         if (overføringer.isEmpty()) return
-        // TODO: Om eksisterende overføring har fom == tom vil dette produsere en overføring med ugyldig periode
+        val nyTilOgMed = fraOgMed.minusDays(1)
+
+        /**
+         * De overføringene som overlapper, men den nye tilOgMed-datoen
+         * gjør det til en ugylidig periode deaktiveres.
+         */
+        val deaktivert = overføringer.filter { overføring ->
+            nyTilOgMed.isBefore(overføring.periode.fom)
+        }.toSet().also { deaktiverOverføringer(it) }
+
+        /**
+         * Kun overføringene som overlapper, og med den nye tilOgMed-datoen
+         * fortsat har en gyldig periode oppdateres.
+         */
         val query = endreTilOgMedQuery(
-            overføringIder = overføringIderArray(overføringer),
-            nyTilOgMed = fraOgMed.minusDays(1)
+            overføringIder = overføringIderArray(overføringer.minus(deaktivert)),
+            nyTilOgMed = nyTilOgMed
         )
         // TODO: Logge om vi ikke får samme antall oppdatere rader som antall overføringer.
         run(query.asUpdate)
@@ -170,7 +192,7 @@ internal class OverføringRepository(
         private const val Avslått = "Avslått"
 
         private const val HentOverføringerStatement =
-            "SELECT * FROM overforing WHERE fra = ANY(?) OR til = ANY(?)"
+            "SELECT * FROM overforing WHERE (fra = ANY(?) OR til = ANY(?))"
         private fun hentOverføringerQuery(saksnummer: Array, status: String?) =
             when (status) {
                 null -> queryOf(HentOverføringerStatement, saksnummer, saksnummer)
@@ -178,7 +200,7 @@ internal class OverføringRepository(
             }
 
         private const val HentBerørteOverføringerStatement =
-            "SELECT * FROM overforing WHERE fra IN(?,?) OR til IN(?,?) AND tom >= ? AND status = ?"
+            "SELECT * FROM overforing WHERE (fra IN(?,?) OR til IN(?,?)) AND tom >= ? AND status = ?"
         private fun hentBerørteOverføringerQuery(fra: Saksnummer, til: Saksnummer, fraOgMed: LocalDate) =
             queryOf(HentBerørteOverføringerStatement, fra, til, fra, til, fraOgMed, Aktiv)
 
@@ -246,5 +268,7 @@ internal class OverføringRepository(
             filter { it.periode.inneholder(fraOgMed) }.toSet()
         private fun Collection<OverføringDb>.saksnummer() : Set<Saksnummer> =
             map { listOf(it.fra, it.til) }.flatten().toSet()
+        private fun Set<OverføringDb>.utenOverføringer(fra: Saksnummer, til: Saksnummer) =
+            filterNot { it.fra == fra && it.til == til }.toSet()
     }
 }
