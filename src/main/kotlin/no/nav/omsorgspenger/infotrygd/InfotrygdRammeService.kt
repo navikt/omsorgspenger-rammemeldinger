@@ -33,6 +33,15 @@ internal class InfotrygdRammeService(
     internal fun hentMidlertidigAlene(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
         hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdMidlertidigAleneVedtak>()
 
+    internal fun hentOverføringGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+            hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdOverføringGirMelding>()
+
+    internal fun hentOverføringFår(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+            hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdOverføringFårMelding>()
+
+    internal fun hentAleneOmOmsorgen(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+            hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdAleneOmOmsorgenMelding>()
+
     private companion object {
         private data class CacheKey(
             val identitetsnummer: Identitetsnummer,

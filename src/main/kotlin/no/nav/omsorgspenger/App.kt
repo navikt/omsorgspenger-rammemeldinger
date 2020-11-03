@@ -33,6 +33,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.omsorgspenger.aleneom.AleneOmApi
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -81,7 +82,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     routing {
         HealthRoute(healthService = applicationContext.healthService)
         OverføringerApi() // todo: autentisering
-        AleneOmApi() // todo: autentisering
+        AleneOmApi(applicationContext.aleneOmOmsorgenService) // todo: autentisering
     }
 }
 
@@ -94,6 +95,7 @@ internal class ApplicationContext(
     internal val utvidetRettService: UtvidetRettService,
     internal val midlertidigAleneService: MidlertidigAleneService,
     internal val overføringService: OverføringService,
+    internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
     internal val healthService: HealthService) {
@@ -112,6 +114,7 @@ internal class ApplicationContext(
         internal var utvidetRettService: UtvidetRettService? = null,
         internal var midlertidigAleneService: MidlertidigAleneService? = null,
         internal var overføringService: OverføringService? = null,
+        internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null) {
         internal fun build() : ApplicationContext {
@@ -132,6 +135,8 @@ internal class ApplicationContext(
 
             val benyttetKafkaProducer =  kafkaProducer ?: benyttetEnv.kafkaProducer()
 
+            val benyttetAleneOmOmsorgenService = aleneOmOmsorgenService ?: AleneOmOmsorgenService(benyttetInfotrygdRammeService)
+
             return ApplicationContext(
                 env = benyttetEnv,
                 accessTokenClient = benyttetAccessTokenClient,
@@ -146,7 +151,8 @@ internal class ApplicationContext(
                 midlertidigAleneService = midlertidigAleneService ?: MidlertidigAleneService(
                     infotrygdRammeService = benyttetInfotrygdRammeService
                 ),
-                overføringService = overføringService ?: OverføringService(),
+                overføringService = overføringService ?: OverføringService(benyttetInfotrygdRammeService),
+                aleneOmOmsorgenService = benyttetAleneOmOmsorgenService,
                 healthService = HealthService(healthChecks = setOf(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
                 )),

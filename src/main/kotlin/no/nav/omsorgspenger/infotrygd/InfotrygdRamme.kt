@@ -69,9 +69,15 @@ internal data class InfotrygdFordelingGirMelding(
 internal data class InfotrygdOverføringFårMelding(
     override val periode: Periode,
     override val kilder: Set<Kilde>,
+    val dato: LocalDate, // // todo: er denne på rett plass? Den returneres fra infotrygd-grunnlag-paaroerende-sykodm og jeg antar at denne tilsvarer "gjennomført"
+    val annenPart: InfotrygdAnnenPart, // todo: er denne på rett plass?
     internal val lengde: Duration) : InfotrygdRamme
 
 internal data class InfotrygdOverføringGirMelding(
     override val periode: Periode,
     override val kilder: Set<Kilde>,
+    val dato: LocalDate, // // todo: er denne på rett plass? Den returneres fra infotrygd-grunnlag-paaroerende-sykodm og jeg antar at denne tilsvarer "gjennomført"
+    val annenPart: InfotrygdAnnenPart, // todo: er denne på rett plass?
     internal val lengde: Duration) : InfotrygdRamme
+
+internal data class InfotrygdAnnenPart(val id: String, val type: String, val fødselsdato: LocalDate)

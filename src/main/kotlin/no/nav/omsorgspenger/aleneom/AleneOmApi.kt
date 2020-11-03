@@ -5,14 +5,31 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.omsorgspenger.Periode
 import java.time.LocalDate
 
-fun Route.AleneOmApi() {
+internal fun Route.AleneOmApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
     post("/hentAleneOmOmsorgen") {
         val request = call.receive<RammemeldingerRequest>()
         // todo: hent faktiske data
+        val aleneOmOmosrgen = aleneOmOmsorgenService.hentAleneOmOmsorgen(request.identitetsnummer, Periode(request.fom, request.tom), "correlation-id") // TODO
 
-        call.respond(status = HttpStatusCode.OK, message = AleneOmOmsorgenResponseDto(aleneOmOmsorgen = listOf()))
+        val result = AleneOmOmsorgenResponseDto(
+                aleneOmOmsorgen = aleneOmOmosrgen.map {
+                    AleneOmOmsorgenDto(
+                            gjennomført = TODO(),
+                            gyldigFraOgMed = it.periode.fom,
+                            gyldigTilOgMed = it.periode.tom,
+                            barn = PersonDto(
+                                    id = it.annenPart.id,
+                                    type = it.annenPart.type,
+                                    fødselsdato = it.annenPart.fødselsdato
+                            )
+                    )
+                }
+        )
+
+        call.respond(status = HttpStatusCode.OK, message = result)
     }
 }
 

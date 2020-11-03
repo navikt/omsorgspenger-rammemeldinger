@@ -1,9 +1,12 @@
 package no.nav.omsorgspenger.overføringer
 
+import no.nav.omsorgspenger.CorrelationId
 import no.nav.omsorgspenger.Identitetsnummer
+import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksreferanse
+import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 
-internal class OverføringService {
+internal class OverføringService(private val infotrygdRammeService: InfotrygdRammeService) {
     /**
      * Mottar referanse til personen som overfører 'fra' og
      * personen som man overfører 'til' samt overføringene som skal gjennomføres.
@@ -26,6 +29,41 @@ internal class OverføringService {
                 saksnummer = til.saksnummer,
                 fått = overføringer.fått(fra)
             )
+        )
+    }
+
+    internal fun hentOverføringer(
+            identitetsnummer: Identitetsnummer,
+            periode: Periode,
+            correlationId: CorrelationId): EGjeldendeOverføringer {
+        val gitt = infotrygdRammeService.hentOverføringGir(identitetsnummer, periode, correlationId)
+        val fått = infotrygdRammeService.hentOverføringFår(identitetsnummer, periode, correlationId)
+
+        return EGjeldendeOverføringer(
+                gitt = gitt.map {
+                    EOverføringGitt(
+                            gjennomført = it.dato,
+                            periode = it.periode,
+                            til = AnnenPart(
+                                    id = it.annenPart.id,
+                                    type = it.annenPart.type,
+                                    fødselsdato = it.annenPart.fødselsdato
+                            ),
+                            lengde = it.lengde
+                    )
+                },
+                fått = fått.map {
+                    EOverføringFått(
+                            gjennomført = it.dato,
+                            periode = it.periode,
+                            fra = AnnenPart(
+                                    id = it.annenPart.id,
+                                    type = it.annenPart.type,
+                                    fødselsdato = it.annenPart.fødselsdato
+                            ),
+                            lengde = it.lengde
+                    )
+                }
         )
     }
 }
