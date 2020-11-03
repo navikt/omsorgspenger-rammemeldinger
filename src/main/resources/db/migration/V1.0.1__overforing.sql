@@ -11,7 +11,8 @@ CREATE TABLE OVERFORING
     lovhenvendelser             jsonb NOT NULL
 );
 
-// TODO: Index fra og til
+create index INDEX_OVERFORING_FRA on OVERFORING(fra);
+create index INDEX_OVERFORING_TIL on OVERFORING(til);
 
 CREATE TABLE OVERFORING_LOGG
 (

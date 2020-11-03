@@ -14,6 +14,7 @@ val flywayVersion = "7.0.3"
 val hikariVersion = "3.4.5"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.18"
+val embeddedPostgres = "0.13.3"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
@@ -38,6 +39,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
+    testImplementation("com.opentable.components:otj-pg-embedded:$embeddedPostgres")
 
     // Test
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")

@@ -3,14 +3,22 @@ package no.nav.omsorgspenger.overføringer
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.registerApplicationContext
+import no.nav.omsorgspenger.testutils.DataSourceExtension
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.Extensions
 import java.time.LocalDate
+import javax.sql.DataSource
 
-internal class FødseldatoPåBarnTest {
+@ExtendWith(DataSourceExtension::class)
+internal class FødseldatoPåBarnTest(
+    private val dataSource: DataSource) {
     private val rapid = TestRapid().apply {
-        this.registerApplicationContext(TestAppliationContextBuilder().build())
+        this.registerApplicationContext(TestAppliationContextBuilder().also { builder ->
+            builder.dataSource = dataSource
+        }.build())
     }
 
     @BeforeEach
