@@ -5,6 +5,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.overføringer.Overføring
 import no.nav.omsorgspenger.overføringer.fjernOverføringerUtenDager
+import java.sql.Array
 import java.time.LocalDate
 import javax.sql.DataSource
 
@@ -93,7 +94,7 @@ internal class OverføringRepository(
         if (overføringer.isEmpty()) return
         // TODO: Om eksisterende overføring har fom == tom vil dette produsere en overføring med ugyldig periode
         val query = endreTilOgMedQuery(
-            overføringer = overføringer,
+            overføringIder = overføringIderArray(overføringer),
             nyTilOgMed = fraOgMed.minusDays(1)
         )
         // TODO: Logge om vi ikke får samme antall oppdatere rader som antall overføringer.
@@ -104,7 +105,7 @@ internal class OverføringRepository(
         overføringer: Set<OverføringDb>) {
         if (overføringer.isEmpty()) return
         val query = deaktivertOverføringQuery(
-            overføringer = overføringer
+            overføringIder = overføringIderArray(overføringer)
         )
         // TODO: Logge om vi ikke får samme antall oppdaterte rader som antall overføringer
         run(query.asUpdate)
@@ -135,7 +136,7 @@ internal class OverføringRepository(
         status: String? = null
     ) : Map<Saksnummer, GjennomførteOverføringer> {
         val query = hentOverføringerQuery(
-            saksnummer = saksnummer,
+            saksnummer = saksnummerArray(saksnummer),
             status = status
         )
         val overføringer = run(query.map { row ->
@@ -152,33 +153,36 @@ internal class OverføringRepository(
         return gjennomførteOverføringer
     }
 
+    private fun Session.saksnummerArray(saksnummer: Set<Saksnummer>) = createArrayOf("varchar", saksnummer)
+    private fun Session.overføringIderArray(overføringer: Set<OverføringDb>) = createArrayOf("bigint", overføringer.map { it.id })
+
     private companion object {
         private const val Aktiv = "Aktiv"
-        private const val Deaktivet = "Deaktivet"
+        private const val Deaktivert = "Deaktivert"
         private const val Avslått = "Avslått"
 
         private const val HentOverføringerStatement =
-            "SELECT * FROM overforing WHERE fra IN(?) OR til IN(?)"
-        private fun hentOverføringerQuery(saksnummer: Set<Saksnummer>, status: String?) =
+            "SELECT * FROM overforing WHERE fra = ANY(?) OR til = ANY(?)"
+        private fun hentOverføringerQuery(saksnummer: Array, status: String?) =
             when (status) {
                 null -> queryOf(HentOverføringerStatement, saksnummer, saksnummer)
                 else -> queryOf("$HentOverføringerStatement AND status = ?", saksnummer, saksnummer, status)
             }
 
         private const val HentBerørteOverføringerStatement =
-            "SELECT id, fom, tom, fra, til FROM overforing WHERE fra IN(?,?) OR til IN(?,?) AND tom >= ? AND status = ?"
+            "SELECT * FROM overforing WHERE fra IN(?,?) OR til IN(?,?) AND tom >= ? AND status = ?"
         private fun hentBerørteOverføringerQuery(fra: Saksnummer, til: Saksnummer, fraOgMed: LocalDate) =
             queryOf(HentBerørteOverføringerStatement, fra, til, fra, til, fraOgMed, Aktiv)
 
         private const val EndreTilOgMedStatement =
-            "UPDATE overforing SET tom = ? WHERE id in(?)"
-        private fun endreTilOgMedQuery(overføringer: Set<OverføringDb>, nyTilOgMed: LocalDate) =
-            queryOf(EndreTilOgMedStatement, overføringer.map { it.id }, nyTilOgMed)
+            "UPDATE overforing SET tom = ? WHERE id = ANY(?)"
+        private fun endreTilOgMedQuery(overføringIder: Array, nyTilOgMed: LocalDate) =
+            queryOf(EndreTilOgMedStatement, nyTilOgMed, overføringIder)
 
         private const val DeaktiverOverføringerStatement =
-            "UPDATE overforing SET status = ? WHERE id in(?)"
-        private fun deaktivertOverføringQuery(overføringer: Set<OverføringDb>) =
-            queryOf(DeaktiverOverføringerStatement, "Deaktivert", overføringer.map { it.id })
+            "UPDATE overforing SET status = ? WHERE id = ANY(?)"
+        private fun deaktivertOverføringQuery(overføringIder: Array) =
+            queryOf(DeaktiverOverføringerStatement, Deaktivert, overføringIder)
 
         private const val LagreOverføringStatement =
             "INSERT INTO overforing (fom, tom, fra, til, antall_dager, status, lovanvendelser) VALUES(?,?,?,?,?,?,(to_json(?::json)))"
