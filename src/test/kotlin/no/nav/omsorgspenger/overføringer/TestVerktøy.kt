@@ -30,6 +30,7 @@ import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import javax.sql.DataSource
 
 internal object IdentitetsnummerGenerator {
     private var teller = 10000000000
@@ -142,5 +143,6 @@ internal fun TestAppliationContextBuilder() = ApplicationContext.Builder(
     omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
         every { it.hent(any(), any(), any())}.returns(listOf())
         coEvery { it.check() }.returns(Healthy("OmsorgspengerInfotrygdRammevedtakGateway", "Mock helsesjekk OK!"))
-    }
+    },
+    dataSource = mockk()
 )

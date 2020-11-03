@@ -24,7 +24,6 @@ import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.OverføringService
 import no.nav.omsorgspenger.overføringer.OverføringerApi
-import no.nav.omsorgspenger.overføringer.meldinger.SerDes
 import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
@@ -33,6 +32,8 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.omsorgspenger.aleneom.AleneOmApi
+import no.nav.omsorgspenger.overføringer.gjennomføring.OverføringRepository
+import javax.sql.DataSource
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -70,7 +71,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
 
 internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {
     install(ContentNegotiation) {
-        jackson() {
+        jackson {
             registerKotlinModule()
             registerModule(JavaTimeModule())
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -94,11 +95,15 @@ internal class ApplicationContext(
     internal val utvidetRettService: UtvidetRettService,
     internal val midlertidigAleneService: MidlertidigAleneService,
     internal val overføringService: OverføringService,
+    internal val overføringRepository: OverføringRepository,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
+    internal val dataSource: DataSource,
     internal val healthService: HealthService) {
 
-    internal fun start() {}
+    internal fun start() {
+        dataSource.migrate()
+    }
     internal fun stop() {
         kafkaProducer.close()
     }
@@ -112,8 +117,10 @@ internal class ApplicationContext(
         internal var utvidetRettService: UtvidetRettService? = null,
         internal var midlertidigAleneService: MidlertidigAleneService? = null,
         internal var overføringService: OverføringService? = null,
+        internal var overføringRepository: OverføringRepository? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
-        internal var formidlingService: FormidlingService? = null) {
+        internal var formidlingService: FormidlingService? = null,
+        internal var dataSource: DataSource? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
             val benyttetAccessTokenClient = accessTokenClient?:ClientSecretAccessTokenClient(
@@ -131,6 +138,8 @@ internal class ApplicationContext(
             )
 
             val benyttetKafkaProducer =  kafkaProducer ?: benyttetEnv.kafkaProducer()
+
+            val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
 
             return ApplicationContext(
                 env = benyttetEnv,
@@ -153,6 +162,10 @@ internal class ApplicationContext(
                 kafkaProducer = benyttetKafkaProducer,
                 formidlingService = formidlingService ?: FormidlingService(
                     kafkaProducer = benyttetKafkaProducer
+                ),
+                dataSource = benyttetDataSource,
+                overføringRepository = overføringRepository ?: OverføringRepository(
+                    dataSource = benyttetDataSource
                 )
             )
         }
