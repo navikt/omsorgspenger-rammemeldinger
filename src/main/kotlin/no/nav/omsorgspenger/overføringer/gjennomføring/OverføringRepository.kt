@@ -5,6 +5,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.overføringer.Overføring
 import no.nav.omsorgspenger.overføringer.fjernOverføringerUtenDager
+import org.slf4j.LoggerFactory
 import java.sql.Array
 import java.time.LocalDate
 import javax.sql.DataSource
@@ -123,12 +124,16 @@ internal class OverføringRepository(
          * Kun overføringene som overlapper, og med den nye tilOgMed-datoen
          * fortsat har en gyldig periode oppdateres.
          */
+        val skalFåNyTilOgMed = overføringer.minus(deaktivert)
         val query = endreTilOgMedQuery(
-            overføringIder = overføringIderArray(overføringer.minus(deaktivert)),
+            overføringIder = overføringIderArray(skalFåNyTilOgMed),
             nyTilOgMed = nyTilOgMed
         )
-        // TODO: Logge om vi ikke får samme antall oppdatere rader som antall overføringer.
-        run(query.asUpdate)
+        run(query.asUpdate).also { oppdaterteRader -> if (oppdaterteRader != skalFåNyTilOgMed.size) {
+            skalFåNyTilOgMed.map { it.id }.also {
+                logger.warn("Forventet at overføringene $it skulle få tom=$nyTilOgMed, men $oppdaterteRader overføringer ble oppdatert.")
+            }
+        }}
     }
 
     private fun Session.deaktiverOverføringer(
@@ -137,8 +142,11 @@ internal class OverføringRepository(
         val query = deaktivertOverføringQuery(
             overføringIder = overføringIderArray(overføringer)
         )
-        // TODO: Logge om vi ikke får samme antall oppdaterte rader som antall overføringer
-        run(query.asUpdate)
+        run(query.asUpdate).also { oppdaterteRader -> if (oppdaterteRader != overføringer.size) {
+            overføringer.map { it.id }.also {
+                logger.warn("Forventet at overføringene $it skulle få status=$Deaktivert, men $oppdaterteRader overføringer ble oppdatert.")
+            }
+        }}
     }
 
     private fun Session.lagreNyeOverføringer(
@@ -187,6 +195,8 @@ internal class OverføringRepository(
     private fun Session.overføringIderArray(overføringer: Set<OverføringDb>) = createArrayOf("bigint", overføringer.map { it.id })
 
     private companion object {
+        private val logger = LoggerFactory.getLogger(OverføringRepository::class.java)
+
         private const val Aktiv = "Aktiv"
         private const val Deaktivert = "Deaktivert"
         private const val Avslått = "Avslått"
@@ -238,6 +248,7 @@ internal class OverføringRepository(
 
         private data class OverføringDb(
             val id: Long,
+            // TODO: gjennomført
             val periode: Periode,
             val fra: Saksnummer,
             val til: Saksnummer,
@@ -249,7 +260,10 @@ internal class OverføringRepository(
                 status = when (status) {
                     Aktiv -> GjennomførtOverføring.Status.Aktiv
                     Avslått -> GjennomførtOverføring.Status.Avslått
-                    else -> GjennomførtOverføring.Status.Deaktivert // TODO: Logg om det er en ukjent status..
+                    Deaktivert -> GjennomførtOverføring.Status.Deaktivert
+                    else -> GjennomførtOverføring.Status.Deaktivert.also {
+                        logger.warn("Overføring $id har uventet status $status. Tolkes som $Deaktivert.")
+                    }
                 },
                 saksnummerMotpart = saksnummerMotpart,
                 type = type

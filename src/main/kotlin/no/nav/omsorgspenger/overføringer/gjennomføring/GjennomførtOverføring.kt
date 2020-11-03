@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.overføringer.gjennomføring
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 
+// TODO: Rename Gjennomført -> Gjeldende?
 internal data class GjennomførtOverføring(
     val antallDager: Int,
     val periode: Periode,
