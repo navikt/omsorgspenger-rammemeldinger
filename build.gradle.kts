@@ -9,6 +9,12 @@ val ulidVersion = "8.2.0"
 val ktorVersion = "1.4.1"
 val assertjVersion = "3.18.0"
 val dusseldorfVersion = "1.4.1.4754df6"
+// Database
+val flywayVersion = "7.0.3"
+val hikariVersion = "3.4.5"
+val kotliqueryVersion = "1.3.1"
+val postgresVersion = "42.2.18"
+
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
@@ -26,6 +32,12 @@ dependencies {
     implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
+
+    // Database
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
+    runtimeOnly("org.postgresql:postgresql:$postgresVersion")
 
     // Test
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
