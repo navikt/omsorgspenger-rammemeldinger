@@ -32,7 +32,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.omsorgspenger.aleneom.AleneOmApi
-import no.nav.omsorgspenger.overføringer.gjennomføring.OverføringRepository
+import no.nav.omsorgspenger.overføringer.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import javax.sql.DataSource
 
@@ -145,6 +145,10 @@ internal class ApplicationContext(
 
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
 
+            val benyttetOverføringRepository = overføringRepository ?: OverføringRepository(
+                dataSource = benyttetDataSource
+            )
+
             return ApplicationContext(
                 env = benyttetEnv,
                 accessTokenClient = benyttetAccessTokenClient,
@@ -159,7 +163,9 @@ internal class ApplicationContext(
                 midlertidigAleneService = midlertidigAleneService ?: MidlertidigAleneService(
                     infotrygdRammeService = benyttetInfotrygdRammeService
                 ),
-                overføringService = overføringService ?: OverføringService(),
+                overføringService = overføringService ?: OverføringService(
+                    overføringRepository = benyttetOverføringRepository
+                ),
                 healthService = HealthService(healthChecks = setOf(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
                 )),
@@ -168,9 +174,7 @@ internal class ApplicationContext(
                     kafkaProducer = benyttetKafkaProducer
                 ),
                 dataSource = benyttetDataSource,
-                overføringRepository = overføringRepository ?: OverføringRepository(
-                    dataSource = benyttetDataSource
-                ),
+                overføringRepository = benyttetOverføringRepository,
                 saksnummerRepository = saksnummerRepository ?: SaksnummerRepository(
                     dataSource = benyttetDataSource
                 )

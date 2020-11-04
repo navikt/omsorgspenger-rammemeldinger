@@ -126,7 +126,7 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         val alleSaksnummer = saksnummerRepository.hentSisteMappingFor(
             saksnummer = gjeldendeOverføringer.saksnummer()
-        )
+        ).plus(saksnummer)
 
         logger.info("legger til behov med løsninger [$OverføreOmsorgsdagerBehandling]")
         packet.leggTilBehovMedLøsninger(

@@ -2,7 +2,8 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Saksnummer
 
-internal class OverføringService {
+internal class OverføringService(
+    private val overføringRepository: OverføringRepository) {
     /**
      * Mottar referanse til personen som overfører 'fra' og
      * personen som man overfører 'til' samt overføringene som skal gjennomføres.
@@ -16,12 +17,10 @@ internal class OverføringService {
         fra: Saksnummer,
         til: Saksnummer,
         overføringer: List<NyOverføring>) : Map<Saksnummer, GjeldendeOverføringer> {
-
-        // TODO: Kalle på repository
-
-        return overføringer.somGjeldendeOverføringer(
+        return overføringRepository.gjennomførOverføringer(
             fra = fra,
-            til = til
+            til = til,
+            overføringer = overføringer
         )
     }
 }

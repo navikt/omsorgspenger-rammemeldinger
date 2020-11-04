@@ -1,14 +1,8 @@
-package no.nav.omsorgspenger.overføringer.gjennomføring
+package no.nav.omsorgspenger.overføringer
 
 import kotliquery.*
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.overføringer.*
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
-import no.nav.omsorgspenger.overføringer.NyOverføring
-import no.nav.omsorgspenger.overføringer.fjernOverføringerUtenDager
 import org.slf4j.LoggerFactory
 import java.sql.Array
 import java.time.LocalDate
