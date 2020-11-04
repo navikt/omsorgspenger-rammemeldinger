@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && !contains(github.event.head_commit.message, 'ci skip')
     steps:
-      - uses: actions/checkout@v2.3.3
+      - uses: actions/checkout@v2.3.4
       - uses: actions/setup-java@v1.4.3
         with:
           java-version: '12.x'
@@ -29,15 +29,14 @@ jobs:
       - name: Bygge JAR
         run: |
           ./gradlew test shadowjar
-          echo "::set-env name=TAG::$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)"
-          echo "::set-env name=IMAGE::$BASE_IMAGE:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)"
+          echo "TAG=$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "IMAGE=$BASE_IMAGE:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
       - name: Bygg & last opp Docker image
         run: |
           docker build --tag ${IMAGE} --tag ${BASE_IMAGE}:latest .
           echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_USERNAME" --password-stdin https://docker.pkg.github.com
           docker push $BASE_IMAGE:latest
           docker push $IMAGE
-
       - name: Deploy til dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
