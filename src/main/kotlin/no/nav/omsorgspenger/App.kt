@@ -55,7 +55,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     BehandleOverføringAvOmsorgsdager(
         rapidsConnection = this,
         overføringService = applicationContext.overføringService,
-        saksnummerRepository = SaksnummerRepository()
+        saksnummerRepository = applicationContext.saksnummerRepository
     )
     PubliserOverføringAvOmsorgsdager(
         rapidsConnection = this,
@@ -100,6 +100,7 @@ internal class ApplicationContext(
     internal val overføringRepository: OverføringRepository,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
+    internal val saksnummerRepository: SaksnummerRepository,
     internal val dataSource: DataSource,
     internal val healthService: HealthService) {
 
@@ -122,6 +123,7 @@ internal class ApplicationContext(
         internal var overføringRepository: OverføringRepository? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
+        internal var saksnummerRepository: SaksnummerRepository? = null,
         internal var dataSource: DataSource? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
@@ -167,6 +169,9 @@ internal class ApplicationContext(
                 ),
                 dataSource = benyttetDataSource,
                 overføringRepository = overføringRepository ?: OverføringRepository(
+                    dataSource = benyttetDataSource
+                ),
+                saksnummerRepository = saksnummerRepository ?: SaksnummerRepository(
                     dataSource = benyttetDataSource
                 )
             )

@@ -11,11 +11,7 @@ import javax.sql.DataSource
 internal class SaksnummerRepository(
     private val dataSource: DataSource) {
 
-    private val map = mutableMapOf<Identitetsnummer, Saksnummer>()
-
     internal fun lagreMapping(mapping: Map<Identitetsnummer, Saksnummer>) {
-        map.putAll(mapping)
-        /*
         sessionOf(dataSource).use { session ->
             mapping.forEach { (identitetsnummer, saksnummer) ->
                 session.run(leggTilMappingQuery(
@@ -24,12 +20,9 @@ internal class SaksnummerRepository(
                 ).asUpdate)
             }
         }
-         */
     }
 
     internal fun hentSisteMappingFor(saksnummer: Set<Saksnummer>) : Map<Identitetsnummer, Saksnummer> {
-        return map.filterValues { it in saksnummer }
-        /*
         val mapping = mutableMapOf<Identitetsnummer, Saksnummer>()
         sessionOf(dataSource).use { session ->
             session.run(hentSisteMappingQuery(
@@ -39,7 +32,6 @@ internal class SaksnummerRepository(
             }.asList)
         }
         return mapping
-         */
     }
 
     private fun Session.saksnummerArray(saksnummer: Set<Saksnummer>) = createArrayOf("varchar", saksnummer)

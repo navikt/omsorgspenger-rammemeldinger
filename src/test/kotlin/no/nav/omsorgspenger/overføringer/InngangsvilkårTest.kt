@@ -3,14 +3,22 @@ package no.nav.omsorgspenger.overføringer
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
 import no.nav.omsorgspenger.registerApplicationContext
+import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
+import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import javax.sql.DataSource
 
-internal class InngangsvilkårTest {
-
+@ExtendWith(DataSourceExtension::class)
+internal class InngangsvilkårTest(
+    dataSource: DataSource) {
     private val rapid = TestRapid().apply {
-        this.registerApplicationContext(TestAppliationContextBuilder().build())
+        this.registerApplicationContext(
+            TestApplicationContextBuilder(dataSource.cleanAndMigrate()).build()
+        )
     }
 
     private val fra = IdentitetsnummerGenerator.identitetsnummer()

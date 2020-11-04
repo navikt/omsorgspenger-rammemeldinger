@@ -4,6 +4,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.overføringer.gjennomføring.OverføringRepository
 import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -13,12 +14,10 @@ import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class)
 internal class OverføringRepositoryTest(
-    dataSource: DataSource){
-
+    dataSource: DataSource) {
     private val overføringRepository = OverføringRepository(
-        dataSource = dataSource
+        dataSource = dataSource.cleanAndMigrate()
     )
-
     @Test
     fun `Håndtere overføringer gjennom samlivsbrudd`() {
         val År2020 = Periode("2020-01-01/2020-12-31")

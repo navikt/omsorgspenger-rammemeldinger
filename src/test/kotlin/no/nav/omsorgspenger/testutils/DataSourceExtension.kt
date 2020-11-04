@@ -2,7 +2,6 @@ package no.nav.omsorgspenger.testutils
 
 import com.opentable.db.postgres.embedded.EmbeddedPostgres
 import no.nav.omsorgspenger.DataSourceBuilder
-import no.nav.omsorgspenger.migrate
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
@@ -26,12 +25,11 @@ internal class DataSourceExtension : ParameterResolver {
             "DATABASE_DATABASE" to "postgres",
             "DATABASE_USERNAME" to "postgres",
             "DATABASE_PASSWORD" to "postgres"
-        )).build().also { it.migrate() }
+        )).build()
 
         init {
             Runtime.getRuntime().addShutdownHook(
                 Thread {
-                    embeddedPostgres.postgresDatabase.connection.close()
                     embeddedPostgres.close()
                 }
             )

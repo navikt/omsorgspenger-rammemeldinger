@@ -3,16 +3,23 @@ package no.nav.omsorgspenger.overføringer
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgspenger.omsorgspengerRammemeldinger
+import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
+import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert
+import javax.sql.DataSource
 import kotlin.test.assertEquals
 
-internal class OverføringerApiKtTest {
+@ExtendWith(DataSourceExtension::class)
+internal class OverføringerApiKtTest(
+    private val dataSource: DataSource) {
     @Test
     fun `hent overføringer`() {
         withTestApplication({
-            omsorgspengerRammemeldinger(TestAppliationContextBuilder().build())
+            omsorgspengerRammemeldinger(TestApplicationContextBuilder(dataSource.cleanAndMigrate()).build())
         }) {
             handleRequest(HttpMethod.Post, "/hentOverfoeringer") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())

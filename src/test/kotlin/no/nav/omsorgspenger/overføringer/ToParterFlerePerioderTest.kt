@@ -10,20 +10,29 @@ import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
 import no.nav.omsorgspenger.registerApplicationContext
+import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
+import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Duration
 import java.time.LocalDate
+import javax.sql.DataSource
 
-internal class ToParterFlerePerioderTest  {
+@ExtendWith(DataSourceExtension::class)
+internal class ToParterFlerePerioderTest(
+    dataSource: DataSource){
     private val fordelingService = mockk<FordelingService>()
     private val utvidetRettService = mockk<UtvidetRettService>()
 
     private val rapid = TestRapid().apply {
-        this.registerApplicationContext(TestAppliationContextBuilder().also { builder ->
+        this.registerApplicationContext(TestApplicationContextBuilder(
+            dataSource = dataSource.cleanAndMigrate()
+        ).also { builder ->
             builder.fordelingService = fordelingService
             builder.utvidetRettService = utvidetRettService
         }.build())

@@ -1,26 +1,15 @@
 package no.nav.omsorgspenger.overføringer
 
 import de.huxhorn.sulky.ulid.ULID
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import no.nav.helse.dusseldorf.ktor.health.Healthy
-import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
-import no.nav.helse.dusseldorf.oauth2.client.AccessTokenResponse
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsning
 import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsningResolver
 import no.nav.k9.rapid.losning.somMelding
-import no.nav.omsorgspenger.ApplicationContext
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
-import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.RecordMetadata
-import org.apache.kafka.common.TopicPartition
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -29,8 +18,6 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
-import java.util.concurrent.CompletableFuture
-import javax.sql.DataSource
 
 internal object IdentitetsnummerGenerator {
     private var teller = 10000000000
@@ -124,25 +111,3 @@ internal fun Map<String, OverføreOmsorgsdagerLøsning.Overføringer>.assertOver
         assertNotNull(getValue(til).fått.firstOrNull { it.antallDager == antallDager && periode == Periode(fom = it.gjelderFraOgMed, tom = it.gjelderTilOgMed) })
     }
 }
-
-internal fun TestAppliationContextBuilder() = ApplicationContext.Builder(
-    accessTokenClient = mockk<AccessTokenClient>().also {
-        every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
-    },
-    kafkaProducer = mockk<KafkaProducer<String, String>>().also {
-        every { it.send(any()) }.returns(CompletableFuture.completedFuture(RecordMetadata(
-            TopicPartition("foo", 1),
-            1L,
-            1L,
-            System.currentTimeMillis(),
-            1L,
-            1,
-            1
-        )))
-    },
-    omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
-        every { it.hent(any(), any(), any())}.returns(listOf())
-        coEvery { it.check() }.returns(Healthy("OmsorgspengerInfotrygdRammevedtakGateway", "Mock helsesjekk OK!"))
-    },
-    dataSource = mockk()
-)

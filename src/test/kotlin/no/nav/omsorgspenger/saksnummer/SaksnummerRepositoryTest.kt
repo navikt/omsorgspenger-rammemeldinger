@@ -1,18 +1,20 @@
 package no.nav.omsorgspenger.saksnummer
 
-import no.nav.omsorgspenger.ApplicationContext
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.testutils.ApplicationContextExtension
-import no.nav.omsorgspenger.testutils.buildReset
+import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import javax.sql.DataSource
 
-@ExtendWith(ApplicationContextExtension::class)
+@ExtendWith(DataSourceExtension::class)
 internal class SaksnummerRepositoryTest(
-    applicationContextBuilder: ApplicationContext.Builder){
-    private val saksnummerRepository = applicationContextBuilder.buildReset().saksnummerRepository
+    dataSource: DataSource){
+    private val saksnummerRepository = SaksnummerRepository(
+        dataSource = dataSource.cleanAndMigrate()
+    )
 
     @Test
     fun `Test håndtering av saksnummer & identitetsnummer`() {

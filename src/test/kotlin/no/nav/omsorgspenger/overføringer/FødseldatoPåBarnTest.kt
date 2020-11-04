@@ -4,21 +4,23 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
+import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.extension.Extensions
+
 import java.time.LocalDate
 import javax.sql.DataSource
 
 @ExtendWith(DataSourceExtension::class)
 internal class FødseldatoPåBarnTest(
-    private val dataSource: DataSource) {
+    dataSource: DataSource) {
     private val rapid = TestRapid().apply {
-        this.registerApplicationContext(TestAppliationContextBuilder().also { builder ->
-            builder.dataSource = dataSource
-        }.build())
+        this.registerApplicationContext(
+            TestApplicationContextBuilder(dataSource.cleanAndMigrate()).build()
+        )
     }
 
     @BeforeEach
