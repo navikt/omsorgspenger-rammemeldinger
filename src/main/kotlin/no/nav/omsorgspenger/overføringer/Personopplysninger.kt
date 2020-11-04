@@ -8,7 +8,7 @@ import no.nav.omsorgspenger.Identitetsnummer
 import java.time.LocalDate
 
 internal data class Personopplysninger(
-    internal val identitetsnummer: Identitetsnummer,
+    internal val gjeldendeIdentitetsnummer: Identitetsnummer,
     internal val fødselsdato: LocalDate,
     internal val navn: Navn?,
     internal val aktørId: AktørId) {
@@ -27,7 +27,8 @@ internal data class Personopplysninger(
                 )}
             }
             return Personopplysninger(
-                identitetsnummer = first,
+                // TODO: Skal ikke være optional.
+                gjeldendeIdentitetsnummer = second["gjeldendeIdentitetsnummer"]?.asText()?:first,
                 fødselsdato = second["fødselsdato"].asLocalDate(),
                 navn = navn,
                 aktørId = second["aktørId"].asText()

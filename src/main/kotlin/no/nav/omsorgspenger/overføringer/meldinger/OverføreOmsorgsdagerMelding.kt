@@ -135,7 +135,7 @@ internal object OverføreOmsorgsdagerMelding :
         internal fun personopplysninger(sak: Saksnummer) =
             personopplysninger.getValue(saksnummerTilIdentitetsnummer.getValue(sak))
         internal fun identitetsnummer(sak: Saksnummer) =
-            saksnummerTilIdentitetsnummer.getValue(sak)
+            personopplysninger(sak).gjeldendeIdentitetsnummer
     }
 
     internal enum class Relasjon {
