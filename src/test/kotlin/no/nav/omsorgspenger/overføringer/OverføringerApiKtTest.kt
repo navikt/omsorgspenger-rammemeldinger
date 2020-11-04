@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 
 internal class OverføringerApiKtTest {
     @Test
-    internal fun `hent overføringer`() {
+    fun `hent overføringer`() {
         withTestApplication({
             omsorgspengerRammemeldinger(TestAppliationContextBuilder().build())
         }) {

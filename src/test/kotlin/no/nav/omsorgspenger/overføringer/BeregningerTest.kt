@@ -8,7 +8,7 @@ import java.time.LocalDate
 internal class BeregningerTest {
 
     @Test
-    internal fun `Ingen barn gir 0 dager`() {
+    fun `Ingen barn gir 0 dager`() {
         val nå = LocalDate.now()
         val omsorgsdagerResultat = Beregninger.beregnOmsorgsdager(listOf(), Periode(nå, nå))
 
@@ -16,7 +16,7 @@ internal class BeregningerTest {
     }
 
     @Test
-    internal fun `1 til 2 barn gir 10 dager`() {
+    fun `1 til 2 barn gir 10 dager`() {
         val nå = LocalDate.now()
         val etBarn = Barn(
             identitetsnummer = "",
@@ -38,7 +38,7 @@ internal class BeregningerTest {
     }
 
     @Test
-    internal fun `3 eller fler barn gir 15 dager`() {
+    fun `3 eller fler barn gir 15 dager`() {
         val nå = LocalDate.now()
         val etBarn = Barn(
             identitetsnummer = "",
@@ -60,7 +60,7 @@ internal class BeregningerTest {
     }
 
     @Test
-    internal fun `1 til 2 barn med aleneomsorg for, gir 10 ekstra dager`() {
+    fun `1 til 2 barn med aleneomsorg for, gir 10 ekstra dager`() {
         val nå = LocalDate.now()
         val etBarn = Barn(
             identitetsnummer = "",
@@ -82,7 +82,7 @@ internal class BeregningerTest {
     }
 
     @Test
-    internal fun `3 eller fler barn med aleneomsorg for, gir 15 ekstra dager`() {
+    fun `3 eller fler barn med aleneomsorg for, gir 15 ekstra dager`() {
         val nå = LocalDate.now()
         val etBarn = Barn(
             identitetsnummer = "",
@@ -104,7 +104,7 @@ internal class BeregningerTest {
     }
 
     @Test
-    internal fun `Får 10 ekstra dager per barn med utvidet rett`() {
+    fun `Får 10 ekstra dager per barn med utvidet rett`() {
         val nå = LocalDate.now()
         val vanligBarn = Barn(
             identitetsnummer = "",
@@ -135,7 +135,7 @@ internal class BeregningerTest {
     }
 
     @Test
-    internal fun `Får 20 ekstra dager per barn med utvidet rett og aleneomsorg, i tillegg til vanlig aleneomsorgsdager`() {
+    fun `Får 20 ekstra dager per barn med utvidet rett og aleneomsorg, i tillegg til vanlig aleneomsorgsdager`() {
         val nå = LocalDate.now()
         val aleneOgUtvidetRettBarn = Barn(
             identitetsnummer = "",

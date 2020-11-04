@@ -10,7 +10,7 @@ import org.skyscreamer.jsonassert.JSONAssert
 
 internal class AleneOmApiKtTest {
     @Test
-    internal fun `hent alene om omsorgen`() {
+    fun `hent alene om omsorgen`() {
         withTestApplication({
             omsorgspengerRammemeldinger(TestAppliationContextBuilder().build())
         }) {
