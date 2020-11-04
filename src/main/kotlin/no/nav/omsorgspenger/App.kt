@@ -33,6 +33,7 @@ import java.net.URI
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.omsorgspenger.aleneom.AleneOmApi
 import no.nav.omsorgspenger.overføringer.gjennomføring.OverføringRepository
+import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import javax.sql.DataSource
 
 fun main() {
@@ -53,7 +54,8 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     )
     BehandleOverføringAvOmsorgsdager(
         rapidsConnection = this,
-        overføringService = applicationContext.overføringService
+        overføringService = applicationContext.overføringService,
+        saksnummerRepository = SaksnummerRepository()
     )
     PubliserOverføringAvOmsorgsdager(
         rapidsConnection = this,

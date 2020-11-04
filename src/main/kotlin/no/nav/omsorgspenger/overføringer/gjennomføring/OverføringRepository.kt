@@ -3,7 +3,11 @@ package no.nav.omsorgspenger.overføringer.gjennomføring
 import kotliquery.*
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.overføringer.Overføring
+import no.nav.omsorgspenger.overføringer.*
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
+import no.nav.omsorgspenger.overføringer.NyOverføring
 import no.nav.omsorgspenger.overføringer.fjernOverføringerUtenDager
 import org.slf4j.LoggerFactory
 import java.sql.Array
@@ -28,7 +32,7 @@ internal class OverføringRepository(
 
     internal fun hentOverføringer(
         saksnummer: Set<Saksnummer>
-    ) : Map<Saksnummer, GjennomførteOverføringer> {
+    ) : Map<Saksnummer, GjeldendeOverføringer> {
         return using(sessionOf(dataSource)) { session ->
             session.hentOverføringerMedOptionalStatus(
                 saksnummer = saksnummer
@@ -39,7 +43,7 @@ internal class OverføringRepository(
     internal fun gjennomførOverføringer(
         fra: Saksnummer,
         til: Saksnummer,
-        overføringer: List<Overføring>) : Map<Saksnummer, GjennomførteOverføringer> {
+        overføringer: List<NyOverføring>) : Map<Saksnummer, GjeldendeOverføringer> {
         val overføringerMedDager = overføringer.fjernOverføringerUtenDager()
 
         if (overføringerMedDager.isEmpty()) {
@@ -152,7 +156,7 @@ internal class OverføringRepository(
     private fun Session.lagreNyeOverføringer(
         fra: Saksnummer,
         til: Saksnummer,
-        overføringer: List<Overføring>) {
+        overføringer: List<NyOverføring>) {
         overføringer.forEach { overføring ->
             run(lagreOverføringQuery(
                 fra = fra,
@@ -172,7 +176,7 @@ internal class OverføringRepository(
     private fun Session.hentOverføringerMedOptionalStatus(
         saksnummer: Set<Saksnummer>,
         status: String? = null
-    ) : Map<Saksnummer, GjennomførteOverføringer> {
+    ) : Map<Saksnummer, GjeldendeOverføringer> {
         val query = hentOverføringerQuery(
             saksnummer = saksnummerArray(saksnummer),
             status = status
@@ -181,11 +185,11 @@ internal class OverføringRepository(
             row.somOverføringDb()
         }.asList)
 
-        val gjennomførteOverføringer = mutableMapOf<Saksnummer, GjennomførteOverføringer>()
-        overføringer.saksnummer().forEach { saksnummer ->
-            gjennomførteOverføringer[saksnummer] = GjennomførteOverføringer(
-                fått = overføringer.filter { it.til == saksnummer }.map { it.somGjennomførtOverføringFått() },
-                gitt = overføringer.filter { it.fra == saksnummer }.map { it.somGjennomførtOverføringGitt() }
+        val gjennomførteOverføringer = mutableMapOf<Saksnummer, GjeldendeOverføringer>()
+        overføringer.saksnummer().forEach { sak ->
+            gjennomførteOverføringer[sak] = GjeldendeOverføringer(
+                fått = overføringer.filter { it.til == sak }.map { it.somGjeldendeOverføringFått() },
+                gitt = overføringer.filter { it.fra == sak }.map { it.somGjeldendeOverføringGitt() }
             )
         }
         return gjennomførteOverføringer
@@ -226,7 +230,7 @@ internal class OverføringRepository(
 
         private const val LagreOverføringStatement =
             "INSERT INTO overforing (fom, tom, fra, til, antall_dager, status, lovanvendelser) VALUES(?,?,?,?,?,?,(to_json(?::json)))"
-        private fun lagreOverføringQuery(fra: Saksnummer, til: Saksnummer, overføring: Overføring) =
+        private fun lagreOverføringQuery(fra: Saksnummer, til: Saksnummer, overføring: NyOverføring) =
             queryOf(
                 statement = LagreOverføringStatement,
                 overføring.periode.fom, overføring.periode.tom, fra, til, overføring.antallDager, Aktiv, "{}"
@@ -254,27 +258,27 @@ internal class OverføringRepository(
             val til: Saksnummer,
             val antallDager: Int,
             val status: String) {
-            private fun somGjennomførtOverføring(saksnummerMotpart: Saksnummer, type: GjennomførtOverføring.Type) = GjennomførtOverføring(
+
+            private fun mapStatus() = when (status) {
+                Aktiv -> GjeldendeOverføring.Status.Aktiv
+                Avslått -> GjeldendeOverføring.Status.Avslått
+                Deaktivert -> GjeldendeOverføring.Status.Deaktivert
+                else -> GjeldendeOverføring.Status.Deaktivert.also {
+                    logger.warn("Overføring $id har uventet status $status. Tolkes som $Deaktivert.")
+                }
+            }
+
+            fun somGjeldendeOverføringFått() = GjeldendeOverføringFått(
                 antallDager = antallDager,
                 periode = periode,
-                status = when (status) {
-                    Aktiv -> GjennomførtOverføring.Status.Aktiv
-                    Avslått -> GjennomførtOverføring.Status.Avslått
-                    Deaktivert -> GjennomførtOverføring.Status.Deaktivert
-                    else -> GjennomførtOverføring.Status.Deaktivert.also {
-                        logger.warn("Overføring $id har uventet status $status. Tolkes som $Deaktivert.")
-                    }
-                },
-                saksnummerMotpart = saksnummerMotpart,
-                type = type
+                status = mapStatus(),
+                fra = fra
             )
-            fun somGjennomførtOverføringFått() = somGjennomførtOverføring(
-                saksnummerMotpart = fra,
-                type = GjennomførtOverføring.Type.Fått
-            )
-            fun somGjennomførtOverføringGitt() = somGjennomførtOverføring(
-                saksnummerMotpart = til,
-                type = GjennomførtOverføring.Type.Gitt
+            fun somGjeldendeOverføringGitt() = GjeldendeOverføringGitt(
+                antallDager = antallDager,
+                periode = periode,
+                status = mapStatus(),
+                til = til
             )
         }
 

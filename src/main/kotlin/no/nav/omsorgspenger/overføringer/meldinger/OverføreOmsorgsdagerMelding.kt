@@ -5,6 +5,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Barn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenFor
@@ -58,6 +59,7 @@ internal object OverføreOmsorgsdagerMelding :
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
         val overføringer = løsning.gjeldendeOverføringer
+            .mapKeys { (saksnummer) -> løsning.identitetsnummer(saksnummer) }
             .mapValues { (_,gjeldendeOverføringer) ->
                 mapOf(
                     "gitt" to gjeldendeOverføringer.gitt.map { gitt -> mapOf(
@@ -65,8 +67,8 @@ internal object OverføreOmsorgsdagerMelding :
                         "gjelderFraOgMed" to gitt.periode.fom,
                         "gjelderTilOgMed" to gitt.periode.tom,
                         "til" to mapOf(
-                            "navn" to løsning.personopplysninger.getValue(gitt.til.identitetsnummer).navnTilLøsning(),
-                            "fødselsdato" to løsning.personopplysninger.getValue(gitt.til.identitetsnummer).fødselsdato.toString()
+                            "navn" to løsning.personopplysninger(gitt.til).navnTilLøsning(),
+                            "fødselsdato" to løsning.personopplysninger(gitt.til).fødselsdato.toString()
                         )
                     )},
                     "fått" to gjeldendeOverføringer.fått.map { fått -> mapOf(
@@ -74,8 +76,8 @@ internal object OverføreOmsorgsdagerMelding :
                         "gjelderFraOgMed" to fått.periode.fom,
                         "gjelderTilOgMed" to fått.periode.tom,
                         "fra" to mapOf(
-                            "navn" to løsning.personopplysninger.getValue(fått.fra.identitetsnummer).navnTilLøsning(),
-                            "fødselsdato" to løsning.personopplysninger.getValue(fått.fra.identitetsnummer).fødselsdato.toString()
+                            "navn" to løsning.personopplysninger(fått.fra).navnTilLøsning(),
+                            "fødselsdato" to løsning.personopplysninger(fått.fra).fødselsdato.toString()
                         )
                     )}
                 )
@@ -126,9 +128,15 @@ internal object OverføreOmsorgsdagerMelding :
 
     internal data class Løsningen(
         internal val utfall: Utfall,
-        internal val gjeldendeOverføringer: Map<Identitetsnummer, GjeldendeOverføringer>,
-        internal val personopplysninger: Map<Identitetsnummer, Personopplysninger>
-    )
+        internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
+        private val personopplysninger: Map<Identitetsnummer, Personopplysninger>,
+        private val saksnummer: Map<Identitetsnummer, Saksnummer>) {
+        private val saksnummerTilIdentitetsnummer = saksnummer.entries.associate{(k,v)-> v to k}
+        internal fun personopplysninger(sak: Saksnummer) =
+            personopplysninger.getValue(saksnummerTilIdentitetsnummer.getValue(sak))
+        internal fun identitetsnummer(sak: Saksnummer) =
+            saksnummerTilIdentitetsnummer.getValue(sak)
+    }
 
     internal enum class Relasjon {
         NåværendeEktefelle,

@@ -19,12 +19,6 @@ internal object Formidling {
         overføreOmsorgsdager: OverføreOmsorgsdagerMelding.Behovet,
         behandling: OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling) : List<Meldingsbestilling> {
 
-        val saksnummer = behandling
-            .gjeldendeOverføringer
-            .entries
-            .map { it.key to it.value.saksnummer }
-            .toMap()
-
         if (!behandling.støtterAutomatiskMelding()) {
             return listOf()
         }
@@ -32,7 +26,7 @@ internal object Formidling {
         val overføringerMedDager = behandling.overføringer.fjernOverføringerUtenDager()
         val bestillinger = mutableListOf<Meldingsbestilling>()
 
-        saksnummer.forEach { (identitetsnummer, saksnummer) ->
+        behandling.saksnummer.forEach { (identitetsnummer, saksnummer) ->
 
             val melding = when (identitetsnummer) {
                 overføreOmsorgsdager.overførerFra -> GittDager(
@@ -82,7 +76,7 @@ internal class GittDager(
     val til: Personopplysninger,
     val mottaksdato: LocalDate,
     val antallDagerØnsketOverført: Int,
-    val overføringer: List<Overføring>
+    val overføringer: List<NyOverføring>
 ) : Melding {
     override val mal = "OVERFORE_GITT_DAGER"
     override val data = {
@@ -98,7 +92,7 @@ internal class GittDager(
 internal class MottattDager(
     val fra: Personopplysninger,
     val mottaksdato: LocalDate,
-    val overføringer: List<Overføring>
+    val overføringer: List<NyOverføring>
 ) : Melding {
     override val mal = "OVERFORE_MOTTATT_DAGER"
     override val data = {
@@ -139,7 +133,7 @@ private fun Personopplysninger.somJSONObject() : JSONObject? {
         root.put("fødselsdato", "$fødselsdato")
     }
 }
-private fun List<Overføring>.somJSONArray() = JSONArray().also {
+private fun List<NyOverføring>.somJSONArray() = JSONArray().also {
     forEach { overføring ->
         it.put(mapOf(
             "gjelderFraOgMed" to "${overføring.periode.fom}",

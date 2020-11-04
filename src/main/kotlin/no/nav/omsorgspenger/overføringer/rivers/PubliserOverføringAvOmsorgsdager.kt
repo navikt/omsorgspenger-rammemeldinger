@@ -15,6 +15,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandl
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
+import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
 
 internal class PubliserOverføringAvOmsorgsdager (
@@ -44,7 +45,7 @@ internal class PubliserOverføringAvOmsorgsdager (
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding.hentLøsning(packet)
         val personopplysninger = HentPersonopplysningerMelding.hentLøsning(packet).also {
-            require(it.keys.containsAll(behandling.gjeldendeOverføringer.keys)) {
+            require(it.keys.containsAll(behandling.saksnummer.identitetsnummer())) {
                 "Mangler personopplysninger for en eller fler av personene berørt av overføringen."
             }
         }
@@ -59,13 +60,10 @@ internal class PubliserOverføringAvOmsorgsdager (
             OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
                 utfall = utfall,
                 gjeldendeOverføringer = behandling.gjeldendeOverføringer,
-                personopplysninger = personopplysninger
+                personopplysninger = personopplysninger,
+                saksnummer = behandling.saksnummer
             ))
         )
-
-        val saksnummer = behandling.gjeldendeOverføringer.entries.first {
-            it.key == overføreOmsorgsdager.overførerFra
-        }.value.saksnummer
 
         packet.leggTilBehovEtter(
             aktueltBehov = OverføreOmsorgsdager,
@@ -74,7 +72,7 @@ internal class PubliserOverføringAvOmsorgsdager (
                     FerdigstillJournalføringForOmsorgspengerMelding.BehovInput(
                         identitetsnummer = overføreOmsorgsdager.overførerFra,
                         journalpostIder = overføreOmsorgsdager.journalpostIder,
-                        saksnummer = saksnummer
+                        saksnummer = behandling.saksnummer.getValue(overføreOmsorgsdager.overførerFra)
                     )
                 )
             )

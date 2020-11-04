@@ -21,4 +21,4 @@ CREATE TABLE overforing_logg
     behovssekvens_id            VARCHAR(100) NOT NULL,
     tidspunkt                   TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'utc'),
     melding                     VARCHAR(280) NOT NULL
-)
+);

@@ -15,8 +15,3 @@ internal data class Kilde(
     val id: String,
     val type: String
 )
-
-internal data class Saksreferanse(
-    val saksnummer: Saksnummer,
-    val identitetsnummer: Identitetsnummer
-)

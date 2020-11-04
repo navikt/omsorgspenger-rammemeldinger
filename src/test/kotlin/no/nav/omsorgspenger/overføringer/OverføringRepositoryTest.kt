@@ -2,7 +2,6 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.overføringer.gjennomføring.GjennomførtOverføring
 import no.nav.omsorgspenger.overføringer.gjennomføring.OverføringRepository
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import org.assertj.core.api.Assertions.assertThat
@@ -106,27 +105,25 @@ internal class OverføringRepositoryTest(
         private const val Trond = "Trond"
         private const val Hege = "Hege"
 
-        private fun Pair<Periode, Int>.somOverføring() = Overføring(
+        private fun Pair<Periode, Int>.somOverføring() = NyOverføring(
             antallDager = second,
             periode = first,
             starterGrunnet = listOf(),
             slutterGrunnet = listOf()
         )
 
-        private fun fått(antallDager: Int, periode: Periode, fra: Saksnummer) = GjennomførtOverføring(
+        private fun fått(antallDager: Int, periode: Periode, fra: Saksnummer) = GjeldendeOverføringFått(
             antallDager = antallDager,
             periode = periode,
-            status = GjennomførtOverføring.Status.Aktiv,
-            type = GjennomførtOverføring.Type.Fått,
-            saksnummerMotpart = fra
+            status = GjeldendeOverføring.Status.Aktiv,
+            fra = fra
         )
 
-        private fun gitt(antallDager: Int, periode: Periode, til: Saksnummer) = GjennomførtOverføring(
+        private fun gitt(antallDager: Int, periode: Periode, til: Saksnummer) = GjeldendeOverføringGitt(
             antallDager = antallDager,
             periode = periode,
-            status = GjennomførtOverføring.Status.Aktiv,
-            type = GjennomførtOverføring.Type.Gitt,
-            saksnummerMotpart = til
+            status = GjeldendeOverføring.Status.Aktiv,
+            til = til
         )
     }
 }
