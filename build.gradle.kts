@@ -80,7 +80,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "6.6.1"
+        gradleVersion = "6.7"
     }
 
 }
