@@ -1,10 +1,10 @@
 package no.nav.omsorgspenger.aleneom
 
+import no.nav.omsorgspenger.AnnenPart
 import no.nav.omsorgspenger.CorrelationId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
-import no.nav.omsorgspenger.overføringer.AnnenPart
 
 internal class AleneOmOmsorgenService(
         private val infotrygdRammeService: InfotrygdRammeService) {
@@ -21,9 +21,9 @@ internal class AleneOmOmsorgenService(
 
         return rammemeldinger.map {
             AleneOmOmsorgen(
-                    vedtatt = TODO(),
+                    gjennomført = it.vedtatt,
                     periode = it.periode,
-                    annenPart = AnnenPart(it.barnetsIdentitetsnummer ?: TODO(), "Identitetsnummer", it.barnetsFødselsdato),
+                    barn = AnnenPart(it.barnetsIdentitetsnummer ?: TODO(), "Identitetsnummer", it.barnetsFødselsdato),
                     kilder = it.kilder,
             )
         }

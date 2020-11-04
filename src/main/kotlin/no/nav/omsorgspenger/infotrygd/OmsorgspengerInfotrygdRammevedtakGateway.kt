@@ -61,18 +61,21 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             periode = it.periode(),
             kilder = it.kilder(),
             barnetsFødselsdato = it.barnetsFødselsdato(),
-            barnetsIdentitetsnummer = it.barnetsIdentitetsnummer()
+            barnetsIdentitetsnummer = it.barnetsIdentitetsnummer(),
+            vedtatt = TODO()
         )}
 
         val fordelingGir = rammevedtak.getArray("FordelingGir").mapJSONObject().map { InfotrygdFordelingGirMelding(
             periode = it.periode(),
             kilder = it.kilder(),
-            lengde = it.lengde()
+            lengde = it.lengde(),
+            vedtatt = TODO()
         )}
 
         val midlertidigAlene = rammevedtak.getArray("MidlertidigAleneOmOmsorgen").mapJSONObject().map { InfotrygdMidlertidigAleneVedtak(
             periode = it.periode(),
-            kilder = it.kilder()
+            kilder = it.kilder(),
+            vedtatt = TODO()
         )}
 
         rammevedtak.getArray("Uidentifisert").also { if (!it.isEmpty) {

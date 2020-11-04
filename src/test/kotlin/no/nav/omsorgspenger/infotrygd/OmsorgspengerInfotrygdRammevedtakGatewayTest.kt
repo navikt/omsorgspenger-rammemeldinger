@@ -31,12 +31,14 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
                 kilder = setOf(Kilde(
                     id = "UTV.RETT/20D/01019911111",
                     type = "Personkort"
-                ))
+                )),
+                vedtatt = TODO()
             ),
             InfotrygdUtvidetRettVedtak(
                 periode = Periode("2020-01-01/2025-12-31"),
                 barnetsIdentitetsnummer = null,
                 barnetsFødselsdato = LocalDate.parse("2001-01-01"),
+                vedtatt = TODO(),
                 kilder = setOf(
                     Kilde(
                         id = "UTV.RETT/10D/01010111111",
@@ -50,6 +52,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             ),
             InfotrygdFordelingGirMelding(
                 periode = Periode("2017-06-17/2018-06-20"),
+                vedtatt = TODO(),
                 kilder = setOf(Kilde(
                     id = "ford/gir",
                     type = "Personkort"
@@ -58,6 +61,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             ),
             InfotrygdMidlertidigAleneVedtak(
                 periode = Periode("1998-06-25/2001-06-25"),
+                vedtatt = TODO(),
                 kilder = setOf(Kilde(
                     id = "midl.alene.om/17D",
                     type = "Personkort"

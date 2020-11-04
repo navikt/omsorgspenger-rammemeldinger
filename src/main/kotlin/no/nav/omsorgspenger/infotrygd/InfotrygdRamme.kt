@@ -8,6 +8,7 @@ import java.time.LocalDate
 
 internal interface InfotrygdRamme{
     val periode: Periode
+    val vedtatt: LocalDate
     val kilder: Set<Kilde>
 }
 
@@ -17,6 +18,7 @@ internal interface InfotrygdRamme{
  */
 internal data class InfotrygdUtvidetRettVedtak(
     override val periode: Periode,
+    override val vedtatt: LocalDate,
     override val kilder: Set<Kilde>,
     internal val barnetsFødselsdato: LocalDate,
     internal val barnetsIdentitetsnummer: Identitetsnummer? = null) : InfotrygdRamme
@@ -31,6 +33,7 @@ internal data class InfotrygdUtvidetRettVedtak(
 
 internal data class InfotrygdAleneOmOmsorgenMelding(
     override val periode: Periode,
+    override val vedtatt: LocalDate,
     override val kilder: Set<Kilde>,
     internal val barnetsFødselsdato: LocalDate,
     internal val barnetsIdentitetsnummer: Identitetsnummer? = null) : InfotrygdRamme
@@ -41,6 +44,7 @@ internal data class InfotrygdAleneOmOmsorgenMelding(
  */
 internal data class InfotrygdMidlertidigAleneVedtak(
     override val periode: Periode,
+    override val vedtatt: LocalDate,
     override val kilder: Set<Kilde>) : InfotrygdRamme
 
 /**
@@ -52,11 +56,13 @@ internal data class InfotrygdMidlertidigAleneVedtak(
 
 internal data class InfotrygdFordelingFårMelding(
     override val periode: Periode,
+    override val vedtatt: LocalDate,
     override val kilder: Set<Kilde>,
     internal val lengde: Duration) : InfotrygdRamme
 
 internal data class InfotrygdFordelingGirMelding(
     override val periode: Periode,
+    override val vedtatt: LocalDate,
     override val kilder: Set<Kilde>,
     internal val lengde: Duration) : InfotrygdRamme
 
@@ -67,17 +73,17 @@ internal data class InfotrygdFordelingGirMelding(
  *        https://github.com/navikt/omsorgspenger-rammemeldinger/issues/23
  */
 internal data class InfotrygdOverføringFårMelding(
-    override val periode: Periode,
-    override val kilder: Set<Kilde>,
-    val dato: LocalDate, // // todo: er denne på rett plass? Den returneres fra infotrygd-grunnlag-paaroerende-sykodm og jeg antar at denne tilsvarer "gjennomført"
-    val annenPart: InfotrygdAnnenPart, // todo: er denne på rett plass?
-    internal val lengde: Duration) : InfotrygdRamme
+        override val periode: Periode,
+        override val vedtatt: LocalDate,
+        override val kilder: Set<Kilde>,
+        val barn: InfotrygdAnnenPart,
+        internal val lengde: Duration) : InfotrygdRamme
 
 internal data class InfotrygdOverføringGirMelding(
-    override val periode: Periode,
-    override val kilder: Set<Kilde>,
-    val dato: LocalDate, // // todo: er denne på rett plass? Den returneres fra infotrygd-grunnlag-paaroerende-sykodm og jeg antar at denne tilsvarer "gjennomført"
-    val annenPart: InfotrygdAnnenPart, // todo: er denne på rett plass?
-    internal val lengde: Duration) : InfotrygdRamme
+        override val periode: Periode,
+        override val vedtatt: LocalDate,
+        override val kilder: Set<Kilde>,
+        val barn: InfotrygdAnnenPart, // todo: er denne på rett plass?
+        internal val lengde: Duration) : InfotrygdRamme
 
 internal data class InfotrygdAnnenPart(val id: String, val type: String, val fødselsdato: LocalDate)

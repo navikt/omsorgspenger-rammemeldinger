@@ -31,41 +31,6 @@ internal class OverføringService(private val infotrygdRammeService: InfotrygdRa
             )
         )
     }
-
-    internal fun hentOverføringer(
-            identitetsnummer: Identitetsnummer,
-            periode: Periode,
-            correlationId: CorrelationId): EGjeldendeOverføringer {
-        val gitt = infotrygdRammeService.hentOverføringGir(identitetsnummer, periode, correlationId)
-        val fått = infotrygdRammeService.hentOverføringFår(identitetsnummer, periode, correlationId)
-
-        return EGjeldendeOverføringer(
-                gitt = gitt.map {
-                    EOverføringGitt(
-                            gjennomført = it.dato,
-                            periode = it.periode,
-                            til = AnnenPart(
-                                    id = it.annenPart.id,
-                                    type = it.annenPart.type,
-                                    fødselsdato = it.annenPart.fødselsdato
-                            ),
-                            lengde = it.lengde
-                    )
-                },
-                fått = fått.map {
-                    EOverføringFått(
-                            gjennomført = it.dato,
-                            periode = it.periode,
-                            fra = AnnenPart(
-                                    id = it.annenPart.id,
-                                    type = it.annenPart.type,
-                                    fødselsdato = it.annenPart.fødselsdato
-                            ),
-                            lengde = it.lengde
-                    )
-                }
-        )
-    }
 }
 
 internal fun Map<Identitetsnummer, GjeldendeOverføringer>.berørteIdentitetsnummer() : Set<Identitetsnummer> {

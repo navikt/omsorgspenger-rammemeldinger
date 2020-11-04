@@ -2,6 +2,7 @@ package no.nav.omsorgspenger
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behovsformat
+import java.time.LocalDate
 
 typealias AktørId = String
 typealias Identitetsnummer = String
@@ -20,3 +21,5 @@ internal data class Saksreferanse(
     val saksnummer: Saksnummer,
     val identitetsnummer: Identitetsnummer
 )
+
+internal data class AnnenPart(val id: String, val type: String, val fødselsdato: LocalDate)

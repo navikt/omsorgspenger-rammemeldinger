@@ -82,7 +82,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     routing {
         HealthRoute(healthService = applicationContext.healthService)
         OverføringerApi() // todo: autentisering
-        AleneOmApi(applicationContext.aleneOmOmsorgenService) // todo: autentisering
+        AleneOmApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService) // todo: autentisering
     }
 }
 
