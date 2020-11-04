@@ -1,19 +1,60 @@
 package no.nav.omsorgspenger.saksnummer
 
+import kotliquery.Session
+import kotliquery.queryOf
+import kotliquery.sessionOf
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
+import java.sql.Array
+import javax.sql.DataSource
 
-internal class SaksnummerRepository {
+internal class SaksnummerRepository(
+    private val dataSource: DataSource) {
 
     private val map = mutableMapOf<Identitetsnummer, Saksnummer>()
 
     internal fun lagreMapping(mapping: Map<Identitetsnummer, Saksnummer>) {
         map.putAll(mapping)
+        /*
+        sessionOf(dataSource).use { session ->
+            mapping.forEach { (identitetsnummer, saksnummer) ->
+                session.run(leggTilMappingQuery(
+                    identitetsnummer = identitetsnummer,
+                    saksnummer = saksnummer
+                ).asUpdate)
+            }
+        }
+         */
     }
 
     internal fun hentSisteMappingFor(saksnummer: Set<Saksnummer>) : Map<Identitetsnummer, Saksnummer> {
-        return map.filterValues { saksnummer.contains(it) }
+        return map.filterValues { it in saksnummer }
+        /*
+        val mapping = mutableMapOf<Identitetsnummer, Saksnummer>()
+        sessionOf(dataSource).use { session ->
+            session.run(hentSisteMappingQuery(
+                saksnummerArray = session.saksnummerArray(saksnummer)
+            ).map { row ->
+                mapping[row.string("identitetsnummer")] = row.string("sak")
+            }.asList)
+        }
+        return mapping
+         */
+    }
+
+    private fun Session.saksnummerArray(saksnummer: Set<Saksnummer>) = createArrayOf("varchar", saksnummer)
+
+    private companion object {
+        private const val LeggTilMappingStatement =
+            "INSERT INTO saksnummer (identitetsnummer, sak) VALUES(?,?) ON CONFLICT DO NOTHING"
+        private fun leggTilMappingQuery(identitetsnummer: Identitetsnummer, saksnummer: Saksnummer) =
+            queryOf(LeggTilMappingStatement, identitetsnummer, saksnummer)
+
+        private const val HentSisteMappingStatement =
+            "SELECT DISTINCT ON(sak) sak, id, identitetsnummer FROM saksnummer WHERE sak = ANY(?) ORDER BY sak, id DESC"
+        private fun hentSisteMappingQuery(saksnummerArray: Array) =
+            queryOf(HentSisteMappingStatement, saksnummerArray)
     }
 }
 
-internal fun Map<Saksnummer, Identitetsnummer>.identitetsnummer() = keys
+internal fun Map<Identitetsnummer, Saksnummer>.identitetsnummer() = keys

@@ -8,11 +8,11 @@ CREATE TABLE overforing
     til                         VARCHAR(50) NOT NULL,
     antall_dager                SMALLINT NOT NULL,
     status                      VARCHAR(100) NOT NULL,
-    lovanvendelser              jsonb NOT NULL
+    lovanvendelser              JSONB NOT NULL
 );
 
-create index INDEX_OVERFORING_FRA on overforing(fra);
-create index INDEX_OVERFORING_TIL on overforing(til);
+CREATE INDEX index_overforing_fra ON overforing(fra);
+CREATE INDEX index_overforing_til ON overforing(til);
 
 CREATE TABLE overforing_logg
 (
