@@ -62,20 +62,20 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             kilder = it.kilder(),
             barnetsFødselsdato = it.barnetsFødselsdato(),
             barnetsIdentitetsnummer = it.barnetsIdentitetsnummer(),
-            vedtatt = TODO()
+            vedtatt = it.vedtatt()
         )}
 
         val fordelingGir = rammevedtak.getArray("FordelingGir").mapJSONObject().map { InfotrygdFordelingGirMelding(
             periode = it.periode(),
             kilder = it.kilder(),
             lengde = it.lengde(),
-            vedtatt = TODO()
+            vedtatt = it.vedtatt()
         )}
 
         val midlertidigAlene = rammevedtak.getArray("MidlertidigAleneOmOmsorgen").mapJSONObject().map { InfotrygdMidlertidigAleneVedtak(
             periode = it.periode(),
             kilder = it.kilder(),
-            vedtatt = TODO()
+            vedtatt = it.vedtatt()
         )}
 
         rammevedtak.getArray("Uidentifisert").also { if (!it.isEmpty) {
@@ -135,6 +135,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
                 false -> null
             }
         }
+        private fun JSONObject.vedtatt(): LocalDate = LocalDate.parse(getString("vedtatt"))
         private fun JSONArray.mapJSONObject() = map { it as JSONObject }
     }
 }

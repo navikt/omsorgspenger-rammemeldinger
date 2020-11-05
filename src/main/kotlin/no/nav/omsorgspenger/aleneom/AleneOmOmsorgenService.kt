@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger.aleneom
 
-import no.nav.omsorgspenger.AnnenPart
 import no.nav.omsorgspenger.CorrelationId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
@@ -23,7 +22,7 @@ internal class AleneOmOmsorgenService(
             AleneOmOmsorgen(
                     gjennomført = it.vedtatt,
                     periode = it.periode,
-                    barn = AnnenPart(it.barnetsIdentitetsnummer ?: TODO(), "Identitetsnummer", it.barnetsFødselsdato),
+                    barn = it.barn,
                     kilder = it.kilder,
             )
         }

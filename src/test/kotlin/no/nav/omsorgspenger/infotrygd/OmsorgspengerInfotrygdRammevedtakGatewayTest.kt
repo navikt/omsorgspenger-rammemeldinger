@@ -7,6 +7,7 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -32,13 +33,13 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
                     id = "UTV.RETT/20D/01019911111",
                     type = "Personkort"
                 )),
-                vedtatt = TODO()
+                vedtatt = LocalDate.parse("2020-06-21")
             ),
             InfotrygdUtvidetRettVedtak(
                 periode = Periode("2020-01-01/2025-12-31"),
                 barnetsIdentitetsnummer = null,
                 barnetsFødselsdato = LocalDate.parse("2001-01-01"),
-                vedtatt = TODO(),
+                vedtatt = LocalDate.parse("2020-06-11"),
                 kilder = setOf(
                     Kilde(
                         id = "UTV.RETT/10D/01010111111",
@@ -52,7 +53,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             ),
             InfotrygdFordelingGirMelding(
                 periode = Periode("2017-06-17/2018-06-20"),
-                vedtatt = TODO(),
+                vedtatt = LocalDate.parse("2018-06-17"),
                 kilder = setOf(Kilde(
                     id = "ford/gir",
                     type = "Personkort"
@@ -61,7 +62,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             ),
             InfotrygdMidlertidigAleneVedtak(
                 periode = Periode("1998-06-25/2001-06-25"),
-                vedtatt = TODO(),
+                vedtatt = LocalDate.parse("1998-06-21"),
                 kilder = setOf(Kilde(
                     id = "midl.alene.om/17D",
                     type = "Personkort"
@@ -81,7 +82,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
         )
 
         assertEquals(4, infotrygdRammer.size)
-        assertTrue(infotrygdRammer.containsAll(forventedeInfotrygdRammer))
+        assertThat(infotrygdRammer).containsAll(forventedeInfotrygdRammer)
     }
 
     @Test

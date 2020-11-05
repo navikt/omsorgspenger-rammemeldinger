@@ -22,4 +22,14 @@ internal data class Saksreferanse(
     val identitetsnummer: Identitetsnummer
 )
 
-internal data class AnnenPart(val id: String, val type: String, val fødselsdato: LocalDate)
+interface AnnenPart {
+    val id: Identitetsnummer
+    val type: String
+    val fødselsdato: LocalDate
+}
+
+internal data class OmsorgspengerRammemeldingerAnnenPart(
+        override val id: Identitetsnummer,
+        override val type: String,
+        override val fødselsdato: LocalDate
+) : AnnenPart

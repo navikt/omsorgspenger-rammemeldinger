@@ -14,7 +14,6 @@ internal fun Route.AleneOmApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
         val request = call.receive<RammemeldingerRequest>()
         val correlationId = call.request.header(HttpHeaders.XCorrelationId) ?: UUID.randomUUID().toString()
 
-        // todo: hent faktiske data
         val aleneOmOmosrgen = aleneOmOmsorgenService.hentAleneOmOmsorgen(request.identitetsnummer, Periode(request.fom, request.tom), correlationId)
 
         val result = AleneOmOmsorgenResponseDto(
@@ -23,7 +22,7 @@ internal fun Route.AleneOmApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
                             gjennomført = it.gjennomført,
                             gyldigFraOgMed = it.periode.fom,
                             gyldigTilOgMed = it.periode.tom,
-                            barn = PersonDto(
+                            barn = AnnenPartDto(
                                     id = it.barn.id,
                                     type = it.barn.type,
                                     fødselsdato = it.barn.fødselsdato
@@ -38,12 +37,12 @@ internal fun Route.AleneOmApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
 
 private data class RammemeldingerRequest(val identitetsnummer: String, val fom: LocalDate, val tom: LocalDate)
 
-private data class PersonDto(val id: String, val type: String, val fødselsdato: LocalDate)
+private data class AnnenPartDto(val id: String, val type: String, val fødselsdato: LocalDate)
 
 private data class AleneOmOmsorgenResponseDto(val aleneOmOmsorgen: List<AleneOmOmsorgenDto>)
 private data class AleneOmOmsorgenDto(
         val gjennomført: LocalDate,
         val gyldigFraOgMed: LocalDate,
         val gyldigTilOgMed: LocalDate,
-        val barn: PersonDto
+        val barn: AnnenPartDto
 )

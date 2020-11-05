@@ -1,10 +1,13 @@
 package no.nav.omsorgspenger.infotrygd
 
+import no.nav.omsorgspenger.AnnenPart
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import java.time.Duration
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 internal interface InfotrygdRamme{
     val periode: Periode
@@ -36,7 +39,28 @@ internal data class InfotrygdAleneOmOmsorgenMelding(
     override val vedtatt: LocalDate,
     override val kilder: Set<Kilde>,
     internal val barnetsFødselsdato: LocalDate,
-    internal val barnetsIdentitetsnummer: Identitetsnummer? = null) : InfotrygdRamme
+    internal val barnetsIdentitetsnummer: Identitetsnummer? = null) : InfotrygdRamme {
+
+    val barn: InfotrygdAnnenPart
+        get() {
+            if(barnetsIdentitetsnummer != null) {
+                return InfotrygdAnnenPart(
+                        id = barnetsIdentitetsnummer,
+                        type = "Identitetsnummer",
+                        fødselsdato = barnetsFødselsdato
+                )
+            } else {
+                val ZONE_ID = ZoneId.of("Europe/Oslo")
+                val ddMMyy = DateTimeFormatter.ofPattern("ddMMyy").withZone(ZONE_ID)
+
+                return InfotrygdAnnenPart(
+                        id = ddMMyy.format(barnetsFødselsdato),
+                        fødselsdato = barnetsFødselsdato,
+                        type = "Fødselsdato"
+                )
+            }
+        }
+}
 
 /**
  * Rammevedtak i Infotrygd for midlertidig alene om omsorgen.
@@ -83,7 +107,7 @@ internal data class InfotrygdOverføringGirMelding(
         override val periode: Periode,
         override val vedtatt: LocalDate,
         override val kilder: Set<Kilde>,
-        val barn: InfotrygdAnnenPart, // todo: er denne på rett plass?
+        val barn: InfotrygdAnnenPart,
         internal val lengde: Duration) : InfotrygdRamme
 
-internal data class InfotrygdAnnenPart(val id: String, val type: String, val fødselsdato: LocalDate)
+internal data class InfotrygdAnnenPart(override val id: Identitetsnummer, override val fødselsdato: LocalDate, override val type: String) : AnnenPart
