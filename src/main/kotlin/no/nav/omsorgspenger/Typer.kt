@@ -23,13 +23,16 @@ internal data class Saksreferanse(
 )
 
 interface AnnenPart {
-    val id: Identitetsnummer
+    val id: String
     val type: String
     val fødselsdato: LocalDate
+    companion object {
+        internal val Identitetsnummer = "Identitetsnummer"
+    }
 }
 
 internal data class OmsorgspengerRammemeldingerAnnenPart(
         override val id: Identitetsnummer,
-        override val type: String,
-        override val fødselsdato: LocalDate
-) : AnnenPart
+        override val fødselsdato: LocalDate) : AnnenPart {
+    override val type = AnnenPart.Identitetsnummer
+}

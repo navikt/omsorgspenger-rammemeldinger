@@ -16,6 +16,7 @@ import no.nav.omsorgspenger.CorrelationId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.infotrygd.InfotrygdAnnenPart.Companion.somInfotrygdAnnenPart
 import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
@@ -60,8 +61,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         val utvidetRett = rammevedtak.getArray("UtvidetRett").mapJSONObject().map { InfotrygdUtvidetRettVedtak(
             periode = it.periode(),
             kilder = it.kilder(),
-            barnetsFødselsdato = it.barnetsFødselsdato(),
-            barnetsIdentitetsnummer = it.barnetsIdentitetsnummer(),
+            barn = it.barn().somInfotrygdAnnenPart(),
             vedtatt = it.vedtatt()
         )}
 
@@ -78,11 +78,21 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             vedtatt = it.vedtatt()
         )}
 
+        val aleneOmOmsorgen = rammevedtak.getArray("AleneOmOmsorgen").mapJSONObject().map { InfotrygdAleneOmOmsorgenMelding(
+            periode = it.periode(),
+            kilder = it.kilder(),
+            vedtatt = it.vedtatt(),
+            barn = it.barn().somInfotrygdAnnenPart()
+        )}
+
         rammevedtak.getArray("Uidentifisert").also { if (!it.isEmpty) {
             logger.info("Antall Uidentifiserte rammevedtak fra Infotrygd = ${it.length()}")
         }}
 
-        return utvidetRett.plus(fordelingGir).plus(midlertidigAlene)
+        return utvidetRett
+            .plus(fordelingGir)
+            .plus(midlertidigAlene)
+            .plus(aleneOmOmsorgen)
     }
 
     private fun authorizationHeader() =
@@ -127,14 +137,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
                 id = it.getString("id"),
                 type = it.getString("type"))
             }.toSet()
-        private fun JSONObject.barnetsFødselsdato() = LocalDate.parse(getJSONObject("barn").getString("fødselsdato"))
-        private fun JSONObject.barnetsIdentitetsnummer() : Identitetsnummer? {
-            val barn = getJSONObject("barn")
-            return when (barn.getString("type") == "PersonIdent") {
-                true -> barn.getString("id")
-                false -> null
-            }
-        }
+        private fun JSONObject.barn() = getJSONObject("barn")
         private fun JSONObject.vedtatt(): LocalDate = LocalDate.parse(getString("vedtatt"))
         private fun JSONArray.mapJSONObject() = map { it as JSONObject }
     }

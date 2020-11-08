@@ -14,10 +14,14 @@ internal fun Route.AleneOmApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
         val request = call.receive<RammemeldingerRequest>()
         val correlationId = call.request.header(HttpHeaders.XCorrelationId) ?: UUID.randomUUID().toString()
 
-        val aleneOmOmosrgen = aleneOmOmsorgenService.hentAleneOmOmsorgen(request.identitetsnummer, Periode(request.fom, request.tom), correlationId)
+        val aleneOmOmsorgen = aleneOmOmsorgenService.hentAleneOmOmsorgen(
+            identitetsnummer = request.identitetsnummer,
+            periode = Periode(request.fom, request.tom),
+            correlationId = correlationId
+        )
 
         val result = AleneOmOmsorgenResponseDto(
-                aleneOmOmsorgen = aleneOmOmosrgen.map {
+                aleneOmOmsorgen = aleneOmOmsorgen.map {
                     AleneOmOmsorgenDto(
                             gjennomført = it.gjennomført,
                             gyldigFraOgMed = it.periode.fom,

@@ -6,7 +6,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 
 internal class AleneOmOmsorgenService(
-        private val infotrygdRammeService: InfotrygdRammeService) {
+    private val infotrygdRammeService: InfotrygdRammeService) {
 
     internal fun hentAleneOmOmsorgen(
             identitetsnummer: Identitetsnummer,

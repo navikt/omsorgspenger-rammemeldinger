@@ -5,6 +5,7 @@ import io.ktor.server.testing.*
 import no.nav.omsorgspenger.omsorgspengerRammemeldinger
 import no.nav.omsorgspenger.overføringer.TestAppliationContextBuilder
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
 
@@ -27,8 +28,8 @@ internal class AleneOmApiKtTest {
                 """.trimIndent()
                 setBody(body)
             }.apply {
-                kotlin.test.assertEquals(HttpStatusCode.OK, response.status())
-                kotlin.test.assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
+                assertEquals(HttpStatusCode.OK, response.status())
+                assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
 
                 @Language("JSON")
                 val forventetResponse = """
