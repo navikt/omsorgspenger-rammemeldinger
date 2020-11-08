@@ -128,6 +128,30 @@ private val AlleTypeRammevedtak = """
         },
         "lengde": "P1DT5H45M"
       }
+    ],
+    "AleneOmOmsorgen": [
+      {
+        "vedtatt": "2016-06-17",
+        "gyldigFraOgMed": "2017-06-17",
+        "gyldigTilOgMed": "2018-06-20",
+        "barn": {   
+          "id": "29099011112",
+          "type": "PersonIdent",
+          "fødselsdato": "1990-09-29"
+        },
+        "kilder": []
+      },
+      {
+        "vedtatt": "2016-06-18",
+        "gyldigFraOgMed": "2017-06-20",
+        "gyldigTilOgMed": "2018-06-25",
+        "barn": {   
+          "id": "1991-09-29",
+          "type": "Fødselsdato",
+          "fødselsdato": "1991-09-29"
+        },
+        "kilder": []
+      }
     ]
   }
 }

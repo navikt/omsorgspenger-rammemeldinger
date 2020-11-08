@@ -4,6 +4,7 @@ import no.nav.omsorgspenger.Saksnummer
 
 internal class OverføringService(
     private val overføringRepository: OverføringRepository) {
+
     /**
      * Mottar referanse til personen som overfører 'fra' og
      * personen som man overfører 'til' samt overføringene som skal gjennomføres.

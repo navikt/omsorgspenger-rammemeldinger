@@ -35,6 +35,7 @@ import no.nav.omsorgspenger.aleneom.AleneOmApi
 import no.nav.omsorgspenger.overføringer.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import javax.sql.DataSource
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -84,7 +85,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     routing {
         HealthRoute(healthService = applicationContext.healthService)
         OverføringerApi() // todo: autentisering
-        AleneOmApi() // todo: autentisering
+        AleneOmApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService) // todo: autentisering
     }
 }
 
@@ -98,6 +99,7 @@ internal class ApplicationContext(
     internal val midlertidigAleneService: MidlertidigAleneService,
     internal val overføringService: OverføringService,
     internal val overføringRepository: OverføringRepository,
+    internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
     internal val saksnummerRepository: SaksnummerRepository,
@@ -121,6 +123,7 @@ internal class ApplicationContext(
         internal var midlertidigAleneService: MidlertidigAleneService? = null,
         internal var overføringService: OverføringService? = null,
         internal var overføringRepository: OverføringRepository? = null,
+        internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
         internal var saksnummerRepository: SaksnummerRepository? = null,
@@ -148,6 +151,7 @@ internal class ApplicationContext(
             val benyttetOverføringRepository = overføringRepository ?: OverføringRepository(
                 dataSource = benyttetDataSource
             )
+            val benyttetAleneOmOmsorgenService = aleneOmOmsorgenService ?: AleneOmOmsorgenService(benyttetInfotrygdRammeService)
 
             return ApplicationContext(
                 env = benyttetEnv,
@@ -166,6 +170,7 @@ internal class ApplicationContext(
                 overføringService = overføringService ?: OverføringService(
                     overføringRepository = benyttetOverføringRepository
                 ),
+                aleneOmOmsorgenService = benyttetAleneOmOmsorgenService,
                 healthService = HealthService(healthChecks = setOf(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
                 )),

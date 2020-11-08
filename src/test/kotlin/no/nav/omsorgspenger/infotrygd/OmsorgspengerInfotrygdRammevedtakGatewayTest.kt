@@ -7,6 +7,7 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -26,17 +27,25 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
         val forventedeInfotrygdRammer = listOf(
             InfotrygdUtvidetRettVedtak(
                 periode = Periode("2020-06-21/2020-06-21"),
-                barnetsIdentitetsnummer = "01019911111",
-                barnetsFødselsdato = LocalDate.parse("1999-01-01"),
+                barn = InfotrygdAnnenPart(
+                    id = "01019911111",
+                    type = "Identitetsnummer",
+                    fødselsdato = LocalDate.parse("1999-01-01")
+                ),
                 kilder = setOf(Kilde(
                     id = "UTV.RETT/20D/01019911111",
                     type = "Personkort"
-                ))
+                )),
+                vedtatt = LocalDate.parse("2020-06-21")
             ),
             InfotrygdUtvidetRettVedtak(
                 periode = Periode("2020-01-01/2025-12-31"),
-                barnetsIdentitetsnummer = null,
-                barnetsFødselsdato = LocalDate.parse("2001-01-01"),
+                barn = InfotrygdAnnenPart(
+                    id = "2001-01-01",
+                    type = "Fødselsdato",
+                    fødselsdato = LocalDate.parse("2001-01-01")
+                ),
+                vedtatt = LocalDate.parse("2020-06-11"),
                 kilder = setOf(
                     Kilde(
                         id = "UTV.RETT/10D/01010111111",
@@ -50,6 +59,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             ),
             InfotrygdFordelingGirMelding(
                 periode = Periode("2017-06-17/2018-06-20"),
+                vedtatt = LocalDate.parse("2018-06-17"),
                 kilder = setOf(Kilde(
                     id = "ford/gir",
                     type = "Personkort"
@@ -58,10 +68,31 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             ),
             InfotrygdMidlertidigAleneVedtak(
                 periode = Periode("1998-06-25/2001-06-25"),
+                vedtatt = LocalDate.parse("1998-06-21"),
                 kilder = setOf(Kilde(
                     id = "midl.alene.om/17D",
                     type = "Personkort"
                 ))
+            ),
+            InfotrygdAleneOmOmsorgenMelding(
+                periode = Periode("2017-06-20/2018-06-25"),
+                vedtatt = LocalDate.parse("2016-06-18"),
+                kilder = setOf(),
+                barn = InfotrygdAnnenPart(
+                    id = "1991-09-29",
+                    fødselsdato = LocalDate.parse("1991-09-29"),
+                    type = "Fødselsdato"
+                )
+            ),
+            InfotrygdAleneOmOmsorgenMelding(
+                periode = Periode("2017-06-17/2018-06-20"),
+                vedtatt = LocalDate.parse("2016-06-17"),
+                kilder = setOf(),
+                barn = InfotrygdAnnenPart(
+                    id = "29099011112",
+                    fødselsdato = LocalDate.parse("1990-09-29"),
+                    type = "Identitetsnummer"
+                )
             )
         )
 
@@ -76,8 +107,8 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             correlationId = UUID.randomUUID().toString()
         )
 
-        assertEquals(4, infotrygdRammer.size)
-        assertTrue(infotrygdRammer.containsAll(forventedeInfotrygdRammer))
+        assertEquals(6, infotrygdRammer.size)
+        assertThat(infotrygdRammer).containsAll(forventedeInfotrygdRammer)
     }
 
     @Test
