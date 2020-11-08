@@ -1,9 +1,12 @@
 package no.nav.omsorgspenger.overføringer
 
+import no.nav.omsorgspenger.CorrelationId
 import no.nav.omsorgspenger.Identitetsnummer
+import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksreferanse
+import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 
-internal class OverføringService {
+internal class OverføringService(private val infotrygdRammeService: InfotrygdRammeService) {
     /**
      * Mottar referanse til personen som overfører 'fra' og
      * personen som man overfører 'til' samt overføringene som skal gjennomføres.
