@@ -97,7 +97,8 @@ internal data class SpleisetOverføringer(
                     id = it.til.id,
                     type = it.til.type
                 ),
-                lengde = it.lengde
+                lengde = it.lengde,
+                kilder = it.kilder
             )},
             fått = fått.map { SpleisetOverføringFått(
                 gjennomført = it.vedtatt,
@@ -107,7 +108,8 @@ internal data class SpleisetOverføringer(
                     id = it.fra.id,
                     type = it.fra.type
                 ),
-                lengde = it.lengde
+                lengde = it.lengde,
+                kilder = it.kilder
             )}
         )
         internal fun fraNyLøsning(
@@ -122,7 +124,8 @@ internal data class SpleisetOverføringer(
                 til = Motpart(
                     id = saksnummerIdentitetsnummerMapping.getValue(it.til)
                 ),
-                lengde = Duration.ofDays(it.antallDager.toLong())
+                lengde = Duration.ofDays(it.antallDager.toLong()),
+                kilder = setOf(Kilde(id = "TODO", type = "OmsorgspengerRammemeldinger"))
             )},
             fått = overføringerINyLøsning.fått.filter { it.periode.overlapperMedMinstEnDag(periode) }.map { SpleisetOverføringFått(
                 gjennomført = it.gjennomført.toLocalDateOslo(),
@@ -131,7 +134,8 @@ internal data class SpleisetOverføringer(
                 fra = Motpart(
                     id = saksnummerIdentitetsnummerMapping.getValue(it.fra)
                 ),
-                lengde = Duration.ofDays(it.antallDager.toLong())
+                lengde = Duration.ofDays(it.antallDager.toLong()),
+                kilder = setOf(Kilde(id = "TODO", type = "OmsorgspengerRammemeldinger"))
             )}
         )
     }
@@ -142,7 +146,8 @@ internal data class SpleisetOverføringGitt(
     val gyldigFraOgMed: LocalDate,
     val gyldigTilOgMed: LocalDate,
     val til: Motpart,
-    val lengde: Duration
+    val lengde: Duration,
+    val kilder: Set<Kilde>
 )
 
 internal data class SpleisetOverføringFått(
@@ -150,7 +155,8 @@ internal data class SpleisetOverføringFått(
     val gyldigFraOgMed: LocalDate,
     val gyldigTilOgMed: LocalDate,
     val fra: Motpart,
-    val lengde: Duration
+    val lengde: Duration,
+    val kilder: Set<Kilde>
 )
 
 internal data class Motpart(

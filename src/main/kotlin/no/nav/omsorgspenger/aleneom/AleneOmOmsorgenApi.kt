@@ -6,18 +6,17 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.extensions.correlationId
 import java.time.LocalDate
-import java.util.*
 
 internal fun Route.AleneOmOmsorgenApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
     post("/hentAleneOmOmsorgen") {
         val request = call.receive<HentAleneOmOmsorgenRequest>()
-        val correlationId = call.request.header(HttpHeaders.XCorrelationId) ?: UUID.randomUUID().toString()
 
         val aleneOmOmsorgen = aleneOmOmsorgenService.hentSpleisetAleneOmOmsorgen(
             identitetsnummer = request.identitetsnummer,
             periode = Periode(request.fom, request.tom),
-            correlationId = correlationId
+            correlationId = call.request.correlationId()
         )
 
         call.respond(

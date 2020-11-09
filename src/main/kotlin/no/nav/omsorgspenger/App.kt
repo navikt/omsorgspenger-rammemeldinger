@@ -36,6 +36,8 @@ import no.nav.omsorgspenger.overføringer.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import javax.sql.DataSource
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
+import no.nav.omsorgspenger.overføringer.OverføringService
+import no.nav.omsorgspenger.saksnummer.SaksnummerService
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -84,7 +86,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     }
     routing {
         HealthRoute(healthService = applicationContext.healthService)
-        OverføringerApi() // todo: autentisering
+        OverføringerApi(overføringService = applicationContext.overføringService) // todo: autentisering
         AleneOmOmsorgenApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService) // todo: autentisering
     }
 }
@@ -99,10 +101,12 @@ internal class ApplicationContext(
     internal val midlertidigAleneService: MidlertidigAleneService,
     internal val gjennomførOverføringService: GjennomførOverføringService,
     internal val overføringRepository: OverføringRepository,
+    internal val overføringService: OverføringService,
     internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
     internal val saksnummerRepository: SaksnummerRepository,
+    internal val saksnummerService: SaksnummerService,
     internal val dataSource: DataSource,
     internal val healthService: HealthService) {
 
@@ -123,10 +127,12 @@ internal class ApplicationContext(
         internal var midlertidigAleneService: MidlertidigAleneService? = null,
         internal var gjennomførOverføringService: GjennomførOverføringService? = null,
         internal var overføringRepository: OverføringRepository? = null,
+        internal var overføringService: OverføringService? = null,
         internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
         internal var saksnummerRepository: SaksnummerRepository? = null,
+        internal var saksnummerService: SaksnummerService? = null,
         internal var dataSource: DataSource? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
@@ -152,6 +158,14 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource
             )
             val benyttetAleneOmOmsorgenService = aleneOmOmsorgenService ?: AleneOmOmsorgenService(benyttetInfotrygdRammeService)
+
+            val benyttetSaksnummerRepository = saksnummerRepository ?: SaksnummerRepository(
+                dataSource = benyttetDataSource
+            )
+
+            val benyttetSaksnummerService = saksnummerService ?: SaksnummerService(
+                saksnummerRepository = benyttetSaksnummerRepository
+            )
 
             return ApplicationContext(
                 env = benyttetEnv,
@@ -180,9 +194,13 @@ internal class ApplicationContext(
                 ),
                 dataSource = benyttetDataSource,
                 overføringRepository = benyttetOverføringRepository,
-                saksnummerRepository = saksnummerRepository ?: SaksnummerRepository(
-                    dataSource = benyttetDataSource
-                )
+                overføringService = overføringService ?: OverføringService(
+                    infotrygdRammeService = benyttetInfotrygdRammeService,
+                    saksnummerService = benyttetSaksnummerService,
+                    overføringRepository = benyttetOverføringRepository
+                ),
+                saksnummerRepository = benyttetSaksnummerRepository,
+                saksnummerService = benyttetSaksnummerService
             )
         }
     }

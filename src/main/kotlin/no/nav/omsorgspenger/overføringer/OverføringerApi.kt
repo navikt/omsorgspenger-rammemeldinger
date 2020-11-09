@@ -5,36 +5,35 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import java.time.Duration
+import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.extensions.correlationId
 import java.time.LocalDate
 
-fun Route.OverføringerApi() {
-    post("/hentOverfoeringer") {
-        val request = call.receive<RammemeldingerRequest>()
-        // todo: hent faktiske data
+internal fun Route.OverføringerApi(
+    overføringService: OverføringService) {
 
-        call.respond(status = HttpStatusCode.OK, message = OverføringResponseDto(gitt = listOf(), fått = listOf()))
+    post("/hentOverfoeringer") {
+        val request = call.receive<HentOverføringerRequest>()
+
+        val spleisetOverføringer =overføringService.hentSpleisetOverføringer(
+            identitetsnummer = request.identitetsnummer,
+            periode = Periode(
+                fom = request.fom,
+                tom = request.tom
+            ),
+            correlationId = call.request.correlationId()
+        )
+
+        call.respond(
+            status = HttpStatusCode.OK,
+            message = spleisetOverføringer
+        )
     }
 }
 
 
-private data class RammemeldingerRequest(val identitetsnummer: String, val fom: LocalDate, val tom: LocalDate)
-
-private data class OverføringResponseDto(val gitt: List<OverføringGittDto>, val fått: List<OverføringFåttDto>)
-private data class OverføringGittDto(
-        val gjennomført: LocalDate,
-        val gyldigFraOgMed: LocalDate,
-        val gyldigTilOgMed: LocalDate,
-        val til: PersonDto,
-        val lengde: Duration
+private data class HentOverføringerRequest(
+    val identitetsnummer: String,
+    val fom: LocalDate,
+    val tom: LocalDate
 )
-
-private data class OverføringFåttDto(
-        val gjennomført: LocalDate,
-        val gyldigFraOgMed: LocalDate,
-        val gyldigTilOgMed: LocalDate,
-        val fra: PersonDto,
-        val lengde: Duration
-)
-
-private data class PersonDto(val id: String, val type: String, val fødselsdato: LocalDate)
