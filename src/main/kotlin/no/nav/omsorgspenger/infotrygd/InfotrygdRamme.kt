@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger.infotrygd
 
-import no.nav.omsorgspenger.AnnenPart
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import org.json.JSONObject
@@ -23,7 +22,7 @@ internal data class InfotrygdUtvidetRettVedtak(
     override val kilder: Set<Kilde>,
     val barn: InfotrygdAnnenPart) : InfotrygdRamme {
     internal val barnetsFødselsdato = barn.fødselsdato
-    internal val barnetsIdentitetsnummer = when (barn.type == AnnenPart.Identitetsnummer) {
+    internal val barnetsIdentitetsnummer = when (barn.type == "Identitetsnummer") {
         true -> barn.id
         false -> null
     }
@@ -92,14 +91,14 @@ internal data class InfotrygdOverføringGirMelding(
         val lengde: Duration) : InfotrygdRamme
 
 internal data class InfotrygdAnnenPart(
-    override val id: String,
-    override val fødselsdato: LocalDate,
-    override val type: String) : AnnenPart {
+    internal val id: String,
+    internal val fødselsdato: LocalDate,
+    internal val type: String) {
     internal companion object {
         internal fun JSONObject.somInfotrygdAnnenPart() = InfotrygdAnnenPart(
             id = getString("id"),
             type = getString("type").let { when(it) {
-                "PersonIdent" -> AnnenPart.Identitetsnummer
+                "PersonIdent" -> "Identitetsnummer"
                 "Fødselsdato" -> "Fødselsdato"
                 else -> throw IllegalStateException("Ugyldig 'type' $it")
             }},

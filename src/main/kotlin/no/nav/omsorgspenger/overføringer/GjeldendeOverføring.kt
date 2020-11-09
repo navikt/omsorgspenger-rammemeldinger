@@ -2,8 +2,10 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import java.time.ZonedDateTime
 
 internal interface GjeldendeOverføring {
+    val gjennomført: ZonedDateTime
     val antallDager: Int
     val periode: Periode
     val status: Status
@@ -15,6 +17,7 @@ internal interface GjeldendeOverføring {
 }
 
 internal data class GjeldendeOverføringGitt(
+    override val gjennomført: ZonedDateTime,
     override val antallDager: Int,
     override val periode: Periode,
     override val status: GjeldendeOverføring.Status,
@@ -22,6 +25,7 @@ internal data class GjeldendeOverføringGitt(
 ) : GjeldendeOverføring
 
 internal data class GjeldendeOverføringFått(
+    override val gjennomført: ZonedDateTime,
     override val antallDager: Int,
     override val periode: Periode,
     override val status: GjeldendeOverføring.Status,

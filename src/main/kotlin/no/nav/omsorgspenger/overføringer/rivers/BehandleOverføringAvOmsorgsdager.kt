@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory
 
 internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
-    private val overføringService: OverføringService,
+    private val gjennomførOverføringService: GjennomførOverføringService,
     private val saksnummerRepository: SaksnummerRepository) : BehovssekvensPacketListener(
     logger = LoggerFactory.getLogger(BehandleOverføringAvOmsorgsdager::class.java)) {
 
@@ -117,7 +117,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 fra = saksnummer.getValue(overføreOmsorgsdager.overførerFra),
                 til = saksnummer.getValue(overføreOmsorgsdager.overførerTil)
             )
-            false -> overføringService.gjennomførOverføringer(
+            false -> gjennomførOverføringService.gjennomførOverføringer(
                 fra = saksnummer.getValue(overføreOmsorgsdager.overførerFra),
                 til = saksnummer.getValue(overføreOmsorgsdager.overførerTil),
                 overføringer = overføringer

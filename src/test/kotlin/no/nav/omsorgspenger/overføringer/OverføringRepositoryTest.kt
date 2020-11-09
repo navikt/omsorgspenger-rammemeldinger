@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.ZonedDateTime
 import javax.sql.DataSource
 import kotlin.test.assertEquals
 
@@ -17,11 +18,12 @@ internal class OverføringRepositoryTest(
     private val overføringRepository = OverføringRepository(
         dataSource = dataSource.cleanAndMigrate()
     )
+
     @Test
     fun `Håndtere overføringer gjennom samlivsbrudd`() {
         val År2020 = Periode("2020-01-01/2020-12-31")
 
-        var gjennomførte = overføringRepository.gjennomførOverføringer(
+        var gjennomførte = gjennomførOverføringer(
             fra = Ola,
             til = Kari,
             overføringer = listOf(
@@ -36,7 +38,7 @@ internal class OverføringRepositoryTest(
         assertThat(setOf(gitt(1, År2020, Kari))).hasSameElementsAs(gjennomførte.getValue(Ola).gitt)
         assertTrue(gjennomførte.getValue(Ola).fått.isEmpty())
 
-        gjennomførte = overføringRepository.gjennomførOverføringer(
+        gjennomførte = gjennomførOverføringer(
             fra = Kari,
             til = Ola,
             overføringer = listOf(
@@ -64,7 +66,7 @@ internal class OverføringRepositoryTest(
         ))
 
         val November2020 = Periode("2020-11-01/2020-11-30")
-        gjennomførte = overføringRepository.gjennomførOverføringer(
+        gjennomførte = gjennomførOverføringer(
             fra = Trond,
             til = Ola,
             overføringer = listOf(
@@ -97,11 +99,28 @@ internal class OverføringRepositoryTest(
         )).hasSameElementsAs(gjennomførte.getValue(Kari).fått)
     }
 
+    private fun gjennomførOverføringer(
+        fra: Saksnummer,
+        til: Saksnummer,
+        overføringer: List<NyOverføring>) =
+        overføringRepository.gjennomførOverføringer(
+            fra = fra,
+            til = til,
+            overføringer = overføringer
+        ).mapValues { (_, gjeldendeOverføringer) ->
+            GjeldendeOverføringer(
+                fått = gjeldendeOverføringer.fått.map { it.copy(gjennomført = Now) },
+                gitt = gjeldendeOverføringer.gitt.map { it.copy(gjennomført = Now) }
+            )
+        }
+
     private companion object {
+        private val Now = ZonedDateTime.now()
         private const val Ola = "Ola"
         private const val Kari = "Kari"
         private const val Trond = "Trond"
         private const val Hege = "Hege"
+
 
         private fun Pair<Periode, Int>.somOverføring() = NyOverføring(
             antallDager = second,
@@ -114,14 +133,16 @@ internal class OverføringRepositoryTest(
             antallDager = antallDager,
             periode = periode,
             status = GjeldendeOverføring.Status.Aktiv,
-            fra = fra
+            fra = fra,
+            gjennomført = Now
         )
 
         private fun gitt(antallDager: Int, periode: Periode, til: Saksnummer) = GjeldendeOverføringGitt(
             antallDager = antallDager,
             periode = periode,
             status = GjeldendeOverføring.Status.Aktiv,
-            til = til
+            til = til,
+            gjennomført = Now
         )
     }
 }

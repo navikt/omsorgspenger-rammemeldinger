@@ -22,7 +22,7 @@ import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
-import no.nav.omsorgspenger.overføringer.OverføringService
+import no.nav.omsorgspenger.overføringer.GjennomførOverføringService
 import no.nav.omsorgspenger.overføringer.OverføringerApi
 import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
@@ -55,7 +55,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     )
     BehandleOverføringAvOmsorgsdager(
         rapidsConnection = this,
-        overføringService = applicationContext.overføringService,
+        gjennomførOverføringService = applicationContext.gjennomførOverføringService,
         saksnummerRepository = applicationContext.saksnummerRepository
     )
     PubliserOverføringAvOmsorgsdager(
@@ -97,7 +97,7 @@ internal class ApplicationContext(
     internal val fordelingService: FordelingService,
     internal val utvidetRettService: UtvidetRettService,
     internal val midlertidigAleneService: MidlertidigAleneService,
-    internal val overføringService: OverføringService,
+    internal val gjennomførOverføringService: GjennomførOverføringService,
     internal val overføringRepository: OverføringRepository,
     internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
     internal val kafkaProducer: KafkaProducer<String, String>,
@@ -121,7 +121,7 @@ internal class ApplicationContext(
         internal var fordelingService: FordelingService? = null,
         internal var utvidetRettService: UtvidetRettService? = null,
         internal var midlertidigAleneService: MidlertidigAleneService? = null,
-        internal var overføringService: OverføringService? = null,
+        internal var gjennomførOverføringService: GjennomførOverføringService? = null,
         internal var overføringRepository: OverføringRepository? = null,
         internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
@@ -167,7 +167,7 @@ internal class ApplicationContext(
                 midlertidigAleneService = midlertidigAleneService ?: MidlertidigAleneService(
                     infotrygdRammeService = benyttetInfotrygdRammeService
                 ),
-                overføringService = overføringService ?: OverføringService(
+                gjennomførOverføringService = gjennomførOverføringService ?: GjennomførOverføringService(
                     overføringRepository = benyttetOverføringRepository
                 ),
                 aleneOmOmsorgenService = benyttetAleneOmOmsorgenService,

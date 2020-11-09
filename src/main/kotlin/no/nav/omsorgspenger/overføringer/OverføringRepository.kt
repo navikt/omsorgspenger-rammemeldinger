@@ -6,6 +6,7 @@ import no.nav.omsorgspenger.Saksnummer
 import org.slf4j.LoggerFactory
 import java.sql.Array
 import java.time.LocalDate
+import java.time.ZonedDateTime
 import javax.sql.DataSource
 
 internal class OverføringRepository(
@@ -237,6 +238,7 @@ internal class OverføringRepository(
 
         private fun Row.somOverføringDb() = OverføringDb(
             id = long("id"),
+            gjennomført = zonedDateTime("gjennomfort"),
             antallDager = int("antall_dager"),
             periode = somPeriode(),
             fra = string("fra"),
@@ -246,7 +248,7 @@ internal class OverføringRepository(
 
         private data class OverføringDb(
             val id: Long,
-            // TODO: gjennomført
+            val gjennomført: ZonedDateTime,
             val periode: Periode,
             val fra: Saksnummer,
             val til: Saksnummer,
@@ -263,12 +265,14 @@ internal class OverføringRepository(
             }
 
             fun somGjeldendeOverføringFått() = GjeldendeOverføringFått(
+                gjennomført = gjennomført,
                 antallDager = antallDager,
                 periode = periode,
                 status = mapStatus(),
                 fra = fra
             )
             fun somGjeldendeOverføringGitt() = GjeldendeOverføringGitt(
+                gjennomført = gjennomført,
                 antallDager = antallDager,
                 periode = periode,
                 status = mapStatus(),

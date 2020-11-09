@@ -34,6 +34,16 @@ internal class SaksnummerRepository(
         return mapping
     }
 
+    internal fun hentSaksnummerFor(identitetsnummer: Identitetsnummer) : Saksnummer? {
+        return sessionOf(dataSource).use { session ->
+            session.run(hentSaksnummerFraIdentitetsnummerQuery(
+                identitetsnummer = identitetsnummer
+            ).map { row ->
+                row.string("sak")
+            }.asSingle)
+        }
+    }
+
     private fun Session.saksnummerArray(saksnummer: Set<Saksnummer>) = createArrayOf("varchar", saksnummer)
 
     private companion object {
@@ -46,6 +56,11 @@ internal class SaksnummerRepository(
             "SELECT DISTINCT ON(sak) sak, id, identitetsnummer FROM saksnummer WHERE sak = ANY(?) ORDER BY sak, id DESC"
         private fun hentSisteMappingQuery(saksnummerArray: Array) =
             queryOf(HentSisteMappingStatement, saksnummerArray)
+
+        private const val HentSaksnummerFraIdentitetsnummerStatement =
+            "SELECT id, sak FROM saksnummer WHERE identitetsnummer = ? ORDER BY id DESC LIMIT 1"
+        private fun hentSaksnummerFraIdentitetsnummerQuery(identitetsnummer: Identitetsnummer) =
+            queryOf(HentSaksnummerFraIdentitetsnummerStatement, identitetsnummer)
     }
 }
 
