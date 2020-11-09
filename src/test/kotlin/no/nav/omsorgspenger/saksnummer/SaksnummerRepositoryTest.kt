@@ -5,6 +5,7 @@ import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import javax.sql.DataSource
@@ -43,6 +44,13 @@ internal class SaksnummerRepositoryTest(
             Identitetsnummer3 to Saksnummer1,
             Identitetsnummer4 to Saksnummer2
         ), saksnummerRepository.hentSisteMappingFor(saksnummer))
+
+        // Hente enkeltsaksnummer
+        assertEquals(Saksnummer1, saksnummerRepository.hentSaksnummerFor(Identitetsnummer1))
+        assertEquals(Saksnummer2, saksnummerRepository.hentSaksnummerFor(Identitetsnummer2))
+        assertEquals(Saksnummer1, saksnummerRepository.hentSaksnummerFor(Identitetsnummer3))
+        assertEquals(Saksnummer2, saksnummerRepository.hentSaksnummerFor(Identitetsnummer4))
+        assertNull(saksnummerRepository.hentSaksnummerFor("404"))
     }
 
     private companion object {
