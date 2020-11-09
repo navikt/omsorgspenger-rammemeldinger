@@ -23,7 +23,8 @@ internal class AleneOmOmsorgenService(
         return aleneOmOmsorgenFraInfotrygd.map {
             SpleisetAleneOmOmsorgen(
                 gjennomført = it.vedtatt,
-                periode = it.periode,
+                gyldigFraOgMed = it.periode.fom,
+                gyldigTilOgMed = it.periode.tom,
                 barn = Barn(
                     id = it.barn.id,
                     type = it.barn.type,
@@ -37,7 +38,8 @@ internal class AleneOmOmsorgenService(
 
 internal data class SpleisetAleneOmOmsorgen(
     val gjennomført: LocalDate,
-    val periode: Periode,
+    val gyldigFraOgMed: LocalDate,
+    val gyldigTilOgMed: LocalDate,
     val barn: Barn,
     val kilder: Set<Kilde>
 )

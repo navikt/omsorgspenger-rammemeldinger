@@ -31,7 +31,7 @@ import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import no.nav.omsorgspenger.aleneom.AleneOmApi
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenApi
 import no.nav.omsorgspenger.overføringer.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import javax.sql.DataSource
@@ -85,7 +85,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     routing {
         HealthRoute(healthService = applicationContext.healthService)
         OverføringerApi() // todo: autentisering
-        AleneOmApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService) // todo: autentisering
+        AleneOmOmsorgenApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService) // todo: autentisering
     }
 }
 

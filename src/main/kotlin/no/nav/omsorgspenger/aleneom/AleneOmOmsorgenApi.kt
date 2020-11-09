@@ -9,7 +9,7 @@ import no.nav.omsorgspenger.Periode
 import java.time.LocalDate
 import java.util.*
 
-internal fun Route.AleneOmApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
+internal fun Route.AleneOmOmsorgenApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
     post("/hentAleneOmOmsorgen") {
         val request = call.receive<HentAleneOmOmsorgenRequest>()
         val correlationId = call.request.header(HttpHeaders.XCorrelationId) ?: UUID.randomUUID().toString()
