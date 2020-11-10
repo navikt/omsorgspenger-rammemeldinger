@@ -106,11 +106,13 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         }}
 
         return utvidetRett
+            .asSequence()
             .plus(fordelingGir)
             .plus(midlertidigAlene)
             .plus(aleneOmOmsorgen)
             .plus(overføringGir)
             .plus(overføringFår)
+            .toList()
     }
 
     private fun authorizationHeader() =
