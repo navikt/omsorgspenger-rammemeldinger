@@ -54,7 +54,18 @@ internal class OverføringService(
 
         return when {
             sistOverførtIInfotrygd == null && sistOverførtINyLøsning == null -> SpleisetOverføringer.ingenOverføringer()
-            sistOverførtIInfotrygd?.isAfter(sistOverførtINyLøsning)?:false -> SpleisetOverføringer.fraInfotrygd(
+            sistOverførtIInfotrygd != null && sistOverførtINyLøsning != null -> when (sistOverførtIInfotrygd.isAfter(sistOverførtINyLøsning)) {
+                true -> SpleisetOverføringer.fraInfotrygd(
+                    gitt = gittIInfotrygd,
+                    fått = fåttIInfotrygd
+                )
+                false -> SpleisetOverføringer.fraNyLøsning(
+                    overføringerINyLøsning = overføringerINyLøsning.getValue(saksnummer!!),
+                    saksnummerIdentitetsnummerMapping = saksnummerIdentitetsnummerMapping,
+                    periode = periode
+                )
+            }
+            sistOverførtIInfotrygd != null -> SpleisetOverføringer.fraInfotrygd(
                 gitt = gittIInfotrygd,
                 fått = fåttIInfotrygd
             )
@@ -64,7 +75,6 @@ internal class OverføringService(
                 periode = periode
             )
         }
-
     }
 }
 
@@ -74,8 +84,12 @@ private fun GjeldendeOverføringer.sistGjennomført() : LocalDate? {
     val sistFått = fått.minByOrNull { it.gjennomført }?.gjennomført
     return when {
         sistGitt == null && sistFått == null -> null
-        sistGitt?.isAfter(sistFått)?:false -> sistGitt!!.toLocalDate()
-        else -> sistFått!!.toLocalDate()
+        sistGitt != null && sistFått != null -> when (sistGitt.isAfter(sistFått)) {
+            true -> sistGitt.toLocalDateOslo()
+            false -> sistFått.toLocalDateOslo()
+        }
+        sistGitt != null -> sistGitt.toLocalDateOslo()
+        else -> sistFått!!.toLocalDateOslo()
     }
 }
 internal data class SpleisetOverføringer(
@@ -163,5 +177,3 @@ internal data class Motpart(
     val id: String,
     val type: String = "Identitetsnummer"
 )
-
-
