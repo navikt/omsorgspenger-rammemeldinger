@@ -22,8 +22,8 @@ spec:
     type: Recreate # Behov fra rapids-and-rivers.
   gcp:
     sqlInstances:
-      - diskAutoresize: true
       - type: POSTGRES_11
+        diskAutoresize: true
         databases:
           - name: omsorgspenger-rammemeldinger
             envVarPrefix: DATABASE
