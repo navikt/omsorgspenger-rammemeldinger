@@ -190,7 +190,7 @@ internal class OverføringServiceTest {
     private fun mockNyLøsning(
         gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer> = mapOf()) {
         val saksnummer = gjeldendeOverføringer.saksnummer()
-        every { overføringRepositoryMock.hentOverføringer(any()) }.returns(gjeldendeOverføringer)
+        every { overføringRepositoryMock.hentAktiveOverføringer(any()) }.returns(gjeldendeOverføringer)
         every { saksnummerServiceMock.hentSaksnummer(identitetsnummer) }.returns(gjeldendeOverføringer.keys.firstOrNull())
         val saksnummerIdentitetsnummerMapping = mutableMapOf<Saksnummer, Identitetsnummer>().also {
             saksnummer.forEach { sak -> it[sak] = "ID-$sak" }

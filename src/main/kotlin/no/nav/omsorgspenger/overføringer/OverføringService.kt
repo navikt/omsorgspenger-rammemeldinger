@@ -41,7 +41,7 @@ internal class OverføringService(
 
         val overføringerINyLøsning = when (saksnummer) {
             null -> mapOf()
-            else -> overføringRepository.hentOverføringer(
+            else -> overføringRepository.hentAktiveOverføringer(
                 saksnummer = setOf(saksnummer)
             )
         }

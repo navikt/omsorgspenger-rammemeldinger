@@ -25,7 +25,7 @@ internal class OverføringRepository(
         }
     }
 
-    internal fun hentOverføringer(
+    internal fun hentAlleOverføringer(
         saksnummer: Set<Saksnummer>
     ) : Map<Saksnummer, GjeldendeOverføringer> {
         return using(sessionOf(dataSource)) { session ->
@@ -33,6 +33,14 @@ internal class OverføringRepository(
                 saksnummer = saksnummer
             )
         }
+    }
+
+    internal fun hentAktiveOverføringer(
+        saksnummer: Set<Saksnummer>
+    ) : Map<Saksnummer, GjeldendeOverføringer> {
+        return using(sessionOf(dataSource)) { session -> session.hentAktiveOverføringer(
+            saksnummer = saksnummer
+        )}
     }
 
     internal fun gjennomførOverføringer(
