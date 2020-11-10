@@ -85,16 +85,34 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             barn = it.barn().somInfotrygdAnnenPart()
         )}
 
-        // TODO: Map Overføringer
+        val overføringGir = rammevedtak.getArray("OverføringGir").mapJSONObject().map { InfotrygdOverføringGirMelding(
+            vedtatt = it.vedtatt(),
+            kilder = it.kilder(),
+            til = it.getJSONObject("mottaker").somInfotrygdAnnenPart(),
+            lengde = it.lengde(),
+            periode = it.periode()
+        )}
+
+        val overføringFår = rammevedtak.getArray("OverføringFår").mapJSONObject().map { InfotrygdOverføringFårMelding(
+            vedtatt = it.vedtatt(),
+            kilder = it.kilder(),
+            fra = it.getJSONObject("avsender").somInfotrygdAnnenPart(),
+            lengde = it.lengde(),
+            periode = it.periode()
+        )}
 
         rammevedtak.getArray("Uidentifisert").also { if (!it.isEmpty) {
             logger.info("Antall Uidentifiserte rammevedtak fra Infotrygd = ${it.length()}")
         }}
 
         return utvidetRett
+            .asSequence()
             .plus(fordelingGir)
             .plus(midlertidigAlene)
             .plus(aleneOmOmsorgen)
+            .plus(overføringGir)
+            .plus(overføringFår)
+            .toList()
     }
 
     private fun authorizationHeader() =

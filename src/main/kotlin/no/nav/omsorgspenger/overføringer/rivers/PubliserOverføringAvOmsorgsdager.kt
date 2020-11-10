@@ -90,7 +90,7 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         // TODO: Send info om saksstatistikk https://github.com/navikt/omsorgspenger-rammemeldinger/issues/15
 
-        secureLogger.trace(packet.toJson())
+        secureLogger.info("SuccessPacket=${packet.toJson()}")
 
         return true
     }

@@ -15,7 +15,7 @@ internal fun Route.OverføringerApi(
     post("/hentOverfoeringer") {
         val request = call.receive<HentOverføringerRequest>()
 
-        val spleisetOverføringer =overføringService.hentSpleisetOverføringer(
+        val spleisetOverføringer = overføringService.hentSpleisetOverføringer(
             identitetsnummer = request.identitetsnummer,
             periode = Periode(
                 fom = request.fom,
