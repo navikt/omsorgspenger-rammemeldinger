@@ -4,7 +4,6 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
-import no.nav.omsorgspenger.Saksreferanse
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
 import no.nav.omsorgspenger.overføringer.Grunnlag
@@ -25,12 +24,15 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandl
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
+import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
+import no.nav.omsorgspenger.saksnummer.identitetsnummer
 
 import org.slf4j.LoggerFactory
 
 internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
-    private val overføringService: OverføringService) : BehovssekvensPacketListener(
+    private val gjennomførOverføringService: GjennomførOverføringService,
+    private val saksnummerRepository: SaksnummerRepository) : BehovssekvensPacketListener(
     logger = LoggerFactory.getLogger(BehandleOverføringAvOmsorgsdager::class.java)) {
 
     init {
@@ -68,6 +70,8 @@ internal class BehandleOverføringAvOmsorgsdager(
         val utvidetRettVedtak = HentUtvidetRettVedtakMelding.hentLøsning(packet)
         val midlertidigAleneVedtak = HentMidlertidigAleneVedtakMelding.hentLøsning(packet)
 
+        saksnummerRepository.lagreMapping(saksnummer)
+
         val behandling = Behandling(
             sendtPerBrev = overføreOmsorgsdager.sendtPerBrev,
             periode = overføreOmsorgsdager.overordnetPeriode
@@ -94,7 +98,7 @@ internal class BehandleOverføringAvOmsorgsdager(
         )
 
         logger.info("identifiserer overføringer som skal gjennomføres.")
-        val overføringer = omsorgsdagerTilgjengeligForOverføring.somOverføringer(
+        val overføringer = omsorgsdagerTilgjengeligForOverføring.somNyeOverføringer(
             ønsketOmsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
         )
 
@@ -108,18 +112,21 @@ internal class BehandleOverføringAvOmsorgsdager(
             }
         )
 
-        val gjeldendeOverføringer = gjeldendeOverføringer(
-            fra = Saksreferanse(
-                identitetsnummer = overføreOmsorgsdager.overførerFra,
-                saksnummer = saksnummer.getValue(overføreOmsorgsdager.overførerFra)
-            ),
-            til = Saksreferanse(
-                identitetsnummer = overføreOmsorgsdager.overførerTil,
-                saksnummer = saksnummer.getValue(overføreOmsorgsdager.overførerTil)
-            ),
-            overføringer = overføringer,
-            måBehandlesSomGosysJournalføringsoppgaver = måBehandlesSomGosysJournalføringsoppgaver
-        )
+        val gjeldendeOverføringer = when (måBehandlesSomGosysJournalføringsoppgaver) {
+            true -> overføringer.somGjeldendeOverføringer(
+                fra = saksnummer.getValue(overføreOmsorgsdager.overførerFra),
+                til = saksnummer.getValue(overføreOmsorgsdager.overførerTil)
+            )
+            false -> gjennomførOverføringService.gjennomførOverføringer(
+                fra = saksnummer.getValue(overføreOmsorgsdager.overførerFra),
+                til = saksnummer.getValue(overføreOmsorgsdager.overførerTil),
+                overføringer = overføringer
+            )
+        }
+
+        val alleSaksnummer = saksnummerRepository.hentSisteMappingFor(
+            saksnummer = gjeldendeOverføringer.saksnummer()
+        ).plus(saksnummer)
 
         logger.info("legger til behov med løsninger [$OverføreOmsorgsdagerBehandling]")
         packet.leggTilBehovMedLøsninger(
@@ -129,7 +136,8 @@ internal class BehandleOverføringAvOmsorgsdager(
                     løsning = OverføreOmsorgsdagerBehandlingMelding.HeleBehandling(
                         behandling = behandling,
                         overføringer = overføringer,
-                        gjeldendeOverføringer = gjeldendeOverføringer
+                        gjeldendeOverføringer = gjeldendeOverføringer,
+                        saksnummer = alleSaksnummer
                     )
                 )
             )
@@ -141,7 +149,8 @@ internal class BehandleOverføringAvOmsorgsdager(
                 OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
                     utfall = Utfall.GosysJournalføringsoppgaver,
                     gjeldendeOverføringer = mapOf(),
-                    personopplysninger = mapOf()
+                    personopplysninger = mapOf(),
+                    saksnummer = mapOf()
                 ))
             )
             logger.info("legger til behov [$OpprettGosysJournalføringsoppgaver]")
@@ -163,7 +172,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 behov = arrayOf(
                     HentPersonopplysningerMelding.behov(
                         HentPersonopplysningerMelding.BehovInput(
-                            identitetsnummer = gjeldendeOverføringer.berørteIdentitetsnummer()
+                            identitetsnummer = alleSaksnummer.identitetsnummer()
                         )
                     )
                 )
@@ -175,21 +184,5 @@ internal class BehandleOverføringAvOmsorgsdager(
 
     override fun onSent(id: String, packet: JsonMessage) {
         logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
-    }
-
-    private fun gjeldendeOverføringer(
-        fra: Saksreferanse,
-        til: Saksreferanse,
-        overføringer: List<Overføring>,
-        måBehandlesSomGosysJournalføringsoppgaver: Boolean) = when (måBehandlesSomGosysJournalføringsoppgaver) {
-        true -> mapOf(
-            fra.identitetsnummer to GjeldendeOverføringer(gitt = overføringer.gitt(til), saksnummer = fra.saksnummer),
-            til.identitetsnummer to GjeldendeOverføringer(fått = overføringer.fått(fra), saksnummer = til.saksnummer)
-        )
-        false -> overføringService.gjennomførOverføringer(
-            fra = fra,
-            til = til,
-            overføringer = overføringer.fjernOverføringerUtenDager()
-        )
     }
 }

@@ -85,6 +85,8 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             barn = it.barn().somInfotrygdAnnenPart()
         )}
 
+        // TODO: Map Overføringer
+
         rammevedtak.getArray("Uidentifisert").also { if (!it.isEmpty) {
             logger.info("Antall Uidentifiserte rammevedtak fra Infotrygd = ${it.length()}")
         }}
