@@ -15,17 +15,6 @@ internal object Vurderinger {
 
         behandling.lovanvendelser.leggTil(
             periode = behandling.periode,
-            lovhenvisning = BorINorge,
-            anvendelse = when (grunnlag.overføreOmsorgsdager.borINorge) {
-                true -> "Er bosatt i Norge."
-                false -> "Må være bosatt i Norge for å overføre omsorgsdager.".also {
-                    behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
-                }
-            }
-        )
-
-        behandling.lovanvendelser.leggTil(
-            periode = behandling.periode,
             lovhenvisning = JobberINorge,
             anvendelse = when (grunnlag.overføreOmsorgsdager.jobberINorge) {
                 true -> "Jobber i Norge."

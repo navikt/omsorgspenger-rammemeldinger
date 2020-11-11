@@ -48,7 +48,6 @@ internal fun behovssekvensOverføreOmsorgsdager(
     omsorgsdagerÅOverføre: Int = 10,
     mottaksdato: LocalDate = LocalDate.now(),
     barn: List<OverføreOmsorgsdagerBehov.Barn> = emptyList(),
-    borINorge: Boolean = true,
     jobberINorge: Boolean = true,
     relasjon: OverføreOmsorgsdagerBehov.Relasjon = OverføreOmsorgsdagerBehov.Relasjon.NåværendeEktefelle,
     harBoddSammenMinstEttÅr: Boolean? = null,
@@ -59,7 +58,6 @@ internal fun behovssekvensOverføreOmsorgsdager(
     behov = arrayOf(OverføreOmsorgsdagerBehov(
         fra = OverføreOmsorgsdagerBehov.OverførerFra(
             identitetsnummer = overføringFra,
-            borINorge = borINorge,
             jobberINorge = jobberINorge
         ),
         til = OverføreOmsorgsdagerBehov.OverførerTil(
