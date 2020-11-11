@@ -77,21 +77,14 @@ internal class IkkeVerifiserbareUtvidetRettVedtakTest(
             ))
         )
 
-        rapid.ventPåLøsning(
-            behovssekvens = behovssekvens,
-            fra = fra,
-            til = til
-        )
+        rapid.sendTestMessage(behovssekvens)
+        rapid.ventPå(antallMeldinger = 1)
+        rapid.mockLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
+        rapid.ventPå(antallMeldinger = 2)
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
-        assertTrue(løsning.erGjennomført())
-        løsning.overføringer.assertOverføringer(
-            fra = fra,
-            til = til,
-            forventedeOverføringer = mapOf(
-                Periode("2020-01-15/2031-12-31") to 5 // Merk at overføringen da kun gjelder ut barnet er 12 år, ikke 18.
-            )
-        )
+        assertTrue(løsning.ikkeBehandlesAvNyttSystem())
+        assertTrue(løsning.overføringer.isEmpty())
     }
 }
