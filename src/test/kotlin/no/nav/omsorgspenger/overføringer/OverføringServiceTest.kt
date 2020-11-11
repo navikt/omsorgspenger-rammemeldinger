@@ -52,7 +52,7 @@ internal class OverføringServiceTest {
         val vedtatt = LocalDate.now()
         mockInfotrygd(fått = listOf(InfotrygdOverføringFårMelding(
             periode = periode,
-            vedtatt = LocalDate.now(),
+            vedtatt = vedtatt,
             kilder = setOf(Kilde(type = "foo", id = "bar")),
             lengde = Duration.ofDays(2),
             fra = InfotrygdAnnenPart(id = "foo", type ="bar", fødselsdato = vedtatt.minusDays(10)),
@@ -110,7 +110,7 @@ internal class OverføringServiceTest {
 
         mockInfotrygd(fått = listOf(InfotrygdOverføringFårMelding(
             periode = periode,
-            vedtatt = LocalDate.now(),
+            vedtatt = vedtatt,
             kilder = setOf(Kilde(type = "foo", id = "bar")),
             lengde = Duration.ofDays(2),
             fra = InfotrygdAnnenPart(id = "foo", type ="bar", fødselsdato = vedtatt.minusDays(10)),

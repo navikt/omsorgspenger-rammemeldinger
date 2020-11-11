@@ -23,6 +23,8 @@ internal class Behandling(
 
     internal fun karakteristikker() = karakteristikker.toSet()
 
+    internal fun avslag() = karakteristikker.contains(Karakteristikk.OppfyllerIkkeInngangsvilkår)
+
     internal enum class Karakteristikk {
         OppfyllerIkkeInngangsvilkår,
         InneholderIkkeVerifiserbareVedtakOmUtvidetRett,
