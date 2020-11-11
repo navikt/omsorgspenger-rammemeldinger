@@ -79,12 +79,17 @@ internal class GittDager(
     val antallDagerØnsketOverført: Int,
     val overføringer: List<NyOverføring>
 ) : Melding {
-    override val mal = "OVERFORE_GITT_DAGER"
+    private val enOverføring = overføringer.size == 1
+    override val mal = when (enOverføring) {
+        true -> "OVERFORE_GITT_DAGER_EN_OVERFORING"
+        false -> "OVERFORE_GITT_DAGER_FLERE_OVERFORINGER"
+    }
     override val data = {
         JSONObject().also { root ->
             root.put("mottaksdato", "$mottaksdato")
             root.put("antallDagerØnsketOverført", antallDagerØnsketOverført)
-            root.put("overføringer", overføringer.somJSONArray())
+            if (enOverføring) root.put("overføring", overføringer.first().somMap())
+            else root.put("overføringer", overføringer.somJSONArray())
             root.put("til", til.somJSONObject())
         }.toString()
     }()
@@ -95,11 +100,16 @@ internal class MottattDager(
     val mottaksdato: LocalDate,
     val overføringer: List<NyOverføring>
 ) : Melding {
-    override val mal = "OVERFORE_MOTTATT_DAGER"
+    private val enOverføring = overføringer.size == 1
+    override val mal = when (enOverføring) {
+        true -> "OVERFORE_MOTTATT_DAGER_EN_OVERFORING"
+        false -> "OVERFORE_MOTTATT_DAGER_FLERE_OVERFORINGER"
+    }
     override val data = {
         JSONObject().also { root ->
             root.put("mottaksdato", "$mottaksdato")
-            root.put("overføringer", overføringer.somJSONArray())
+            if (enOverføring) root.put("overføring", overføringer.first().somMap())
+            else root.put("overføringer", overføringer.somJSONArray())
             root.put("fra", fra.somJSONObject())
         }.toString()
     }()
@@ -136,15 +146,18 @@ private fun Personopplysninger.somJSONObject() : JSONObject? {
 }
 private fun List<NyOverføring>.somJSONArray() = JSONArray().also {
     forEach { overføring ->
-        it.put(mapOf(
-            "gjelderFraOgMed" to "${overføring.periode.fom}",
-            "gjelderTilOgMed" to "${overføring.periode.tom}",
-            "antallDager" to overføring.antallDager,
-            "starterGrunnet" to overføring.starterGrunnet.map { knekk -> knekk.dto() },
-            "slutterGrunnet" to overføring.slutterGrunnet.map { knekk -> knekk.dto() }
-        ))
+        it.put(overføring.somMap())
     }
 }
+
+private fun NyOverføring.somMap() = mapOf(
+    "gjelderFraOgMed" to "${periode.fom}",
+    "gjelderTilOgMed" to "${periode.tom}",
+    "antallDager" to antallDager,
+    "starterGrunnet" to starterGrunnet.map { knekk -> knekk.dto() },
+    "slutterGrunnet" to slutterGrunnet.map { knekk -> knekk.dto() }
+)
+
 private fun Knekkpunkt.dto() = when(this) {
     // Vil alltid være i listen 'starterGrunnet' for første overføring
     Knekkpunkt.Mottaksdato -> "MOTTAKSDATO"
