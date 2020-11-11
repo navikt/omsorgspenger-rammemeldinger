@@ -27,7 +27,7 @@ internal class GjennomførOverføringService(
     }
 }
 
-internal fun List<NyOverføring>.somGjeldendeOverføringer(fra: Saksnummer, til: Saksnummer) =
+internal fun List<NyOverføring>.somAvslåtteGjeldendeOverføringer(fra: Saksnummer, til: Saksnummer) =
     fjernOverføringerUtenDager().let { overføringer ->
         mapOf(
             fra to GjeldendeOverføringer(
@@ -35,7 +35,7 @@ internal fun List<NyOverføring>.somGjeldendeOverføringer(fra: Saksnummer, til:
                     gjennomført = ZonedDateTime.now(),
                     antallDager = it.antallDager,
                     periode = it.periode,
-                    status = GjeldendeOverføring.Status.Aktiv,
+                    status = GjeldendeOverføring.Status.Avslått,
                     til = til
                 )}
             ),
@@ -44,7 +44,7 @@ internal fun List<NyOverføring>.somGjeldendeOverføringer(fra: Saksnummer, til:
                     gjennomført = ZonedDateTime.now(),
                     antallDager = it.antallDager,
                     periode = it.periode,
-                    status = GjeldendeOverføring.Status.Aktiv,
+                    status = GjeldendeOverføring.Status.Avslått,
                     fra = fra
                 )}
             )

@@ -61,6 +61,7 @@ internal object Formidling {
 
 
     private fun OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling.støtterAutomatiskMelding() = when {
+        oppfyllerIkkeInngangsvilkår -> meldingMåSendesManuelt("avslag på inngangsvilkår")
         ingenOverføringer -> meldingMåSendesManuelt("avslag")
         overføringer.size !in 1..2 -> meldingMåSendesManuelt("${overføringer.size} overføringer")
         else -> true
