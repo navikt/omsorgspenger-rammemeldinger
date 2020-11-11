@@ -11,7 +11,8 @@ internal data class Personopplysninger(
     internal val gjeldendeIdentitetsnummer: Identitetsnummer,
     internal val fødselsdato: LocalDate,
     internal val navn: Navn?,
-    internal val aktørId: AktørId) {
+    internal val aktørId: AktørId,
+    internal val adressebeskyttet: Boolean) {
     internal companion object {
         internal fun Pair<String, JsonNode>.somPersonopplysninger() : Personopplysninger {
             val adressebeskyttet = second["adressebeskyttelse"]?.asText() != "UGRADERT"
@@ -31,7 +32,8 @@ internal data class Personopplysninger(
                 gjeldendeIdentitetsnummer = second["gjeldendeIdentitetsnummer"]?.asText()?:first,
                 fødselsdato = second["fødselsdato"].asLocalDate(),
                 navn = navn,
-                aktørId = second["aktørId"].asText()
+                aktørId = second["aktørId"].asText(),
+                adressebeskyttet = adressebeskyttet
             )
         }
     }
