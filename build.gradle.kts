@@ -64,22 +64,10 @@ dependencies {
 
 repositories {
     mavenLocal()
-    maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/navikt/k9-rapid")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
-    maven {
-        name = "K9-Statistikk"
-        url = uri("https://maven.pkg.github.com/navikt/k9-statistikk")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
+    gitHub(
+            "navikt/k9-rapid",
+            "navikt/k9-statistikk"
+    )
     mavenCentral()
     jcenter()
     maven("https://dl.bintray.com/kotlin/ktor")
@@ -110,4 +98,17 @@ tasks {
         gradleVersion = "6.7"
     }
 
+}
+
+fun RepositoryHandler.gitHub(vararg repos: String) {
+    for (repo in repos) {
+        maven {
+            name = repo
+            url = uri("https://maven.pkg.github.com/$repo")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
