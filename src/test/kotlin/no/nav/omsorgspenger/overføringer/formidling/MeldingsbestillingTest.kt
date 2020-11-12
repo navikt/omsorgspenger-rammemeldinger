@@ -44,6 +44,26 @@ internal class MeldingsbestillingTest {
         )
     }
 
+    @Test
+    fun `Full innvilgelse med utvidet rett og tidligere partner`() {
+        val meldingsbestillinger = meldingsbestillinger(
+            tattUtIÅr = 0,
+            girDager = 5,
+            listOf(barn(utvidetRett = true)),
+            medTidligerePartner = true
+        )
+
+        assertThat(meldingsbestillinger).hasSize(3)
+        val forventetStartOgSluttGrunn = Grunn.MOTTAKSDATO to Grunn.OMSORGEN_FOR_BARN_MED_UTVIDET_RETT_OPPHØRER
+        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
+        meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
+        val tidligerePartner = meldingsbestillinger.first { it.melding is TidligerePartner}.melding as TidligerePartner
+        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertTrue(gitt.formidlingsoverføringer.innvilget)
+        assertEquals(gitt.formidlingsoverføringer.innvilgedeOverføringer.first().periode.fom, tidligerePartner.fraOgMed)
+        meldingsbestillinger.forEach { println(it.keyValue.second) }
+    }
+
     private fun List<Meldingsbestilling>.assertInnvilgelse(forventetStartOgSluttGrunn: Pair<Grunn, Grunn>) {
         assertThat(this).hasSize(2)
         val gitt = first { it.melding is GittDager }.melding as GittDager
@@ -139,7 +159,6 @@ internal class MeldingsbestillingTest {
         meldingsbestillinger.forEach { println(it.keyValue.second) }
     }
 
-    // TODO: Tidligere samboer && fordeling bla bla bla
     @Test
     fun `Brukt alle dager i år - fordeler dager så får delvis innvilget neste år - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
@@ -190,9 +209,36 @@ internal class MeldingsbestillingTest {
         meldingsbestillinger.forEach { println(it.keyValue.second) }
     }
 
+    @Test
+    fun `Brukt og fordelt dager i år - delvis også fra neste år pga fordeling`() {
+        val meldingsbestillinger = meldingsbestillinger(
+            tattUtIÅr = 4,
+            girDager = 6,
+            fordelinger = listOf(FordelingGirMelding(
+                periode = Periode("1999-01-01/2050-12-31"),
+                lengde = Duration.ofDays(15),
+                kilder = setOf()
+            )),
+            barn = listOf(barn())
+        )
+
+        assertThat(meldingsbestillinger).hasSize(2)
+        val forventetStartOgSluttGrunn = Grunn.PÅGÅENDE_FORDELING to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
+        val mottatt= meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
+        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertEquals(mottatt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertFalse(gitt.formidlingsoverføringer.innvilget)
+        assertFalse(gitt.formidlingsoverføringer.avslått)
+        assertThat(gitt.formidlingsoverføringer.alleOverføringer).hasSize(2)
+        meldingsbestillinger.forEach { println(it.keyValue.second) }
+    }
+
     private companion object {
         private const val fra = "11111111111"
         private const val til = "22222222222"
+        private const val tidligerePartner = "44444444444"
+
         private fun barn(fødselsdato: LocalDate = LocalDate.now().minusYears(1), utvidetRett: Boolean = false) = Barn(
             fødselsdato = fødselsdato,
             identitetsnummer = "33333333333",
@@ -203,7 +249,8 @@ internal class MeldingsbestillingTest {
             tattUtIÅr: Int,
             girDager: Int,
             barn: List<Barn>,
-            fordelinger: List<FordelingGirMelding> = listOf()
+            fordelinger: List<FordelingGirMelding> = listOf(),
+            medTidligerePartner: Boolean = false
         ) : List<Meldingsbestilling> {
             val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.Behovet(
                 overførerFra = fra,
@@ -241,7 +288,9 @@ internal class MeldingsbestillingTest {
                     fra to Personopplysninger(gjeldendeIdentitetsnummer = fra, fødselsdato = LocalDate.now(),
                         navn = Personopplysninger.Navn("Ola","En","Nordmann"), aktørId = "123", adressebeskyttet = false),
                     til to Personopplysninger(gjeldendeIdentitetsnummer = til, fødselsdato = LocalDate.now(),
-                        navn = Personopplysninger.Navn("Kari","To", "Nordmann"), aktørId = "345", adressebeskyttet = false)
+                        navn = Personopplysninger.Navn("Kari","To", "Nordmann"), aktørId = "345", adressebeskyttet = false),
+                    tidligerePartner to  Personopplysninger(gjeldendeIdentitetsnummer = til, fødselsdato = LocalDate.now(),
+                        navn = Personopplysninger.Navn("Heidi","Tre", "Nordmann"), aktørId = "789", adressebeskyttet = false)
                 ),
                 overføreOmsorgsdager = overføreOmsorgsdager,
                 behandling = OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling(
@@ -251,7 +300,10 @@ internal class MeldingsbestillingTest {
                     saksnummer = mapOf(
                         fra to "1",
                         til to "2"
-                    ),
+                    ).let { when (medTidligerePartner){
+                        true -> it.plus(tidligerePartner to "3")
+                        false -> it
+                    }},
                     periode = behandling.periode
                 )
             )

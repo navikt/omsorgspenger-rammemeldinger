@@ -32,8 +32,26 @@ internal object StartOgSluttGrunnUtleder {
             avslått = avslåtteOverføringer.first(),
             delvisInnvilget = delvisInnvilgedeOverføringer.first()
         )
-        delvisInnvilgedeOverføringer.size == 2 -> null
+        delvisInnvilgedeOverføringer.size == 2 -> toDelvis(
+            delvisEn = delvisInnvilgedeOverføringer.first(),
+            delvisTo = delvisInnvilgedeOverføringer[1]
+        )
         else -> null
+    }
+
+    private fun toDelvis(delvisEn: NyOverføring, delvisTo: NyOverføring): Pair<Grunn, Grunn>? {
+        val start = when {
+            delvisEn.starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter, Knekkpunkt.ForbrukteDagerIÅr) &&
+            delvisTo.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
+                Grunn.PÅGÅENDE_FORDELING
+            else -> null
+        }
+        val slutt = delvisTo.innvilget()?.second
+
+        return when {
+            start != null && slutt != null -> start to slutt
+            else -> null
+        }
     }
 
     private fun bruktAlleDagerIÅrOgFordeler(avslått: NyOverføring, delvisInnvilget: NyOverføring): Pair<Grunn, Grunn>? {
