@@ -26,7 +26,7 @@ internal class GittDager(
             root.put("starterGrunnet", formidlingsoverføringer.startOgSluttGrunn!!.first)
             root.put("slutterGrunnet", formidlingsoverføringer.startOgSluttGrunn.second)
             root.put("antallDagerØnsketOverført", antallDagerØnsketOverført)
-            root.put("overføringer", formidlingsoverføringer.alleOverføringer.somJSONArray())
+            root.put("overføringer", formidlingsoverføringer.utenAvslåtteOverføringer.somJSONArray())
             root.put("til", til.somJSONObject())
         }.toString()
     }()
@@ -38,10 +38,7 @@ internal class MottattDager private constructor(
     val formidlingsoverføringer: Formidlingsoverføringer
 ) : Melding {
     init { require(formidlingsoverføringer.støtterAutomatiskMelding) }
-    override val mal = when (formidlingsoverføringer.innvilget) {
-        true -> "OVERFORE_MOTTATT_DAGER_INNVILGET"
-        false -> "OVERFORE_MOTTATT_DAGER_DELVIS_INNVILGET"
-    }
+    override val mal = "OVERFORE_MOTTATT_DAGER"
     override val data = {
         JSONObject().also { root ->
             root.put("mottaksdato", "$mottaksdato")
