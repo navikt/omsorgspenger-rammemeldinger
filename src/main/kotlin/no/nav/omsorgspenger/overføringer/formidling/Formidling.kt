@@ -71,28 +71,16 @@ internal class Formidlingsoverføringer(
     behandling: OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling,
     personopplysninger: Map<Identitetsnummer, Personopplysninger>) {
 
+    internal val alleOverføringer =
+        behandling.overføringer
     internal val avslåtteOverføringer =
-        behandling.overføringer.filter { it.antallDager == 0 }
+        alleOverføringer.filter { it.antallDager == 0 }
     internal val innvilgedeOverføringer =
-        behandling.overføringer.filter { it.antallDager == overføreOmsorgsdager.omsorgsdagerÅOverføre }
+        alleOverføringer.filter { it.antallDager == overføreOmsorgsdager.omsorgsdagerÅOverføre }
     internal val delvisInnvilgedeOverføringer =
-        behandling.overføringer.minus(avslåtteOverføringer).minus(innvilgedeOverføringer)
+        alleOverføringer.minus(avslåtteOverføringer).minus(innvilgedeOverføringer)
     internal val utenAvslåtteOverføringer =
-        behandling.overføringer.filter { it.antallDager != 0 }
-
-    internal val startOgSluttGrunner = behandling.overføringer.mapIndexed { index, nyOverføring ->
-        val startOgSluttGrunn = nyOverføring.startOgSluttGrunn(første = index == 0)
-        if (startOgSluttGrunn == null) null
-        else nyOverføring to startOgSluttGrunn
-    }.filterNotNull().toMap()
-
-    internal val støtterAutomatiskMelding = when {
-        personopplysninger.values.any { it.adressebeskyttet } -> meldingMåSendesManuelt("adresssebeskyttede parter")
-        behandling.oppfyllerIkkeInngangsvilkår -> meldingMåSendesManuelt("avslag på inngangsvilkår")
-        behandling.overføringer.size !in 1..2 -> meldingMåSendesManuelt("${behandling.overføringer.size} overføringer")
-        !startOgSluttGrunner.keys.containsAll(behandling.overføringer) -> meldingMåSendesManuelt("ikke utarbeidet brev")
-        else -> true
-    }
+        alleOverføringer.filter { it.antallDager != 0 }
 
     internal val innvilget =
         avslåtteOverføringer.isEmpty() &&
@@ -103,6 +91,23 @@ internal class Formidlingsoverføringer(
         avslåtteOverføringer.size == 1 &&
         delvisInnvilgedeOverføringer.isEmpty() &&
         innvilgedeOverføringer.isEmpty()
+
+    internal val startOgSluttGrunn = startOgSluttGrunn(
+        innvilget = innvilget,
+        avslått = avslått,
+        alleOverføringer = alleOverføringer,
+        innvilgedeOverføringer = innvilgedeOverføringer,
+        delvisInnvilgedeOverføringer = delvisInnvilgedeOverføringer,
+        avslåtteOverføringer = avslåtteOverføringer
+    )
+
+    internal val støtterAutomatiskMelding = when {
+        personopplysninger.values.any { it.adressebeskyttet } -> meldingMåSendesManuelt("adresssebeskyttede parter")
+        behandling.oppfyllerIkkeInngangsvilkår -> meldingMåSendesManuelt("avslag på inngangsvilkår")
+        behandling.overføringer.size !in 1..2 -> meldingMåSendesManuelt("${behandling.overføringer.size} overføringer")
+        startOgSluttGrunn == null -> meldingMåSendesManuelt("dette scenarioet")
+        else -> true
+    }
 
     private companion object {
         private val logger = LoggerFactory.getLogger(Formidlingsoverføringer::class.java)

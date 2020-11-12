@@ -23,16 +23,10 @@ internal class GittDager(
     override val data = {
         JSONObject().also { root ->
             root.put("mottaksdato", "$mottaksdato")
+            root.put("starterGrunnet", formidlingsoverføringer.startOgSluttGrunn!!.first)
+            root.put("slutterGrunnet", formidlingsoverføringer.startOgSluttGrunn.second)
             root.put("antallDagerØnsketOverført", antallDagerØnsketOverført)
-            root.put("innvilgedeOverføringer", formidlingsoverføringer.innvilgedeOverføringer.somJSONArray(
-                formidlingsoverføringer.startOgSluttGrunner
-            ))
-            root.put("avslåtteOverføringer", formidlingsoverføringer.avslåtteOverføringer.somJSONArray(
-                formidlingsoverføringer.startOgSluttGrunner
-            ))
-            root.put("delvisInnvilgedeOverføringer", formidlingsoverføringer.delvisInnvilgedeOverføringer.somJSONArray(
-                formidlingsoverføringer.startOgSluttGrunner
-            ))
+            root.put("overføringer", formidlingsoverføringer.alleOverføringer.somJSONArray())
             root.put("til", til.somJSONObject())
         }.toString()
     }()
@@ -51,9 +45,9 @@ internal class MottattDager private constructor(
     override val data = {
         JSONObject().also { root ->
             root.put("mottaksdato", "$mottaksdato")
-            root.put("overføringer", formidlingsoverføringer.utenAvslåtteOverføringer.somJSONArray(
-                formidlingsoverføringer.startOgSluttGrunner
-            ))
+            root.put("starterGrunnet", formidlingsoverføringer.startOgSluttGrunn!!.first)
+            root.put("slutterGrunnet", formidlingsoverføringer.startOgSluttGrunn.second)
+            root.put("overføringer", formidlingsoverføringer.utenAvslåtteOverføringer.somJSONArray())
             root.put("fra", fra.somJSONObject())
         }.toString()
     }()
@@ -110,17 +104,12 @@ private fun Personopplysninger.somJSONObject() = JSONObject().also { root ->
     root.put("fødselsdato", "$fødselsdato")
 }
 
-private fun List<NyOverføring>.somJSONArray(
-    startOgSluttGrunner: Map<NyOverføring, Pair<StartGrunn, SluttGrunn>>
-) = JSONArray().also {
+private fun List<NyOverføring>.somJSONArray() = JSONArray().also {
     forEach { overføring ->
-        val startOgSluttGrunn = startOgSluttGrunner.getValue(overføring)
         it.put(mapOf(
             "gjelderFraOgMed" to "${overføring.periode.fom}",
             "gjelderTilOgMed" to "${overføring.periode.tom}",
-            "antallDager" to overføring.antallDager,
-            "starterGrunnet" to startOgSluttGrunn.first.name,
-            "slutterGrunnet" to startOgSluttGrunn.second.name
+            "antallDager" to overføring.antallDager
         ))
     }
 }

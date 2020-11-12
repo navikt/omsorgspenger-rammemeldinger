@@ -4,63 +4,40 @@ import no.nav.omsorgspenger.overføringer.Knekkpunkt
 import no.nav.omsorgspenger.overføringer.NyOverføring
 
 internal object StartOgSluttGrunnUtleder {
-    internal fun NyOverføring.startOgSluttGrunn(
-        første: Boolean,
-    ) : Pair<StartGrunn, SluttGrunn>? {
-        if (inneholderGrunnerSomIkkeStøttes()) return null
-
-        val start = when {
-            starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter, Knekkpunkt.ForbrukteDagerIÅr) ->
-                StartGrunn.PÅGÅENDE_FORDELING_OG_FORBRUKTE_DAGER_I_ÅR
-            starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter) ->
-                StartGrunn.PÅGÅENDE_FORDELING
-            starterGrunnet.inneholder(Knekkpunkt.ForbrukteDagerIÅr) ->
-                StartGrunn.FORBRUKTE_DAGER_I_ÅR
-            starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
-                StartGrunn.NULLSTILLING_AV_FORBRUKTE_DAGER
-            første ->
-                StartGrunn.MOTTAKSDATO
-            else -> null
-        }
-        val slutt = when {
-            slutterGrunnet.inneholder(Knekkpunkt.FordelingGirSlutter, Knekkpunkt.NullstillingAvForbrukteDager) ->
-                SluttGrunn.AVSLUTTET_FORDELING_OG_NULLSILLING_AV_FORBRUKTE_DAGER
-            slutterGrunnet.inneholder(Knekkpunkt.FordelingGirSlutter) ->
-                SluttGrunn.AVSLUTTET_FORDELING
-            slutterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
-                SluttGrunn.NULLSTILLING_AV_FORBRUKTE_DAGER
-            slutterGrunnet.inneholder(Knekkpunkt.OmsorgenForSlutter) ->
-                SluttGrunn.OMSORGEN_FOR_BARN_OPPHØRER
-            slutterGrunnet.inneholder(Knekkpunkt.OmsorgenForMedUtvidetRettSlutter) ->
-                SluttGrunn.OMSORGEN_FOR_BARN_MED_UTVIDET_RETT_OPPHØRER
-            else -> null
-        }
-
-        return when {
-            start != null && slutt != null -> start to slutt
-            else -> null
-        }
+    internal fun startOgSluttGrunn(
+        innvilget: Boolean,
+        avslått: Boolean,
+        alleOverføringer: List<NyOverføring>,
+        innvilgedeOverføringer: List<NyOverføring>,
+        delvisInnvilgedeOverføringer: List<NyOverføring>,
+        avslåtteOverføringer: List<NyOverføring>,
+    ) : Pair<Grunn, Grunn>? = when {
+        alleOverføringer.map { it.starterGrunnet.plus(it.slutterGrunnet) }.flatten().inneholder(
+            Knekkpunkt.MidlertidigAleneStarter, Knekkpunkt.MidlertidigAleneSlutter
+        ) -> null
+        innvilget -> innvilgedeOverføringer.first().innvilget()
+        avslått -> avslåtteOverføringer.first().avslag()
+        else -> null
     }
-
-    private fun NyOverføring.inneholderGrunnerSomIkkeStøttes() =
-        starterGrunnet.plus(slutterGrunnet).any {
-            it == Knekkpunkt.MidlertidigAleneStarter ||
-            it == Knekkpunkt.MidlertidigAleneSlutter
-        }
 }
 
-internal enum class StartGrunn {
+private fun NyOverføring.innvilget() = when {
+    slutterGrunnet.inneholder(Knekkpunkt.OmsorgenForMedUtvidetRettSlutter) ->
+        Grunn.MOTTAKSDATO to Grunn.OMSORGEN_FOR_BARN_MED_UTVIDET_RETT_OPPHØRER
+    slutterGrunnet.inneholder(Knekkpunkt.OmsorgenForSlutter) ->
+        Grunn.MOTTAKSDATO to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+    else -> null
+}
+
+private fun NyOverføring.avslag() = when {
+    starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter) ->
+        Grunn.PÅGÅENDE_FORDELING to Grunn.PÅGÅENDE_FORDELING
+    else -> null
+}
+
+internal enum class Grunn {
     MOTTAKSDATO,
     PÅGÅENDE_FORDELING,
-    FORBRUKTE_DAGER_I_ÅR,
-    NULLSTILLING_AV_FORBRUKTE_DAGER,
-    PÅGÅENDE_FORDELING_OG_FORBRUKTE_DAGER_I_ÅR
-}
-
-internal enum class SluttGrunn {
-    AVSLUTTET_FORDELING,
-    NULLSTILLING_AV_FORBRUKTE_DAGER,
-    AVSLUTTET_FORDELING_OG_NULLSILLING_AV_FORBRUKTE_DAGER,
     OMSORGEN_FOR_BARN_OPPHØRER,
     OMSORGEN_FOR_BARN_MED_UTVIDET_RETT_OPPHØRER
 }
