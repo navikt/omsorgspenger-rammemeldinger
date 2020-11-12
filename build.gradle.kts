@@ -72,6 +72,14 @@ repositories {
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
+    maven {
+        name = "K9-Statistikk"
+        url = uri("https://maven.pkg.github.com/navikt/k9-statistikk")
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
     mavenCentral()
     jcenter()
     maven("https://dl.bintray.com/kotlin/ktor")
