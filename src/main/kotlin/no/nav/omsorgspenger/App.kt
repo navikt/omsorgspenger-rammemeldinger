@@ -40,15 +40,10 @@ import io.micrometer.core.instrument.Clock
 import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
 import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics
-import io.micrometer.core.instrument.binder.kafka.KafkaConsumerMetrics
-import io.micrometer.core.instrument.binder.logging.LogbackMetrics
-import io.micrometer.core.instrument.binder.system.ProcessorMetrics
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
-import no.nav.helse.rapids_rivers.KtorBuilder
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenApi
 import no.nav.omsorgspenger.overføringer.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
@@ -57,7 +52,7 @@ import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
 import no.nav.omsorgspenger.overføringer.OverføringService
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 
-fun main() = when (System.getenv("RAPIDS_DISABLED") == "true") {
+fun main() = when (System.getenv("RAPIDS_APPLICATION") == "disabled") {
     true -> ktorApplication()
     else -> rapidsApplication()
 }

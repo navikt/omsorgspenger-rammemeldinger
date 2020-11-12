@@ -18,6 +18,6 @@
     "HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES": "eadadb81-a814-4402-b820-a3fab240f8ee/.default",
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL": "https://omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
     "AZURE_APP_TOKEN_ENDPOINT": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/oauth2/v2.0/token",
-    "RAPIDS_DISABLED": "true"
+    "RAPIDS_APPLICATION": "disabled"
   }
 }
