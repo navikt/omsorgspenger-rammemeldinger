@@ -72,8 +72,3 @@ object JobberINorge: Lovhenvisning {
     override val lov = Folketrygdeloven
     override val henvisning = "§ 2-2"
 }
-
-object BorINorge: Lovhenvisning {
-    override val lov = Folketrygdeloven
-    override val henvisning = "§ 2-1"
-}

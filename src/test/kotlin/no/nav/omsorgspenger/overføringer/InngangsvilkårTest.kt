@@ -56,32 +56,6 @@ internal class InngangsvilkårTest(
     }
 
     @Test
-    fun `Bor ikke i Norge`() {
-        val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
-            overføringFra = fra,
-            overføringTil = til,
-            omsorgsdagerTattUtIÅr = 0,
-            omsorgsdagerÅOverføre = 10,
-            borINorge = false,
-            barn = listOf(
-                overføreOmsorgsdagerBarn(
-                    aleneOmOmsorgen = true
-                )
-            )
-        )
-
-        rapid.ventPåLøsning(
-            behovssekvens = behovssekvens,
-            fra = fra,
-            til = til
-        )
-
-        val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
-
-        assertTrue(løsning.erAvslått())
-    }
-
-    @Test
     fun `Ikke bodd med samboer minst ett år`() {
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             overføringFra = fra,

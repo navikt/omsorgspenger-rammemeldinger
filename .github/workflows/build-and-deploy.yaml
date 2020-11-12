@@ -37,6 +37,7 @@ jobs:
           echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_USERNAME" --password-stdin https://docker.pkg.github.com
           docker push $BASE_IMAGE:latest
           docker push $IMAGE
+
       - name: Deploy til dev-gcp
         uses: nais/deploy/actions/deploy@v1
         env:
@@ -44,3 +45,12 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: nais/naiserator.yaml
           VARS: nais/dev-gcp.json
+
+      - name: Deploy til prod-gcp
+        if: github.ref == 'refs/heads/master'
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: nais/naiserator.yaml
+          VARS: nais/prod-gcp.json

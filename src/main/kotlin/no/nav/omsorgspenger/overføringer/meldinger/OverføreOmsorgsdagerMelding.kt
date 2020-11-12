@@ -28,7 +28,6 @@ internal object OverføreOmsorgsdagerMelding :
             BehovKeys.Mottaksdato,
             BehovKeys.JournalpostIder,
             BehovKeys.JobberINorge,
-            BehovKeys.BorINorge,
             BehovKeys.Kilde,
             BehovKeys.Relasjon
         )
@@ -47,7 +46,6 @@ internal object OverføreOmsorgsdagerMelding :
             mottaksdato = packet[BehovKeys.Mottaksdato].asLocalDate(),
             journalpostIder = (packet[BehovKeys.JournalpostIder] as ArrayNode).map { it.asText() }.toSet(),
             jobberINorge = packet[BehovKeys.JobberINorge].asBoolean(),
-            borINorge = packet[BehovKeys.BorINorge].asBoolean(),
             sendtPerBrev = packet[BehovKeys.Kilde].asText().equals(other = "Brev", ignoreCase = true),
             relasjon = relasjon,
             harBoddSammentMinstEttÅr = when (relasjon) {
@@ -90,13 +88,18 @@ internal object OverføreOmsorgsdagerMelding :
         )
     }
 
-    // TODO: https://github.com/navikt/k9-rapid/issues/6
-    private fun Personopplysninger.navnTilLøsning() = navn?.toString()?:""
+    private fun Personopplysninger.navnTilLøsning() = when (navn) {
+        null -> null
+        else -> mapOf(
+            "fornavn" to navn.fornavn,
+            "mellomnavn" to navn.mellomnavn,
+            "etternavn" to navn.etternavn
+        )
+    }
 
     internal data class Behovet(
         val barn : List<Barn>,
         val overførerFra: String,
-        val borINorge: Boolean,
         val jobberINorge: Boolean,
         val sendtPerBrev: Boolean,
         val overførerTil: String,
@@ -146,7 +149,6 @@ internal object OverføreOmsorgsdagerMelding :
     private object BehovKeys {
         val Barn = "@behov.$OverføreOmsorgsdager.barn"
         val OverførerFra = "@behov.$OverføreOmsorgsdager.fra.identitetsnummer"
-        val BorINorge = "@behov.$OverføreOmsorgsdager.fra.borINorge"
         val JobberINorge = "@behov.$OverføreOmsorgsdager.fra.jobberINorge"
         val OverførerTil = "@behov.$OverføreOmsorgsdager.til.identitetsnummer"
         val OmsorgsdagerTattUtIÅr = "@behov.$OverføreOmsorgsdager.omsorgsdagerTattUtIÅr"

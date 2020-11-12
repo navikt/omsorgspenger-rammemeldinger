@@ -7,7 +7,6 @@ import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
 import no.nav.omsorgspenger.overføringer.Grunnlag
-import no.nav.omsorgspenger.overføringer.RoutingVurderinger.måBehandlesSomGosysJournalføringsoppgaver
 import no.nav.omsorgspenger.overføringer.Vurderinger.vurderGrunnlag
 import no.nav.omsorgspenger.overføringer.Vurderinger.vurderInngangsvilkår
 import no.nav.omsorgspenger.overføringer.meldinger.*
@@ -104,14 +103,7 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         logger.info("karakteristikker = ${behandling.karakteristikker()}")
 
-        val måBehandlesSomGosysJournalføringsoppgaver = måBehandlesSomGosysJournalføringsoppgaver(
-            behandling = behandling,
-            overføreOmsorgsdager = grunnlag.overføreOmsorgsdager,
-            omsorgsdagerTilgjengeligForOverføring = omsorgsdagerTilgjengeligForOverføring.mapKeys {
-                it.key.periode
-            }
-        )
-
+        val måBehandlesSomGosysJournalføringsoppgaver = behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()
         val avslag = behandling.avslag() || måBehandlesSomGosysJournalføringsoppgaver || overføringer.fjernOverføringerUtenDager().isEmpty()
 
         logger.info("Avlsag=$avslag")

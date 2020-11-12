@@ -74,7 +74,6 @@ internal class KnekkingTest {
                 overførerFra = "11111111111",
                 overførerTil = "11111111112",
                 barn = barn,
-                borINorge = true,
                 jobberINorge = true,
                 sendtPerBrev = false,
                 journalpostIder = setOf(),
