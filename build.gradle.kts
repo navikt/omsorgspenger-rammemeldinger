@@ -9,6 +9,7 @@ val ulidVersion = "8.2.0"
 val ktorVersion = "1.4.2"
 val assertjVersion = "3.18.0"
 val dusseldorfVersion = "1.4.2.1de1f7a"
+val k9StatistikkKontrakterVersion = "2.0_20201102094838_c03156e"
 // Database
 val flywayVersion = "7.2.0"
 val hikariVersion = "3.4.5"
@@ -34,6 +35,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
+    implementation("no.nav.k9.statistikk:kontrakter:$k9StatistikkKontrakterVersion")
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")

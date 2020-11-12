@@ -18,6 +18,7 @@ import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.GjennomførOverføringService
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import no.nav.omsorgspenger.overføringer.OverføringService
+import no.nav.omsorgspenger.overføringer.statistikk.OverføringerStatistikkService
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
@@ -37,6 +38,7 @@ internal class ApplicationContext(
     internal val gjennomførOverføringService: GjennomførOverføringService,
     internal val overføringRepository: OverføringRepository,
     internal val overføringService: OverføringService,
+    internal val overføringerStatistikkService: OverføringerStatistikkService,
     internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
     internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
     internal val kafkaProducer: KafkaProducer<String, String>,
@@ -65,6 +67,7 @@ internal class ApplicationContext(
         internal var gjennomførOverføringService: GjennomførOverføringService? = null,
         internal var overføringRepository: OverføringRepository? = null,
         internal var overføringService: OverføringService? = null,
+        internal var overføringerStatistikkService: OverføringerStatistikkService? = null,
         internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
         internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
@@ -94,6 +97,11 @@ internal class ApplicationContext(
 
             val benyttetOverføringRepository = overføringRepository ?: OverføringRepository(
                 dataSource = benyttetDataSource
+            )
+
+            val benyttetOverføringerStatistikkService = overføringerStatistikkService ?: OverføringerStatistikkService(
+                    kafkaProducer = benyttetKafkaProducer,
+                    topic = "" // todo
             )
 
             val benyttetAleneOmOmsorgenRepository = aleneOmOmsorgenRepository ?: AleneOmOmsorgenRepository(
@@ -145,6 +153,7 @@ internal class ApplicationContext(
                     saksnummerService = benyttetSaksnummerService,
                     overføringRepository = benyttetOverføringRepository
                 ),
+                overføringerStatistikkService = benyttetOverføringerStatistikkService,
                 saksnummerRepository = benyttetSaksnummerRepository,
                 saksnummerService = benyttetSaksnummerService,
                 behovssekvensRepository = behovssekvensRepository ?: BehovssekvensRepository(

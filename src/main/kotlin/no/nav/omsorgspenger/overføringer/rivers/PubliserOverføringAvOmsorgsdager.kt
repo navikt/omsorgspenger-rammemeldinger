@@ -17,13 +17,16 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandl
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
+import no.nav.omsorgspenger.overføringer.statistikk.OverføringStatistikkMelding
+import no.nav.omsorgspenger.overføringer.statistikk.OverføringerStatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
 
 internal class PubliserOverføringAvOmsorgsdager (
     rapidsConnection: RapidsConnection,
     private val formidlingService: FormidlingService,
-    behovssekvensRepository: BehovssekvensRepository
+    behovssekvensRepository: BehovssekvensRepository,
+    private val overføringerStatistikkService: OverføringerStatistikkService
 ) : PersistentBehovssekvensPacketListener(
     steg = "PubliserOverføringAvOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
@@ -95,6 +98,12 @@ internal class PubliserOverføringAvOmsorgsdager (
         }}
 
         // TODO: Send info om saksstatistikk https://github.com/navikt/omsorgspenger-rammemeldinger/issues/15
+        overføringerStatistikkService.publiser(OverføringStatistikkMelding(
+                saksnummer = behandling.saksnummer.getValue(overføreOmsorgsdager.overførerFra),
+                behandlingId = id,
+                mottaksdato = overføreOmsorgsdager.mottaksdato
+        ))
+
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")
 

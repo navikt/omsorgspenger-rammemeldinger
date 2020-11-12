@@ -49,7 +49,8 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     PubliserOverføringAvOmsorgsdager(
         rapidsConnection = this,
         formidlingService = applicationContext.formidlingService,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        overføringerStatistikkService = applicationContext.overføringerStatistikkService
     )
     InitierMidlertidigAlene(
         rapidsConnection = this,
