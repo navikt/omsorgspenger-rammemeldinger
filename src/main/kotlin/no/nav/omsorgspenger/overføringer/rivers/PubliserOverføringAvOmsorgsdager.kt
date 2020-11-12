@@ -6,7 +6,7 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.overføringer.*
-import no.nav.omsorgspenger.overføringer.Formidling.opprettMeldingsBestillinger
+import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger

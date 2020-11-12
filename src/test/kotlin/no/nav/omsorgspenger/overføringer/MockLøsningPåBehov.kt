@@ -60,7 +60,8 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
                         "etternavn" to "Nordmann"
                     ),
                     "fødselsdato" to "1992-09-01",
-                    "aktørId" to "44"
+                    "aktørId" to "44",
+                    "adressebeskyttelse" to "UGRADERT"
                 )
             )
         )
