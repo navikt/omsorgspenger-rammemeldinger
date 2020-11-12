@@ -1,10 +1,10 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: {{app}}
-  namespace: {{namespace}}
+  name: omsorgspenger-rammemeldinger
+  namespace: omsorgspenger
   labels:
-    team: {{team}}
+    team: omsorgspenger
 spec:
   image: {{ image }}
   port: 8080

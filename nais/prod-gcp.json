@@ -1,0 +1,23 @@
+{
+  "cluster": "prod-gcp",
+  "minReplicas": "1",
+  "maxReplicas": "2",
+  "ingresses": [
+    "https://omsorgspenger-rammemeldinger.intern.nav.no"
+  ],
+  "externalHosts": [
+    "omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
+    "login.microsoftonline.com"
+  ],
+  "azureTenant": "nav.no",
+  "env": {
+    "KAFKA_BOOTSTRAP_SERVERS": "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
+    "KAFKA_PROPERTIES_SECURITY_PROTOCOL": "SASL_SSL",
+    "KAFKA_RAPID_TOPIC": "k9-rapid-v2",
+    "KAFKA_CONSUMER_GROUP_ID": "omsorgspenger-rammemelding",
+    "HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES": "eadadb81-a814-4402-b820-a3fab240f8ee/.default",
+    "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL": "https://omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
+    "AZURE_APP_TOKEN_ENDPOINT": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/oauth2/v2.0/token",
+    "RAPIDS_DISABLED": "true"
+  }
+}

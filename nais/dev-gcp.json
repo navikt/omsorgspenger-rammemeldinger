@@ -1,8 +1,5 @@
 {
-  "app": "omsorgspenger-rammemeldinger",
   "cluster": "dev-gcp",
-  "namespace": "omsorgspenger",
-  "team": "omsorgspenger",
   "minReplicas": "1",
   "maxReplicas": "2",
   "ingresses": [
