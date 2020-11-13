@@ -127,6 +127,8 @@ internal class BehandleOverføringAvOmsorgsdager(
             ).plus(saksnummer)
         }
 
+        val alleIdentitetsnummer = alleSaksnummer.identitetsnummer()
+
         logger.info("legger til behov med løsninger [$OverføreOmsorgsdagerBehandling]")
         packet.leggTilBehovMedLøsninger(
             aktueltBehov = OverføreOmsorgsdager,
@@ -158,7 +160,8 @@ internal class BehandleOverføringAvOmsorgsdager(
                 behov = arrayOf(
                     OpprettGosysJournalføringsoppgaverMelding.behov(
                         OpprettGosysJournalføringsoppgaverMelding.BehovInput(
-                            identitetsnummer = overføreOmsorgsdager.overførerFra,
+                            fra = overføreOmsorgsdager.overførerFra,
+                            alleIdentitetsnummer = alleIdentitetsnummer,
                             journalpostIder = overføreOmsorgsdager.journalpostIder
                         )
                     )
@@ -171,7 +174,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 behov = arrayOf(
                     HentPersonopplysningerMelding.behov(
                         HentPersonopplysningerMelding.BehovInput(
-                            identitetsnummer = alleSaksnummer.identitetsnummer()
+                            identitetsnummer = alleIdentitetsnummer
                         )
                     )
                 )

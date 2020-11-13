@@ -11,14 +11,16 @@ internal object OpprettGosysJournalføringsoppgaverMelding :
     override fun behov(behovInput: BehovInput) = Behov(
         navn = OpprettGosysJournalføringsoppgaver,
         input = mapOf(
-            "identitetsnummer" to behovInput.identitetsnummer,
+            "identitetsnummer" to behovInput.fra,
+            "berørteIdentitetsnummer" to behovInput.alleIdentitetsnummer.minus(behovInput.fra),
             "journalpostIder" to behovInput.journalpostIder,
             "journalpostType" to "OverføreOmsorgsdager"
         )
     )
 
     internal data class BehovInput(
-        val identitetsnummer: Identitetsnummer,
+        val fra: Identitetsnummer,
+        val alleIdentitetsnummer: Set<Identitetsnummer>,
         val journalpostIder: Set<JournalpostId>
     )
 }
