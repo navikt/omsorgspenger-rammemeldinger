@@ -167,6 +167,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                     )
                 )
             )
+            secureLogger.info("SuccessPacket=${packet.toJson()}")
         } else {
             logger.info("legger til behov [$HentPersonopplysninger]")
             packet.leggTilBehov(
