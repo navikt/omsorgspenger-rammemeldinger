@@ -1,11 +1,14 @@
 package no.nav.omsorgspenger.testutils
 
+import com.github.tomakehurst.wiremock.WireMockServer
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenResponse
+import no.nav.helse.dusseldorf.testsupport.jws.Azure
+import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
 import no.nav.omsorgspenger.ApplicationContext
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -16,7 +19,8 @@ import java.util.concurrent.CompletableFuture
 import javax.sql.DataSource
 
 internal fun TestApplicationContextBuilder(
-    dataSource: DataSource
+    dataSource: DataSource,
+    wireMockServer: WireMockServer? = null
 ) = ApplicationContext.Builder(
     accessTokenClient = mockk<AccessTokenClient>().also {
         every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
@@ -36,7 +40,16 @@ internal fun TestApplicationContextBuilder(
         every { it.hent(any(), any(), any())}.returns(listOf())
         coEvery { it.check() }.returns(Healthy("OmsorgspengerInfotrygdRammevedtakGateway", "Mock helsesjekk OK!"))
     },
-    dataSource = dataSource
+    dataSource = dataSource,
+    env = when (wireMockServer) {
+        null -> null
+        else -> mapOf(
+            "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
+            "AZURE_V2_JWKS_URI" to wireMockServer.getAzureV2JwksUrl(),
+            "AZURE_APP_CLIENT_ID" to "omsorgspenger-rammemeldinger",
+            "AZURE_K9_AARSKVANTUM_CLIENT_ID" to "k9-aarskvantum"
+        )
+    }
 )
 
 internal fun DataSource.cleanAndMigrate() = this.also {

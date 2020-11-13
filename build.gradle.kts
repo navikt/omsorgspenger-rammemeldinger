@@ -33,6 +33,7 @@ dependencies {
     implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")

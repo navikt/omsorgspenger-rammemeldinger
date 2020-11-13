@@ -1,13 +1,16 @@
 package no.nav.omsorgspenger.overføringer
 
+import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.omsorgspengerRammemeldinger
+import no.nav.omsorgspenger.testutils.AuthorizationHeaders
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
+import no.nav.omsorgspenger.testutils.WireMockExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -18,9 +21,10 @@ import java.time.LocalDate
 import javax.sql.DataSource
 import kotlin.test.assertEquals
 
-@ExtendWith(DataSourceExtension::class)
+@ExtendWith(DataSourceExtension::class, WireMockExtension::class)
 internal class OverføringerApiTest(
-    private val dataSource: DataSource) {
+    dataSource: DataSource,
+    wireMockServer: WireMockServer) {
 
     private val overføringServiceMock = mockk<OverføringService>().also {
         every { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
@@ -43,26 +47,21 @@ internal class OverføringerApiTest(
             ))
         ))
     }
+
+    private val applicationContext = TestApplicationContextBuilder(
+        dataSource = dataSource.cleanAndMigrate(),
+        wireMockServer = wireMockServer
+    ).also { builder ->
+        builder.overføringService = overføringServiceMock
+    }.build()
+
     @Test
     fun `hent overføringer`() {
-
-        withTestApplication({
-            omsorgspengerRammemeldinger(TestApplicationContextBuilder(dataSource.cleanAndMigrate()).also { builder ->
-                builder.overføringService = overføringServiceMock
-            }.build())
-        }) {
-            handleRequest(HttpMethod.Post, "/hentOverfoeringer") {
+        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
+            handleRequest(HttpMethod.Post, Path) {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-
-                @Language("JSON")
-                val body = """
-                    {
-                        "identitetsnummer": "12345678900",
-                        "fom": "2020-01-01",
-                        "tom": "2020-12-31"
-                    }
-                """.trimIndent()
-                setBody(body)
+                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumAuthorized())
+                setBody(Body)
             }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
@@ -104,5 +103,36 @@ internal class OverføringerApiTest(
                 JSONAssert.assertEquals(forventetResponse, response.content, true)
             }
         }
+    }
+
+    @Test
+    fun `hent overføringer uten tilgang`() {
+        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
+            handleRequest(HttpMethod.Post, Path) {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                setBody(Body)
+            }.apply {
+                assertEquals(HttpStatusCode.Unauthorized, response.status())
+            }
+            handleRequest(HttpMethod.Post, Path) {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumUnauthorized())
+                setBody(Body)
+            }.apply {
+                assertEquals(HttpStatusCode.Forbidden, response.status())
+            }
+        }
+    }
+
+    private companion object {
+        private const val Path = "/hentOverfoeringer"
+        @Language("JSON")
+        private val Body = """
+            {
+                "identitetsnummer": "12345678900",
+                "fom": "2020-01-01",
+                "tom": "2020-12-31"
+            }
+        """.trimIndent()
     }
 }

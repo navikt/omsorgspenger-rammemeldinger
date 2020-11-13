@@ -31,6 +31,7 @@ import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.metrics.micrometer.*
 import io.ktor.response.*
@@ -44,6 +45,7 @@ import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
+import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenApi
 import no.nav.omsorgspenger.overføringer.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
@@ -133,10 +135,32 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
             disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
         }
     }
+
+    install(StatusPages) {
+        exception<ClaimEnforcementFailed> { cause ->
+            log.error("Request uten tilstrekkelig tilganger stoppet. Håndheving av regler resulterte i '${cause.outcomes}'")
+            call.respond(HttpStatusCode.Forbidden)
+        }
+    }
+
+    val azureV2K9Aarskvantum = Issuers.azureV2K9Aarskvantm(
+        env = applicationContext.env
+    )
+
+    val accessAsApplicationIssuers = mapOf(
+        azureV2K9Aarskvantum.alias() to azureV2K9Aarskvantum
+    ).withoutAdditionalClaimRules()
+
+    install(Authentication) {
+        multipleJwtIssuers(accessAsApplicationIssuers)
+    }
+
     routing {
         HealthRoute(healthService = applicationContext.healthService)
-        OverføringerApi(overføringService = applicationContext.overføringService) // todo: autentisering
-        AleneOmOmsorgenApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService) // todo: autentisering
+        authenticate(*accessAsApplicationIssuers.allIssuers()) {
+            OverføringerApi(overføringService = applicationContext.overføringService)
+            AleneOmOmsorgenApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService)
+        }
     }
 }
 
