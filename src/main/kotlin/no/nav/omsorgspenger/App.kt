@@ -47,6 +47,7 @@ import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenApi
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
 import no.nav.omsorgspenger.overføringer.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import javax.sql.DataSource
@@ -175,6 +176,7 @@ internal class ApplicationContext(
     internal val gjennomførOverføringService: GjennomførOverføringService,
     internal val overføringRepository: OverføringRepository,
     internal val overføringService: OverføringService,
+    internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
     internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
@@ -201,6 +203,7 @@ internal class ApplicationContext(
         internal var gjennomførOverføringService: GjennomførOverføringService? = null,
         internal var overføringRepository: OverføringRepository? = null,
         internal var overføringService: OverføringService? = null,
+        internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
         internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
@@ -230,7 +233,10 @@ internal class ApplicationContext(
             val benyttetOverføringRepository = overføringRepository ?: OverføringRepository(
                 dataSource = benyttetDataSource
             )
-            val benyttetAleneOmOmsorgenService = aleneOmOmsorgenService ?: AleneOmOmsorgenService(benyttetInfotrygdRammeService)
+
+            val benyttetAleneOmOmsorgenRepository = aleneOmOmsorgenRepository ?: AleneOmOmsorgenRepository(
+                dataSource = benyttetDataSource
+            )
 
             val benyttetSaksnummerRepository = saksnummerRepository ?: SaksnummerRepository(
                 dataSource = benyttetDataSource
@@ -257,7 +263,12 @@ internal class ApplicationContext(
                 gjennomførOverføringService = gjennomførOverføringService ?: GjennomførOverføringService(
                     overføringRepository = benyttetOverføringRepository
                 ),
-                aleneOmOmsorgenService = benyttetAleneOmOmsorgenService,
+                aleneOmOmsorgenRepository = benyttetAleneOmOmsorgenRepository,
+                aleneOmOmsorgenService = aleneOmOmsorgenService ?: AleneOmOmsorgenService(
+                    infotrygdRammeService = benyttetInfotrygdRammeService,
+                    aleneOmOmsorgenRepository = benyttetAleneOmOmsorgenRepository,
+                    saksnummerService = benyttetSaksnummerService
+                ),
                 healthService = HealthService(healthChecks = setOf(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
                 )),

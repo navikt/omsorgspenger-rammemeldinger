@@ -33,14 +33,14 @@ internal class AleneOmOmsorgenApiTest(
                     gyldigFraOgMed = LocalDate.parse("2020-02-01"),
                     gyldigTilOgMed = LocalDate.parse("2020-03-01"),
                     kilder = setOf(Kilde(id = "noe/fra/it", type = "Personkort")),
-                    barn = Barn(id = "2020-01-01", type = "Fødselsdato", fødselsdato = LocalDate.parse("2010-01-01"))
+                    barn = SpleisetAleneOmOmsorgen.Barn(id = "2020-01-01", type = "Fødselsdato", fødselsdato = LocalDate.parse("2010-01-01"))
                 ),
                 SpleisetAleneOmOmsorgen(
                     gjennomført = LocalDate.parse("2020-02-02"),
                     gyldigFraOgMed = LocalDate.parse("2020-03-01"),
                     gyldigTilOgMed = LocalDate.parse("2020-04-01"),
                     kilder = setOf(Kilde(id = "1234", type = "OmsorgspengerRammemeldinger")),
-                    barn = Barn(id = "02022011111", type = "Identetsnummer", fødselsdato = LocalDate.parse("2020-02-02"))
+                    barn = SpleisetAleneOmOmsorgen.Barn(id = "02022011111", type = "Identetsnummer", fødselsdato = LocalDate.parse("2020-02-02"))
                 )
             )
         )
