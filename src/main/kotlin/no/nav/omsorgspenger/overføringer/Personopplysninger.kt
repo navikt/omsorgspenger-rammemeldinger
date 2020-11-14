@@ -28,8 +28,7 @@ internal data class Personopplysninger(
                 )}
             }
             return Personopplysninger(
-                // TODO: Skal ikke være optional.
-                gjeldendeIdentitetsnummer = second["gjeldendeIdentitetsnummer"]?.asText()?:first,
+                gjeldendeIdentitetsnummer = second["gjeldendeIdentitetsnummer"].asText(),
                 fødselsdato = second["fødselsdato"].asLocalDate(),
                 navn = navn,
                 aktørId = second["aktørId"].asText(),

@@ -51,7 +51,8 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
                     ),
                     "fødselsdato" to "1990-09-01",
                     "aktørId" to "33",
-                    "adressebeskyttelse" to "UGRADERT"
+                    "adressebeskyttelse" to "UGRADERT",
+                    "gjeldendeIdentitetsnummer" to fra
                 ),
                 til to mapOf(
                     "navn" to mapOf(
@@ -61,7 +62,8 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
                     ),
                     "fødselsdato" to "1992-09-01",
                     "aktørId" to "44",
-                    "adressebeskyttelse" to "UGRADERT"
+                    "adressebeskyttelse" to "UGRADERT",
+                    "gjeldendeIdentitetsnummer" to til
                 )
             )
         )
