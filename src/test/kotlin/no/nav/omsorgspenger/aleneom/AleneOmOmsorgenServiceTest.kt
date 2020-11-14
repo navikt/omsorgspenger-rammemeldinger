@@ -44,7 +44,7 @@ internal class AleneOmOmsorgenServiceTest {
         mockNyLøsning(emptySet())
 
         val forventet = listOf(SpleisetAleneOmOmsorgen(
-            gjennomført = LocalDate.parse("2018-01-01"),
+            registrert = LocalDate.parse("2018-01-01"),
             gyldigFraOgMed = LocalDate.parse("2020-01-01"),
             gyldigTilOgMed = LocalDate.parse("2021-01-01"),
             barn = SpleisetAleneOmOmsorgen.Barn(
@@ -74,7 +74,7 @@ internal class AleneOmOmsorgenServiceTest {
         )))
 
         val forventet = listOf(SpleisetAleneOmOmsorgen(
-            gjennomført = LocalDate.parse("2020-11-10"),
+            registrert = LocalDate.parse("2020-11-10"),
             gyldigFraOgMed = LocalDate.parse("2020-01-01"),
             gyldigTilOgMed = LocalDate.parse("2025-02-02"),
             barn = SpleisetAleneOmOmsorgen.Barn(
@@ -133,19 +133,19 @@ internal class AleneOmOmsorgenServiceTest {
         )))
 
         val forventet = listOf(SpleisetAleneOmOmsorgen(
-            gjennomført = LocalDate.parse("2020-11-10"),
+            registrert = LocalDate.parse("2020-11-10"),
             gyldigFraOgMed = LocalDate.parse("2020-01-01"),
             gyldigTilOgMed = LocalDate.parse("2025-02-02"),
             barn = SpleisetAleneOmOmsorgen.Barn(id = "1234", type = "Identitetsnummer", fødselsdato = LocalDate.parse("2017-02-06")),
             kilder = setOf(Kilde(id= "Behovssekvens-1", type = "OmsorgspengerRammemeldinger[Overføring]"))
         ), SpleisetAleneOmOmsorgen(
-            gjennomført = LocalDate.parse("2020-11-10"),
+            registrert = LocalDate.parse("2020-11-10"),
             gyldigFraOgMed = LocalDate.parse("2020-01-06"),
             gyldigTilOgMed = LocalDate.parse("2025-02-27"),
             barn = SpleisetAleneOmOmsorgen.Barn(id = "5678", type = "Identitetsnummer", fødselsdato = LocalDate.parse("2017-02-12")),
             kilder = setOf(Kilde(id= "Behovssekvens-1", type = "OmsorgspengerRammemeldinger[Overføring]"))
         ), SpleisetAleneOmOmsorgen(
-            gjennomført = LocalDate.parse("2018-01-02"),
+            registrert = LocalDate.parse("2018-01-02"),
             gyldigFraOgMed = LocalDate.parse("2020-01-02"),
             gyldigTilOgMed = LocalDate.parse("2021-01-02"),
             barn = SpleisetAleneOmOmsorgen.Barn(id = "2019-01-05", type = "Fødselsdato", fødselsdato = LocalDate.parse("2019-01-05")),

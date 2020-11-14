@@ -47,7 +47,7 @@ internal class AleneOmOmsorgenService(
     private companion object {
         private fun List<InfotrygdAleneOmOmsorgenMelding>.spleisetFraInfotrygd() = map {
             SpleisetAleneOmOmsorgen(
-                gjennomført = it.vedtatt,
+                registrert = it.vedtatt,
                 gyldigFraOgMed = it.periode.fom,
                 gyldigTilOgMed = it.periode.tom,
                 barn = SpleisetAleneOmOmsorgen.Barn(
@@ -60,7 +60,7 @@ internal class AleneOmOmsorgenService(
         }
         private fun Set<AleneOmOmsorgen>.spleisetFraNyLøsning() = map {
             SpleisetAleneOmOmsorgen(
-                gjennomført = it.registrert.toLocalDateOslo(),
+                registrert = it.registrert.toLocalDateOslo(),
                 gyldigFraOgMed = it.periode.fom,
                 gyldigTilOgMed = it.periode.tom,
                 barn = SpleisetAleneOmOmsorgen.Barn(
@@ -83,11 +83,12 @@ internal class AleneOmOmsorgenService(
 }
 
 internal data class SpleisetAleneOmOmsorgen(
-    val gjennomført: LocalDate,
+    val registrert: LocalDate,
     val gyldigFraOgMed: LocalDate,
     val gyldigTilOgMed: LocalDate,
     val barn: Barn,
     val kilder: Set<Kilde>) {
+    @Deprecated(message = "Bruk registrert") val gjennomført = registrert
     internal data class Barn(
         val id: String,
         val type: String,

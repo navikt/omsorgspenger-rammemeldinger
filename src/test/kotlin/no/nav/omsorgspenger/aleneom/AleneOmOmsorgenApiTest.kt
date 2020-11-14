@@ -29,14 +29,14 @@ internal class AleneOmOmsorgenApiTest(
         every { it.hentSpleisetAleneOmOmsorgen(any(), any(), any()) }.returns(
             listOf(
                 SpleisetAleneOmOmsorgen(
-                    gjennomført = LocalDate.parse("2020-01-01"),
+                    registrert = LocalDate.parse("2020-01-01"),
                     gyldigFraOgMed = LocalDate.parse("2020-02-01"),
                     gyldigTilOgMed = LocalDate.parse("2020-03-01"),
                     kilder = setOf(Kilde(id = "noe/fra/it", type = "Personkort")),
                     barn = SpleisetAleneOmOmsorgen.Barn(id = "2020-01-01", type = "Fødselsdato", fødselsdato = LocalDate.parse("2010-01-01"))
                 ),
                 SpleisetAleneOmOmsorgen(
-                    gjennomført = LocalDate.parse("2020-02-02"),
+                    registrert = LocalDate.parse("2020-02-02"),
                     gyldigFraOgMed = LocalDate.parse("2020-03-01"),
                     gyldigTilOgMed = LocalDate.parse("2020-04-01"),
                     kilder = setOf(Kilde(id = "1234", type = "OmsorgspengerRammemeldinger")),
@@ -64,11 +64,12 @@ internal class AleneOmOmsorgenApiTest(
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
 
-                @Language("JSON") // TODO: registrert..
+                @Language("JSON")
                 val forventetResponse = """
                 {
                     "aleneOmOmsorgen": [{
                         "gjennomført": "2020-01-01",
+                        "registrert": "2020-01-01",
                         "gyldigFraOgMed": "2020-02-01",
                         "gyldigTilOgMed": "2020-03-01",
                         "barn": {
@@ -82,6 +83,7 @@ internal class AleneOmOmsorgenApiTest(
                         }]
                     }, {
                         "gjennomført": "2020-02-02",
+                        "registrert": "2020-02-02",
                         "gyldigFraOgMed": "2020-03-01",
                         "gyldigTilOgMed": "2020-04-01",
                         "barn": {
