@@ -5,6 +5,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.BehovssekvensId
+import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenFor
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
@@ -211,15 +212,18 @@ internal class BehandleOverføringAvOmsorgsdager(
             aleneOmOmsorgenFor = overføreOmsorgsdager.barn.filter { it.aleneOmOmsorgen }.mapNotNull {
                 /**
                  * Lagrer nå alene om omsorgen ut året barnet fyller 18 uavhengig av det utvidet rett eller ikke.
-                 * Dette for å unngå ev. problermer om man skulle få utvidet rett for barnet senere.
+                 * Dette for å unngå ev. problemer om man skulle få utvidet rett for barnet senere.
                  */
-                val alenOmOmsorgenTilOgMed = it.fødselsdato.plusYears(18).sisteDagIÅret()
-                when (overføreOmsorgsdager.mottaksdato.isAfter(alenOmOmsorgenTilOgMed)) {
+                val aleneOmOmsorgenTilOgMed = it.fødselsdato.plusYears(18).sisteDagIÅret()
+                when (overføreOmsorgsdager.mottaksdato.isAfter(aleneOmOmsorgenTilOgMed)) {
                     true -> null
                     false -> AleneOmOmsorgenFor(
                         identitetsnummer = it.identitetsnummer,
                         fødselsdato = it.fødselsdato,
-                        aleneOmOmsorgenI = it.omsorgenFor
+                        aleneOmOmsorgenI = Periode(
+                            fom = overføreOmsorgsdager.mottaksdato,
+                            tom = aleneOmOmsorgenTilOgMed
+                        )
                     )
                 }
             }.toSet()

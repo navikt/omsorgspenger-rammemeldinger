@@ -6,6 +6,7 @@ import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.toLocalDateOslo
 import no.nav.omsorgspenger.infotrygd.InfotrygdAleneOmOmsorgenMelding
+import no.nav.omsorgspenger.infotrygd.InfotrygdAnnenPart
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import java.time.LocalDate
@@ -23,7 +24,7 @@ internal class AleneOmOmsorgenService(
                 identitetsnummer = identitetsnummer,
                 periode = periode,
                 correlationId = correlationId
-        )
+         ).toMutableList()
 
         val saksnummer = saksnummerService.hentSaksnummer(
             identitetsnummer = identitetsnummer
@@ -36,48 +37,82 @@ internal class AleneOmOmsorgenService(
             ).filter { it.periode.overlapperMedMinstEnDag(periode) }.toSet()
         }
 
-        val spleisetFraNyLøsning = aleneOmOmsorgenFraNyLøsning.spleisetFraNyLøsning()
-        val spleisetFraInfotrygd = aleneOmOmsorgenFraInfotrygd
-            .spleisetFraInfotrygd()
-            .fjernBarn(barn = spleisetFraNyLøsning.map { it.barn })
+        val spleiset = mutableListOf<SpleisetAleneOmOmsorgen>()
 
-        return spleisetFraNyLøsning.plus(spleisetFraInfotrygd)
+        aleneOmOmsorgenFraNyLøsning.forEach { fraNyLøsning ->
+            val forSammeBarnIInfotrygd = aleneOmOmsorgenFraInfotrygd
+                .firstOrNull { fraNyLøsning.barn.erSamme(it.barn) }
+            when (forSammeBarnIInfotrygd) {
+                null -> spleiset.add(fraNyLøsning.somSpleiset())
+                else -> {
+                    aleneOmOmsorgenFraInfotrygd.remove(forSammeBarnIInfotrygd)
+                    spleiset.add((fraNyLøsning to forSammeBarnIInfotrygd).spleis())
+                }
+            }
+        }
+        aleneOmOmsorgenFraInfotrygd.forEach { fraInfotrygd ->
+            spleiset.add(fraInfotrygd.somSpleiset())
+        }
+
+        return spleiset.toList()
     }
 
     private companion object {
-        private fun List<InfotrygdAleneOmOmsorgenMelding>.spleisetFraInfotrygd() = map {
-            SpleisetAleneOmOmsorgen(
-                registrert = it.vedtatt,
-                gyldigFraOgMed = it.periode.fom,
-                gyldigTilOgMed = it.periode.tom,
+        private const val IdentitetsnummerType = "Identitetsnummer"
+
+        private fun AleneOmOmsorgen.somSpleiset() = SpleisetAleneOmOmsorgen(
+            registrert = registrert.toLocalDateOslo(),
+            gyldigFraOgMed = periode.fom,
+            gyldigTilOgMed = periode.tom,
+            barn = SpleisetAleneOmOmsorgen.Barn(
+                id = barn.identitetsnummer,
+                type = "Identitetsnummer",
+                fødselsdato = barn.fødselsdato
+            ),
+            kilder = setOf(kilde)
+        )
+
+        private fun InfotrygdAleneOmOmsorgenMelding.somSpleiset() = SpleisetAleneOmOmsorgen(
+            registrert = vedtatt,
+            gyldigFraOgMed = periode.fom,
+            gyldigTilOgMed = periode.tom,
+            barn = SpleisetAleneOmOmsorgen.Barn(
+                id = barn.id,
+                type = barn.type,
+                fødselsdato = barn.fødselsdato
+            ),
+            kilder = kilder
+        )
+
+        private fun Pair<AleneOmOmsorgen, InfotrygdAleneOmOmsorgenMelding>.spleis() : SpleisetAleneOmOmsorgen {
+            val (fraNyLøsning, fraInfotrygd) = this
+            val registrertNyLøsning = fraNyLøsning.registrert.toLocalDateOslo()
+            return SpleisetAleneOmOmsorgen(
+                registrert = when (fraInfotrygd.vedtatt.isBefore(registrertNyLøsning)) {
+                    true -> fraInfotrygd.vedtatt
+                    false -> registrertNyLøsning
+                },
                 barn = SpleisetAleneOmOmsorgen.Barn(
-                    id = it.barn.id,
-                    type = it.barn.type,
-                    fødselsdato = it.barn.fødselsdato
+                    id = fraInfotrygd.barn.id,
+                    type = fraInfotrygd.barn.type,
+                    fødselsdato = fraNyLøsning.barn.fødselsdato
                 ),
-                kilder = it.kilder
+                kilder = fraInfotrygd.kilder.plus(fraNyLøsning.kilde),
+                gyldigFraOgMed = when (fraInfotrygd.periode.fom.isBefore(fraNyLøsning.periode.fom)) {
+                    true -> fraInfotrygd.periode.fom
+                    false -> fraNyLøsning.periode.fom
+                },
+                gyldigTilOgMed = when (fraInfotrygd.periode.tom.isAfter(fraNyLøsning.periode.tom)) {
+                    true -> fraInfotrygd.periode.tom
+                    false -> fraNyLøsning.periode.tom
+                }
             )
         }
-        private fun Set<AleneOmOmsorgen>.spleisetFraNyLøsning() = map {
-            SpleisetAleneOmOmsorgen(
-                registrert = it.registrert.toLocalDateOslo(),
-                gyldigFraOgMed = it.periode.fom,
-                gyldigTilOgMed = it.periode.tom,
-                barn = SpleisetAleneOmOmsorgen.Barn(
-                    id = it.barn.identitetsnummer,
-                    type = "Identitetsnummer",
-                    fødselsdato = it.barn.fødselsdato
-                ),
-                kilder = setOf(it.kilde)
-            )
-        }
-        private fun List<SpleisetAleneOmOmsorgen>.fjernBarn(barn: List<SpleisetAleneOmOmsorgen.Barn>) : List<SpleisetAleneOmOmsorgen> {
-            val identitetsnummer = barn.map { it.id }
-            val fødselsdatoer = barn.map { it.fødselsdato }
-            return filterNot { when (it.barn.type) {
-                "Identitetsnummer" -> it.barn.id in identitetsnummer
-                else -> it.barn.fødselsdato in fødselsdatoer
-            }}
+
+        private fun AleneOmOmsorgen.Barn.erSamme(
+            fraInfotrygd: InfotrygdAnnenPart) = when (fraInfotrygd.type == IdentitetsnummerType) {
+            true -> identitetsnummer == fraInfotrygd.id
+            false -> fødselsdato.isEqual(fraInfotrygd.fødselsdato)
         }
     }
 }
