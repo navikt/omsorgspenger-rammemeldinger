@@ -1,9 +1,7 @@
 omsorgspenger-rammemeldinger
 ================
 
-WIP
-
----
+Håndterer behandling og lagring av rammemeldinger og som er flyttet ut av Infotrygd, samt sammenstille nye rammemeldinger med det som allerede finnes i Infotrygd.
 
 # Henvendelser
 
