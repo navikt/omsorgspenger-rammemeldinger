@@ -119,14 +119,14 @@ internal class AleneOmOmsorgenServiceTest {
             // Unikt barn i infotrygd
             barn = InfotrygdAnnenPart(id = "2019-01-05", type = "Fødselsdato", fødselsdato = LocalDate.parse("2019-01-05"))
         ), InfotrygdAleneOmOmsorgenMelding(
-            periode = Periode("2020-01-03/2021-01-03"),
-            vedtatt = LocalDate.parse("2018-01-03"),
+            periode = Periode("2020-01-05/2025-02-26"), // Starter en dag før, slutter en dag tidligere
+            vedtatt = LocalDate.parse("2018-01-03"), // Vedtatt før
             kilder = setOf(Kilde(id= "456", type = "Personkort")),
             // Samme fødselsdato som i ny løsning
             barn = InfotrygdAnnenPart(id = "2017-02-12", type = "Fødselsdato", fødselsdato = LocalDate.parse("2017-02-12"))
         ), InfotrygdAleneOmOmsorgenMelding(
-            periode = Periode("2020-01-04/2021-01-04"),
-            vedtatt = LocalDate.parse("2018-01-03"),
+            periode = Periode("2020-01-02/2025-02-03"), // Starter en dag etter, slutter en dag etter
+            vedtatt = LocalDate.parse("2022-01-03"), // Vedatt etter
             kilder = setOf(Kilde(id= "789", type = "Personkort")),
             // Samme identitetsnummer som i ny løsning
             barn = InfotrygdAnnenPart(id = "1234", type = "Identitetsnummer", fødselsdato = LocalDate.parse("1999-01-01"))
@@ -135,15 +135,21 @@ internal class AleneOmOmsorgenServiceTest {
         val forventet = listOf(SpleisetAleneOmOmsorgen(
             registrert = LocalDate.parse("2020-11-10"),
             gyldigFraOgMed = LocalDate.parse("2020-01-01"),
-            gyldigTilOgMed = LocalDate.parse("2025-02-02"),
+            gyldigTilOgMed = LocalDate.parse("2025-02-03"),
             barn = SpleisetAleneOmOmsorgen.Barn(id = "1234", type = "Identitetsnummer", fødselsdato = LocalDate.parse("2017-02-06")),
-            kilder = setOf(Kilde(id= "Behovssekvens-1", type = "OmsorgspengerRammemeldinger[Overføring]"))
+            kilder = setOf(
+                Kilde(id= "Behovssekvens-1", type = "OmsorgspengerRammemeldinger[Overføring]"),
+                Kilde(id= "789", type = "Personkort")
+            )
         ), SpleisetAleneOmOmsorgen(
-            registrert = LocalDate.parse("2020-11-10"),
-            gyldigFraOgMed = LocalDate.parse("2020-01-06"),
+            registrert = LocalDate.parse("2018-01-03"),
+            gyldigFraOgMed = LocalDate.parse("2020-01-05"),
             gyldigTilOgMed = LocalDate.parse("2025-02-27"),
-            barn = SpleisetAleneOmOmsorgen.Barn(id = "5678", type = "Identitetsnummer", fødselsdato = LocalDate.parse("2017-02-12")),
-            kilder = setOf(Kilde(id= "Behovssekvens-1", type = "OmsorgspengerRammemeldinger[Overføring]"))
+            barn = SpleisetAleneOmOmsorgen.Barn(id = "2017-02-12", type = "Fødselsdato", fødselsdato = LocalDate.parse("2017-02-12")),
+            kilder = setOf(
+                Kilde(id= "Behovssekvens-1", type = "OmsorgspengerRammemeldinger[Overføring]"),
+                Kilde(id= "456", type = "Personkort")
+            )
         ), SpleisetAleneOmOmsorgen(
             registrert = LocalDate.parse("2018-01-02"),
             gyldigFraOgMed = LocalDate.parse("2020-01-02"),
