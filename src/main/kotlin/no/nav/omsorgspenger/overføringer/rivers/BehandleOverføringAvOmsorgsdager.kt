@@ -4,6 +4,11 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
+import no.nav.omsorgspenger.BehovssekvensId
+import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenFor
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
+import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
 import no.nav.omsorgspenger.overføringer.Grunnlag
@@ -31,7 +36,8 @@ import org.slf4j.LoggerFactory
 internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
     private val gjennomførOverføringService: GjennomførOverføringService,
-    private val saksnummerRepository: SaksnummerRepository) : BehovssekvensPacketListener(
+    private val saksnummerRepository: SaksnummerRepository,
+    private val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository) : BehovssekvensPacketListener(
     logger = LoggerFactory.getLogger(BehandleOverføringAvOmsorgsdager::class.java)) {
 
     init {
@@ -70,6 +76,11 @@ internal class BehandleOverføringAvOmsorgsdager(
         val midlertidigAleneVedtak = HentMidlertidigAleneVedtakMelding.hentLøsning(packet)
 
         saksnummerRepository.lagreMapping(saksnummer)
+        lagreAleneOmOmsorgen(
+            behovssekvensId = id,
+            saksnummer = saksnummer.getValue(overføreOmsorgsdager.overførerFra),
+            overføreOmsorgsdager = overføreOmsorgsdager
+        )
 
         val behandling = Behandling(
             sendtPerBrev = overføreOmsorgsdager.sendtPerBrev,
@@ -187,5 +198,31 @@ internal class BehandleOverføringAvOmsorgsdager(
 
     override fun onSent(id: String, packet: JsonMessage) {
         logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
+    }
+
+    private fun lagreAleneOmOmsorgen(
+        behovssekvensId: BehovssekvensId,
+        saksnummer: Saksnummer,
+        overføreOmsorgsdager: OverføreOmsorgsdagerMelding.Behovet)  {
+        aleneOmOmsorgenRepository.lagre(
+            saksnummer = saksnummer,
+            behovssekvensId = behovssekvensId,
+            registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.Overføring,
+            aleneOmOmsorgenFor = overføreOmsorgsdager.barn.filter { it.aleneOmOmsorgen }.mapNotNull {
+                /**
+                 * Lagrer nå alene om omsorgen ut året barnet fyller 18 uavhengig av det utvidet rett eller ikke.
+                 * Dette for å unngå ev. problermer om man skulle få utvidet rett for barnet senere.
+                 */
+                val alenOmOmsorgenTilOgMed = it.fødselsdato.plusYears(18).sisteDagIÅret()
+                when (overføreOmsorgsdager.mottaksdato.isAfter(alenOmOmsorgenTilOgMed)) {
+                    true -> null
+                    false -> AleneOmOmsorgenFor(
+                        identitetsnummer = it.identitetsnummer,
+                        fødselsdato = it.fødselsdato,
+                        aleneOmOmsorgenI = it.omsorgenFor
+                    )
+                }
+            }.toSet()
+        )
     }
 }
