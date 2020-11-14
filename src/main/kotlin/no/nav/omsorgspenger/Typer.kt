@@ -13,5 +13,13 @@ internal fun JsonMessage.correlationId() : CorrelationId = get(Behovsformat.Corr
 
 internal data class Kilde(
     val id: String,
-    val type: String
-)
+    val type: String) {
+    internal companion object {
+        internal fun internKilde(
+            behovssekvensId: BehovssekvensId,
+            type: String) = Kilde(
+            id = behovssekvensId,
+            type = "OmsorgspengerRammemeldinger[$type]"
+        )
+    }
+}
