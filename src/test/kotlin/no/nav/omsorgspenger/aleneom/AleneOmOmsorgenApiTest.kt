@@ -40,7 +40,7 @@ internal class AleneOmOmsorgenApiTest(
                     gyldigFraOgMed = LocalDate.parse("2020-03-01"),
                     gyldigTilOgMed = LocalDate.parse("2020-04-01"),
                     kilder = setOf(Kilde(id = "1234", type = "OmsorgspengerRammemeldinger")),
-                    barn = SpleisetAleneOmOmsorgen.Barn(id = "02022011111", type = "Identetsnummer", fødselsdato = LocalDate.parse("2020-02-02"))
+                    barn = SpleisetAleneOmOmsorgen.Barn(id = "02022011111", type = "Identitetsnummer", fødselsdato = LocalDate.parse("2020-02-02"))
                 )
             )
         )
@@ -64,7 +64,7 @@ internal class AleneOmOmsorgenApiTest(
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
 
-                @Language("JSON")
+                @Language("JSON") // TODO: registrert..
                 val forventetResponse = """
                 {
                     "aleneOmOmsorgen": [{
@@ -86,7 +86,7 @@ internal class AleneOmOmsorgenApiTest(
                         "gyldigTilOgMed": "2020-04-01",
                         "barn": {
                             "id": "02022011111",
-                            "type": "Identetsnummer",
+                            "type": "Identitetsnummer",
                             "fødselsdato": "2020-02-02"
                         },
                         "kilder": [{
