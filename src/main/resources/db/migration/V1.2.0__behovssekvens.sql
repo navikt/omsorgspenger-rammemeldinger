@@ -8,4 +8,4 @@ CREATE TABLE behovssekvens
 );
 
 CREATE INDEX index_behovssekvens_id ON behovssekvens(behovssekvens_id);
-CREATE INDEX index_behovssekvens_id_og_teg ON behovssekvens(behovssekvens_id, gjennomfort_steg);
+CREATE INDEX index_behovssekvens_id_og_steg ON behovssekvens(behovssekvens_id, gjennomfort_steg);
