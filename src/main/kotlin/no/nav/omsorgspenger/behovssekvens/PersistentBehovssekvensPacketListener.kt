@@ -14,7 +14,9 @@ internal abstract class PersistentBehovssekvensPacketListener(
         return behovssekvensRepository.skalHåndtere(
             behovssekvensId = id,
             steg = steg
-        )
+        ).also { if (!it) {
+            logger.warn("BehovssekvensId=$id allerede håndtert.")
+        }}
     }
 
     override fun onSent(id: String, packet: JsonMessage) {
