@@ -6,3 +6,5 @@ CREATE TABLE behovssekvens
     gjennomfort         TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'utc'),
     gjennomfort_steg    VARCHAR(100) NOT NULL
 );
+
+CREATE INDEX index_behovssekvens_steg ON behovssekvens(behovssekvens_id, gjennomfort_steg);

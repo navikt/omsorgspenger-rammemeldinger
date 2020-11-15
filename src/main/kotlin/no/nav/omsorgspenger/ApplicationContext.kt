@@ -147,7 +147,9 @@ internal class ApplicationContext(
                 ),
                 saksnummerRepository = benyttetSaksnummerRepository,
                 saksnummerService = benyttetSaksnummerService,
-                behovssekvensRepository = behovssekvensRepository ?: BehovssekvensRepository()
+                behovssekvensRepository = behovssekvensRepository ?: BehovssekvensRepository(
+                    dataSource = benyttetDataSource
+                )
             )
         }
     }
