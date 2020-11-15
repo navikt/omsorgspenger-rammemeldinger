@@ -15,7 +15,7 @@ internal abstract class PersistentBehovssekvensPacketListener(
             behovssekvensId = id,
             steg = steg
         ).also { if (!it) {
-            logger.warn("BehovssekvensId=$id allerede håndtert.")
+            logger.warn("BehovssekvensId=$id har allerede vært gjennom steg=$steg.")
         }}
     }
 
