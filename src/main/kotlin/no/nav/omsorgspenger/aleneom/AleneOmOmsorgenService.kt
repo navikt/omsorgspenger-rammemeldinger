@@ -41,7 +41,8 @@ internal class AleneOmOmsorgenService(
 
         aleneOmOmsorgenFraNyLøsning.forEach { fraNyLøsning ->
             val forSammeBarnIInfotrygd = aleneOmOmsorgenFraInfotrygd
-                .firstOrNull { fraNyLøsning.barn.erSamme(it.barn) }
+                .filter { fraNyLøsning.barn.erSamme(it.barn) }
+                .minByOrNull { it.periode.fom }
             when (forSammeBarnIInfotrygd) {
                 null -> spleiset.add(fraNyLøsning.somSpleiset())
                 else -> {
