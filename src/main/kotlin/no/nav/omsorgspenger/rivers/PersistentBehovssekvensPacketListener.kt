@@ -10,7 +10,7 @@ internal abstract class PersistentBehovssekvensPacketListener(
     private val behovssekvensRepository: BehovssekvensRepository
 ) : BehovssekvensPacketListener(logger = logger) {
 
-    internal fun doHandlePacket(id: String, packet: JsonMessage) : Boolean {
+    override fun doHandlePacket(id: String, packet: JsonMessage) : Boolean {
         return behovssekvensRepository.skalHåndtere(
             behovssekvensId = id,
             status = håndtertStatus

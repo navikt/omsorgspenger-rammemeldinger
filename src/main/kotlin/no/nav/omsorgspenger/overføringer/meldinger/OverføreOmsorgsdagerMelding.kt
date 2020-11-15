@@ -6,12 +6,16 @@ import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.extensions.Oslo
+import no.nav.omsorgspenger.extensions.toLocalDateOslo
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Barn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenFor
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
 import no.nav.omsorgspenger.overføringer.Utfall
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZonedDateTime
 
 internal object OverføreOmsorgsdagerMelding :
     HentBehov<OverføreOmsorgsdagerMelding.Behovet>,
@@ -25,25 +29,28 @@ internal object OverføreOmsorgsdagerMelding :
             BehovKeys.OverførerTil,
             BehovKeys.OmsorgsdagerTattUtIÅr,
             BehovKeys.OmsorgsdagerÅOverføre,
-            BehovKeys.Mottaksdato,
             BehovKeys.JournalpostIder,
             BehovKeys.JobberINorge,
             BehovKeys.Kilde,
             BehovKeys.Relasjon
         )
         packet.interestedIn(
-            BehovKeys.HarBoddSammenMinstEttÅr // Kun satt om relasjon er NåværendeSamboer
+            BehovKeys.HarBoddSammenMinstEttÅr, // Kun satt om relasjon er NåværendeSamboer
+            BehovKeys.Mottaksdato, // TODO: Fjerne når i bruk i brukerdialog & punsj
+            BehovKeys.Mottatt
         )
     }
 
     override fun hentBehov(packet: JsonMessage) = Relasjon.valueOf(packet[BehovKeys.Relasjon].asText()).let { relasjon ->
+
+
         Behovet(
             barn = (packet[BehovKeys.Barn] as ArrayNode).map { it.somBarn() },
             overførerFra = packet[BehovKeys.OverførerFra].textValue(),
             overførerTil = packet[BehovKeys.OverførerTil].textValue(),
             omsorgsdagerTattUtIÅr = packet[BehovKeys.OmsorgsdagerTattUtIÅr].asInt(),
             omsorgsdagerÅOverføre = packet[BehovKeys.OmsorgsdagerÅOverføre].asInt(),
-            mottaksdato = packet[BehovKeys.Mottaksdato].asLocalDate(),
+            mottatt = packet.mottatt(),
             journalpostIder = (packet[BehovKeys.JournalpostIder] as ArrayNode).map { it.asText() }.toSet(),
             jobberINorge = packet[BehovKeys.JobberINorge].asBoolean(),
             sendtPerBrev = packet[BehovKeys.Kilde].asText().equals(other = "Brev", ignoreCase = true),
@@ -54,6 +61,16 @@ internal object OverføreOmsorgsdagerMelding :
             }
         )
     }
+
+    private fun JsonMessage.mottatt() = kotlin.runCatching { get(BehovKeys.Mottatt).asText().let {
+        ZonedDateTime.parse(it)
+    }}.fold(
+        onSuccess = { it },
+        onFailure = {
+            val mottaksdato = get(BehovKeys.Mottaksdato).asLocalDate()
+            ZonedDateTime.of(mottaksdato, LocalTime.now(Oslo), Oslo)
+        }
+    )
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
         val overføringer = løsning.gjeldendeOverføringer
@@ -82,6 +99,7 @@ internal object OverføreOmsorgsdagerMelding :
             }
 
         return OverføreOmsorgsdager to mapOf(
+            "versjon" to "1.0.0",
             "utfall" to løsning.utfall.name,
             "begrunnelser" to listOf<String>(),
             "overføringer" to overføringer
@@ -105,7 +123,8 @@ internal object OverføreOmsorgsdagerMelding :
         val overførerTil: String,
         val omsorgsdagerTattUtIÅr: Int,
         val omsorgsdagerÅOverføre: Int,
-        val mottaksdato: LocalDate,
+        val mottatt: ZonedDateTime,
+        val mottaksdato: LocalDate = mottatt.toLocalDateOslo(),
         val journalpostIder: Set<String>,
         val relasjon: Relasjon,
         val harBoddSammentMinstEttÅr: Boolean?) {
@@ -154,6 +173,7 @@ internal object OverføreOmsorgsdagerMelding :
         val OmsorgsdagerTattUtIÅr = "@behov.$OverføreOmsorgsdager.omsorgsdagerTattUtIÅr"
         val OmsorgsdagerÅOverføre = "@behov.$OverføreOmsorgsdager.omsorgsdagerÅOverføre"
         val Mottaksdato = "@behov.$OverføreOmsorgsdager.mottaksdato"
+        val Mottatt = "@behov.$OverføreOmsorgsdager.mottatt"
         val JournalpostIder = "@behov.$OverføreOmsorgsdager.journalpostIder"
         val Kilde = "@behov.$OverføreOmsorgsdager.kilde"
         val Relasjon = "@behov.$OverføreOmsorgsdager.til.relasjon"

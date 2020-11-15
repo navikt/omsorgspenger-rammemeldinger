@@ -12,6 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
+import java.time.ZonedDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -257,7 +258,7 @@ internal class MeldingsbestillingTest {
                 overførerTil = til,
                 jobberINorge = true,
                 sendtPerBrev = false,
-                mottaksdato = LocalDate.now(),
+                mottatt = ZonedDateTime.now(),
                 journalpostIder = setOf(),
                 relasjon = OverføreOmsorgsdagerMelding.Relasjon.NåværendeSamboer,
                 harBoddSammentMinstEttÅr = true,
