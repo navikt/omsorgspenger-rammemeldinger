@@ -100,8 +100,4 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         return true
     }
-
-    override fun onSent(id: String, packet: JsonMessage) {
-        logger.warn("TODO: Lagre at packet med id $id er håndtert. https://github.com/navikt/omsorgspenger-rammemeldinger/issues/12")
-    }
 }
