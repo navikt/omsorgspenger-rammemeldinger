@@ -9,6 +9,8 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenFor
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
+import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
@@ -38,7 +40,11 @@ internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
     private val gjennomførOverføringService: GjennomførOverføringService,
     private val saksnummerRepository: SaksnummerRepository,
-    private val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository) : BehovssekvensPacketListener(
+    private val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
+    behovssekvensRepository: BehovssekvensRepository
+) : PersistentBehovssekvensPacketListener(
+    steg = "BehandleOverføringAvOmsorgsdager",
+    behovssekvensRepository = behovssekvensRepository,
     logger = LoggerFactory.getLogger(BehandleOverføringAvOmsorgsdager::class.java)) {
 
     init {

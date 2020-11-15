@@ -4,6 +4,8 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
+import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
@@ -20,7 +22,11 @@ import org.slf4j.LoggerFactory
 
 internal class PubliserOverføringAvOmsorgsdager (
     rapidsConnection: RapidsConnection,
-    private val formidlingService: FormidlingService) : BehovssekvensPacketListener(
+    private val formidlingService: FormidlingService,
+    behovssekvensRepository: BehovssekvensRepository
+) : PersistentBehovssekvensPacketListener(
+    steg = "PubliserOverføringAvOmsorgsdager",
+    behovssekvensRepository = behovssekvensRepository,
     logger = LoggerFactory.getLogger(PubliserOverføringAvOmsorgsdager::class.java)) {
     init {
         River(rapidsConnection).apply {

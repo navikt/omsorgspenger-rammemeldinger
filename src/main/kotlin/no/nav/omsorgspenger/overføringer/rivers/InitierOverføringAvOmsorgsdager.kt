@@ -4,6 +4,8 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
+import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.correlationId
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
@@ -25,8 +27,11 @@ internal class InitierOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
     private val fordelingService: FordelingService,
     private val utvidetRettService: UtvidetRettService,
-    private val midlertidigAleneService: MidlertidigAleneService
-) : BehovssekvensPacketListener(
+    private val midlertidigAleneService: MidlertidigAleneService,
+    behovssekvensRepository: BehovssekvensRepository
+) : PersistentBehovssekvensPacketListener(
+    steg = "InitierOverføringAvOmsorgsdager",
+    behovssekvensRepository = behovssekvensRepository,
     logger = LoggerFactory.getLogger(InitierOverføringAvOmsorgsdager::class.java)) {
 
     init {

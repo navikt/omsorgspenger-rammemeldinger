@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.rivers
+package no.nav.omsorgspenger.behovssekvens
 
 import no.nav.omsorgspenger.BehovssekvensId
 
@@ -7,14 +7,14 @@ internal typealias Behovssekvens = String
 internal class BehovssekvensRepository {
 
     internal fun skalHåndtere(
-        behovssekvensId: BehovssekvensId, status: String) : Boolean {
+        behovssekvensId: BehovssekvensId,
+        steg: String) : Boolean {
         return true
     }
 
     internal fun harHåndtert(
         behovssekvensId: BehovssekvensId,
         behovssekvens: Behovssekvens,
-        status: String) {
-
+        steg: String) {
     }
 }
