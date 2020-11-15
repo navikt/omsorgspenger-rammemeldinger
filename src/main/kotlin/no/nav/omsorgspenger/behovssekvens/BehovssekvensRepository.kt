@@ -1,12 +1,10 @@
 package no.nav.omsorgspenger.behovssekvens
 
+import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import no.nav.omsorgspenger.BehovssekvensId
 import javax.sql.DataSource
-
-internal typealias Behovssekvens = String
 
 internal class BehovssekvensRepository(
     private val dataSource: DataSource) {
@@ -15,16 +13,16 @@ internal class BehovssekvensRepository(
         behovssekvensId: BehovssekvensId,
         steg: String) : Boolean {
         return using(sessionOf(dataSource)) { session ->
-            session.run(henteQuery(
+            session.run(hentSisteIdQuery(
                 behovssekvensId = behovssekvensId,
                 steg = steg
-            ).map { it.long("id") }.asList).size
-        } == 0
+            ).map { it.long("id") }.asSingle)
+        } == null
     }
 
     internal fun harHåndtert(
         behovssekvensId: BehovssekvensId,
-        behovssekvens: Behovssekvens,
+        behovssekvens: BehovssekvensJSON,
         steg: String) {
         using(sessionOf(dataSource)) { session ->
             session.run(lagreQuery(
@@ -35,18 +33,37 @@ internal class BehovssekvensRepository(
         }
     }
 
+    internal fun hent(behovssekvensId: BehovssekvensId) : List<Behovssekvens> {
+        return using(sessionOf(dataSource)) { session ->
+            session.run(hentQuery(
+                behovssekvensId = behovssekvensId,
+            ).map { row -> row.somBehovssekvens() }.asList)
+        }
+    }
+
     private companion object {
-        private const val HentStatement = """
+        private const val HentSisteIdStatement = """
             SELECT id FROM behovssekvens 
             WHERE behovssekvens_id = :behovssekvens_id 
             AND gjennomfort_steg = :gjennomfort_steg
+            ORDER BY id DESC LIMIT 1
         """
 
-        private fun henteQuery(
+        private fun hentSisteIdQuery(
             behovssekvensId: BehovssekvensId,
-            steg: String) = queryOf(HentStatement, mapOf(
+            steg: String) = queryOf(HentSisteIdStatement, mapOf(
             "behovssekvens_id" to behovssekvensId,
             "gjennomfort_steg" to steg
+        ))
+
+        private const val HentStatement = """
+            SELECT * FROM behovssekvens 
+            WHERE behovssekvens_id = :behovssekvens_id
+        """
+
+        private fun hentQuery(
+            behovssekvensId: BehovssekvensId) = queryOf(HentStatement, mapOf(
+            "behovssekvens_id" to behovssekvensId
         ))
 
         private const val LagreStatement = """
@@ -58,11 +75,18 @@ internal class BehovssekvensRepository(
 
         private fun lagreQuery(
             behovssekvensId: BehovssekvensId,
-            behovssekvens: Behovssekvens,
+            behovssekvens: BehovssekvensJSON,
             steg: String) = queryOf(LagreStatement, mapOf(
             "behovssekvens_id" to behovssekvensId,
             "behovssekvens" to behovssekvens,
             "gjennomfort_steg" to steg
         ))
+
+        private fun Row.somBehovssekvens() = Behovssekvens(
+            gjennomført = zonedDateTime("gjennomfort"),
+            gjennomførtSteg = string("gjennomfort_steg"),
+            behovssekvensId = string("behovssekvens_id"),
+            behovssekvens = string("behovssekvens")
+        )
     }
 }

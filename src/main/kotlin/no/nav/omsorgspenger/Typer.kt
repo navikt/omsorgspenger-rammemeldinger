@@ -2,13 +2,13 @@ package no.nav.omsorgspenger
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behovsformat
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 
 typealias AktørId = String
 typealias Identitetsnummer = String
 typealias Saksnummer = String
 typealias JournalpostId = String
 typealias CorrelationId = String
-typealias BehovssekvensId = String
 internal fun JsonMessage.correlationId() : CorrelationId = get(Behovsformat.CorrelationId).asText()
 
 internal data class Kilde(

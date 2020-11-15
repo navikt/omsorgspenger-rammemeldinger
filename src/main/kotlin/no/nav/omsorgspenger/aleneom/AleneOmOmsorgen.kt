@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger.aleneom
 
-import no.nav.omsorgspenger.BehovssekvensId
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode

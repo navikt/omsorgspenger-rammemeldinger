@@ -7,4 +7,5 @@ CREATE TABLE behovssekvens
     gjennomfort_steg    VARCHAR(100) NOT NULL
 );
 
-CREATE INDEX index_behovssekvens_steg ON behovssekvens(behovssekvens_id, gjennomfort_steg);
+CREATE INDEX index_behovssekvens_id ON behovssekvens(behovssekvens_id);
+CREATE INDEX index_behovssekvens_id_og_teg ON behovssekvens(behovssekvens_id, gjennomfort_steg);

@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger.overføringer.formidling
 
-import no.nav.omsorgspenger.BehovssekvensId
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.formidling.Meldingsbestilling
 import no.nav.omsorgspenger.overføringer.Personopplysninger

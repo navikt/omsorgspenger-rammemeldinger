@@ -1,7 +1,7 @@
 package no.nav.omsorgspenger.formidling
 
 import no.nav.omsorgspenger.AktørId
-import no.nav.omsorgspenger.BehovssekvensId
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.Saksnummer
 import org.intellij.lang.annotations.Language
 import org.json.JSONObject
