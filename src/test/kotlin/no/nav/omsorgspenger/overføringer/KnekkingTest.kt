@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.extensions.Oslo
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneVedtak
 import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenFor
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZonedDateTime
 
 internal class KnekkingTest {
 
@@ -79,7 +82,7 @@ internal class KnekkingTest {
                 journalpostIder = setOf(),
                 relasjon = OverføreOmsorgsdagerMelding.Relasjon.NåværendeEktefelle,
                 harBoddSammentMinstEttÅr = null,
-                mottaksdato = mottaksdato,
+                mottatt = ZonedDateTime.of(mottaksdato, LocalTime.now(Oslo), Oslo),
                 omsorgsdagerTattUtIÅr = 0,
                 omsorgsdagerÅOverføre = 10
             ),

@@ -9,6 +9,7 @@ import no.nav.k9.rapid.losning.OverføreOmsorgsdagerLøsningResolver
 import no.nav.k9.rapid.losning.somMelding
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.extensions.Oslo
 import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZonedDateTime
 import java.util.*
 
 internal object IdentitetsnummerGenerator {
@@ -70,7 +73,7 @@ internal fun behovssekvensOverføreOmsorgsdager(
         barn = barn,
         kilde = kilde,
         journalpostIder = listOf(),
-        mottaksdato = mottaksdato
+        mottatt = ZonedDateTime.of(mottaksdato, LocalTime.now(Oslo), Oslo)
     ))
 ).keyValue
 

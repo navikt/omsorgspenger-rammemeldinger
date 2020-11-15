@@ -9,6 +9,7 @@ import no.nav.k9.rapid.river.csvTilSet
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
@@ -32,6 +33,7 @@ internal class ApplicationContext(
     internal val fordelingService: FordelingService,
     internal val utvidetRettService: UtvidetRettService,
     internal val midlertidigAleneService: MidlertidigAleneService,
+    internal val behovssekvensRepository: BehovssekvensRepository,
     internal val gjennomførOverføringService: GjennomførOverføringService,
     internal val overføringRepository: OverføringRepository,
     internal val overføringService: OverføringService,
@@ -59,6 +61,7 @@ internal class ApplicationContext(
         internal var fordelingService: FordelingService? = null,
         internal var utvidetRettService: UtvidetRettService? = null,
         internal var midlertidigAleneService: MidlertidigAleneService? = null,
+        internal var behovssekvensRepository: BehovssekvensRepository? = null,
         internal var gjennomførOverføringService: GjennomførOverføringService? = null,
         internal var overføringRepository: OverføringRepository? = null,
         internal var overføringService: OverføringService? = null,
@@ -143,7 +146,10 @@ internal class ApplicationContext(
                     overføringRepository = benyttetOverføringRepository
                 ),
                 saksnummerRepository = benyttetSaksnummerRepository,
-                saksnummerService = benyttetSaksnummerService
+                saksnummerService = benyttetSaksnummerService,
+                behovssekvensRepository = behovssekvensRepository ?: BehovssekvensRepository(
+                    dataSource = benyttetDataSource
+                )
             )
         }
     }

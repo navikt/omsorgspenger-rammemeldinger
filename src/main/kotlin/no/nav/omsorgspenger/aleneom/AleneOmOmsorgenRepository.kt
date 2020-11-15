@@ -4,7 +4,7 @@ import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import no.nav.omsorgspenger.BehovssekvensId
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import javax.sql.DataSource

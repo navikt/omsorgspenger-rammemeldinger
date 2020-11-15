@@ -82,17 +82,20 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         rapidsConnection = this,
         fordelingService = applicationContext.fordelingService,
         utvidetRettService = applicationContext.utvidetRettService,
-        midlertidigAleneService = applicationContext.midlertidigAleneService
+        midlertidigAleneService = applicationContext.midlertidigAleneService,
+        behovssekvensRepository = applicationContext.behovssekvensRepository
     )
     BehandleOverføringAvOmsorgsdager(
         rapidsConnection = this,
         gjennomførOverføringService = applicationContext.gjennomførOverføringService,
         saksnummerRepository = applicationContext.saksnummerRepository,
-        aleneOmOmsorgenRepository = applicationContext.aleneOmOmsorgenRepository
+        aleneOmOmsorgenRepository = applicationContext.aleneOmOmsorgenRepository,
+        behovssekvensRepository = applicationContext.behovssekvensRepository
     )
     PubliserOverføringAvOmsorgsdager(
         rapidsConnection = this,
-        formidlingService = applicationContext.formidlingService
+        formidlingService = applicationContext.formidlingService,
+        behovssekvensRepository = applicationContext.behovssekvensRepository
     )
     register(object : RapidsConnection.StatusListener {
         override fun onStartup(rapidsConnection: RapidsConnection) {

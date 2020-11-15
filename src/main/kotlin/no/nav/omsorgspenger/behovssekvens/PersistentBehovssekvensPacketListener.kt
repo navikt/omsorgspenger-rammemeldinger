@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.rivers
+package no.nav.omsorgspenger.behovssekvens
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.river.BehovssekvensPacketListener
@@ -6,22 +6,24 @@ import org.slf4j.Logger
 
 internal abstract class PersistentBehovssekvensPacketListener(
     logger: Logger,
-    private val håndtertStatus: String,
+    private val steg: String,
     private val behovssekvensRepository: BehovssekvensRepository
 ) : BehovssekvensPacketListener(logger = logger) {
 
-    internal fun doHandlePacket(id: String, packet: JsonMessage) : Boolean {
+    override fun doHandlePacket(id: String, packet: JsonMessage) : Boolean {
         return behovssekvensRepository.skalHåndtere(
             behovssekvensId = id,
-            status = håndtertStatus
-        )
+            steg = steg
+        ).also { if (!it) {
+            logger.warn("BehovssekvensId=$id har allerede vært gjennom steg=$steg.")
+        }}
     }
 
     override fun onSent(id: String, packet: JsonMessage) {
         behovssekvensRepository.harHåndtert(
             behovssekvensId = id,
             behovssekvens = packet.toJson(),
-            status = håndtertStatus
+            steg = steg
         )
     }
 }
