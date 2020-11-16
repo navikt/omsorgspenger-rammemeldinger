@@ -101,9 +101,11 @@ internal class PubliserOverføringAvOmsorgsdager (
         overføringerStatistikkService.publiser(OverføringStatistikkMelding(
                 saksnummer = behandling.saksnummer.getValue(overføreOmsorgsdager.overførerFra),
                 behandlingId = id,
-                mottaksdato = overføreOmsorgsdager.mottaksdato
+                mottaksdato = overføreOmsorgsdager.mottaksdato,
+                behandlingType = "omsorgspenger/overføring",
+                behandlingStatus = "TODO", // TODO???
+                aktørId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId
         ))
-
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")
 
