@@ -21,6 +21,7 @@ import no.nav.omsorgspenger.overføringer.statistikk.OverføringStatistikkMeldin
 import no.nav.omsorgspenger.overføringer.statistikk.OverføringerStatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
+import java.time.ZonedDateTime
 
 internal class PubliserOverføringAvOmsorgsdager (
     rapidsConnection: RapidsConnection,
@@ -102,6 +103,8 @@ internal class PubliserOverføringAvOmsorgsdager (
                 saksnummer = behandling.saksnummer.getValue(overføreOmsorgsdager.overførerFra),
                 behandlingId = id,
                 mottaksdato = overføreOmsorgsdager.mottaksdato,
+                registrertDato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
+                funksjonellTid = overføreOmsorgsdager.mottatt.toOffsetDateTime(),
                 behandlingType = "omsorgspenger/overføring",
                 behandlingStatus = "TODO", // TODO???
                 aktørId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId

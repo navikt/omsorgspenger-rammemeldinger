@@ -23,7 +23,7 @@ internal class OverføringerStatistikkService(
                     tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller
                     oppdatering tilbake i tid, skal tekniskTid være lik endringstidspunktet, mens funksjonellTid angir
                     tidspunktet da endringen offisielt gjelder fra. */
-                funksjonellTid = null, // todo: Denne må hentes inn
+                funksjonellTid = statistikk.funksjonellTid,
 
                 tekniskTid = tekniskTid,
                 opprettetDato = null, // Denne har vi ikke noe forhold til!
@@ -49,7 +49,7 @@ internal class OverføringerStatistikkService(
                     tidspunkt der hendelsen faktisk er gjeldende fra. Ved for eksempel patching av data eller
                     oppdatering tilbake i tid, skal tekniskTid være lik endringstidspunktet, mens funksjonellTid angir
                     tidspunktet da endringen offisielt gjelder fra. */
-                funksjonellTid = null, // todo: denne må hentes inn
+                funksjonellTid = statistikk.funksjonellTid,
 
                 tekniskTid = tekniskTid,
 
