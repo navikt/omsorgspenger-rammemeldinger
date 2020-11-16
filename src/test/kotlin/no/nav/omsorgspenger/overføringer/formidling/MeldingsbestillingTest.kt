@@ -95,6 +95,25 @@ internal class MeldingsbestillingTest {
     }
 
     @Test
+    fun `Brukt fler dager enn man har tilgjengelig i år - delvis`() {
+        val meldingsbestillinger = meldingsbestillinger(
+            tattUtIÅr = 50,
+            girDager = 5,
+            listOf(barn())
+        )
+
+        assertThat(meldingsbestillinger).hasSize(2)
+        val forventetStartOgSluttGrunn = Grunn.BRUKT_ALLE_DAGER_I_ÅR to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
+        val mottatt = meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
+        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertEquals(mottatt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertFalse(gitt.formidlingsoverføringer.innvilget)
+        assertFalse(gitt.formidlingsoverføringer.avslått)
+        meldingsbestillinger.forEach { println(it.keyValue.second) }
+    }
+
+    @Test
     fun `Brukt noen dager i år - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
             tattUtIÅr = 15,

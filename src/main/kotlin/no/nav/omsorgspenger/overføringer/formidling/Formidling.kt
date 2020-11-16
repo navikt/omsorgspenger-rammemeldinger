@@ -75,13 +75,13 @@ internal class Formidlingsoverføringer(
     internal val alleOverføringer =
         behandling.overføringer
     internal val avslåtteOverføringer =
-        alleOverføringer.filter { it.antallDager == 0 }
+        alleOverføringer.filter { it.antallDager <= 0 }
     internal val innvilgedeOverføringer =
         alleOverføringer.filter { it.antallDager == overføreOmsorgsdager.omsorgsdagerÅOverføre }
     internal val delvisInnvilgedeOverføringer =
         alleOverføringer.minus(avslåtteOverføringer).minus(innvilgedeOverføringer)
     internal val utenAvslåtteOverføringer =
-        alleOverføringer.filter { it.antallDager != 0 }
+        alleOverføringer.filter { it.antallDager > 0 }
 
     internal val innvilget =
         avslåtteOverføringer.isEmpty() &&
