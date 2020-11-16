@@ -28,15 +28,16 @@ internal object Formidling {
 
         val bestillinger = mutableListOf<Meldingsbestilling>()
 
-        behandling.saksnummer.forEach { (identitetsnummer, saksnummer) ->
-            val melding = when (identitetsnummer) {
-                overføreOmsorgsdager.overførerFra -> GittDager(
+        behandling.alleSaksnummerMapping.forEach { (identitetsnummer, saksnummer) ->
+            val melding = when {
+                !behandling.berørteSaksnummer.contains(saksnummer) -> null
+                identitetsnummer == overføreOmsorgsdager.overførerFra -> GittDager(
                     til = personopplysninger.getValue(overføreOmsorgsdager.overførerTil),
                     formidlingsoverføringer = formidlingsoverføringer,
                     antallDagerØnsketOverført = overføreOmsorgsdager.omsorgsdagerÅOverføre,
                     mottaksdato = overføreOmsorgsdager.mottaksdato
                 )
-                overføreOmsorgsdager.overførerTil -> MottattDager.melding(
+                identitetsnummer == overføreOmsorgsdager.overførerTil -> MottattDager.melding(
                     fra = personopplysninger.getValue(overføreOmsorgsdager.overførerFra),
                     formidlingsoverføringer = formidlingsoverføringer,
                     mottaksdato = overføreOmsorgsdager.mottaksdato

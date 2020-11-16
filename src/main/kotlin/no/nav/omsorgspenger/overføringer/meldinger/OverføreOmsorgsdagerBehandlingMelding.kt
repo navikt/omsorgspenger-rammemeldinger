@@ -23,7 +23,8 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
             "lovanvendelser" to løsning.behandling.lovanvendelser.somLøsning(),
             "overføringer" to JacksonObjectMapper.convertValue(løsning.overføringer),
             "gjeldendeOverføringer" to JacksonObjectMapper.convertValue(løsning.gjeldendeOverføringer),
-            "saksnummer" to JacksonObjectMapper.convertValue(løsning.saksnummer),
+            "alleSaksnummerMapping" to JacksonObjectMapper.convertValue(løsning.alleSaksnummerMapping),
+            "berørteSaksnummer" to løsning.berørteSaksnummer,
             "periode" to løsning.behandling.periode.toString()
         )
 
@@ -33,7 +34,8 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
             LøsningKeys.Overføringer,
             LøsningKeys.GjeldendeOverføringer,
             LøsningKeys.Periode,
-            LøsningKeys.Saksnummer
+            LøsningKeys.AlleSaksnummerMapping,
+            LøsningKeys.BerørteSaksnummer
         )
     }
 
@@ -42,21 +44,24 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
         gjeldendeOverføringer = JacksonObjectMapper.readValue(packet[LøsningKeys.GjeldendeOverføringer].toString()),
         karakteristikker = JacksonObjectMapper.readValue(packet[LøsningKeys.Karakteristikker].toString()),
         periode = Periode(packet[LøsningKeys.Periode].asText()),
-        saksnummer = JacksonObjectMapper.readValue(packet[LøsningKeys.Saksnummer].toString())
+        alleSaksnummerMapping = JacksonObjectMapper.readValue(packet[LøsningKeys.AlleSaksnummerMapping].toString()),
+        berørteSaksnummer = packet[LøsningKeys.BerørteSaksnummer].map { it.asText() }.toSet()
     )
 
     internal data class HeleBehandling(
         internal val behandling: Behandling,
         internal val overføringer: List<NyOverføring>,
         internal val gjeldendeOverføringer: Map<Identitetsnummer, GjeldendeOverføringer>,
-        internal val saksnummer: Map<Identitetsnummer, Saksnummer>
+        internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>,
+        internal val berørteSaksnummer: Set<Saksnummer>
     )
 
     internal data class ForVidereBehandling(
         internal val karakteristikker: Set<Behandling.Karakteristikk>,
         internal val overføringer: List<NyOverføring>,
         internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
-        internal val saksnummer: Map<Identitetsnummer, Saksnummer>,
+        internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>,
+        internal val berørteSaksnummer: Set<Saksnummer>,
         internal val periode: Periode) {
         internal val oppfyllerIkkeInngangsvilkår = karakteristikker.contains(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
         internal val måBesvaresPerBrev = karakteristikker.contains(Behandling.Karakteristikk.MåBesvaresPerBrev)
@@ -68,7 +73,7 @@ internal object OverføreOmsorgsdagerBehandlingMelding :
         const val Overføringer = "@løsninger.$OverføreOmsorgsdagerBehandling.overføringer"
         const val GjeldendeOverføringer = "@løsninger.$OverføreOmsorgsdagerBehandling.gjeldendeOverføringer"
         const val Periode = "@løsninger.$OverføreOmsorgsdagerBehandling.periode"
-        const val Saksnummer = "@løsninger.$OverføreOmsorgsdagerBehandling.saksnummer"
-
+        const val AlleSaksnummerMapping = "@løsninger.$OverføreOmsorgsdagerBehandling.alleSaksnummerMapping"
+        const val BerørteSaksnummer = "@løsninger.$OverføreOmsorgsdagerBehandling.berørteSaksnummer"
     }
 }

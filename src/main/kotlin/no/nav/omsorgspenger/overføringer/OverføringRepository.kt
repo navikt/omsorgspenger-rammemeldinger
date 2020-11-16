@@ -46,12 +46,15 @@ internal class OverføringRepository(
     internal fun gjennomførOverføringer(
         fra: Saksnummer,
         til: Saksnummer,
-        overføringer: List<NyOverføring>) : Map<Saksnummer, GjeldendeOverføringer> {
+        overføringer: List<NyOverføring>) : GjennomførtOverføringer {
         val overføringerMedDager = overføringer.fjernOverføringerUtenDager()
 
         if (overføringerMedDager.isEmpty()) {
             return using(sessionOf(dataSource)) { it.hentAktiveOverføringer(
                 saksnummer = setOf(fra, til)
+            )}.let { GjennomførtOverføringer(
+                gjeldendeOverføringer = it,
+                berørteSaksnummer = setOf(fra,til)
             )}
         }
 
@@ -90,9 +93,16 @@ internal class OverføringRepository(
                     til = til,
                     overføringer = overføringerMedDager
                 )
+
+                val berørteSaksnummer =
+                    berørteOverføringer.saksnummer().plus(setOf(fra, til))
+
                 transactionalSession.hentAktiveOverføringer(
-                    saksnummer = berørteOverføringer.saksnummer().plus(setOf(fra, til))
-                )
+                    saksnummer = berørteSaksnummer
+                ).let { GjennomførtOverføringer(
+                    gjeldendeOverføringer = it,
+                    berørteSaksnummer = berørteSaksnummer
+                )}
             }
         }
     }

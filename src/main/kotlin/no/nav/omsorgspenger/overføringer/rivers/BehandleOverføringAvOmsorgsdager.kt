@@ -74,7 +74,7 @@ internal class BehandleOverføringAvOmsorgsdager(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("BehandleOverføringAvOmsorgsdager for $id")
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
-        val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet).also {
+        val fraTilSaksnummerMapping = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet).also {
             require(it.containsKey(overføreOmsorgsdager.overførerFra)) { "Mangler saksnummer for 'overførerFra'"}
             require(it.containsKey(overføreOmsorgsdager.overførerTil)) { "Mangler saksnummer for 'overførerTil'"}
         }
@@ -82,10 +82,10 @@ internal class BehandleOverføringAvOmsorgsdager(
         val utvidetRettVedtak = HentUtvidetRettVedtakMelding.hentLøsning(packet)
         val midlertidigAleneVedtak = HentMidlertidigAleneVedtakMelding.hentLøsning(packet)
 
-        saksnummerRepository.lagreMapping(saksnummer)
+        saksnummerRepository.lagreMapping(fraTilSaksnummerMapping)
         lagreAleneOmOmsorgen(
             behovssekvensId = id,
-            saksnummer = saksnummer.getValue(overføreOmsorgsdager.overførerFra),
+            saksnummer = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
             overføreOmsorgsdager = overføreOmsorgsdager
         )
 
@@ -124,28 +124,26 @@ internal class BehandleOverføringAvOmsorgsdager(
         val måBehandlesSomGosysJournalføringsoppgaver = behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()
         val avslag = behandling.avslag() || måBehandlesSomGosysJournalføringsoppgaver || overføringer.fjernOverføringerUtenDager().isEmpty()
 
-        logger.info("Avlsag=$avslag")
+        logger.info("Avslag=$avslag")
 
-        val gjeldendeOverføringer = when (avslag) {
-            true -> overføringer.somAvslåtteGjeldendeOverføringer(
-                fra = saksnummer.getValue(overføreOmsorgsdager.overførerFra),
-                til = saksnummer.getValue(overføreOmsorgsdager.overførerTil)
+        val gjennomførtOverføringer = when (avslag) {
+            true -> overføringer.somAvslått(
+                fra = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
+                til = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerTil)
             )
             false -> gjennomførOverføringService.gjennomførOverføringer(
-                fra = saksnummer.getValue(overføreOmsorgsdager.overførerFra),
-                til = saksnummer.getValue(overføreOmsorgsdager.overførerTil),
+                fra = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
+                til = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerTil),
                 overføringer = overføringer
             )
         }
 
-        val alleSaksnummer = when (avslag) {
-            true -> saksnummer
+        val alleSaksnummerMapping = when (avslag) {
+            true -> fraTilSaksnummerMapping
             false -> saksnummerRepository.hentSisteMappingFor(
-                saksnummer = gjeldendeOverføringer.saksnummer()
-            ).plus(saksnummer)
+                saksnummer = gjennomførtOverføringer.alleSaksnummer
+            )
         }
-
-        val alleIdentitetsnummer = alleSaksnummer.identitetsnummer()
 
         logger.info("legger til behov med løsninger [$OverføreOmsorgsdagerBehandling]")
         packet.leggTilBehovMedLøsninger(
@@ -155,8 +153,9 @@ internal class BehandleOverføringAvOmsorgsdager(
                     løsning = OverføreOmsorgsdagerBehandlingMelding.HeleBehandling(
                         behandling = behandling,
                         overføringer = overføringer,
-                        gjeldendeOverføringer = gjeldendeOverføringer,
-                        saksnummer = alleSaksnummer
+                        gjeldendeOverføringer = gjennomførtOverføringer.gjeldendeOverføringer,
+                        alleSaksnummerMapping = alleSaksnummerMapping,
+                        berørteSaksnummer = gjennomførtOverføringer.berørteSaksnummer
                     )
                 )
             )
@@ -169,7 +168,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                     utfall = Utfall.GosysJournalføringsoppgaver,
                     gjeldendeOverføringer = mapOf(),
                     personopplysninger = mapOf(),
-                    saksnummer = mapOf()
+                    alleSaksnummerMapping = mapOf()
                 ))
             )
             logger.info("legger til behov [$OpprettGosysJournalføringsoppgaver]")
@@ -179,7 +178,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                     OpprettGosysJournalføringsoppgaverMelding.behov(
                         OpprettGosysJournalføringsoppgaverMelding.BehovInput(
                             fra = overføreOmsorgsdager.overførerFra,
-                            alleIdentitetsnummer = alleIdentitetsnummer,
+                            til = overføreOmsorgsdager.overførerTil,
                             journalpostIder = overføreOmsorgsdager.journalpostIder
                         )
                     )
@@ -193,7 +192,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 behov = arrayOf(
                     HentPersonopplysningerMelding.behov(
                         HentPersonopplysningerMelding.BehovInput(
-                            identitetsnummer = alleIdentitetsnummer
+                            identitetsnummer = alleSaksnummerMapping.identitetsnummer()
                         )
                     )
                 )

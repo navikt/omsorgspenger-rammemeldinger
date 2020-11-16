@@ -152,8 +152,8 @@ internal object OverføreOmsorgsdagerMelding :
         internal val utfall: Utfall,
         internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
         private val personopplysninger: Map<Identitetsnummer, Personopplysninger>,
-        private val saksnummer: Map<Identitetsnummer, Saksnummer>) {
-        private val saksnummerTilIdentitetsnummer = saksnummer.entries.associate{(k,v)-> v to k}
+        private val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>) {
+        private val saksnummerTilIdentitetsnummer = alleSaksnummerMapping.entries.associate{(k,v)-> v to k}
         internal fun personopplysninger(sak: Saksnummer) =
             personopplysninger.getValue(saksnummerTilIdentitetsnummer.getValue(sak))
         internal fun identitetsnummer(sak: Saksnummer) =

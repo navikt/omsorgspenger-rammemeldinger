@@ -298,13 +298,14 @@ internal class MeldingsbestillingTest {
                     karakteristikker = behandling.karakteristikker(),
                     overføringer = nyeOverføringer,
                     gjeldendeOverføringer = mapOf(),
-                    saksnummer = mapOf(
+                    alleSaksnummerMapping = mapOf(
                         fra to "1",
                         til to "2"
                     ).let { when (medTidligerePartner){
                         true -> it.plus(tidligerePartner to "3")
                         false -> it
                     }},
+                    berørteSaksnummer = setOf("1","2","3"),
                     periode = behandling.periode
                 )
             )

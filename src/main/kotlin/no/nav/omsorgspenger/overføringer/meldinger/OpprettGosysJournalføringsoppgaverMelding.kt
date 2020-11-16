@@ -12,7 +12,7 @@ internal object OpprettGosysJournalføringsoppgaverMelding :
         navn = OpprettGosysJournalføringsoppgaver,
         input = mapOf(
             "identitetsnummer" to behovInput.fra,
-            "berørteIdentitetsnummer" to behovInput.alleIdentitetsnummer.minus(behovInput.fra),
+            "berørteIdentitetsnummer" to setOf(behovInput.til),
             "journalpostIder" to behovInput.journalpostIder,
             "journalpostType" to "OverføreOmsorgsdager"
         )
@@ -20,7 +20,7 @@ internal object OpprettGosysJournalføringsoppgaverMelding :
 
     internal data class BehovInput(
         val fra: Identitetsnummer,
-        val alleIdentitetsnummer: Set<Identitetsnummer>,
+        val til: Identitetsnummer,
         val journalpostIder: Set<JournalpostId>
     )
 }
