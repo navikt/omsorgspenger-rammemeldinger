@@ -18,7 +18,7 @@ internal class GjennomførOverføringService(
     internal fun gjennomførOverføringer(
         fra: Saksnummer,
         til: Saksnummer,
-        overføringer: List<NyOverføring>) : Map<Saksnummer, GjeldendeOverføringer> {
+        overføringer: List<NyOverføring>) : GjennomførtOverføringer {
         return overføringRepository.gjennomførOverføringer(
             fra = fra,
             til = til,
@@ -27,7 +27,13 @@ internal class GjennomførOverføringService(
     }
 }
 
-internal fun List<NyOverføring>.somAvslåtteGjeldendeOverføringer(fra: Saksnummer, til: Saksnummer) =
+internal data class GjennomførtOverføringer(
+    internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
+    internal val berørteSaksnummer: Set<Saksnummer>) {
+    internal val alleSaksnummer = gjeldendeOverføringer.saksnummer()
+}
+
+internal fun List<NyOverføring>.somAvslått(fra: Saksnummer, til: Saksnummer) =
     fjernOverføringerUtenDager().let { overføringer ->
         mapOf(
             fra to GjeldendeOverføringer(
@@ -49,4 +55,7 @@ internal fun List<NyOverføring>.somAvslåtteGjeldendeOverføringer(fra: Saksnum
                 )}
             )
         )
-    }
+    }.let { GjennomførtOverføringer(
+        gjeldendeOverføringer = it,
+        berørteSaksnummer = setOf(fra, til)
+    )}

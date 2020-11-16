@@ -51,7 +51,7 @@ internal class PubliserOverføringAvOmsorgsdager (
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding.hentLøsning(packet)
         val personopplysninger = HentPersonopplysningerMelding.hentLøsning(packet).also {
-            require(it.keys.containsAll(behandling.saksnummer.identitetsnummer())) {
+            require(it.keys.containsAll(behandling.alleSaksnummerMapping.identitetsnummer())) {
                 "Mangler personopplysninger for en eller fler av personene berørt av overføringen."
             }
         }
@@ -67,7 +67,7 @@ internal class PubliserOverføringAvOmsorgsdager (
                 utfall = utfall,
                 gjeldendeOverføringer = behandling.gjeldendeOverføringer,
                 personopplysninger = personopplysninger,
-                saksnummer = behandling.saksnummer
+                alleSaksnummerMapping = behandling.alleSaksnummerMapping
             ))
         )
 
@@ -78,7 +78,7 @@ internal class PubliserOverføringAvOmsorgsdager (
                     FerdigstillJournalføringForOmsorgspengerMelding.BehovInput(
                         identitetsnummer = overføreOmsorgsdager.overførerFra,
                         journalpostIder = overføreOmsorgsdager.journalpostIder,
-                        saksnummer = behandling.saksnummer.getValue(overføreOmsorgsdager.overførerFra)
+                        saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra)
                     )
                 )
             )

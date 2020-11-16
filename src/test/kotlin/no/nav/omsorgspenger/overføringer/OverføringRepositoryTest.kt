@@ -107,7 +107,7 @@ internal class OverføringRepositoryTest(
             fra = fra,
             til = til,
             overføringer = overføringer
-        ).mapValues { (_, gjeldendeOverføringer) ->
+        ).gjeldendeOverføringer.mapValues { (_, gjeldendeOverføringer) ->
             GjeldendeOverføringer(
                 fått = gjeldendeOverføringer.fått.map { it.copy(gjennomført = Now) },
                 gitt = gjeldendeOverføringer.gitt.map { it.copy(gjennomført = Now) }
@@ -119,9 +119,7 @@ internal class OverføringRepositoryTest(
         private const val Ola = "Ola"
         private const val Kari = "Kari"
         private const val Trond = "Trond"
-        private const val Hege = "Hege"
-
-
+        
         private fun Pair<Periode, Int>.somOverføring() = NyOverføring(
             antallDager = second,
             periode = first,
