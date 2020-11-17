@@ -15,7 +15,10 @@ internal fun Map<KnektPeriode, Int>.somNyeOverføringer(
     val overføringer = mutableListOf<NyOverføring>()
 
     forEach { (knektPeriode, omsorgsdagerTilgjengeligForOverføring) ->
-        val antallDager = minOf(omsorgsdagerTilgjengeligForOverføring, ønsketOmsorgsdagerÅOverføre)
+        val antallDager = minOf(
+            omsorgsdagerTilgjengeligForOverføring,
+            ønsketOmsorgsdagerÅOverføre
+        ).takeIf { it > 0 } ?: 0
         val overføring = overføringer.firstOrNull { it.antallDager == antallDager && it.periode.erKantIKant(knektPeriode.periode) }
 
         when (overføring) {
