@@ -21,12 +21,12 @@ internal object Beregninger {
     ): Map<KnektPeriode, Int> {
         val beregnet = mutableMapOf<KnektPeriode, Int>()
         grunnlag.knekk(behandling.periode).forEach { knektPeriode ->
-            beregnet[knektPeriode] = beregnPeriode(grunnlag, knektPeriode.periode, behandling)
+            beregnet[knektPeriode] = beregnTilgjenegeligeDagerForPeriode(grunnlag, knektPeriode.periode, behandling)
         }
         return beregnet
     }
 
-    private fun beregnPeriode(grunnlag: Grunnlag, periode: Periode, behandling: Behandling): Int {
+    private fun beregnTilgjenegeligeDagerForPeriode(grunnlag: Grunnlag, periode: Periode, behandling: Behandling): Int {
         val erMidlertidigAleneIPerioden = grunnlag.midlertidigAleneVedtak.any { it.periode.inneholder(periode) }
 
         if (erMidlertidigAleneIPerioden) {
@@ -125,11 +125,18 @@ internal object Beregninger {
             }
         }
 
-        val tilgjengeligeDager = antallOmsorgsdager - dagerTattUt - fordeltBort
+        val tilgjengeligeDager = antallOmsorgsdager - dagerTattUt - fordeltBort - grunnrettsdager.antallDager
 
-        return when (tilgjengeligeDager > DagerMaksForOverføring) {
-            true -> DagerMaksForOverføring
-            false -> tilgjengeligeDager
+        behandling.lovanvendelser.leggTil(
+            periode = periode,
+            lovhenvisning = Max10DagerTilgjengelig,
+            anvendelse = "Har $tilgjengeligeDager tilgjengelige omsorgsdager"
+        )
+
+        return when {
+            tilgjengeligeDager > DagerMaksForOverføring -> DagerMaksForOverføring
+            tilgjengeligeDager < 0 -> 0
+            else -> tilgjengeligeDager
         }
     }
 
