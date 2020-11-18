@@ -63,12 +63,17 @@ object EktefelleEllerSamboer : Lovhenvisning {
     override val henvisning = "§ 9-6 sjette ledd"
 }
 
+object Max10DagerTilgjengelig : Lovhenvisning {
+    override val lov = Folketrygdeloven
+    override val henvisning = "§ 9-6 sjette ledd"
+}
+
 object ErMidlertidigAlenerOmOmsorgen : Lovhenvisning {
     override val lov = Folketrygdeloven
     override val henvisning = "§ 9-6 ErMidlertidigAlenerOmOmsorgen"
 }
 
-object JobberINorge: Lovhenvisning {
+object JobberINorge : Lovhenvisning {
     override val lov = Folketrygdeloven
     override val henvisning = "§ 2-2"
 }

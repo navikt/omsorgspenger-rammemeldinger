@@ -80,7 +80,7 @@ internal class ToParterForskjelligAntallDagerTest(
             id = id,
             overføringFra = fra,
             overføringTil = til,
-            omsorgsdagerTattUtIÅr = 17,
+            omsorgsdagerTattUtIÅr = 7,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre,
             mottaksdato = LocalDate.parse("2020-09-29"),
             barn = listOf(overføreOmsorgsdagerBarn(
