@@ -135,7 +135,7 @@ internal object Beregninger {
 
         behandling.lovanvendelser.leggTil(
             periode = periode,
-            lovhenvisning = Max10DagerTilgjengelig,
+            lovhenvisning = OverføreMaks10Dager,
             anvendelse = "Har $tilgjengeligDagerForOverføring omsorgsdager tilgjengelig for overføring"
         )
 
