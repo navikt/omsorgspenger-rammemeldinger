@@ -44,7 +44,7 @@ internal class ToParterFlerePerioderTest(
     }
 
     @Test
-    fun `Brukt dager i år og fordeling som gir tre perioder & oveføringer`() {
+    fun `Brukt dager i år i kombinasjon med fordeling`() {
         val fra = identitetsnummer()
         val til = identitetsnummer()
         val mottaksdato = LocalDate.parse("2020-09-29")
@@ -116,9 +116,9 @@ internal class ToParterFlerePerioderTest(
             fra = fra,
             til = til,
             forventedeOverføringer = mapOf(
-                Periode("2020-09-29/2020-12-31") to 3, // 35 (omsorgsdager) - 15 (fordelt bort) - 17 (tatt ut i år) = 3
-                Periode("2021-01-01/2021-12-31") to 10, // 35 (omsorgdager) - 15 (fordelt bort) = 20, men kan maks overføre 10
-                Periode("2022-01-01/2027-12-31") to 5 // 20 (omsorgsdager) - 15 (fordelt bort) = 5
+                //Periode("2020-09-29/2020-12-31") to 0, // 35 (omsorgsdager) - 15 (fordelt bort) - 17 (tatt ut i år) = 3 == 0 dager tilgjengelig for overføring
+                Periode("2021-01-01/2021-12-31") to 5, // 35 (omsorgdager) - 15 (fordelt bort) = 20 == 5 dager tilgjengelig for overføring ettersom man må sitte igjen med grunnretten
+                //Periode("2022-01-01/2027-12-31") to 0 // 20 (omsorgsdager) - 15 (fordelt bort) = 5 == 0 dager tilgjengelig for overføring ettersom man må sitet igjen med grunnretten
             )
         )
     }

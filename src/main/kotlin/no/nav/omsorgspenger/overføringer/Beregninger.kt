@@ -125,19 +125,21 @@ internal object Beregninger {
             }
         }
 
-        val tilgjengeligeDager = antallOmsorgsdager - dagerTattUt - fordeltBort - grunnrettsdager.antallDager
+        val tilgjengelig = antallOmsorgsdager - dagerTattUt - fordeltBort - grunnrettsdager.antallDager
+
+        val tilgjengeligDagerForOverføring = when {
+            tilgjengelig > DagerMaksForOverføring -> DagerMaksForOverføring
+            tilgjengelig < 0 -> 0
+            else -> tilgjengelig
+        }
 
         behandling.lovanvendelser.leggTil(
             periode = periode,
             lovhenvisning = Max10DagerTilgjengelig,
-            anvendelse = "Har $tilgjengeligeDager tilgjengelige omsorgsdager"
+            anvendelse = "Har $tilgjengeligDagerForOverføring omsorgsdager tilgjengelig for overføring"
         )
 
-        return when {
-            tilgjengeligeDager > DagerMaksForOverføring -> DagerMaksForOverføring
-            tilgjengeligeDager < 0 -> 0
-            else -> tilgjengeligeDager
-        }
+        return tilgjengeligDagerForOverføring
     }
 
     internal fun beregnOmsorgsdager(barn: List<Barn>, periode: Periode): OmsorgsdagerResultat {
