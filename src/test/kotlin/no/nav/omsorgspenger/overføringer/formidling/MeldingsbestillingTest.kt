@@ -116,7 +116,7 @@ internal class MeldingsbestillingTest {
     @Test
     fun `Brukt noen dager i år - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
-            tattUtIÅr = 15,
+            tattUtIÅr = 5,
             girDager = 6,
             listOf(barn())
         )
@@ -136,11 +136,11 @@ internal class MeldingsbestillingTest {
     @Test
     fun `Brukt noe og fordelt noe i år - fortsatt dager tilgjengelig - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
-            tattUtIÅr = 8,
+            tattUtIÅr = 4,
             girDager = 5,
             fordelinger = listOf(FordelingGirMelding(
                 periode = Periode("1999-01-01/2050-12-31"),
-                lengde = Duration.ofDays(10),
+                lengde = Duration.ofDays(5),
                 kilder = setOf()
             )),
             barn = listOf(barn())
@@ -186,7 +186,7 @@ internal class MeldingsbestillingTest {
             girDager = 10,
             fordelinger = listOf(FordelingGirMelding(
                 periode = Periode("1999-01-01/2050-12-31"),
-                lengde = Duration.ofDays(15),
+                lengde = Duration.ofDays(5),
                 kilder = setOf()
             )),
             barn = listOf(barn())
@@ -211,7 +211,7 @@ internal class MeldingsbestillingTest {
             girDager = 6,
             fordelinger = listOf(FordelingGirMelding(
                 periode = Periode("1999-01-01/2050-12-31"),
-                lengde = Duration.ofDays(15),
+                lengde = Duration.ofDays(5),
                 kilder = setOf()
             )),
             barn = listOf(barn())
@@ -236,7 +236,7 @@ internal class MeldingsbestillingTest {
             girDager = 6,
             fordelinger = listOf(FordelingGirMelding(
                 periode = Periode("1999-01-01/2050-12-31"),
-                lengde = Duration.ofDays(15),
+                lengde = Duration.ofDays(5),
                 kilder = setOf()
             )),
             barn = listOf(barn())
