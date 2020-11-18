@@ -302,6 +302,14 @@ internal class MeldingsbestillingTest {
                 behandling = behandling
             ).somNyeOverføringer(overføreOmsorgsdager.omsorgsdagerÅOverføre)
 
+            val alleSaksnummerMapping = mapOf(
+                fra to "1",
+                til to "2"
+            ).let { when (medTidligerePartner){
+                true -> it.plus(tidligerePartner to "3")
+                false -> it
+            }}
+
             return opprettMeldingsBestillinger(
                 behovssekvensId = "foo",
                 personopplysninger = mapOf(
@@ -317,14 +325,8 @@ internal class MeldingsbestillingTest {
                     karakteristikker = behandling.karakteristikker(),
                     overføringer = nyeOverføringer,
                     gjeldendeOverføringer = mapOf(),
-                    alleSaksnummerMapping = mapOf(
-                        fra to "1",
-                        til to "2"
-                    ).let { when (medTidligerePartner){
-                        true -> it.plus(tidligerePartner to "3")
-                        false -> it
-                    }},
-                    berørteSaksnummer = setOf("1","2","3"),
+                    alleSaksnummerMapping = alleSaksnummerMapping,
+                    berørteSaksnummer = alleSaksnummerMapping.values.toSet(),
                     periode = behandling.periode
                 )
             )

@@ -102,8 +102,14 @@ internal class Formidlingsoverføringer(
         avslåtteOverføringer = avslåtteOverføringer
     )
 
+    private val berørteIdentitetsnummer = behandling.alleSaksnummerMapping.filterValues {
+        it in behandling.berørteSaksnummer
+    }.values.toSet().also { require(it.size == behandling.berørteSaksnummer.size) }
+
     internal val støtterAutomatiskMelding = when {
-        personopplysninger.values.any { it.adressebeskyttet } -> meldingMåSendesManuelt("adresssebeskyttede parter")
+        personopplysninger.any { (identitetsnummer,personopplysninger) ->
+            identitetsnummer in berørteIdentitetsnummer && personopplysninger.adressebeskyttet
+        } -> meldingMåSendesManuelt("adresssebeskyttede parter")
         behandling.oppfyllerIkkeInngangsvilkår -> meldingMåSendesManuelt("avslag på inngangsvilkår")
         behandling.overføringer.size !in 1..2 -> meldingMåSendesManuelt("${behandling.overføringer.size} overføringer")
         startOgSluttGrunn == null -> meldingMåSendesManuelt("dette scenarioet")
