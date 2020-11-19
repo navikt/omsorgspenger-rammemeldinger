@@ -7,6 +7,7 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringFårMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringGirMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdRamme
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
+import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import java.time.Duration
 import java.time.LocalDate
@@ -139,7 +140,7 @@ internal data class SpleisetOverføringer(
                     id = saksnummerIdentitetsnummerMapping.getValue(it.til)
                 ),
                 lengde = Duration.ofDays(it.antallDager.toLong()),
-                kilder = setOf(Kilde(id = "TODO", type = "OmsorgspengerRammemeldinger"))
+                kilder = it.kilder
             )},
             fått = overføringerINyLøsning.fått.filter { it.periode.overlapperMedMinstEnDag(periode) }.map { SpleisetOverføringFått(
                 gjennomført = it.gjennomført.toLocalDateOslo(),
@@ -149,7 +150,7 @@ internal data class SpleisetOverføringer(
                     id = saksnummerIdentitetsnummerMapping.getValue(it.fra)
                 ),
                 lengde = Duration.ofDays(it.antallDager.toLong()),
-                kilder = setOf(Kilde(id = "TODO", type = "OmsorgspengerRammemeldinger"))
+                kilder = it.kilder
             )}
         )
     }

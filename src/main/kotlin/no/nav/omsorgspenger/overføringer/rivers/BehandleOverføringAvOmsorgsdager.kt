@@ -134,7 +134,8 @@ internal class BehandleOverføringAvOmsorgsdager(
             false -> gjennomførOverføringService.gjennomførOverføringer(
                 fra = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
                 til = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerTil),
-                overføringer = overføringer
+                overføringer = overføringer,
+                behovssekvensId = id
             )
         }
 

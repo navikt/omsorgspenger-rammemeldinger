@@ -11,6 +11,7 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdAnnenPart
 import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringFårMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringGirMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
+import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -84,7 +85,8 @@ internal class OverføringServiceTest {
                     antallDager = 5,
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
-                    til = "456"
+                    til = "456",
+                    kilder = kilderNyLøsning
                 ))
             )
         ))
@@ -92,7 +94,7 @@ internal class OverføringServiceTest {
         val spleisetOverføringer = hentSpleisetOverføringer()
         assertThat(spleisetOverføringer.gitt).hasSameElementsAs(listOf(SpleisetOverføringGitt(
             gjennomført = LocalDate.parse("2020-11-10"),
-            kilder = setOf(Kilde(id = "TODO", type= "OmsorgspengerRammemeldinger")),
+            kilder = kilderNyLøsning,
             gyldigFraOgMed = periode.fom,
             gyldigTilOgMed = periode.tom,
             til = Motpart(id = "ID-456", type= "Identitetsnummer"),
@@ -123,7 +125,8 @@ internal class OverføringServiceTest {
                     antallDager = 5,
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
-                    til = "456"
+                    til = "456",
+                    kilder = kilderNyLøsning
                 ))
             )
         ))
@@ -131,7 +134,7 @@ internal class OverføringServiceTest {
         val spleisetOverføringer = hentSpleisetOverføringer()
         assertThat(spleisetOverføringer.gitt).hasSameElementsAs(listOf(SpleisetOverføringGitt(
             gjennomført = LocalDate.parse("2020-11-10"),
-            kilder = setOf(Kilde(id = "TODO", type= "OmsorgspengerRammemeldinger")),
+            kilder = kilderNyLøsning,
             gyldigFraOgMed = periode.fom,
             gyldigTilOgMed = periode.tom,
             til = Motpart(id = "ID-456", type= "Identitetsnummer"),
@@ -161,7 +164,8 @@ internal class OverføringServiceTest {
                     antallDager = 5,
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
-                    til = "456"
+                    til = "456",
+                    kilder = setOf()
                 ))
             )
         ))
@@ -205,21 +209,13 @@ internal class OverføringServiceTest {
     )
 
     private companion object {
+        private val kilderNyLøsning = setOf(
+            Kilde.internKilde("1", "Overføring"),
+            Kilde.internKilde("2", "Overføring")
+        )
         private const val saksnummer = "123"
         private const val identitetsnummer = "11111111111"
         private val periode = Periode("2020-01-01/2020-12-31")
         private val correlationId = "test"
-
-        private fun overføringerNyLøsning(gjennomført: ZonedDateTime) = mapOf(
-            saksnummer to GjeldendeOverføringer(
-                gitt = listOf(GjeldendeOverføringGitt(
-                    gjennomført = gjennomført,
-                    antallDager = 5,
-                    periode = periode,
-                    status = GjeldendeOverføring.Status.Aktiv,
-                    til = "456"
-                ))
-            )
-        )
     }
 }
