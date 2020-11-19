@@ -42,7 +42,8 @@ internal class OverføringRepository(
     ) : Map<Saksnummer, GjeldendeOverføringer> {
         return using(sessionOf(dataSource)) { session ->
             session.hentOverføringerMedOptionalStatus(
-                saksnummer = saksnummer
+                saksnummer = saksnummer,
+                medKilder = true
             )
         }
     }
@@ -50,8 +51,9 @@ internal class OverføringRepository(
     internal fun hentAktiveOverføringer(
         saksnummer: Set<Saksnummer>
     ) : Map<Saksnummer, GjeldendeOverføringer> {
-        return using(sessionOf(dataSource)) { session -> session.hentAktiveOverføringer(
+        return using(sessionOf(dataSource)) { session -> session.hentOverføringerMedOptionalStatus(
             saksnummer = saksnummer,
+            status = Aktiv,
             medKilder = true
         )}
     }
@@ -64,7 +66,9 @@ internal class OverføringRepository(
         val overføringerMedDager = overføringer.fjernOverføringerUtenDager()
 
         if (overføringerMedDager.isEmpty()) {
-            return using(sessionOf(dataSource)) { it.hentAktiveOverføringer(
+            return using(sessionOf(dataSource)) { it.hentOverføringerMedOptionalStatus(
+                status = Aktiv,
+                medKilder = false,
                 saksnummer = setOf(fra, til)
             )}.let { GjennomførtOverføringer(
                 gjeldendeOverføringer = it,
@@ -114,8 +118,10 @@ internal class OverføringRepository(
                 val berørteSaksnummer =
                     berørteOverføringer.saksnummer().plus(setOf(fra, til))
 
-                transactionalSession.hentAktiveOverføringer(
-                    saksnummer = berørteSaksnummer
+                transactionalSession.hentOverføringerMedOptionalStatus(
+                    saksnummer = berørteSaksnummer,
+                    status = Aktiv,
+                    medKilder = false
                 ).let { GjennomførtOverføringer(
                     gjeldendeOverføringer = it,
                     berørteSaksnummer = berørteSaksnummer
@@ -220,15 +226,6 @@ internal class OverføringRepository(
             overføringIder = overføringIder
         )
     }
-
-    private fun Session.hentAktiveOverføringer(
-        saksnummer: Set<Saksnummer>,
-        medKilder: Boolean = false
-    ) = hentOverføringerMedOptionalStatus(
-        saksnummer = saksnummer,
-        status = Aktiv,
-        medKilder = medKilder
-    )
 
     private fun Session.hentOverføringerMedOptionalStatus(
         saksnummer: Set<Saksnummer>,

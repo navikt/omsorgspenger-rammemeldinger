@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.overføringer.db
 
+import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.overføringer.*
@@ -67,7 +68,7 @@ internal class OverføringRepositoryTest(
         ))
 
         val November2020 = Periode("2020-11-01/2020-11-30")
-        gjennomførte = gjennomførOverføringer(
+        gjennomførOverføringer(
             fra = Trond,
             til = Ola,
             overføringer = listOf(
@@ -75,8 +76,14 @@ internal class OverføringRepositoryTest(
             )
         )
 
+        gjennomførte = hentAktive(setOf(Ola, Kari, Trond))
+
         assertThat(setOf(Ola, Kari, Trond)).hasSameElementsAs(gjennomførte.keys)
-        assertThat(setOf(gitt(7, November2020, Ola))).hasSameElementsAs(gjennomførte.getValue(Trond).gitt)
+        assertThat(setOf(
+            gitt(7, November2020, Ola, setOf(
+                Kilde.internKilde("3", "Overføring")
+            ))
+        )).hasSameElementsAs(gjennomførte.getValue(Trond).gitt)
         assertTrue(gjennomførte.getValue(Trond).fått.isEmpty())
 
         val nyPeriodeForOverføringMellomOlaOgKari = Periode(
@@ -85,36 +92,77 @@ internal class OverføringRepositoryTest(
         )
 
         assertThat(setOf(
-            gitt(1, nyPeriodeForOverføringMellomOlaOgKari, Kari)
+            gitt(1, nyPeriodeForOverføringMellomOlaOgKari, Kari, setOf(
+                Kilde.internKilde("1", "Overføring"),
+                Kilde.internKilde("3", "Overføring")
+            ))
         )).hasSameElementsAs(gjennomførte.getValue(Ola).gitt)
+
         assertThat(setOf(
-            fått(5, nyPeriodeForOverføringMellomOlaOgKari, Kari),
-            fått(7, November2020, Trond)
+            fått(5, nyPeriodeForOverføringMellomOlaOgKari, Kari, setOf(
+                Kilde.internKilde("2", "Overføring"),
+                Kilde.internKilde("3", "Overføring")
+            )),
+            fått(7, November2020, Trond, setOf(
+                Kilde.internKilde("3", "Overføring")
+            ))
         )).hasSameElementsAs(gjennomførte.getValue(Ola).fått)
 
+
         assertThat(setOf(
-            gitt(5, nyPeriodeForOverføringMellomOlaOgKari, Ola)
+            gitt(5, nyPeriodeForOverføringMellomOlaOgKari, Ola, setOf(
+                Kilde.internKilde("2", "Overføring"),
+                Kilde.internKilde("3", "Overføring")
+            ))
         )).hasSameElementsAs(gjennomførte.getValue(Kari).gitt)
         assertThat(setOf(
-            fått(1, nyPeriodeForOverføringMellomOlaOgKari, Ola),
+            fått(1, nyPeriodeForOverføringMellomOlaOgKari, Ola, setOf(
+                Kilde.internKilde("1", "Overføring"),
+                Kilde.internKilde("3", "Overføring")
+            )),
         )).hasSameElementsAs(gjennomførte.getValue(Kari).fått)
     }
+    /*
+        oveføringId : melding
+        ---------------------------
+        - 1 : Opprettet
+        - 2 : Opprettet
+        - 1 : Endret til og med til 2020-10-31
+        - 2 : Endret til og med til 2020-10-31
+        - 3 : Opprettet
+     */
 
+    private var behovsekvensCounter = 1
     private fun gjennomførOverføringer(
         fra: Saksnummer,
         til: Saksnummer,
         overføringer: List<NyOverføring>) =
         overføringRepository.gjennomførOverføringer(
-            behovssekvensId = "1",
+            behovssekvensId = "${behovsekvensCounter++}",
             fra = fra,
             til = til,
             overføringer = overføringer
         ).gjeldendeOverføringer.mapValues { (_, gjeldendeOverføringer) ->
             GjeldendeOverføringer(
-                fått = gjeldendeOverføringer.fått.map { it.copy(gjennomført = Now) },
-                gitt = gjeldendeOverføringer.gitt.map { it.copy(gjennomført = Now) }
+                fått = gjeldendeOverføringer.fått.map { it.copy(gjennomført = Now) }.also { fått ->
+                    require(fått.all { it.kilder.isEmpty()})
+                },
+                gitt = gjeldendeOverføringer.gitt.map { it.copy(gjennomført = Now) }.also { gitt ->
+                    require(gitt.all { it.kilder.isEmpty() })
+                }
             )
         }
+
+    private fun hentAktive(
+        saksnummer: Set<Saksnummer>
+    ) = overføringRepository.hentAktiveOverføringer(
+        saksnummer = saksnummer
+    ).mapValues { (_, gjeldendeOverføringer) ->
+        GjeldendeOverføringer(
+            fått = gjeldendeOverføringer.fått.map { it.copy(gjennomført = Now) },
+            gitt = gjeldendeOverføringer.gitt.map { it.copy(gjennomført = Now) }
+        )
+    }
 
     private companion object {
         private val Now = ZonedDateTime.now()
@@ -129,22 +177,22 @@ internal class OverføringRepositoryTest(
             slutterGrunnet = listOf()
         )
 
-        private fun fått(antallDager: Int, periode: Periode, fra: Saksnummer) = GjeldendeOverføringFått(
+        private fun fått(antallDager: Int, periode: Periode, fra: Saksnummer, kilder: Set<Kilde> = setOf()) = GjeldendeOverføringFått(
             antallDager = antallDager,
             periode = periode,
             status = GjeldendeOverføring.Status.Aktiv,
             fra = fra,
             gjennomført = Now,
-            kilder = setOf()
+            kilder = kilder
         )
 
-        private fun gitt(antallDager: Int, periode: Periode, til: Saksnummer) = GjeldendeOverføringGitt(
+        private fun gitt(antallDager: Int, periode: Periode, til: Saksnummer, kilder: Set<Kilde> = setOf()) = GjeldendeOverføringGitt(
             antallDager = antallDager,
             periode = periode,
             status = GjeldendeOverføring.Status.Aktiv,
             til = til,
             gjennomført = Now,
-            kilder = setOf()
+            kilder = kilder
         )
     }
 }
