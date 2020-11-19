@@ -7,3 +7,5 @@ CREATE TABLE overforing_logg
     melding                     VARCHAR(280) NOT NULL,
     CONSTRAINT foreign_key_overforing FOREIGN KEY(overforing_id) REFERENCES overforing(id)
 );
+
+CREATE INDEX index_overforing_logg_overforing_id ON overforing_logg(overforing_id);

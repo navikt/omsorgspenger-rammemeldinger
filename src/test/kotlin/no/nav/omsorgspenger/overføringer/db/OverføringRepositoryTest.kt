@@ -134,7 +134,8 @@ internal class OverføringRepositoryTest(
             periode = periode,
             status = GjeldendeOverføring.Status.Aktiv,
             fra = fra,
-            gjennomført = Now
+            gjennomført = Now,
+            kilder = setOf()
         )
 
         private fun gitt(antallDager: Int, periode: Periode, til: Saksnummer) = GjeldendeOverføringGitt(
@@ -142,7 +143,8 @@ internal class OverføringRepositoryTest(
             periode = periode,
             status = GjeldendeOverføring.Status.Aktiv,
             til = til,
-            gjennomført = Now
+            gjennomført = Now,
+            kilder = setOf()
         )
     }
 }

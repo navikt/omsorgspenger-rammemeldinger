@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.overføringer.db
 
 import kotliquery.*
+import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
@@ -11,6 +12,7 @@ import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.GjennomførtOverføringer
 import no.nav.omsorgspenger.overføringer.NyOverføring
+import no.nav.omsorgspenger.overføringer.db.OverføringLogg.hentOverføringLogger
 import no.nav.omsorgspenger.overføringer.db.OverføringLogg.overføringerEndret
 import no.nav.omsorgspenger.overføringer.db.OverføringLogg.overføringerOpprettet
 import org.slf4j.LoggerFactory
@@ -49,7 +51,8 @@ internal class OverføringRepository(
         saksnummer: Set<Saksnummer>
     ) : Map<Saksnummer, GjeldendeOverføringer> {
         return using(sessionOf(dataSource)) { session -> session.hentAktiveOverføringer(
-            saksnummer = saksnummer
+            saksnummer = saksnummer,
+            medKilder = true
         )}
     }
 
@@ -219,15 +222,18 @@ internal class OverføringRepository(
     }
 
     private fun Session.hentAktiveOverføringer(
-        saksnummer: Set<Saksnummer>
+        saksnummer: Set<Saksnummer>,
+        medKilder: Boolean = false
     ) = hentOverføringerMedOptionalStatus(
         saksnummer = saksnummer,
-        status = Aktiv
+        status = Aktiv,
+        medKilder = medKilder
     )
 
     private fun Session.hentOverføringerMedOptionalStatus(
         saksnummer: Set<Saksnummer>,
-        status: String? = null
+        status: String? = null,
+        medKilder: Boolean = false
     ) : Map<Saksnummer, GjeldendeOverføringer> {
         val query = hentOverføringerQuery(
             saksnummer = saksnummerArray(saksnummer),
@@ -237,18 +243,31 @@ internal class OverføringRepository(
             row.somOverføringDb()
         }.asList)
 
+        val overføringsLogger = when (medKilder) {
+            true -> hentOverføringLogger(
+                overføringIder = overføringIderArray(overføringer)
+            )
+            false -> listOf()
+        }
+
         val gjennomførteOverføringer = mutableMapOf<Saksnummer, GjeldendeOverføringer>()
         overføringer.saksnummer().forEach { sak ->
             gjennomførteOverføringer[sak] = GjeldendeOverføringer(
-                fått = overføringer.filter { it.til == sak }.map { it.somGjeldendeOverføringFått() },
-                gitt = overføringer.filter { it.fra == sak }.map { it.somGjeldendeOverføringGitt() }
+                fått = overføringer.filter { it.til == sak }.map {
+                    it.somGjeldendeOverføringFått(
+                        logg = overføringsLogger.filter { logg -> logg.overføringId == it.id }
+                    )},
+                gitt = overføringer.filter { it.fra == sak }.map {
+                    it.somGjeldendeOverføringGitt(
+                        logg = overføringsLogger.filter { logg -> logg.overføringId == it.id }
+                    )}
             )
         }
         return gjennomførteOverføringer
     }
 
     private fun Session.saksnummerArray(saksnummer: Set<Saksnummer>) = createArrayOf("varchar", saksnummer)
-    private fun Session.overføringIderArray(overføringer: Set<OverføringDb>) = createArrayOf("bigint", overføringer.map { it.id })
+    private fun Session.overføringIderArray(overføringer: Collection<OverføringDb>) = createArrayOf("bigint", overføringer.map { it.id })
 
     private companion object {
         private val logger = LoggerFactory.getLogger(OverføringRepository::class.java)
@@ -321,21 +340,28 @@ internal class OverføringRepository(
                 }
             }
 
-            fun somGjeldendeOverføringFått() = GjeldendeOverføringFått(
+            fun somGjeldendeOverføringFått(logg: List<OverføringLogg.OverføringLoggDb>) = GjeldendeOverføringFått(
                 gjennomført = gjennomført,
                 antallDager = antallDager,
                 periode = periode,
                 status = mapStatus(),
-                fra = fra
+                fra = fra,
+                kilder = logg.somKilder()
             )
-            fun somGjeldendeOverføringGitt() = GjeldendeOverføringGitt(
+            fun somGjeldendeOverføringGitt(logg: List<OverføringLogg.OverføringLoggDb>) = GjeldendeOverføringGitt(
                 gjennomført = gjennomført,
                 antallDager = antallDager,
                 periode = periode,
                 status = mapStatus(),
-                til = til
+                til = til,
+                kilder = logg.somKilder()
             )
         }
+
+        private fun List<OverføringLogg.OverføringLoggDb>.somKilder() = map { Kilde.internKilde(
+            behovssekvensId = it.behovssekvensId,
+            type = "Overføring"
+        )}.toSet()
 
         private fun Set<OverføringDb>.overlapper(fraOgMed: LocalDate) =
             filter { it.periode.inneholder(fraOgMed) }.toSet()

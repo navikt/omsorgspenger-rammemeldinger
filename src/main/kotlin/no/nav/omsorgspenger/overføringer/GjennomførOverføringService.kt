@@ -46,7 +46,8 @@ internal fun List<NyOverføring>.somAvslått(fra: Saksnummer, til: Saksnummer) =
                     antallDager = it.antallDager,
                     periode = it.periode,
                     status = GjeldendeOverføring.Status.Avslått,
-                    til = til
+                    til = til,
+                    kilder = setOf()
                 )}
             ),
             til to GjeldendeOverføringer(
@@ -55,7 +56,8 @@ internal fun List<NyOverføring>.somAvslått(fra: Saksnummer, til: Saksnummer) =
                     antallDager = it.antallDager,
                     periode = it.periode,
                     status = GjeldendeOverføring.Status.Avslått,
-                    fra = fra
+                    fra = fra,
+                    kilder = setOf()
                 )}
             )
         )
