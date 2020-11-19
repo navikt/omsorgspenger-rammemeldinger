@@ -101,8 +101,7 @@ internal class ApplicationContext(
 
             val benyttetOverføringerStatistikkService = overføringerStatistikkService ?: OverføringerStatistikkService(
                     kafkaProducer = benyttetKafkaProducer,
-                    topicSak = "", // todo
-                    topicBehandling = "" // todo
+                    topic = "", // todo
             )
 
             val benyttetAleneOmOmsorgenRepository = aleneOmOmsorgenRepository ?: AleneOmOmsorgenRepository(

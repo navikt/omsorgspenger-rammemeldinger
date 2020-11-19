@@ -14,7 +14,6 @@
     "behandlingId",
     "behandlingType",
     "behandlingStatus",
-    "utenlandstilsnitt",
     "ansvarligEnhetKode",
     "ansvarligEnhetType",
     "behandlendeEnhetKode",
@@ -40,7 +39,7 @@
       "description": "Nøkkelen til saken i kildesystemet. Noen kildesystem har valgt å kalle dette objektet fagsak. Denne identifiserer samlingen av behandlinger som vil kunne oppstå i forbindelse med saken. Skal kunne spores i kilden."
     },
     "aktorId": {
-      "type": "number",
+      "type": "string",
       "description":"Aktør IDen til primær mottager av ytelsen om denne blir godkjent. Altså, den som saken omhandler."
     },
     "aktorer": {
@@ -101,10 +100,6 @@
     "behandlingStatus": {
       "type": "string",
       "description": "Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt. Ha med alle mulige statuser som er naturlig for det enkelte system/ytelse. Som minimum, angi om saken har følgende status: Registrert, Klar for behandling, Venter på bruker, venter på ekstern (arbeidsgiver, lege etc.), venter på utland, Avsluttet.Her bør det også angis at saken er behandlet av beslutter, men sendt i retur for ny behandling."
-    },
-    "utenlandstilsnitt": {
-      "type": "string",
-      "description": "Kode som beskriver behandlingens  utlandstilsnitt i henhold til NAV spesialisering. I hoved sak vil denne koden beskrive om saksbehandlingsfrister er i henhold til utlandssaker eller innlandssaker, men vil for mange kildesystem være angitt med en høyere oppløsning."
     },
     "ansvarligEnhetKode": {
       "type": "string",

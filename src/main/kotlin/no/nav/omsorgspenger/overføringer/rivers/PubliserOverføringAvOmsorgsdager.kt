@@ -18,9 +18,12 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.overføringer.statistikk.OverføringStatistikkMelding
+import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
+import no.nav.omsorgspenger.statistikk.OverføringStatistikkMelding
 import no.nav.omsorgspenger.overføringer.statistikk.OverføringerStatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
+import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 
 internal class PubliserOverføringAvOmsorgsdager (
@@ -102,12 +105,13 @@ internal class PubliserOverføringAvOmsorgsdager (
         overføringerStatistikkService.publiser(OverføringStatistikkMelding(
                 saksnummer = behandling.saksnummer.getValue(overføreOmsorgsdager.overførerFra),
                 behandlingId = id,
-                mottaksdato = overføreOmsorgsdager.mottaksdato,
+                mottattDato = overføreOmsorgsdager.mottaksdato,
                 registrertDato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
                 funksjonellTid = overføreOmsorgsdager.mottatt.toOffsetDateTime(),
                 behandlingType = "omsorgspenger/overføring",
                 behandlingStatus = "TODO", // TODO???
-                aktørId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId
+                aktorId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
+                tekniskTid = OffsetDateTime.now()
         ))
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")
