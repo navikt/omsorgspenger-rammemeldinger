@@ -23,7 +23,7 @@ internal data class GjeldendeOverføringGitt(
     override val antallDager: Int,
     override val periode: Periode,
     override val status: GjeldendeOverføring.Status,
-    override val kilder: Set<Kilde>,
+    override val kilder: Set<Kilde> = setOf(),
     val til: Saksnummer
 ) : GjeldendeOverføring
 
@@ -32,7 +32,7 @@ internal data class GjeldendeOverføringFått(
     override val antallDager: Int,
     override val periode: Periode,
     override val status: GjeldendeOverføring.Status,
-    override val kilder: Set<Kilde>,
+    override val kilder: Set<Kilde> = setOf(),
     val fra: Saksnummer
 ) : GjeldendeOverføring
 

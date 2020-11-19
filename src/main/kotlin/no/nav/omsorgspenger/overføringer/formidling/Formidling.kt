@@ -104,7 +104,7 @@ internal class Formidlingsoverføringer(
 
     private val berørteIdentitetsnummer = behandling.alleSaksnummerMapping.filterValues {
         it in behandling.berørteSaksnummer
-    }.values.toSet().also { require(it.size == behandling.berørteSaksnummer.size) }
+    }.keys.also { require(it.size == behandling.berørteSaksnummer.size) }
 
     internal val støtterAutomatiskMelding = when {
         personopplysninger.any { (identitetsnummer,personopplysninger) ->
