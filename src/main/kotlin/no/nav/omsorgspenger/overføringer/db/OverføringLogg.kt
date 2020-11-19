@@ -13,7 +13,7 @@ internal object OverføringLogg {
         update(leggTilLoggQuery(
             behovssekvensId = behovssekvensId,
             overføringId = it,
-            melding = "Overføring opprettet"
+            melding = "Opprettet"
         ))
     }
 
