@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.overføringer.meldinger
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.JournalpostId
+import no.nav.omsorgspenger.rivers.LeggTilBehov
 
 internal object OpprettGosysJournalføringsoppgaverMelding :
     LeggTilBehov<OpprettGosysJournalføringsoppgaverMelding.BehovInput> {

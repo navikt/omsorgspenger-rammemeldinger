@@ -13,6 +13,8 @@ import no.nav.omsorgspenger.overføringer.Barn
 import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenFor
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
 import no.nav.omsorgspenger.overføringer.Utfall
+import no.nav.omsorgspenger.rivers.HentBehov
+import no.nav.omsorgspenger.rivers.LeggTilLøsning
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime

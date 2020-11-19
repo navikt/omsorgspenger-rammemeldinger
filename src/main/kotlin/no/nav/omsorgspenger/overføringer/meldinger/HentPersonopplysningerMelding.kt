@@ -6,6 +6,8 @@ import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.overføringer.Personopplysninger
 import no.nav.omsorgspenger.overføringer.Personopplysninger.Companion.somPersonopplysninger
+import no.nav.omsorgspenger.rivers.HentLøsning
+import no.nav.omsorgspenger.rivers.LeggTilBehov
 
 internal object HentPersonopplysningerMelding :
     LeggTilBehov<HentPersonopplysningerMelding.BehovInput>,
