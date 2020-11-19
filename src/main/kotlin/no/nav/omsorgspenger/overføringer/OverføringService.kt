@@ -7,6 +7,7 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringFårMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringGirMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdRamme
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
+import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import java.time.Duration
 import java.time.LocalDate

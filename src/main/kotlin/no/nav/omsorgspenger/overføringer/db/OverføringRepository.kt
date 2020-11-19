@@ -1,8 +1,15 @@
-package no.nav.omsorgspenger.overføringer
+package no.nav.omsorgspenger.overføringer.db
 
 import kotliquery.*
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.overføringer.*
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
+import no.nav.omsorgspenger.overføringer.GjennomførtOverføringer
+import no.nav.omsorgspenger.overføringer.NyOverføring
 import org.slf4j.LoggerFactory
 import java.sql.Array
 import java.time.LocalDate
@@ -55,7 +62,8 @@ internal class OverføringRepository(
             )}.let { GjennomførtOverføringer(
                 gjeldendeOverføringer = it,
                 berørteSaksnummer = setOf(fra,til)
-            )}
+            )
+            }
         }
 
         val fraOgMed = overføringerMedDager.map { it.periode }.minByOrNull { it.fom }!!.fom
@@ -102,7 +110,8 @@ internal class OverføringRepository(
                 ).let { GjennomførtOverføringer(
                     gjeldendeOverføringer = it,
                     berørteSaksnummer = berørteSaksnummer
-                )}
+                )
+                }
             }
         }
     }

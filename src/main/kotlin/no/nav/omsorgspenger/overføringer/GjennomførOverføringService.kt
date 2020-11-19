@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import java.time.ZonedDateTime
 
 internal class GjennomførOverføringService(
