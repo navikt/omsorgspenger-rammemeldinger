@@ -108,7 +108,7 @@ internal class PubliserOverføringAvOmsorgsdager (
                 mottattDato = overføreOmsorgsdager.mottaksdato,
                 registrertDato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
                 funksjonellTid = overføreOmsorgsdager.mottatt.toOffsetDateTime(),
-                behandlingType = "omsorgspenger/overføring",
+                behandlingType = "overføring",
                 behandlingStatus = "TODO", // TODO???
                 aktorId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
                 tekniskTid = OffsetDateTime.now()
