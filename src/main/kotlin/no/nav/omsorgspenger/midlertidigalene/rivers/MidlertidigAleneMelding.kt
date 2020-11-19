@@ -21,6 +21,7 @@ internal object MidlertidigAleneMelding : HentBehov<MidlertidigAleneMelding.Beho
     }
 
     override fun hentBehov(packet: JsonMessage) = Behovet(
+        versjon = packet[BehovKeys.Versjon].asText(),
         søker = packet[BehovKeys.SøkerIdentitetsnummer].asText(),
         annenForelder = packet[BehovKeys.AnnenForelderIdentitetsnummer].asText(),
         mottatt = packet[BehovKeys.Mottatt].asText().let { ZonedDateTime.parse(it) },
@@ -30,6 +31,7 @@ internal object MidlertidigAleneMelding : HentBehov<MidlertidigAleneMelding.Beho
     )
 
     internal data class Behovet(
+        val versjon: String,
         val mottatt: ZonedDateTime,
         val søker:  Identitetsnummer,
         val annenForelder: Identitetsnummer,

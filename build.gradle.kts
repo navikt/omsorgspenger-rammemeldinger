@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.7.0"
 val jsonassertVersion = "1.5.0"
-val k9rapidVersion = "1.f3af2d5"
+val k9rapidVersion = "1.91b665d"
 val awaitilityVersion = "4.0.3"
 val mockkVersion = "1.10.0"
 val ulidVersion = "8.2.0"
@@ -44,6 +44,8 @@ dependencies {
 
     // Test
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
+    testImplementation("no.nav.k9.rapid:midlertidig-alene:$k9rapidVersion")
+
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
 
