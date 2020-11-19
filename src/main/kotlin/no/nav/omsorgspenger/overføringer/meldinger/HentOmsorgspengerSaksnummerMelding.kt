@@ -5,10 +5,12 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.rivers.HentLøsning
+import no.nav.omsorgspenger.rivers.LeggTilBehov
 
 internal object HentOmsorgspengerSaksnummerMelding :
     LeggTilBehov<HentOmsorgspengerSaksnummerMelding.BehovInput>,
-    HentLøsning<Map<Identitetsnummer,Saksnummer>> {
+    HentLøsning<Map<Identitetsnummer, Saksnummer>> {
     internal const val HentOmsorgspengerSaksnummer = "HentOmsorgspengerSaksnummer"
     private const val SaksnummerKey = "@løsninger.$HentOmsorgspengerSaksnummer.saksnummer"
 

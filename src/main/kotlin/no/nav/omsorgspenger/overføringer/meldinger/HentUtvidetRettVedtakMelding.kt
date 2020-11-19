@@ -5,6 +5,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.overføringer.meldinger.SerDes.JacksonObjectMapper
+import no.nav.omsorgspenger.rivers.BehovMedLøsning
+import no.nav.omsorgspenger.rivers.HentLøsning
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 
 internal object HentUtvidetRettVedtakMelding :

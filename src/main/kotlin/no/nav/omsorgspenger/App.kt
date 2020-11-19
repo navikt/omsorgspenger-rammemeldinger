@@ -31,6 +31,7 @@ import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenApi
+import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 
 fun main() = when (System.getenv("RAPIDS_APPLICATION") == "disabled") {
     true -> ktorApplication()
@@ -95,6 +96,10 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     PubliserOverføringAvOmsorgsdager(
         rapidsConnection = this,
         formidlingService = applicationContext.formidlingService,
+        behovssekvensRepository = applicationContext.behovssekvensRepository
+    )
+    InitierMidlertidigAlene(
+        rapidsConnection = this,
         behovssekvensRepository = applicationContext.behovssekvensRepository
     )
     register(object : RapidsConnection.StatusListener {

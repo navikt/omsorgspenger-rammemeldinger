@@ -30,7 +30,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.OpprettGosysJournalføringso
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
-import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
+import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 
