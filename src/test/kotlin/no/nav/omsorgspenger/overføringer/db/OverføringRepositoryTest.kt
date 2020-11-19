@@ -105,6 +105,7 @@ internal class OverføringRepositoryTest(
         til: Saksnummer,
         overføringer: List<NyOverføring>) =
         overføringRepository.gjennomførOverføringer(
+            behovssekvensId = "1",
             fra = fra,
             til = til,
             overføringer = overføringer

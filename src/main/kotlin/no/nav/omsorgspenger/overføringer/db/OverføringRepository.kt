@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.overføringer.db
 import kotliquery.*
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
@@ -10,6 +11,8 @@ import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.GjennomførtOverføringer
 import no.nav.omsorgspenger.overføringer.NyOverføring
+import no.nav.omsorgspenger.overføringer.db.OverføringLogg.overføringerEndret
+import no.nav.omsorgspenger.overføringer.db.OverføringLogg.overføringerOpprettet
 import org.slf4j.LoggerFactory
 import java.sql.Array
 import java.time.LocalDate
@@ -51,6 +54,7 @@ internal class OverføringRepository(
     }
 
     internal fun gjennomførOverføringer(
+        behovssekvensId: BehovssekvensId,
         fra: Saksnummer,
         til: Saksnummer,
         overføringer: List<NyOverføring>) : GjennomførtOverføringer {
@@ -62,13 +66,12 @@ internal class OverføringRepository(
             )}.let { GjennomførtOverføringer(
                 gjeldendeOverføringer = it,
                 berørteSaksnummer = setOf(fra,til)
-            )
-            }
+            )}
         }
 
         val fraOgMed = overføringerMedDager.map { it.periode }.minByOrNull { it.fom }!!.fom
 
-        return using(sessionOf(dataSource)) { session ->
+        return using(sessionOf(dataSource, true)) { session ->
             session.transaction { transactionalSession ->
                 val berørteOverføringer = transactionalSession.berørteOverføringer(
                     fra = fra,
@@ -89,17 +92,20 @@ internal class OverføringRepository(
 
                 transactionalSession.endrePeriodePåOverføringer(
                     overføringer = overlapper,
-                    fraOgMed = fraOgMed
+                    fraOgMed = fraOgMed,
+                    behovssekvensId = behovssekvensId
                 )
 
                 transactionalSession.deaktiverOverføringer(
-                    overføringer = berørteOverføringer.minus(overlapper)
+                    overføringer = berørteOverføringer.minus(overlapper),
+                    behovssekvensId = behovssekvensId
                 )
 
                 transactionalSession.lagreNyeOverføringer(
                     fra = fra,
                     til = til,
-                    overføringer = overføringerMedDager
+                    overføringer = overføringerMedDager,
+                    behovssekvensId = behovssekvensId
                 )
 
                 val berørteSaksnummer =
@@ -110,8 +116,7 @@ internal class OverføringRepository(
                 ).let { GjennomførtOverføringer(
                     gjeldendeOverføringer = it,
                     berørteSaksnummer = berørteSaksnummer
-                )
-                }
+                )}
             }
         }
     }
@@ -133,6 +138,7 @@ internal class OverføringRepository(
     }
 
     private fun Session.endrePeriodePåOverføringer(
+        behovssekvensId: BehovssekvensId,
         overføringer: Set<OverføringDb>,
         fraOgMed: LocalDate) {
         if (overføringer.isEmpty()) return
@@ -144,7 +150,10 @@ internal class OverføringRepository(
          */
         val deaktivert = overføringer.filter { overføring ->
             nyTilOgMed.isBefore(overføring.periode.fom)
-        }.toSet().also { deaktiverOverføringer(it) }
+        }.toSet().also { deaktiverOverføringer(
+            behovssekvensId = behovssekvensId,
+            overføringer = it
+        )}
 
         /**
          * Kun overføringene som overlapper, og med den nye tilOgMed-datoen
@@ -160,9 +169,16 @@ internal class OverføringRepository(
                 logger.warn("Forventet at overføringene $it skulle få tom=$nyTilOgMed, men $oppdaterteRader overføringer ble oppdatert.")
             }
         }}
+
+        overføringerEndret(
+            behovssekvensId = behovssekvensId,
+            overføringIder = skalFåNyTilOgMed.map { it.id },
+            endring = "Endret til og med til $nyTilOgMed"
+        )
     }
 
     private fun Session.deaktiverOverføringer(
+        behovssekvensId: BehovssekvensId,
         overføringer: Set<OverføringDb>) {
         if (overføringer.isEmpty()) return
         val query = deaktivertOverføringQuery(
@@ -173,19 +189,33 @@ internal class OverføringRepository(
                 logger.warn("Forventet at overføringene $it skulle få status=$Deaktivert, men $oppdaterteRader overføringer ble oppdatert.")
             }
         }}
+
+        overføringerEndret(
+            behovssekvensId = behovssekvensId,
+            overføringIder = overføringer.map { it.id },
+            endring = "Endret status til deaktivert"
+        )
     }
 
     private fun Session.lagreNyeOverføringer(
+        behovssekvensId: BehovssekvensId,
         fra: Saksnummer,
         til: Saksnummer,
         overføringer: List<NyOverføring>) {
-        overføringer.forEach { overføring ->
-            run(lagreOverføringQuery(
-                fra = fra,
-                til = til,
-                overføring = overføring
-            ).asUpdate)
+        val overføringIder = overføringer.map { overføring ->
+            updateAndReturnGeneratedKey(
+                lagreOverføringQuery(
+                    fra = fra,
+                    til = til,
+                    overføring = overføring
+                )
+            )!!
         }
+
+        overføringerOpprettet(
+            behovssekvensId = behovssekvensId,
+            overføringIder = overføringIder
+        )
     }
 
     private fun Session.hentAktiveOverføringer(

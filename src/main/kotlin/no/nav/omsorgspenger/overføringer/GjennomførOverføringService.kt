@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import java.time.ZonedDateTime
 
@@ -17,13 +18,15 @@ internal class GjennomførOverføringService(
      */
 
     internal fun gjennomførOverføringer(
+        behovssekvensId: BehovssekvensId,
         fra: Saksnummer,
         til: Saksnummer,
         overføringer: List<NyOverføring>) : GjennomførtOverføringer {
         return overføringRepository.gjennomførOverføringer(
             fra = fra,
             til = til,
-            overføringer = overføringer
+            overføringer = overføringer,
+            behovssekvensId = behovssekvensId
         )
     }
 }
