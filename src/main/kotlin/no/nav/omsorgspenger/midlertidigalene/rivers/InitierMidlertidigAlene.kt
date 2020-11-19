@@ -7,6 +7,7 @@ import no.nav.k9.rapid.river.skalLøseBehov
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import org.slf4j.LoggerFactory
+import kotlin.IllegalStateException
 
 internal class InitierMidlertidigAlene(
     rapidsConnection: RapidsConnection,
@@ -25,10 +26,18 @@ internal class InitierMidlertidigAlene(
         }.register(this)
     }
 
-    override fun handlePacket(id: String, packet: JsonMessage): Boolean {
+    override fun doHandlePacket(id: String, packet: JsonMessage): Boolean {
         MidlertidigAleneMelding.hentBehov(packet)
         logger.warn("Håndtering av behov ${MidlertidigAleneMelding.MidlertidigAlene} bør flyttes til 'omsorgspenger-rammevedtak'")
         logger.info("Støtter ikke å løse behovet ${MidlertidigAleneMelding.MidlertidigAlene} enda.")
         return false
     }
+
+    override fun handlePacket(id: String, packet: JsonMessage) = throw IllegalStateException(
+        "'doHandlePacket' returnerer alltid false, skal aldri havne i 'handlePacket'"
+    )
+
+    override fun onSent(id: String, packet: JsonMessage) = throw IllegalStateException(
+        "'handlePacket' skal aldri bli gjort, så skal heller aldri havne i 'onSent'"
+    )
 }
