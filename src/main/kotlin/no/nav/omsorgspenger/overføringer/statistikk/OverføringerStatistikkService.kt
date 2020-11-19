@@ -6,7 +6,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 
 internal class OverføringerStatistikkService(
         private val kafkaProducer: KafkaProducer<String, String>,
-        private val topic: String) {
+        private val topic: String = "aapen-omsorgspengerRammemeldinger-statistikk-v1") {
 
     fun publiser(statistikk: OverføringStatistikkMelding) {
         kafkaProducer.send(ProducerRecord(topic, statistikk.toJson()))
