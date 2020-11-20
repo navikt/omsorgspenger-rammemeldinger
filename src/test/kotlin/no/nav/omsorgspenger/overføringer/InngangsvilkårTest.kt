@@ -44,15 +44,15 @@ internal class InngangsvilkårTest(
             )
         )
 
-        rapid.ventPåLøsning(
-            behovssekvens = behovssekvens,
-            fra = fra,
-            til = til
-        )
+        rapid.sendTestMessage(behovssekvens)
+        rapid.ventPå(antallMeldinger = 1)
+        rapid.mockLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
+        rapid.ventPå(antallMeldinger = 2)
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
 
-        assertTrue(løsning.erAvslått())
+        assertTrue(løsning.ikkeBehandlesAvNyttSystem())
+        assertTrue(løsning.overføringer.isEmpty())
     }
 
     @Test

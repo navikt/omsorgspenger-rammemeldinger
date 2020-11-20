@@ -143,7 +143,7 @@ internal class OverføringRepositoryTest(
             fra = fra,
             til = til,
             overføringer = overføringer,
-            lovanvendelser = Lovanvendelser()
+            lovanvendelser = lovanvendelser
         ).gjeldendeOverføringer.mapValues { (_, gjeldendeOverføringer) ->
             GjeldendeOverføringer(
                 fått = gjeldendeOverføringer.fått.map { it.copy(gjennomført = Now) }.also { fått ->
@@ -171,6 +171,12 @@ internal class OverføringRepositoryTest(
         private const val Ola = "Ola"
         private const val Kari = "Kari"
         private const val Trond = "Trond"
+        private val lovanvendelser = Lovanvendelser()
+            .leggTil(
+                periode = Periode("2020-11-01/2020-11-30"),
+                lovhenvisning = JobberINorge,
+                anvendelse = "Tester repository"
+            )
         
         private fun Pair<Periode, Int>.somOverføring() = NyOverføring(
             antallDager = second,

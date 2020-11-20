@@ -121,7 +121,7 @@ internal class BehandleOverføringAvOmsorgsdager(
 
         logger.info("karakteristikker = ${behandling.karakteristikker()}")
 
-        val måBehandlesSomGosysJournalføringsoppgaver = behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett()
+        val måBehandlesSomGosysJournalføringsoppgaver = behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett() || !overføreOmsorgsdager.jobberINorge
         val avslag = behandling.avslag() || måBehandlesSomGosysJournalføringsoppgaver || overføringer.fjernOverføringerUtenDager().isEmpty()
 
         logger.info("Avslag=$avslag")
