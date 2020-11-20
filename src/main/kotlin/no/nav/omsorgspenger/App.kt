@@ -17,59 +17,12 @@ import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdage
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.auth.*
 import io.ktor.http.*
-import io.ktor.metrics.micrometer.*
 import io.ktor.response.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.micrometer.core.instrument.Clock
-import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
-import io.micrometer.prometheus.PrometheusConfig
-import io.micrometer.prometheus.PrometheusMeterRegistry
-import io.prometheus.client.CollectorRegistry
-import io.prometheus.client.exporter.common.TextFormat
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenApi
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 
-fun main() = when (System.getenv("RAPIDS_APPLICATION") == "disabled") {
-    true -> ktorApplication()
-    else -> rapidsApplication()
-}
-
-private fun ktorApplication() {
-    embeddedServer(Netty, port = 8080) {
-        install(MicrometerMetrics) {
-            registry = PrometheusMeterRegistry(
-                PrometheusConfig.DEFAULT,
-                CollectorRegistry.defaultRegistry,
-                Clock.SYSTEM
-            )
-            meterBinders = listOf(
-                ClassLoaderMetrics(),
-                JvmMemoryMetrics(),
-                JvmGcMetrics()
-            )
-        }
-        routing {
-            get ("/isalive") {
-                call.respondText("ALIVE")
-            }
-            get ("/isready") {
-                call.respondText("READY")
-            }
-            get("/metrics") {
-                val names = call.request.queryParameters.getAll("name[]")?.toSet() ?: emptySet()
-                call.respondTextWriter(ContentType.parse(TextFormat.CONTENT_TYPE_004)) {
-                    TextFormat.write004(this, CollectorRegistry.defaultRegistry.filteredMetricFamilySamples(names))
-                }
-            }
-        }
-    }.start(wait = true)
-}
-
-private fun rapidsApplication() {
+fun main() {
     val applicationContext = ApplicationContext.Builder().build()
     RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(applicationContext.env))
         .withKtorModule { omsorgspengerRammemeldinger(applicationContext) }
