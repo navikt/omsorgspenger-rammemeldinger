@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.overføringer.db
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
@@ -141,7 +142,8 @@ internal class OverføringRepositoryTest(
             behovssekvensId = "${behovsekvensCounter++}",
             fra = fra,
             til = til,
-            overføringer = overføringer
+            overføringer = overføringer,
+            lovanvendelser = Lovanvendelser()
         ).gjeldendeOverføringer.mapValues { (_, gjeldendeOverføringer) ->
             GjeldendeOverføringer(
                 fått = gjeldendeOverføringer.fått.map { it.copy(gjennomført = Now) }.also { fått ->

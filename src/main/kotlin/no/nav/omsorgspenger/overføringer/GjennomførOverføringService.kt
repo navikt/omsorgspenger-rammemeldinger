@@ -2,6 +2,7 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
+import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import java.time.ZonedDateTime
 
@@ -21,12 +22,14 @@ internal class GjennomførOverføringService(
         behovssekvensId: BehovssekvensId,
         fra: Saksnummer,
         til: Saksnummer,
+        lovanvendelser: Lovanvendelser,
         overføringer: List<NyOverføring>) : GjennomførtOverføringer {
         return overføringRepository.gjennomførOverføringer(
             fra = fra,
             til = til,
             overføringer = overføringer,
-            behovssekvensId = behovssekvensId
+            behovssekvensId = behovssekvensId,
+            lovanvendelser = lovanvendelser
         )
     }
 }

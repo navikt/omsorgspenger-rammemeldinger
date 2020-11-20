@@ -5,6 +5,7 @@ import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
+import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
@@ -62,6 +63,7 @@ internal class OverføringRepository(
         behovssekvensId: BehovssekvensId,
         fra: Saksnummer,
         til: Saksnummer,
+        lovanvendelser: Lovanvendelser,
         overføringer: List<NyOverføring>) : GjennomførtOverføringer {
         val overføringerMedDager = overføringer.fjernOverføringerUtenDager()
 
@@ -112,7 +114,8 @@ internal class OverføringRepository(
                     fra = fra,
                     til = til,
                     overføringer = overføringerMedDager,
-                    behovssekvensId = behovssekvensId
+                    behovssekvensId = behovssekvensId,
+                    lovanvendelser = lovanvendelser
                 )
 
                 val berørteSaksnummer =
@@ -210,13 +213,15 @@ internal class OverføringRepository(
         behovssekvensId: BehovssekvensId,
         fra: Saksnummer,
         til: Saksnummer,
+        lovanvendelser: Lovanvendelser,
         overføringer: List<NyOverføring>) {
         val overføringIder = overføringer.map { overføring ->
             updateAndReturnGeneratedKey(
                 lagreOverføringQuery(
                     fra = fra,
                     til = til,
-                    overføring = overføring
+                    overføring = overføring,
+                    lovanvendelser = lovanvendelser
                 )
             )!!
         }
@@ -298,10 +303,10 @@ internal class OverføringRepository(
 
         private const val LagreOverføringStatement =
             "INSERT INTO overforing (fom, tom, fra, til, antall_dager, status, lovanvendelser) VALUES(?,?,?,?,?,?,(to_json(?::json)))"
-        private fun lagreOverføringQuery(fra: Saksnummer, til: Saksnummer, overføring: NyOverføring) =
+        private fun lagreOverføringQuery(fra: Saksnummer, til: Saksnummer, overføring: NyOverføring, lovanvendelser: Lovanvendelser) =
             queryOf(
                 statement = LagreOverføringStatement,
-                overføring.periode.fom, overføring.periode.tom, fra, til, overføring.antallDager, Aktiv, "{}"
+                overføring.periode.fom, overføring.periode.tom, fra, til, overføring.antallDager, Aktiv, lovanvendelser.somJson()
             )
 
         private fun Row.somPeriode() = Periode(

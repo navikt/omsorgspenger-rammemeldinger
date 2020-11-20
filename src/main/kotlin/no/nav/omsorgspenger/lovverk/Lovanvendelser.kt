@@ -1,5 +1,7 @@
 package no.nav.omsorgspenger.lovverk
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.omsorgspenger.Periode
 
 interface Lov {
@@ -14,8 +16,15 @@ interface Lovhenvisning {
 
 typealias Lovanvendelse = String
 
-internal class Lovanvendelser {
+internal class Lovanvendelser(
     private val lovanvendelser : MutableMap<String, MutableMap<String, MutableList<Lovanvendelse>>> = mutableMapOf()
+) {
+    internal companion object {
+        private val objectMapper = ObjectMapper()
+        internal fun fraJson(json: String) = Lovanvendelser(
+            lovanvendelser = objectMapper.readValue(json)
+        )
+    }
 
     internal fun leggTil(periode: Periode, lovhenvisning: Lovhenvisning, anvendelse: Lovanvendelse) : Lovanvendelser {
         val innenforPeriode = lovanvendelser.getOrDefault(periode.toString(), mutableMapOf())
@@ -26,4 +35,5 @@ internal class Lovanvendelser {
     }
 
     internal fun somLøsning() = lovanvendelser.toMap()
+    internal fun somJson() = objectMapper.writeValueAsString(somLøsning())
 }

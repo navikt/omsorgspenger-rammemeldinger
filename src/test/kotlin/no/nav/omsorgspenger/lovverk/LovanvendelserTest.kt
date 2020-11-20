@@ -1,7 +1,5 @@
 package no.nav.omsorgspenger.lovverk
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.omsorgspenger.Periode
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -47,19 +45,16 @@ internal class LovanvendelserTest {
         }
         """.trimIndent()
 
-        val serialized = objectMapper.writeValueAsString(lovanvendelser.somLøsning())
+        val serialized = lovanvendelser.somJson()
         JSONAssert.assertEquals(forventetJson, serialized, true)
 
-        val deserialisert : Map<String, Any> = objectMapper.readValue(serialized)
+        val reserialized = Lovanvendelser.fraJson(serialized).somJson()
 
-        val reserialized = objectMapper.writeValueAsString(deserialisert)
         JSONAssert.assertEquals(forventetJson, reserialized, true)
 
     }
 
     private companion object {
-        private val objectMapper = ObjectMapper()
-
         private val MinLov = object: Lov {
             override val id = "Min lov (versjon 1)"
         }
