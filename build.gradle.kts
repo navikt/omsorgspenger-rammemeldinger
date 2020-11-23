@@ -9,7 +9,6 @@ val ulidVersion = "8.2.0"
 val ktorVersion = "1.4.2"
 val assertjVersion = "3.18.0"
 val dusseldorfVersion = "1.4.2.1de1f7a"
-val k9StatistikkKontrakterVersion = "2.0_20201102094838_c03156e"
 // Database
 val flywayVersion = "7.2.0"
 val hikariVersion = "3.4.5"
@@ -36,7 +35,6 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
-    implementation("no.nav.k9.statistikk:kontrakter:$k9StatistikkKontrakterVersion")
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")
@@ -66,10 +64,14 @@ dependencies {
 
 repositories {
     mavenLocal()
-    gitHub(
-            "navikt/k9-rapid",
-            "navikt/k9-statistikk"
-    )
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/navikt/k9-rapid")
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
     mavenCentral()
     jcenter()
     maven("https://dl.bintray.com/kotlin/ktor")
@@ -100,17 +102,4 @@ tasks {
         gradleVersion = "6.7"
     }
 
-}
-
-fun RepositoryHandler.gitHub(vararg repos: String) {
-    for (repo in repos) {
-        maven {
-            name = repo
-            url = uri("https://maven.pkg.github.com/$repo")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
 }
