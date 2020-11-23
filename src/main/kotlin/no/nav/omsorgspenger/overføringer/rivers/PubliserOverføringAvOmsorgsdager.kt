@@ -18,7 +18,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.statistikk.OverføringStatistikkMelding
-import no.nav.omsorgspenger.overføringer.statistikk.OverføringerStatistikkService
+import no.nav.omsorgspenger.statistikk.StatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
 import java.time.OffsetDateTime
@@ -28,7 +28,7 @@ internal class PubliserOverføringAvOmsorgsdager (
     rapidsConnection: RapidsConnection,
     private val formidlingService: FormidlingService,
     behovssekvensRepository: BehovssekvensRepository,
-    private val overføringerStatistikkService: OverføringerStatistikkService
+    private val statistikkService: StatistikkService
 ) : PersistentBehovssekvensPacketListener(
     steg = "PubliserOverføringAvOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
@@ -99,7 +99,7 @@ internal class PubliserOverføringAvOmsorgsdager (
             else -> formidlingService.sendMeldingsbestillinger(it)
         }}
 
-        overføringerStatistikkService.publiser(OverføringStatistikkMelding(
+        statistikkService.publiser(OverføringStatistikkMelding(
                 saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
                 behandlingId = id,
                 mottattDato = overføreOmsorgsdager.mottaksdato,

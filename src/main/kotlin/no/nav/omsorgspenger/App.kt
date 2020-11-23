@@ -50,7 +50,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         rapidsConnection = this,
         formidlingService = applicationContext.formidlingService,
         behovssekvensRepository = applicationContext.behovssekvensRepository,
-        overføringerStatistikkService = applicationContext.overføringerStatistikkService
+        statistikkService = applicationContext.statistikkService
     )
     InitierMidlertidigAlene(
         rapidsConnection = this,

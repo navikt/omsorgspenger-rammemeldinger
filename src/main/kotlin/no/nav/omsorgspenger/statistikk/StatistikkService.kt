@@ -1,10 +1,9 @@
-package no.nav.omsorgspenger.overføringer.statistikk
+package no.nav.omsorgspenger.statistikk
 
-import no.nav.omsorgspenger.statistikk.OverføringStatistikkMelding
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-internal class OverføringerStatistikkService(
+internal class StatistikkService(
         private val kafkaProducer: KafkaProducer<String, String>,
         private val topic: String = "aapen-omsorgspengerRammemeldinger-statistikk-v1") {
 

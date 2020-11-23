@@ -1,9 +1,8 @@
-package no.nav.omsorgspenger.overføringer.statistikk
+package no.nav.omsorgspenger.statistikk
 
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.omsorgspenger.statistikk.OverføringStatistikkMelding
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
@@ -13,11 +12,11 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.util.concurrent.CompletableFuture
 
-internal class OverføringerStatistikkServiceTest {
+internal class StatistikkServiceTest {
     private val kafkaProducer = mockk<KafkaProducer<String, String>>()
     private val topic = "topic"
 
-    private val overføringerStatistikkService = OverføringerStatistikkService(
+    private val overføringerStatistikkService = StatistikkService(
             kafkaProducer = kafkaProducer,
             topic = topic
     )
