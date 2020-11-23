@@ -106,7 +106,11 @@ internal class PubliserOverføringAvOmsorgsdager (
                 registrertDato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
                 funksjonellTid = overføreOmsorgsdager.mottatt.toOffsetDateTime(),
                 behandlingType = "overføring",
-                behandlingStatus = "gjennomført",
+                behandlingStatus = when(utfall) {
+                    Utfall.Avslått -> "avslått"
+                    Utfall.Gjennomført -> "gjennomført"
+                    Utfall.GosysJournalføringsoppgaver -> throw IllegalStateException("Uventet utfall: $utfall")
+                },
                 aktorId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
                 tekniskTid = OffsetDateTime.now()
         ))
