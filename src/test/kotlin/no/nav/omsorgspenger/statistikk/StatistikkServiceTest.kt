@@ -16,9 +16,10 @@ internal class StatistikkServiceTest {
     private val kafkaProducer = mockk<KafkaProducer<String, String>>()
     private val topic = "topic"
 
-    private val overføringerStatistikkService = StatistikkService(
+    private val statistikkService = StatistikkService(
             kafkaProducer = kafkaProducer,
-            topic = topic
+            topic = topic,
+            enabled = true
     )
 
     @BeforeEach
@@ -43,7 +44,7 @@ internal class StatistikkServiceTest {
                 aktorId = "12345678",
                 tekniskTid = OffsetDateTime.now(),
         )
-        overføringerStatistikkService.publiser(melding)
+        statistikkService.publiser(melding)
 
         assertThat(meldinger.map { it.topic() }).containsExactly(topic)
         assertThat(meldinger.map { StatistikkMelding.fromJson(it.value()) }).containsExactly(melding)
