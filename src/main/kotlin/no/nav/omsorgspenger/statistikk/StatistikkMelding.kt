@@ -11,7 +11,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class OverføringStatistikkMelding(
+data class StatistikkMelding(
         @JsonProperty("saksnummer")
         val saksnummer: String,
 
@@ -72,7 +72,7 @@ data class OverføringStatistikkMelding(
     }
 
     companion object {
-        fun fromJson(json: String): OverføringStatistikkMelding {
+        fun fromJson(json: String): StatistikkMelding {
             return objectMapper.readValue(json)
         }
 

@@ -17,7 +17,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandl
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
-import no.nav.omsorgspenger.statistikk.OverføringStatistikkMelding
+import no.nav.omsorgspenger.statistikk.StatistikkMelding
 import no.nav.omsorgspenger.statistikk.StatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
@@ -99,7 +99,7 @@ internal class PubliserOverføringAvOmsorgsdager (
             else -> formidlingService.sendMeldingsbestillinger(it)
         }}
 
-        statistikkService.publiser(OverføringStatistikkMelding(
+        statistikkService.publiser(StatistikkMelding(
                 saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
                 behandlingId = id,
                 mottattDato = overføreOmsorgsdager.mottaksdato,

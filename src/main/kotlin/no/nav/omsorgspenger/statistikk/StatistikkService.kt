@@ -5,9 +5,14 @@ import org.apache.kafka.clients.producer.ProducerRecord
 
 internal class StatistikkService(
         private val kafkaProducer: KafkaProducer<String, String>,
-        private val topic: String = "aapen-omsorgspengerRammemeldinger-statistikk-v1") {
+        private val topic: String = "aapen-omsorgspengerRammemeldinger-statistikk-v1",
+        private val enabled: Boolean
+) {
 
-    fun publiser(statistikk: OverføringStatistikkMelding) {
+    fun publiser(statistikk: StatistikkMelding) {
+        if(!enabled) {
+            return
+        }
         kafkaProducer.send(ProducerRecord(topic, statistikk.toJson()))
     }
 }

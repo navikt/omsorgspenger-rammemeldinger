@@ -32,7 +32,7 @@ internal class StatistikkServiceTest {
 
         every { kafkaProducer.send(capture(meldinger)) }.returns(CompletableFuture.completedFuture(null))
 
-        val melding = OverføringStatistikkMelding(
+        val melding = StatistikkMelding(
                 saksnummer = "",
                 behandlingId = "",
                 mottattDato = LocalDate.parse("2020-01-01"),
@@ -46,6 +46,6 @@ internal class StatistikkServiceTest {
         overføringerStatistikkService.publiser(melding)
 
         assertThat(meldinger.map { it.topic() }).containsExactly(topic)
-        assertThat(meldinger.map { OverføringStatistikkMelding.fromJson(it.value()) }).containsExactly(melding)
+        assertThat(meldinger.map { StatistikkMelding.fromJson(it.value()) }).containsExactly(melding)
     }
 }

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.OffsetDateTime
 
-internal class OverføringStatistikkMeldingTest {
+internal class StatistikkMeldingTest {
     val schema = TestSchemaHelper.schema
     val objectMapper = TestSchemaHelper.objectMapper
 
@@ -28,11 +28,11 @@ internal class OverføringStatistikkMeldingTest {
 
     @Test
     internal fun `melding kan parses`() {
-        val res = OverføringStatistikkMelding.fromJson(melding.toJson())
+        val res = StatistikkMelding.fromJson(melding.toJson())
         assertThat(res).isEqualTo(melding)
     }
 
-    private val melding = OverføringStatistikkMelding(
+    private val melding = StatistikkMelding(
             saksnummer = "",
             behandlingId = "",
             mottattDato = LocalDate.parse("2020-01-01"),
