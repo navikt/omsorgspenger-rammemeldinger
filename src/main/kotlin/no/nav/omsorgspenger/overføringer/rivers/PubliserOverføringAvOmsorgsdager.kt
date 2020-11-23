@@ -17,8 +17,6 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandl
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
-import no.nav.omsorgspenger.overføringer.statistikk.OverføringStatistikkMelding
-import no.nav.omsorgspenger.overføringer.meldinger.leggTilLøsningPar
 import no.nav.omsorgspenger.statistikk.OverføringStatistikkMelding
 import no.nav.omsorgspenger.overføringer.statistikk.OverføringerStatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
@@ -101,9 +99,8 @@ internal class PubliserOverføringAvOmsorgsdager (
             else -> formidlingService.sendMeldingsbestillinger(it)
         }}
 
-        // TODO: Send info om saksstatistikk https://github.com/navikt/omsorgspenger-rammemeldinger/issues/15
         overføringerStatistikkService.publiser(OverføringStatistikkMelding(
-                saksnummer = behandling.saksnummer.getValue(overføreOmsorgsdager.overførerFra),
+                saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
                 behandlingId = id,
                 mottattDato = overføreOmsorgsdager.mottaksdato,
                 registrertDato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
