@@ -17,13 +17,18 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandl
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
+import no.nav.omsorgspenger.statistikk.StatistikkMelding
+import no.nav.omsorgspenger.statistikk.StatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
+import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 internal class PubliserOverføringAvOmsorgsdager (
     rapidsConnection: RapidsConnection,
     private val formidlingService: FormidlingService,
-    behovssekvensRepository: BehovssekvensRepository
+    behovssekvensRepository: BehovssekvensRepository,
+    private val statistikkService: StatistikkService
 ) : PersistentBehovssekvensPacketListener(
     steg = "PubliserOverføringAvOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
@@ -94,7 +99,21 @@ internal class PubliserOverføringAvOmsorgsdager (
             else -> formidlingService.sendMeldingsbestillinger(it)
         }}
 
-        // TODO: Send info om saksstatistikk https://github.com/navikt/omsorgspenger-rammemeldinger/issues/15
+        statistikkService.publiser(StatistikkMelding(
+                saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
+                behandlingId = id,
+                mottattDato = overføreOmsorgsdager.mottaksdato,
+                registrertDato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
+                funksjonellTid = overføreOmsorgsdager.mottatt.toOffsetDateTime(),
+                behandlingType = "overføring",
+                behandlingStatus = when(utfall) {
+                    Utfall.Avslått -> "avslått"
+                    Utfall.Gjennomført -> "gjennomført"
+                    Utfall.GosysJournalføringsoppgaver -> throw IllegalStateException("Uventet utfall: $utfall")
+                },
+                aktorId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
+                tekniskTid = OffsetDateTime.now()
+        ))
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")
 

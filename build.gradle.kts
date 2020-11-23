@@ -15,6 +15,7 @@ val hikariVersion = "3.4.5"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.18"
 val embeddedPostgres = "0.13.3"
+val schemaValidatorVersion = "1.0.30"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
@@ -48,6 +49,7 @@ dependencies {
 
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
+    testImplementation("com.networknt:json-schema-validator:$schemaValidatorVersion")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
