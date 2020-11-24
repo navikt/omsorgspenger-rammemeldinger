@@ -30,10 +30,10 @@ internal data class Barn(
             aleneOmOmsorgen = get("aleneOmOmsorgen").asBoolean(),
             utvidetRett = get("utvidetRett").asBoolean()
         )
-        internal fun List<Barn>.sisteDatoMedOmsorgenForOgAleneOm() =
+        internal fun List<Barn>.sisteDatoMedOmsorgenForOgAleneOmOmsorgen() =
             filter { it.aleneOmOmsorgen }
             .maxByOrNull { it.omsorgenFor.tom }?.let { barn ->
-                barn.omsorgenFor.tom to barn.utvidetRett
-            }
+            barn.omsorgenFor.tom to barn.utvidetRett
+        }
     }
 }
