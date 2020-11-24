@@ -13,7 +13,7 @@ internal fun Route.SpleisetOverføringerApi(
     spleisetOverføringerService: SpleisetOverføringerService) {
 
     post("/hentOverfoeringer") {
-        val request = call.receive<HentOverføringerRequest>()
+        val request = call.receive<HentSpleisetOverføringerRequest>()
 
         val spleisetOverføringer = spleisetOverføringerService.hentSpleisetOverføringer(
             identitetsnummer = request.identitetsnummer,
@@ -31,8 +31,7 @@ internal fun Route.SpleisetOverføringerApi(
     }
 }
 
-
-private data class HentOverføringerRequest(
+private data class HentSpleisetOverføringerRequest(
     val identitetsnummer: String,
     val fom: LocalDate,
     val tom: LocalDate

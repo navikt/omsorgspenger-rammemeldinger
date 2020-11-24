@@ -21,6 +21,7 @@ import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
+import no.nav.omsorgspenger.overføringer.apis.OverføringApi
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -109,7 +110,10 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         }
 
         authenticate(*accessAsPersonIssuers.allIssuers()) {
-
+            OverføringApi(
+                overføringRepository = applicationContext.overføringRepository,
+                saksnummerService = applicationContext.saksnummerService
+            )
         }
     }
 }
