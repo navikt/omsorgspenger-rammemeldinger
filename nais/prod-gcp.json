@@ -20,7 +20,6 @@
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL": "https://omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
     "AZURE_APP_TOKEN_ENDPOINT": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/oauth2/v2.0/token",
     "AZURE_V2_JWKS_URI": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/discovery/v2.0/keys",
-    "AZURE_V2_ISSUER": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/v2.0",
-    "AZURE_K9_AARSKVANTUM_CLIENT_ID": "a3cf9b7c-d490-445a-8dff-6ba698a1a679"
+    "AZURE_V2_ISSUER": "https://login.microsoftonline.com/62366534-1ec3-4962-8869-9b5535279d0b/v2.0"
   }
 }

@@ -84,13 +84,9 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         }
     }
 
-    val azureV2K9Aarskvantum = Issuers.azureV2K9Aarskvantm(
+    val accessAsApplicationIssuers = Issuers.accessAsApplication(
         env = applicationContext.env
     )
-
-    val accessAsApplicationIssuers = mapOf(
-        azureV2K9Aarskvantum.alias() to azureV2K9Aarskvantum
-    ).withoutAdditionalClaimRules()
 
     install(Authentication) {
         multipleJwtIssuers(accessAsApplicationIssuers)
