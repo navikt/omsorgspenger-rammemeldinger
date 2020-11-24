@@ -10,7 +10,7 @@ import no.nav.omsorgspenger.extensions.Oslo
 import no.nav.omsorgspenger.extensions.toLocalDateOslo
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Barn
-import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenFor
+import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenForOgAleneOmOmsorgen
 import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
 import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.rivers.HentBehov
@@ -135,7 +135,7 @@ internal object OverføreOmsorgsdagerMelding :
 
         init {
             val (sisteDatoMedOmsorgenFor, utledetFraBarnMedUtvidetRett) =
-                barn.sisteDatoMedOmsorgenFor()?:(mottaksdato to false)
+                barn.sisteDatoMedOmsorgenForOgAleneOmOmsorgen()?:(mottaksdato to false)
 
             when {
                 sisteDatoMedOmsorgenFor.isBefore(mottaksdato) -> {
