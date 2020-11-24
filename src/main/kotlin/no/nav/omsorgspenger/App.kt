@@ -88,15 +88,28 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         env = applicationContext.env
     )
 
+    val accessAsPersonIssuers = Issuers.accessAsPerson(
+        env = applicationContext.env
+    )
+
     install(Authentication) {
-        multipleJwtIssuers(accessAsApplicationIssuers)
+        multipleJwtIssuers(accessAsApplicationIssuers.plus(accessAsPersonIssuers))
     }
 
     routing {
         HealthRoute(healthService = applicationContext.healthService)
+
         authenticate(*accessAsApplicationIssuers.allIssuers()) {
-            OverføringerApi(overføringService = applicationContext.overføringService)
-            AleneOmOmsorgenApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService)
+            OverføringerApi(
+                overføringService = applicationContext.overføringService
+            )
+            AleneOmOmsorgenApi(
+                aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService
+            )
+        }
+
+        authenticate(*accessAsPersonIssuers.allIssuers()) {
+
         }
     }
 }
