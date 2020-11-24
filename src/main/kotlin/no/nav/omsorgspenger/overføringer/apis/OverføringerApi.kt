@@ -5,18 +5,18 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.k9.rapid.behov.Behovsformat.iso8601
+import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
-import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import org.json.JSONArray
 import org.json.JSONObject
-import java.time.LocalDate
 
-internal fun Route.OverføringApi(
-    overføringRepository: OverføringRepository,
-    saksnummerService: SaksnummerService) {
+internal fun Route.OverføringerApi(
+    overføringRepository: OverføringRepository) {
 
     post("/hent-overforinger") {
         val request = call.receive<HentOverføringerRequest>()
@@ -29,21 +29,9 @@ internal fun Route.OverføringApi(
             return@post
         }
 
-        val saksnummer = saksnummerService.hentSaksnummer(
-            identitetsnummer = request.identitetsnummer
-        )
-
-        if (saksnummer == null) {
-            call.respondJson(
-                json = """{"melding":"Fant ikke saksnummer på person."}""",
-                status = HttpStatusCode.NotFound
-            )
-            return@post
-        }
-
         val overføringer = overføringRepository.hentAktiveOverføringer(
-            saksnummer = setOf(saksnummer)
-        )[saksnummer]
+            saksnummer = setOf(request.saksnummer)
+        )[request.saksnummer]
 
         // TODO: Legg til tilgangsstyring
 
@@ -66,12 +54,29 @@ private fun somJson(gjeldendeOverføringer: GjeldendeOverføringer?) = when (gje
         root.put("gitt", gjeldendeOverføringer.gitt.gittSomJson())
     }.toString()
 }
-private fun List<GjeldendeOverføringGitt>.gittSomJson() = JSONArray()
-private fun List<GjeldendeOverføringFått>.fåttSomJson() = JSONArray()
+private fun List<GjeldendeOverføringGitt>.gittSomJson() = JSONArray().also { array ->
+    forEach { gitt -> array.put(gitt.gittSomJson()) }
+}
+
+private fun List<GjeldendeOverføringFått>.fåttSomJson() = JSONArray().also { array ->
+    forEach { fått -> array.put(fått.fåttSomJson()) }
+}
+
+private fun GjeldendeOverføringFått.fåttSomJson() = somJson().also {
+    it.put("fra", JSONObject("""{"saksnummer":"$fra"}"""))
+}
+private fun GjeldendeOverføringGitt.gittSomJson() = somJson().also {
+    it.put("til", JSONObject("""{"saksnummer":"$til"}"""))
+}
+private fun GjeldendeOverføring.somJson() = JSONObject().also { root ->
+    root.put("lovanvendelser", JSONObject(lovanvendelser!!.somJson()))
+    root.put("antallDager", antallDager)
+    root.put("gjennomført", gjennomført.iso8601())
+    root.put("periode", "$periode")
+    root.put("status", "Aktiv")
+}
 
 private data class HentOverføringerRequest(
-    val identitetsnummer: String,
-    val fom: LocalDate,
-    val tom: LocalDate,
+    val saksnummer: Saksnummer,
     val status: Set<String>
 )

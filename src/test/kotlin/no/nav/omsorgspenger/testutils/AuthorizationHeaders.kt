@@ -16,4 +16,11 @@ internal object AuthorizationHeaders {
         clientAuthenticationMode = Azure.ClientAuthenticationMode.CLIENT_SECRET,
         accessAsApplication = false
     ).let { "Bearer $it" }
+
+    internal fun authorizedUser() = Azure.V2_0.generateJwt(
+        clientId = "omsorgspenger-oidc-auth-proxy",
+        audience = "omsorgspenger-rammemeldinger",
+        clientAuthenticationMode = Azure.ClientAuthenticationMode.CLIENT_SECRET,
+        accessAsApplication = false
+    ).let { "Bearer $it" }
 }
