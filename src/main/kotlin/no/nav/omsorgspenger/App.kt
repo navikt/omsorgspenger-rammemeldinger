@@ -19,7 +19,7 @@ import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenApi
+import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 
 fun main() {
@@ -103,8 +103,8 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
             SpleisetOverføringerApi(
                 spleisetOverføringerService = applicationContext.spleisetOverføringerService
             )
-            AleneOmOmsorgenApi(
-                aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService
+            SpleisetAleneOmOmsorgenApi(
+                spleisetAleneOmOmsorgenService = applicationContext.spleisetAleneOmOmsorgenService
             )
         }
 

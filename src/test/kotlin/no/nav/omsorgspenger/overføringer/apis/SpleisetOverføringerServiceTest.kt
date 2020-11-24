@@ -32,7 +32,7 @@ internal class SpleisetOverføringerServiceTest {
 
     private val overføringRepositoryMock = mockk<OverføringRepository>()
 
-    private val overføringService = SpleisetOverføringerService(
+    private val spleisetOverføringerService = SpleisetOverføringerService(
         infotrygdRammeService = infotrygdRammeServiceMock,
         saksnummerService = saksnummerServiceMock,
         overføringRepository = overføringRepositoryMock
@@ -206,7 +206,7 @@ internal class SpleisetOverføringerServiceTest {
         every { saksnummerServiceMock.hentSaksnummerIdentitetsnummerMapping(saksnummer) }.returns(saksnummerIdentitetsnummerMapping)
     }
 
-    private fun hentSpleisetOverføringer() = overføringService.hentSpleisetOverføringer(
+    private fun hentSpleisetOverføringer() = spleisetOverføringerService.hentSpleisetOverføringer(
         identitetsnummer = identitetsnummer,
         periode = periode,
         correlationId = correlationId

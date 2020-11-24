@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.aleneom
+package no.nav.omsorgspenger.aleneom.apis
 
 import io.ktor.application.*
 import io.ktor.http.*
@@ -9,11 +9,13 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.correlationId
 import java.time.LocalDate
 
-internal fun Route.AleneOmOmsorgenApi(aleneOmOmsorgenService: AleneOmOmsorgenService) {
+internal fun Route.SpleisetAleneOmOmsorgenApi(
+    spleisetAleneOmOmsorgenService: SpleisetAleneOmOmsorgenService) {
+
     post("/hentAleneOmOmsorgen") {
         val request = call.receive<HentAleneOmOmsorgenRequest>()
 
-        val aleneOmOmsorgen = aleneOmOmsorgenService.hentSpleisetAleneOmOmsorgen(
+        val aleneOmOmsorgen = spleisetAleneOmOmsorgenService.hentSpleisetAleneOmOmsorgen(
             identitetsnummer = request.identitetsnummer,
             periode = Periode(request.fom, request.tom),
             correlationId = call.request.correlationId()

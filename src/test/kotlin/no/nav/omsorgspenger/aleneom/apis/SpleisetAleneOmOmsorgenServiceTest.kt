@@ -1,10 +1,12 @@
-package no.nav.omsorgspenger.aleneom
+package no.nav.omsorgspenger.aleneom.apis
 
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
 import no.nav.omsorgspenger.infotrygd.InfotrygdAleneOmOmsorgenMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdAnnenPart
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
@@ -15,14 +17,14 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
-internal class AleneOmOmsorgenServiceTest {
+internal class SpleisetAleneOmOmsorgenServiceTest {
     private val infotrygdRammeServiceMock = mockk<InfotrygdRammeService>()
 
     private val saksnummerServiceMock = mockk<SaksnummerService>()
 
     private val aleneOmOmsorgenRepository = mockk<AleneOmOmsorgenRepository>()
 
-    private val aleneOmOmsorgenService = AleneOmOmsorgenService(
+    private val spleisetAleneOmOmsorgenService = SpleisetAleneOmOmsorgenService(
         infotrygdRammeService = infotrygdRammeServiceMock,
         saksnummerService = saksnummerServiceMock,
         aleneOmOmsorgenRepository = aleneOmOmsorgenRepository
@@ -173,7 +175,7 @@ internal class AleneOmOmsorgenServiceTest {
         every { aleneOmOmsorgenRepository.hent(Saksnummer) }.returns(aleneOmOmsorgen)
     }
 
-    private fun hentSpleiset() = aleneOmOmsorgenService.hentSpleisetAleneOmOmsorgen(
+    private fun hentSpleiset() = spleisetAleneOmOmsorgenService.hentSpleisetAleneOmOmsorgen(
         identitetsnummer = Identitsnummer,
         periode = periode,
         correlationId = CorrelationId

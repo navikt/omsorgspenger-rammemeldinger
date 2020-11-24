@@ -9,7 +9,7 @@ import no.nav.k9.rapid.river.csvTilSet
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
+import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenService
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.formidling.FormidlingService
@@ -41,7 +41,7 @@ internal class ApplicationContext(
     internal val spleisetOverføringerService: SpleisetOverføringerService,
     internal val statistikkService: StatistikkService,
     internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
-    internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
+    internal val spleisetAleneOmOmsorgenService: SpleisetAleneOmOmsorgenService,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
     internal val saksnummerRepository: SaksnummerRepository,
@@ -70,7 +70,7 @@ internal class ApplicationContext(
         internal var spleisetOverføringerService: SpleisetOverføringerService? = null,
         internal var statistikkService: StatistikkService? = null,
         internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
-        internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
+        internal var spleisetAleneOmOmsorgenService: SpleisetAleneOmOmsorgenService? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
         internal var saksnummerRepository: SaksnummerRepository? = null,
@@ -135,7 +135,7 @@ internal class ApplicationContext(
                     overføringRepository = benyttetOverføringRepository
                 ),
                 aleneOmOmsorgenRepository = benyttetAleneOmOmsorgenRepository,
-                aleneOmOmsorgenService = aleneOmOmsorgenService ?: AleneOmOmsorgenService(
+                spleisetAleneOmOmsorgenService = spleisetAleneOmOmsorgenService ?: SpleisetAleneOmOmsorgenService(
                     infotrygdRammeService = benyttetInfotrygdRammeService,
                     aleneOmOmsorgenRepository = benyttetAleneOmOmsorgenRepository,
                     saksnummerService = benyttetSaksnummerService

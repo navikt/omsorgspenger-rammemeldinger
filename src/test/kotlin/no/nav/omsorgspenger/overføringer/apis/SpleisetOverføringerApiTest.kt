@@ -26,7 +26,7 @@ internal class SpleisetOverføringerApiTest(
     dataSource: DataSource,
     wireMockServer: WireMockServer) {
 
-    private val overføringServiceMock = mockk<SpleisetOverføringerService>().also {
+    private val spleisetoverføringerServiceMock = mockk<SpleisetOverføringerService>().also {
         every { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
             gitt = listOf(SpleisetOverføringGitt(
                 gjennomført = LocalDate.parse("2018-01-01"),
@@ -52,7 +52,7 @@ internal class SpleisetOverføringerApiTest(
         dataSource = dataSource.cleanAndMigrate(),
         wireMockServer = wireMockServer
     ).also { builder ->
-        builder.spleisetOverføringerService = overføringServiceMock
+        builder.spleisetOverføringerService = spleisetoverføringerServiceMock
     }.build()
 
     @Test
