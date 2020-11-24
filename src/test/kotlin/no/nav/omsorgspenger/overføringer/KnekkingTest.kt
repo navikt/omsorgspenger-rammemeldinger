@@ -4,7 +4,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.Oslo
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneVedtak
-import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenFor
+import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenForOgAleneOmOmsorgen
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import org.assertj.core.api.Assertions.assertThat
@@ -30,7 +30,7 @@ internal class KnekkingTest {
 
         val overordnetPeriode = Periode(
             fom = mottaksdato,
-            tom = barn.sisteDatoMedOmsorgenFor()!!.first
+            tom = barn.sisteDatoMedOmsorgenForOgAleneOmOmsorgen()!!.first
         )
 
         val fordelingGir = listOf(FordelingGirMelding(

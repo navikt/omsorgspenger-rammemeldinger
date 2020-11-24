@@ -33,6 +33,23 @@ internal class MeldingsbestillingTest {
     }
 
     @Test
+    fun `Full innvilgelse ikke utvidet rett - yngste barnet uten alene om omsorgen`() {
+        val meldingsbestillinger = meldingsbestillinger(
+            mottatt = ZonedDateTime.parse("2021-09-29T14:15:00.000Z"),
+            tattUtIÅr = 0,
+            girDager = 5,
+            barn = listOf(
+                barn(fødselsdato = LocalDate.parse("2018-02-15"), aleneOmOmsorgen = true),
+                barn(fødselsdato = LocalDate.parse("2020-03-20"), aleneOmOmsorgen = false)
+            )
+        )
+
+        meldingsbestillinger.assertInnvilgelse(
+            forventetStartOgSluttGrunn = Grunn.MOTTAKSDATO to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+        )
+    }
+
+    @Test
     fun `Full innvilgelse med utvidet rett`() {
         val meldingsbestillinger = meldingsbestillinger(
             tattUtIÅr = 0,
@@ -259,10 +276,13 @@ internal class MeldingsbestillingTest {
         private const val til = "22222222222"
         private const val tidligerePartner = "44444444444"
 
-        private fun barn(fødselsdato: LocalDate = LocalDate.now().minusYears(1), utvidetRett: Boolean = false) = Barn(
+        private fun barn(
+            fødselsdato: LocalDate = LocalDate.now().minusYears(1),
+            utvidetRett: Boolean = false,
+            aleneOmOmsorgen: Boolean = true) = Barn(
             fødselsdato = fødselsdato,
-            identitetsnummer = "33333333333",
-            aleneOmOmsorgen = true,
+            identitetsnummer = IdentitetsnummerGenerator.identitetsnummer(),
+            aleneOmOmsorgen = aleneOmOmsorgen,
             utvidetRett = utvidetRett
         )
         private fun meldingsbestillinger(
@@ -270,14 +290,15 @@ internal class MeldingsbestillingTest {
             girDager: Int,
             barn: List<Barn>,
             fordelinger: List<FordelingGirMelding> = listOf(),
-            medTidligerePartner: Boolean = false
+            medTidligerePartner: Boolean = false,
+            mottatt: ZonedDateTime = ZonedDateTime.now()
         ) : List<Meldingsbestilling> {
             val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.Behovet(
                 overførerFra = fra,
                 overførerTil = til,
                 jobberINorge = true,
                 sendtPerBrev = false,
-                mottatt = ZonedDateTime.now(),
+                mottatt = mottatt,
                 journalpostIder = setOf(),
                 relasjon = OverføreOmsorgsdagerMelding.Relasjon.NåværendeSamboer,
                 harBoddSammentMinstEttÅr = true,
