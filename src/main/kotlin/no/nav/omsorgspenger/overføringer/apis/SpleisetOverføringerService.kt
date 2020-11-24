@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer
+package no.nav.omsorgspenger.overføringer.apis
 
 import no.nav.omsorgspenger.*
 import no.nav.omsorgspenger.Periode
@@ -7,12 +7,14 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringFårMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringGirMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdRamme
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
+import no.nav.omsorgspenger.overføringer.saksnummer
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import java.time.Duration
 import java.time.LocalDate
 
-internal class OverføringService(
+internal class SpleisetOverføringerService(
     private val infotrygdRammeService: InfotrygdRammeService,
     private val saksnummerService: SaksnummerService,
     private val overføringRepository: OverføringRepository) {
@@ -114,7 +116,8 @@ internal data class SpleisetOverføringer(
                 ),
                 lengde = it.lengde,
                 kilder = it.kilder
-            )},
+            )
+            },
             fått = fått.map { SpleisetOverføringFått(
                 gjennomført = it.vedtatt,
                 gyldigFraOgMed = it.periode.fom,
@@ -125,7 +128,8 @@ internal data class SpleisetOverføringer(
                 ),
                 lengde = it.lengde,
                 kilder = it.kilder
-            )}
+            )
+            }
         )
         internal fun fraNyLøsning(
             overføringerINyLøsning: GjeldendeOverføringer,
@@ -141,7 +145,8 @@ internal data class SpleisetOverføringer(
                 ),
                 lengde = Duration.ofDays(it.antallDager.toLong()),
                 kilder = it.kilder
-            )},
+            )
+            },
             fått = overføringerINyLøsning.fått.filter { it.periode.overlapperMedMinstEnDag(periode) }.map { SpleisetOverføringFått(
                 gjennomført = it.gjennomført.toLocalDateOslo(),
                 gyldigFraOgMed = it.periode.fom,
@@ -151,7 +156,8 @@ internal data class SpleisetOverføringer(
                 ),
                 lengde = Duration.ofDays(it.antallDager.toLong()),
                 kilder = it.kilder
-            )}
+            )
+            }
         )
     }
 }

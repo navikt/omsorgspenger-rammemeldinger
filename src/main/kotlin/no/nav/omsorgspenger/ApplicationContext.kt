@@ -18,7 +18,7 @@ import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.GjennomførOverføringService
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
-import no.nav.omsorgspenger.overføringer.OverføringService
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
 import no.nav.omsorgspenger.statistikk.StatistikkService
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
@@ -28,26 +28,26 @@ import java.net.URI
 import javax.sql.DataSource
 
 internal class ApplicationContext(
-        internal val env: Environment,
-        internal val accessTokenClient: AccessTokenClient,
-        internal val omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway,
-        internal val infotrygdRammeService: InfotrygdRammeService,
-        internal val fordelingService: FordelingService,
-        internal val utvidetRettService: UtvidetRettService,
-        internal val midlertidigAleneService: MidlertidigAleneService,
-        internal val behovssekvensRepository: BehovssekvensRepository,
-        internal val gjennomførOverføringService: GjennomførOverføringService,
-        internal val overføringRepository: OverføringRepository,
-        internal val overføringService: OverføringService,
-        internal val statistikkService: StatistikkService,
-        internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
-        internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
-        internal val kafkaProducer: KafkaProducer<String, String>,
-        internal val formidlingService: FormidlingService,
-        internal val saksnummerRepository: SaksnummerRepository,
-        internal val saksnummerService: SaksnummerService,
-        internal val dataSource: DataSource,
-        internal val healthService: HealthService) {
+    internal val env: Environment,
+    internal val accessTokenClient: AccessTokenClient,
+    internal val omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway,
+    internal val infotrygdRammeService: InfotrygdRammeService,
+    internal val fordelingService: FordelingService,
+    internal val utvidetRettService: UtvidetRettService,
+    internal val midlertidigAleneService: MidlertidigAleneService,
+    internal val behovssekvensRepository: BehovssekvensRepository,
+    internal val gjennomførOverføringService: GjennomførOverføringService,
+    internal val overføringRepository: OverføringRepository,
+    internal val spleisetOverføringerService: SpleisetOverføringerService,
+    internal val statistikkService: StatistikkService,
+    internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
+    internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
+    internal val kafkaProducer: KafkaProducer<String, String>,
+    internal val formidlingService: FormidlingService,
+    internal val saksnummerRepository: SaksnummerRepository,
+    internal val saksnummerService: SaksnummerService,
+    internal val dataSource: DataSource,
+    internal val healthService: HealthService) {
 
     internal fun start() {
         dataSource.migrate()
@@ -57,25 +57,25 @@ internal class ApplicationContext(
     }
 
     internal class Builder(
-            internal var env: Environment? = null,
-            internal var accessTokenClient: AccessTokenClient? = null,
-            internal var omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway? = null,
-            internal var infotrygdRammeService: InfotrygdRammeService? = null,
-            internal var fordelingService: FordelingService? = null,
-            internal var utvidetRettService: UtvidetRettService? = null,
-            internal var midlertidigAleneService: MidlertidigAleneService? = null,
-            internal var behovssekvensRepository: BehovssekvensRepository? = null,
-            internal var gjennomførOverføringService: GjennomførOverføringService? = null,
-            internal var overføringRepository: OverføringRepository? = null,
-            internal var overføringService: OverføringService? = null,
-            internal var statistikkService: StatistikkService? = null,
-            internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
-            internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
-            internal var kafkaProducer: KafkaProducer<String, String>? = null,
-            internal var formidlingService: FormidlingService? = null,
-            internal var saksnummerRepository: SaksnummerRepository? = null,
-            internal var saksnummerService: SaksnummerService? = null,
-            internal var dataSource: DataSource? = null) {
+        internal var env: Environment? = null,
+        internal var accessTokenClient: AccessTokenClient? = null,
+        internal var omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway? = null,
+        internal var infotrygdRammeService: InfotrygdRammeService? = null,
+        internal var fordelingService: FordelingService? = null,
+        internal var utvidetRettService: UtvidetRettService? = null,
+        internal var midlertidigAleneService: MidlertidigAleneService? = null,
+        internal var behovssekvensRepository: BehovssekvensRepository? = null,
+        internal var gjennomførOverføringService: GjennomførOverføringService? = null,
+        internal var overføringRepository: OverføringRepository? = null,
+        internal var spleisetOverføringerService: SpleisetOverføringerService? = null,
+        internal var statistikkService: StatistikkService? = null,
+        internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
+        internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
+        internal var kafkaProducer: KafkaProducer<String, String>? = null,
+        internal var formidlingService: FormidlingService? = null,
+        internal var saksnummerRepository: SaksnummerRepository? = null,
+        internal var saksnummerService: SaksnummerService? = null,
+        internal var dataSource: DataSource? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
             val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
@@ -149,7 +149,7 @@ internal class ApplicationContext(
                 ),
                 dataSource = benyttetDataSource,
                 overføringRepository = benyttetOverføringRepository,
-                overføringService = overføringService ?: OverføringService(
+                spleisetOverføringerService = spleisetOverføringerService ?: SpleisetOverføringerService(
                     infotrygdRammeService = benyttetInfotrygdRammeService,
                     saksnummerService = benyttetSaksnummerService,
                     overføringRepository = benyttetOverføringRepository

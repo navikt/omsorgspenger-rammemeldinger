@@ -10,7 +10,7 @@ import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.omsorgspenger.overføringer.OverføringerApi
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerApi
 import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
@@ -100,8 +100,8 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         HealthRoute(healthService = applicationContext.healthService)
 
         authenticate(*accessAsApplicationIssuers.allIssuers()) {
-            OverføringerApi(
-                overføringService = applicationContext.overføringService
+            SpleisetOverføringerApi(
+                spleisetOverføringerService = applicationContext.spleisetOverføringerService
             )
             AleneOmOmsorgenApi(
                 aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService
