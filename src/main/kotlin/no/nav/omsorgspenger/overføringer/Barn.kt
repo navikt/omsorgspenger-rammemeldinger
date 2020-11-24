@@ -24,16 +24,16 @@ internal data class Barn(
     )
 
     internal companion object {
-         internal fun JsonNode.somBarn() = Barn(
+        internal fun JsonNode.somBarn() = Barn(
             identitetsnummer = get("identitetsnummer").asText(),
             fødselsdato = LocalDate.parse(get("fødselsdato").asText()),
             aleneOmOmsorgen = get("aleneOmOmsorgen").asBoolean(),
             utvidetRett = get("utvidetRett").asBoolean()
         )
+
         internal fun List<Barn>.sisteDatoMedOmsorgenForOgAleneOmOmsorgen() =
-            filter { it.aleneOmOmsorgen }
-            .maxByOrNull { it.omsorgenFor.tom }?.let { barn ->
-            barn.omsorgenFor.tom to barn.utvidetRett
-        }
+            filter { it.aleneOmOmsorgen }.maxByOrNull { it.omsorgenFor.tom }?.let { barn ->
+                barn.omsorgenFor.tom to barn.utvidetRett
+            }
     }
 }
