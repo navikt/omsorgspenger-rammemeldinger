@@ -92,10 +92,10 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     }
 
     install(CallLogging) {
+        val ignorePaths = setOf("/isalive", "/isready", "/metrics")
         level = Level.INFO
         logger = log
-        filter { call -> !call.request.path().startsWith("/isalive") }
-        filter { call -> !call.request.path().startsWith("/isready") }
+        filter { call -> !ignorePaths.contains(call.request.path().toLowerCase()) }
         callIdMdc("correlation_id")
         callIdMdc("callId")
     }
