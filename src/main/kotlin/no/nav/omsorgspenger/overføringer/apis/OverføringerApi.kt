@@ -7,6 +7,7 @@ import io.ktor.routing.*
 import no.nav.k9.rapid.behov.Behovsformat.iso8601
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
@@ -86,11 +87,22 @@ private fun GjeldendeOverføringGitt.gittSomJson(identitetsnummer: Identitetsnum
     it.put("til", JSONObject("""{"saksnummer":"$til", "identitetsnummer": "$identitetsnummer"}"""))
 }
 private fun GjeldendeOverføring.somJson() = JSONObject().also { root ->
-    root.put("lovanvendelser", JSONObject(lovanvendelser!!.somJson()))
-    root.put("antallDager", antallDager)
+    root.put("begrunnelserForPeriode", lovanvendelser!!.somBegrunnelserJson())
+    root.put("dagerOverført", antallDager)
     root.put("gjennomført", gjennomført.iso8601())
-    root.put("periode", "$periode")
+    root.put("gjelderFraOgMed", "${periode.fom}")
+    root.put("gjelderTilOgMed", "${periode.tom}")
     root.put("status", "Aktiv")
+}
+
+private fun Lovanvendelser.somBegrunnelserJson() = JSONArray().also { root ->
+    kunAnvendelser().forEach { (periode, begrunnelser) ->
+        root.put(JSONObject().also {
+            it.put("gjelderFraOgMed", "${periode.fom}")
+            it.put("gjelderTilOgMed", "${periode.tom}")
+            it.put("begrunnelser", begrunnelser)
+        })
+    }
 }
 
 private data class HentOverføringerRequest(

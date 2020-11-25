@@ -86,36 +86,68 @@ internal class OverføringerApiTest(
                 @Language("JSON")
                 val forventetResponse = """
                 {
-                  "gitt": [{
-                    "gjennomført": "2020-11-24T17:34:31.227Z",
-                    "til": {"saksnummer": "101112", "identitetsnummer": "22"},
-                    "lovanvendelser": {
-                      "2019-01-01/2019-03-05": {"Min lov (versjon 1) § 1-2 Noe kult, første ledd, andre punktum": [
-                        "En to tre § lov",
-                        "Samme periode."
-                      ]},
-                      "2021-12-30/2022-02-02": {"Min andre lov (versjon 2) § 1-4 Noe kult, første ledd, fjerde punktum": ["Det var som bare.."]},
-                      "2020-02-03/2020-05-07": {"Min lov (versjon 1) § 1-3 Noe kult, første ledd, tredje punktum": ["By design"]}
-                    },
-                    "antallDager": 5,
-                    "periode": "2020-01-01/2020-12-31",
-                    "status": "Aktiv"
-                  }],
-                  "fått": [{
-                    "gjennomført": "2018-11-24T17:34:31.000Z",
-                    "fra": {"saksnummer": "131415", "identitetsnummer": "33"},
-                    "lovanvendelser": {
-                      "2019-01-01/2019-03-05": {"Min lov (versjon 1) § 1-2 Noe kult, første ledd, andre punktum": [
-                        "En to tre § lov",
-                        "Samme periode."
-                      ]},
-                      "2021-12-30/2022-02-02": {"Min andre lov (versjon 2) § 1-4 Noe kult, første ledd, fjerde punktum": ["Det var som bare.."]},
-                      "2020-02-03/2020-05-07": {"Min lov (versjon 1) § 1-3 Noe kult, første ledd, tredje punktum": ["By design"]}
-                    },
-                    "antallDager": 3,
-                    "periode": "2019-01-01/2019-12-31",
-                    "status": "Aktiv"
-                  }]
+                 "gitt": [{
+                  "gjennomført": "2020-11-24T17:34:31.227Z",
+                  "til": {
+                   "saksnummer": "101112",
+                   "identitetsnummer": "22"
+                  },
+                  "gjelderFraOgMed": "2020-01-01",
+                  "begrunnelserForPeriode": [
+                   {
+                    "gjelderFraOgMed": "2019-01-01",
+                    "gjelderTilOgMed": "2019-03-05",
+                    "begrunnelser": [
+                     "En to tre § lov",
+                     "Samme periode."
+                    ]
+                   },
+                   {
+                    "gjelderFraOgMed": "2020-02-03",
+                    "gjelderTilOgMed": "2020-05-07",
+                    "begrunnelser": ["By design"]
+                   },
+                   {
+                    "gjelderFraOgMed": "2021-12-30",
+                    "gjelderTilOgMed": "2022-02-02",
+                    "begrunnelser": ["Det var som bare.."]
+                   }
+                  ],
+                  "gjelderTilOgMed": "2020-12-31",
+                  "dagerOverført": 5,
+                  "status": "Aktiv"
+                 }],
+                 "fått": [{
+                  "gjennomført": "2018-11-24T17:34:31.000Z",
+                  "fra": {
+                   "saksnummer": "131415",
+                   "identitetsnummer": "33"
+                  },
+                  "gjelderFraOgMed": "2019-01-01",
+                  "begrunnelserForPeriode": [
+                   {
+                    "gjelderFraOgMed": "2019-01-01",
+                    "gjelderTilOgMed": "2019-03-05",
+                    "begrunnelser": [
+                     "En to tre § lov",
+                     "Samme periode."
+                    ]
+                   },
+                   {
+                    "gjelderFraOgMed": "2020-02-03",
+                    "gjelderTilOgMed": "2020-05-07",
+                    "begrunnelser": ["By design"]
+                   },
+                   {
+                    "gjelderFraOgMed": "2021-12-30",
+                    "gjelderTilOgMed": "2022-02-02",
+                    "begrunnelser": ["Det var som bare.."]
+                   }
+                  ],
+                  "gjelderTilOgMed": "2019-12-31",
+                  "dagerOverført": 3,
+                  "status": "Aktiv"
+                 }]
                 }
                 """.trimIndent()
 

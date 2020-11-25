@@ -4,6 +4,7 @@ import no.nav.omsorgspenger.Periode
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
+import kotlin.test.assertEquals
 
 internal class LovanvendelserTest {
 
@@ -32,6 +33,15 @@ internal class LovanvendelserTest {
 
         JSONAssert.assertEquals(forventetJson, reserialized, true)
 
+    }
+
+    @Test
+    fun `kun anvendelser`() {
+        assertEquals(mapOf(
+            periode1 to listOf("En to tre § lov", "Samme periode."),
+            periode2 to listOf("By design"),
+            periode3 to listOf("Det var som bare..")
+        ), TestLovanvendelser.kunAnvendelser())
     }
 
     internal companion object {
