@@ -20,6 +20,7 @@ spec:
       {{/each}}
     inbound:
       rules:
+        - application: omsorgspenger-oidc-auth-proxy
         - application: k9-aarskvantum
           namespace: default
           cluster: {{clusterFss}}
