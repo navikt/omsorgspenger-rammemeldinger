@@ -43,7 +43,7 @@ internal fun Route.OverføringerApi(
             return@get
         }
 
-        require(overføringer.size == 1 && overføringer.keys.first() == saksnummer) {
+        require(overføringer.containsKey(saksnummer)) {
             "Fikk overføringer for ${overføringer.keys} ved oppslag på $saksnummer"
         }
 
