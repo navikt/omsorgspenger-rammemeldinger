@@ -68,10 +68,8 @@ internal class OverføringerApiTest(
     @Test
     fun `Hent overføringer for en person som har overføringer`() {
         withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Post, Path) {
-                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            handleRequest(HttpMethod.Get, path(SaksnummerHarOverføringer)) {
                 addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
-                setBody(body(SaksnummerHarOverføringer))
             }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
@@ -120,10 +118,8 @@ internal class OverføringerApiTest(
     @Test
     fun `Hent overføringer for en person som ikke har overføringer`() {
         withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Post, Path) {
-                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            handleRequest(HttpMethod.Get, path(SaksnummerHarIkkeOverføringer)) {
                 addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
-                setBody(body(SaksnummerHarIkkeOverføringer))
             }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
@@ -144,10 +140,8 @@ internal class OverføringerApiTest(
     @Test
     fun `Hent annet enn aktive overføringer`() {
         withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Post, Path) {
-                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            handleRequest(HttpMethod.Get, path(SaksnummerHarOverføringer, "Deaktivert")) {
                 addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
-                setBody(body(SaksnummerHarOverføringer, "Deaktivert"))
             }.apply {
                 assertEquals(HttpStatusCode.BadRequest, response.status())
             }
@@ -155,17 +149,11 @@ internal class OverføringerApiTest(
     }
 
     private companion object {
-        private const val Path = "/hent-overforinger"
+        private const val Path = "/overforinger"
         private const val SaksnummerHarOverføringer = "123"
         private const val SaksnummerHarIkkeOverføringer = "456"
 
-        @Language("JSON")
-        private fun body(saksnummer: Saksnummer, status: String = "Aktiv") = """
-            {
-                "saksnummer": "$saksnummer",
-                "status": ["$status"]
-            }
-        """.trimIndent()
+        private fun path(saksnummer: Saksnummer, status: String = "Aktiv") =
+            "$Path?saksnummer=$saksnummer&status=$status"
     }
-
 }

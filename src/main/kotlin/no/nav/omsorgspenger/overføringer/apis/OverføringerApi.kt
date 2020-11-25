@@ -2,7 +2,6 @@ package no.nav.omsorgspenger.overføringer.apis
 
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.k9.rapid.behov.Behovsformat.iso8601
@@ -18,26 +17,28 @@ import org.json.JSONObject
 internal fun Route.OverføringerApi(
     overføringRepository: OverføringRepository) {
 
-    post("/hent-overforinger") {
-        val request = call.receive<HentOverføringerRequest>()
-
-        if (request.status.size != 1 || request.status.first() != "Aktiv") {
+    get("/overforinger") {
+        val saksnummer = try {
+            call.støtterKunAktiv()
+            call.saksnummer()
+        } catch (cause: IllegalArgumentException) {
             call.respondJson(
-                json = """{"melding":"Støtter ikke status ${request.status}"}""",
+                json = """{"melding":"Ugylidg request ${cause.message}"}""",
                 status = HttpStatusCode.BadRequest
             )
-            return@post
+            return@get
         }
 
         val overføringer = overføringRepository.hentAktiveOverføringer(
-            saksnummer = setOf(request.saksnummer)
-        )[request.saksnummer]
+            saksnummer = setOf(saksnummer)
+        )[saksnummer]
 
         // TODO: Legg til tilgangsstyring
 
         call.respondJson(json = somJson(overføringer))
     }
 }
+
 
 private suspend fun ApplicationCall.respondJson(
     json: String,
@@ -80,3 +81,21 @@ private data class HentOverføringerRequest(
     val saksnummer: Saksnummer,
     val status: Set<String>
 )
+
+private val saksnummerRegex  = "[a-zA-Z0-9]{2,10}".toRegex()
+private fun ApplicationCall.saksnummer() : Saksnummer {
+    return requireNotNull(request.queryParameters["saksnummer"]) {
+        "Mangler saksnummer i requesten"
+    }.also { saksnummer ->
+        require(saksnummer.matches(saksnummerRegex)) {
+            "Ugyldig saksnummer $saksnummer"
+        }
+    }
+}
+private fun ApplicationCall.støtterKunAktiv() {
+    val statuser = requireNotNull(request.queryParameters.getAll("status")) {
+        "Mangler parameter status"
+    }
+    require(statuser.size == 1) { "Støtter kun en status"}
+    require(statuser.first() == "Aktiv") { "Støtter ikke status ${statuser.first()}"}
+}
