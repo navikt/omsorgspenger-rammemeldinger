@@ -5,6 +5,7 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class LovanvendelserTest {
 
@@ -42,6 +43,15 @@ internal class LovanvendelserTest {
             periode2 to listOf("By design"),
             periode3 to listOf("Det var som bare..")
         ), TestLovanvendelser.kunAnvendelser())
+    }
+
+    @Test
+    fun `ingen anvendelser`() {
+        val lovanvendelser = Lovanvendelser()
+        assertEquals(Lovanvendelser.fraJson("{}"), lovanvendelser)
+        assertTrue(lovanvendelser.somLøsning().isEmpty())
+        assertTrue(lovanvendelser.kunAnvendelser().isEmpty())
+        JSONAssert.assertEquals("{}", lovanvendelser.somJson(), true)
     }
 
     internal companion object {
