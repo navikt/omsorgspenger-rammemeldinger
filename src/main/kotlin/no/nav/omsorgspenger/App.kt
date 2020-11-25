@@ -17,11 +17,13 @@ import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdage
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.auth.*
 import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
+import org.slf4j.event.Level
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -83,6 +85,19 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
             log.error("Request uten tilstrekkelig tilganger stoppet. Håndheving av regler resulterte i '${cause.outcomes}'")
             call.respond(HttpStatusCode.Forbidden)
         }
+    }
+
+    install(CallId) {
+        retrieveFromHeader(HttpHeaders.XCorrelationId)
+    }
+
+    install(CallLogging) {
+        level = Level.INFO
+        logger = log
+        filter { call -> !call.request.path().startsWith("/isalive") }
+        filter { call -> !call.request.path().startsWith("/isready") }
+        callIdMdc("correlation_id")
+        callIdMdc("callId")
     }
 
     val accessAsApplicationIssuers = Issuers.accessAsApplication(
