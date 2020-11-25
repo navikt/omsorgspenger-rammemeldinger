@@ -14,6 +14,7 @@ import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
+import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import no.nav.omsorgspenger.testutils.AuthorizationHeaders
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
@@ -31,6 +32,13 @@ import kotlin.test.assertEquals
 internal class OverføringerApiTest(
     dataSource: DataSource,
     wireMockServer: WireMockServer) {
+
+    private val saksnummerServiceMock = mockk<SaksnummerService>().also {
+        every { it.hentSaksnummerIdentitetsnummerMapping(any()) }.returns(mapOf(
+            "101112" to "22",
+            "131415" to "33"
+        ))
+    }
 
     private val overføringRepositoryMock = mockk<OverføringRepository>().also {
         every { it.hentAktiveOverføringer(setOf(SaksnummerHarIkkeOverføringer)) }.returns(emptyMap())
@@ -63,6 +71,7 @@ internal class OverføringerApiTest(
         wireMockServer = wireMockServer
     ).also { builder ->
         builder.overføringRepository = overføringRepositoryMock
+        builder.saksnummerService = saksnummerServiceMock
     }.build()
 
     @Test
@@ -79,7 +88,7 @@ internal class OverføringerApiTest(
                 {
                   "gitt": [{
                     "gjennomført": "2020-11-24T17:34:31.227Z",
-                    "til": {"saksnummer": "101112"},
+                    "til": {"saksnummer": "101112", "identitetsnummer": "22"},
                     "lovanvendelser": {
                       "2019-01-01/2019-03-05": {"Min lov (versjon 1) § 1-2 Noe kult, første ledd, andre punktum": [
                         "En to tre § lov",
@@ -94,7 +103,7 @@ internal class OverføringerApiTest(
                   }],
                   "fått": [{
                     "gjennomført": "2018-11-24T17:34:31.000Z",
-                    "fra": {"saksnummer": "131415"},
+                    "fra": {"saksnummer": "131415", "identitetsnummer": "33"},
                     "lovanvendelser": {
                       "2019-01-01/2019-03-05": {"Min lov (versjon 1) § 1-2 Noe kult, første ledd, andre punktum": [
                         "En to tre § lov",

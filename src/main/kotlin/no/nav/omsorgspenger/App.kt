@@ -126,7 +126,8 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
 
         authenticate(*accessAsPersonIssuers.allIssuers()) {
             OverføringerApi(
-                overføringRepository = applicationContext.overføringRepository
+                overføringRepository = applicationContext.overføringRepository,
+                saksnummerService = applicationContext.saksnummerService
             )
         }
     }
