@@ -44,7 +44,8 @@ internal class OverføringRepository(
         return using(sessionOf(dataSource)) { session ->
             session.hentOverføringerMedOptionalStatus(
                 saksnummer = saksnummer,
-                medKilder = true
+                medKilder = true,
+                medLovanvendelser = true
             )
         }
     }
@@ -55,7 +56,8 @@ internal class OverføringRepository(
         return using(sessionOf(dataSource)) { session -> session.hentOverføringerMedOptionalStatus(
             saksnummer = saksnummer,
             status = Aktiv,
-            medKilder = true
+            medKilder = true,
+            medLovanvendelser = true
         )}
     }
 
@@ -235,7 +237,8 @@ internal class OverføringRepository(
     private fun Session.hentOverføringerMedOptionalStatus(
         saksnummer: Set<Saksnummer>,
         status: String? = null,
-        medKilder: Boolean = false
+        medKilder: Boolean = false,
+        medLovanvendelser: Boolean = false
     ) : Map<Saksnummer, GjeldendeOverføringer> {
         val query = hentOverføringerQuery(
             saksnummer = saksnummerArray(saksnummer),
@@ -257,10 +260,12 @@ internal class OverføringRepository(
             gjennomførteOverføringer[sak] = GjeldendeOverføringer(
                 fått = overføringer.filter { it.til == sak }.map {
                     it.somGjeldendeOverføringFått(
+                        medLovanvendelser = medLovanvendelser,
                         logg = overføringsLogger.filter { logg -> logg.overføringId == it.id }
                     )},
                 gitt = overføringer.filter { it.fra == sak }.map {
                     it.somGjeldendeOverføringGitt(
+                        medLovanvendelser = medLovanvendelser,
                         logg = overføringsLogger.filter { logg -> logg.overføringId == it.id }
                     )}
             )
@@ -321,7 +326,8 @@ internal class OverføringRepository(
             periode = somPeriode(),
             fra = string("fra"),
             til = string("til"),
-            status = string("status")
+            status = string("status"),
+            lovanvendelser = Lovanvendelser.fraJson(string("lovanvendelser"))
         )
 
         private data class OverføringDb(
@@ -331,7 +337,8 @@ internal class OverføringRepository(
             val fra: Saksnummer,
             val til: Saksnummer,
             val antallDager: Int,
-            val status: String) {
+            val status: String,
+            val lovanvendelser: Lovanvendelser) {
 
             private fun mapStatus() = when (status) {
                 Aktiv -> GjeldendeOverføring.Status.Aktiv
@@ -342,21 +349,33 @@ internal class OverføringRepository(
                 }
             }
 
-            fun somGjeldendeOverføringFått(logg: List<OverføringLogg.OverføringLoggDb>) = GjeldendeOverføringFått(
+            fun somGjeldendeOverføringFått(
+                logg: List<OverføringLogg.OverføringLoggDb>,
+                medLovanvendelser: Boolean) = GjeldendeOverføringFått(
                 gjennomført = gjennomført,
                 antallDager = antallDager,
                 periode = periode,
                 status = mapStatus(),
                 fra = fra,
-                kilder = logg.somKilder()
+                kilder = logg.somKilder(),
+                lovanvendelser = when (medLovanvendelser) {
+                    true -> lovanvendelser
+                    false -> null
+                }
             )
-            fun somGjeldendeOverføringGitt(logg: List<OverføringLogg.OverføringLoggDb>) = GjeldendeOverføringGitt(
+            fun somGjeldendeOverføringGitt(
+                logg: List<OverføringLogg.OverføringLoggDb>,
+                medLovanvendelser: Boolean) = GjeldendeOverføringGitt(
                 gjennomført = gjennomført,
                 antallDager = antallDager,
                 periode = periode,
                 status = mapStatus(),
                 til = til,
-                kilder = logg.somKilder()
+                kilder = logg.somKilder(),
+                lovanvendelser = when (medLovanvendelser) {
+                    true -> lovanvendelser
+                    false -> null
+                }
             )
         }
 

@@ -83,7 +83,7 @@ internal class OverføringRepositoryTest(
         assertThat(setOf(
             gitt(7, November2020, Ola, setOf(
                 Kilde.internKilde("3", "Overføring")
-            ))
+            ), lovanvendelser)
         )).hasSameElementsAs(gjennomførte.getValue(Trond).gitt)
         assertTrue(gjennomførte.getValue(Trond).fått.isEmpty())
 
@@ -96,17 +96,17 @@ internal class OverføringRepositoryTest(
             gitt(1, nyPeriodeForOverføringMellomOlaOgKari, Kari, setOf(
                 Kilde.internKilde("1", "Overføring"),
                 Kilde.internKilde("3", "Overføring")
-            ))
+            ), lovanvendelser)
         )).hasSameElementsAs(gjennomførte.getValue(Ola).gitt)
 
         assertThat(setOf(
             fått(5, nyPeriodeForOverføringMellomOlaOgKari, Kari, setOf(
                 Kilde.internKilde("2", "Overføring"),
                 Kilde.internKilde("3", "Overføring")
-            )),
-            fått(7, November2020, Trond, setOf(
+            ), lovanvendelser),
+                fått(7, November2020, Trond, setOf(
                 Kilde.internKilde("3", "Overføring")
-            ))
+            ), lovanvendelser)
         )).hasSameElementsAs(gjennomførte.getValue(Ola).fått)
 
 
@@ -114,13 +114,13 @@ internal class OverføringRepositoryTest(
             gitt(5, nyPeriodeForOverføringMellomOlaOgKari, Ola, setOf(
                 Kilde.internKilde("2", "Overføring"),
                 Kilde.internKilde("3", "Overføring")
-            ))
+            ), lovanvendelser)
         )).hasSameElementsAs(gjennomførte.getValue(Kari).gitt)
         assertThat(setOf(
             fått(1, nyPeriodeForOverføringMellomOlaOgKari, Ola, setOf(
                 Kilde.internKilde("1", "Overføring"),
                 Kilde.internKilde("3", "Overføring")
-            )),
+            ), lovanvendelser),
         )).hasSameElementsAs(gjennomførte.getValue(Kari).fått)
     }
     /*
@@ -185,22 +185,34 @@ internal class OverføringRepositoryTest(
             slutterGrunnet = listOf()
         )
 
-        private fun fått(antallDager: Int, periode: Periode, fra: Saksnummer, kilder: Set<Kilde> = setOf()) = GjeldendeOverføringFått(
+        private fun fått(
+            antallDager: Int,
+            periode: Periode,
+            fra: Saksnummer,
+            kilder: Set<Kilde> = setOf(),
+            lovanvendelser: Lovanvendelser? = null) = GjeldendeOverføringFått(
             antallDager = antallDager,
             periode = periode,
             status = GjeldendeOverføring.Status.Aktiv,
             fra = fra,
             gjennomført = Now,
-            kilder = kilder
+            kilder = kilder,
+            lovanvendelser = lovanvendelser
         )
 
-        private fun gitt(antallDager: Int, periode: Periode, til: Saksnummer, kilder: Set<Kilde> = setOf()) = GjeldendeOverføringGitt(
+        private fun gitt(
+            antallDager: Int,
+            periode: Periode,
+            til: Saksnummer,
+            kilder: Set<Kilde> = setOf(),
+            lovanvendelser: Lovanvendelser? = null) = GjeldendeOverføringGitt(
             antallDager = antallDager,
             periode = periode,
             status = GjeldendeOverføring.Status.Aktiv,
             til = til,
             gjennomført = Now,
-            kilder = kilder
+            kilder = kilder,
+            lovanvendelser = lovanvendelser
         )
     }
 }

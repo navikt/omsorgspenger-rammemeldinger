@@ -36,4 +36,6 @@ internal class Lovanvendelser(
 
     internal fun somLøsning() = lovanvendelser.toMap()
     internal fun somJson() = objectMapper.writeValueAsString(somLøsning())
+    override fun toString(): String = somJson()
+    override fun equals(other: Any?): Boolean = other != null && other is Lovanvendelser && other.lovanvendelser == lovanvendelser
 }
