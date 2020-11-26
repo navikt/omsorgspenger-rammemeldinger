@@ -143,7 +143,8 @@ internal class OverføringRepositoryTest(
             fra = fra,
             til = til,
             overføringer = overføringer,
-            lovanvendelser = lovanvendelser
+            lovanvendelser = lovanvendelser,
+            antallDagerØnsketOverført = overføringer.maxByOrNull { it.antallDager }!!.antallDager
         ).gjeldendeOverføringer.mapValues { (_, gjeldendeOverføringer) ->
             GjeldendeOverføringer(
                 fått = gjeldendeOverføringer.fått.map { it.copy(gjennomført = Now) }.also { fått ->
@@ -212,7 +213,8 @@ internal class OverføringRepositoryTest(
             til = til,
             gjennomført = Now,
             kilder = kilder,
-            lovanvendelser = lovanvendelser
+            lovanvendelser = lovanvendelser,
+            antallDagerØnsketOverført = antallDager
         )
     }
 }

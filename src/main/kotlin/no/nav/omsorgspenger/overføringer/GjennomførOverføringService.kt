@@ -22,6 +22,7 @@ internal class GjennomførOverføringService(
         behovssekvensId: BehovssekvensId,
         fra: Saksnummer,
         til: Saksnummer,
+        antallDagerØnsketOverført: Int,
         lovanvendelser: Lovanvendelser,
         overføringer: List<NyOverføring>) : GjennomførtOverføringer {
         return overføringRepository.gjennomførOverføringer(
@@ -29,7 +30,8 @@ internal class GjennomførOverføringService(
             til = til,
             overføringer = overføringer,
             behovssekvensId = behovssekvensId,
-            lovanvendelser = lovanvendelser
+            lovanvendelser = lovanvendelser,
+            antallDagerØnsketOverført = antallDagerØnsketOverført
         )
     }
 }
@@ -40,7 +42,10 @@ internal data class GjennomførtOverføringer(
     internal val alleSaksnummer = gjeldendeOverføringer.saksnummer()
 }
 
-internal fun List<NyOverføring>.somAvslått(fra: Saksnummer, til: Saksnummer) =
+internal fun List<NyOverføring>.somAvslått(
+    fra: Saksnummer,
+    til: Saksnummer,
+    antallDagerØnsketOverført: Int) =
     fjernOverføringerUtenDager().let { overføringer ->
         mapOf(
             fra to GjeldendeOverføringer(
@@ -50,7 +55,8 @@ internal fun List<NyOverføring>.somAvslått(fra: Saksnummer, til: Saksnummer) =
                     periode = it.periode,
                     status = GjeldendeOverføring.Status.Avslått,
                     til = til,
-                    kilder = setOf()
+                    kilder = setOf(),
+                    antallDagerØnsketOverført = antallDagerØnsketOverført
                 )}
             ),
             til to GjeldendeOverføringer(

@@ -66,6 +66,7 @@ internal class OverføringRepository(
         fra: Saksnummer,
         til: Saksnummer,
         lovanvendelser: Lovanvendelser,
+        antallDagerØnsketOverført: Int,
         overføringer: List<NyOverføring>) : GjennomførtOverføringer {
         val overføringerMedDager = overføringer.fjernOverføringerUtenDager()
 
@@ -117,7 +118,8 @@ internal class OverføringRepository(
                     til = til,
                     overføringer = overføringerMedDager,
                     behovssekvensId = behovssekvensId,
-                    lovanvendelser = lovanvendelser
+                    lovanvendelser = lovanvendelser,
+                    antallDagerØnsketOverført = antallDagerØnsketOverført
                 )
 
                 val berørteSaksnummer =
@@ -216,6 +218,7 @@ internal class OverføringRepository(
         fra: Saksnummer,
         til: Saksnummer,
         lovanvendelser: Lovanvendelser,
+        antallDagerØnsketOverført: Int,
         overføringer: List<NyOverføring>) {
         val overføringIder = overføringer.map { overføring ->
             updateAndReturnGeneratedKey(
@@ -223,7 +226,8 @@ internal class OverføringRepository(
                     fra = fra,
                     til = til,
                     overføring = overføring,
-                    lovanvendelser = lovanvendelser
+                    lovanvendelser = lovanvendelser,
+                    antallDagerØnsketOverført = antallDagerØnsketOverført
                 )
             )!!
         }
@@ -307,11 +311,12 @@ internal class OverføringRepository(
             queryOf(DeaktiverOverføringerStatement, Deaktivert, overføringIder)
 
         private const val LagreOverføringStatement =
-            "INSERT INTO overforing (fom, tom, fra, til, antall_dager, status, lovanvendelser) VALUES(?,?,?,?,?,?,(to_json(?::json)))"
-        private fun lagreOverføringQuery(fra: Saksnummer, til: Saksnummer, overføring: NyOverføring, lovanvendelser: Lovanvendelser) =
+            "INSERT INTO overforing (fom, tom, fra, til, antall_dager, status, lovanvendelser, antall_dager_onsket_overfort) VALUES(?,?,?,?,?,?,(to_json(?::json)),?)"
+        private fun lagreOverføringQuery(
+            fra: Saksnummer, til: Saksnummer, overføring: NyOverføring, lovanvendelser: Lovanvendelser, antallDagerØnsketOverført: Int) =
             queryOf(
                 statement = LagreOverføringStatement,
-                overføring.periode.fom, overføring.periode.tom, fra, til, overføring.antallDager, Aktiv, lovanvendelser.somJson()
+                overføring.periode.fom, overføring.periode.tom, fra, til, overføring.antallDager, Aktiv, lovanvendelser.somJson(), antallDagerØnsketOverført
             )
 
         private fun Row.somPeriode() = Periode(
@@ -327,7 +332,8 @@ internal class OverføringRepository(
             fra = string("fra"),
             til = string("til"),
             status = string("status"),
-            lovanvendelser = Lovanvendelser.fraJson(string("lovanvendelser"))
+            lovanvendelser = Lovanvendelser.fraJson(string("lovanvendelser")),
+            antallDagerØnsketOverført = int("antall_dager_onsket_overfort")
         )
 
         private data class OverføringDb(
@@ -337,6 +343,7 @@ internal class OverføringRepository(
             val fra: Saksnummer,
             val til: Saksnummer,
             val antallDager: Int,
+            val antallDagerØnsketOverført: Int,
             val status: String,
             val lovanvendelser: Lovanvendelser) {
 
@@ -368,6 +375,7 @@ internal class OverføringRepository(
                 medLovanvendelser: Boolean) = GjeldendeOverføringGitt(
                 gjennomført = gjennomført,
                 antallDager = antallDager,
+                antallDagerØnsketOverført = antallDagerØnsketOverført,
                 periode = periode,
                 status = mapStatus(),
                 til = til,

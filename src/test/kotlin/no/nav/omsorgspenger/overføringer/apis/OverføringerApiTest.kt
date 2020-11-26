@@ -51,7 +51,8 @@ internal class OverføringerApiTest(
                     kilder = setOf(),
                     lovanvendelser = LovanvendelserTest.TestLovanvendelser,
                     periode = Periode("2020-01-01/2020-12-31"),
-                    til = "101112"
+                    til = "101112",
+                    antallDagerØnsketOverført = 10
                 )),
                 fått = listOf(GjeldendeOverføringFått(
                     gjennomført = ZonedDateTime.parse("2018-11-24T17:34:31.000Z"),
@@ -115,6 +116,7 @@ internal class OverføringerApiTest(
                   ],
                   "gjelderTilOgMed": "2020-12-31",
                   "dagerOverført": 5,
+                  "dagerØnsketOverført": 10,
                   "status": "Aktiv"
                  }],
                  "fått": [{

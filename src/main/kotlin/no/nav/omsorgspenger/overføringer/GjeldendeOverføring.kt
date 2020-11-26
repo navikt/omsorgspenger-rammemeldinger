@@ -27,7 +27,8 @@ internal data class GjeldendeOverføringGitt(
     override val status: GjeldendeOverføring.Status,
     override val kilder: Set<Kilde> = setOf(),
     override val lovanvendelser: Lovanvendelser? = null,
-    val til: Saksnummer
+    val til: Saksnummer,
+    val antallDagerØnsketOverført: Int
 ) : GjeldendeOverføring
 
 internal data class GjeldendeOverføringFått(

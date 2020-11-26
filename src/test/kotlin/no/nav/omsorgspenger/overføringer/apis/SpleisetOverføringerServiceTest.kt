@@ -90,7 +90,8 @@ internal class SpleisetOverføringerServiceTest {
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
                     til = "456",
-                    kilder = kilderNyLøsning
+                    kilder = kilderNyLøsning,
+                    antallDagerØnsketOverført = 5
                 ))
             )
         ))
@@ -130,7 +131,8 @@ internal class SpleisetOverføringerServiceTest {
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
                     til = "456",
-                    kilder = kilderNyLøsning
+                    kilder = kilderNyLøsning,
+                    antallDagerØnsketOverført = 5
                 ))
             )
         ))
@@ -169,7 +171,8 @@ internal class SpleisetOverføringerServiceTest {
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
                     til = "456",
-                    kilder = setOf()
+                    kilder = setOf(),
+                    antallDagerØnsketOverført = 5
                 ))
             )
         ))
