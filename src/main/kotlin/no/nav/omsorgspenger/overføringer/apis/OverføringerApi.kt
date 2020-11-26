@@ -86,9 +86,9 @@ private fun GjeldendeOverføringFått.fåttSomJson(identitetsnummer: Identitetsn
 private fun GjeldendeOverføringGitt.gittSomJson(identitetsnummer: Identitetsnummer) = somJson().also {
     it.put("til", JSONObject("""{"saksnummer":"$til", "identitetsnummer": "$identitetsnummer"}"""))
     it.put("dagerØnsketOverført", antallDagerØnsketOverført)
+    it.put("begrunnelserForPeriode", lovanvendelser!!.somBegrunnelserJson())
 }
 private fun GjeldendeOverføring.somJson() = JSONObject().also { root ->
-    root.put("begrunnelserForPeriode", lovanvendelser!!.somBegrunnelserJson())
     root.put("dagerOverført", antallDager)
     root.put("gjennomført", gjennomført.iso8601())
     root.put("gjelderFraOgMed", "${periode.fom}")

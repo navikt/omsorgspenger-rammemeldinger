@@ -126,26 +126,6 @@ internal class OverføringerApiTest(
                    "identitetsnummer": "33"
                   },
                   "gjelderFraOgMed": "2019-01-01",
-                  "begrunnelserForPeriode": [
-                   {
-                    "gjelderFraOgMed": "2019-01-01",
-                    "gjelderTilOgMed": "2019-03-05",
-                    "begrunnelser": [
-                     "En to tre § lov",
-                     "Samme periode."
-                    ]
-                   },
-                   {
-                    "gjelderFraOgMed": "2020-02-03",
-                    "gjelderTilOgMed": "2020-05-07",
-                    "begrunnelser": ["By design"]
-                   },
-                   {
-                    "gjelderFraOgMed": "2021-12-30",
-                    "gjelderTilOgMed": "2022-02-02",
-                    "begrunnelser": ["Det var som bare.."]
-                   }
-                  ],
                   "gjelderTilOgMed": "2019-12-31",
                   "dagerOverført": 3,
                   "status": "Aktiv"
