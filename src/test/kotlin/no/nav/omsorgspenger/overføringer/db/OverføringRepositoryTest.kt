@@ -133,6 +133,42 @@ internal class OverføringRepositoryTest(
         - 3 : Opprettet
      */
 
+
+    @Test
+    fun `Tidligere partner som får overføring deaktivert inngår også i gjeldende overføringer`() {
+        val Erik = "Erik"
+        val Silje = "Silje"
+        val Ida = "Ida"
+        val Periode1 = Periode("2020-11-01/2020-11-30")
+        val Periode2 = Periode("2020-11-01/2020-12-31")
+
+        var gjeldendeOverføringer = gjennomførOverføringer(
+            fra = Erik,
+            til = Silje,
+            overføringer = listOf(
+                (Periode1 to 5).somOverføring()
+            )
+        )
+
+        assertThat(gjeldendeOverføringer.keys).hasSameElementsAs(setOf(Erik, Silje))
+
+        gjeldendeOverføringer = gjennomførOverføringer(
+            fra = Erik,
+            til = Ida,
+            overføringer = listOf(
+                (Periode2 to 7).somOverføring()
+            )
+        )
+
+        assertThat(gjeldendeOverføringer.keys).hasSameElementsAs(setOf(Erik, Silje, Ida))
+        assertThat(gjeldendeOverføringer.getValue(Erik).gitt).hasSize(1)
+        assertThat(gjeldendeOverføringer.getValue(Erik).fått).hasSize(0)
+        assertThat(gjeldendeOverføringer.getValue(Ida).gitt).hasSize(0)
+        assertThat(gjeldendeOverføringer.getValue(Ida).fått).hasSize(1)
+        assertThat(gjeldendeOverføringer.getValue(Silje).fått).hasSize(0)
+        assertThat(gjeldendeOverføringer.getValue(Silje).fått).hasSize(0)
+    }
+
     private var behovsekvensCounter = 1
     private fun gjennomførOverføringer(
         fra: Saksnummer,
