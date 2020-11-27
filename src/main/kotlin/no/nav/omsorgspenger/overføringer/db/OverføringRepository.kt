@@ -125,14 +125,22 @@ internal class OverføringRepository(
                 val berørteSaksnummer =
                     berørteOverføringer.saksnummer().plus(setOf(fra, til))
 
-                transactionalSession.hentOverføringerMedOptionalStatus(
-                    saksnummer = berørteSaksnummer,
-                    status = Aktiv,
-                    medKilder = false
-                ).let { GjennomførtOverføringer(
-                    gjeldendeOverføringer = it,
+                val aktiveGjeldendeOverføringer =
+                    transactionalSession.hentOverføringerMedOptionalStatus(
+                        saksnummer = berørteSaksnummer,
+                        status = Aktiv,
+                        medKilder = false
+                    )
+
+                val ikkeAktiveGjeldendeOverføringer =
+                    berørteSaksnummer
+                        .minus(aktiveGjeldendeOverføringer.keys)
+                        .associateWith { GjeldendeOverføringer() }
+
+                GjennomførtOverføringer(
+                    gjeldendeOverføringer = aktiveGjeldendeOverføringer.plus(ikkeAktiveGjeldendeOverføringer),
                     berørteSaksnummer = berørteSaksnummer
-                )}
+                )
             }
         }
     }
