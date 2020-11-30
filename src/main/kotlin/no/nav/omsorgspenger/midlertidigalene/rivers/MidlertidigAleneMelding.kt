@@ -5,9 +5,10 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.JournalpostId
 import no.nav.omsorgspenger.rivers.HentBehov
+import no.nav.omsorgspenger.rivers.LeggTilLøsning
 import java.time.ZonedDateTime
 
-internal object MidlertidigAleneMelding : HentBehov<MidlertidigAleneMelding.Behovet> {
+internal object MidlertidigAleneMelding : HentBehov<MidlertidigAleneMelding.Behovet>, LeggTilLøsning<MidlertidigAleneMelding.Løsningen> {
     internal const val MidlertidigAlene = "MidlertidigAlene"
 
     override fun validateBehov(packet: JsonMessage) {
@@ -30,6 +31,10 @@ internal object MidlertidigAleneMelding : HentBehov<MidlertidigAleneMelding.Beho
         }
     )
 
+    override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> = MidlertidigAlene to mapOf(
+        "utfall" to "GosysJournalføringsoppgaver"
+    )
+
     internal data class Behovet(
         val versjon: String,
         val mottatt: ZonedDateTime,
@@ -37,6 +42,8 @@ internal object MidlertidigAleneMelding : HentBehov<MidlertidigAleneMelding.Beho
         val annenForelder: Identitetsnummer,
         val journalpostIder: Set<JournalpostId>
     )
+
+    internal class Løsningen
 
     private object BehovKeys {
         val Versjon = "@behov.${MidlertidigAlene}.versjon"
