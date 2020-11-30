@@ -112,7 +112,9 @@ internal class PubliserOverføringAvOmsorgsdager (
                     Utfall.GosysJournalføringsoppgaver -> throw IllegalStateException("Uventet utfall: $utfall")
                 },
                 aktorId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
-                tekniskTid = OffsetDateTime.now()
+                tekniskTid = OffsetDateTime.now(),
+                ansvarligEnhetKode = "4487",
+                behandlendeEnhetKode = "4487"
         ))
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")

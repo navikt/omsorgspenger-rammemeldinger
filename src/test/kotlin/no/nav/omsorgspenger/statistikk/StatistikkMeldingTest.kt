@@ -42,6 +42,9 @@ internal class StatistikkMeldingTest {
             funksjonellTid = OffsetDateTime.now(),
             aktorId = "12345678",
             tekniskTid = OffsetDateTime.now(),
+            ansvarligEnhetType = "",
+            behandlendeEnhetKode = "",
+            ansvarligEnhetKode = ""
     )
 }
 

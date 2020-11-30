@@ -46,13 +46,13 @@ data class StatistikkMelding(
         val ytelseType: String = "omsorgspenger",
 
         @JsonProperty("ansvarligEnhetKode")
-        val ansvarligEnhetKode: String = "SRV",
+        val ansvarligEnhetKode: String,
 
         @JsonProperty("ansvarligEnhetType")
         val ansvarligEnhetType: String = "NORG",
 
         @JsonProperty("behandlendeEnhetKode")
-        val behandlendeEnhetKode: String = "SRV",
+        val behandlendeEnhetKode: String,
 
         @JsonProperty("behandlendeEnhetType")
         val behandlendeEnhetType: String = "NORG",
