@@ -20,7 +20,8 @@ import org.json.JSONObject
 
 internal fun Route.OverføringerApi(
     overføringRepository: OverføringRepository,
-    saksnummerService: SaksnummerService) {
+    saksnummerService: SaksnummerService,
+    enabled: Boolean) {
 
     get("/overforinger") {
         val saksnummer = try {
@@ -30,6 +31,14 @@ internal fun Route.OverføringerApi(
             call.respondJson(
                 json = """{"melding":"Ugylidg request ${cause.message}"}""",
                 status = HttpStatusCode.BadRequest
+            )
+            return@get
+        }
+
+        if (!enabled) {
+            call.respondJson(
+                json = """{"melding":"Henting av overføringer ikke implementert."}""",
+                status = HttpStatusCode.NotImplemented
             )
             return@get
         }

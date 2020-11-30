@@ -20,6 +20,7 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
+import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
@@ -127,7 +128,8 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         authenticate(*accessAsPersonIssuers.allIssuers()) {
             OverføringerApi(
                 overføringRepository = applicationContext.overføringRepository,
-                saksnummerService = applicationContext.saksnummerService
+                saksnummerService = applicationContext.saksnummerService,
+                enabled = applicationContext.env.hentOptionalEnv("OVERFORING_API") == "enabled"
             )
         }
     }

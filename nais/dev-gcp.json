@@ -21,6 +21,7 @@
     "AZURE_APP_TOKEN_ENDPOINT": "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/oauth2/v2.0/token",
     "AZURE_V2_JWKS_URI": "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/discovery/v2.0/keys",
     "AZURE_V2_ISSUER": "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/v2.0",
-    "SEND_STATISTIKK": "enabled"
+    "SEND_STATISTIKK": "enabled",
+    "OVERFORING_API": "enabled"
   }
 }
