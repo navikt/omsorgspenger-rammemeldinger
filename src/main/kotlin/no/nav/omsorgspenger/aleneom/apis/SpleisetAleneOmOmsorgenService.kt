@@ -1,9 +1,11 @@
-package no.nav.omsorgspenger.aleneom
+package no.nav.omsorgspenger.aleneom.apis
 
 import no.nav.omsorgspenger.CorrelationId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
 import no.nav.omsorgspenger.extensions.toLocalDateOslo
 import no.nav.omsorgspenger.infotrygd.InfotrygdAleneOmOmsorgenMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdAnnenPart
@@ -11,7 +13,7 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import java.time.LocalDate
 
-internal class AleneOmOmsorgenService(
+internal class SpleisetAleneOmOmsorgenService(
     private val infotrygdRammeService: InfotrygdRammeService,
     private val saksnummerService: SaksnummerService,
     private val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository) {

@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer
+package no.nav.omsorgspenger.overføringer.apis
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.http.*
@@ -22,11 +22,11 @@ import javax.sql.DataSource
 import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
-internal class OverføringerApiTest(
+internal class SpleisetOverføringerApiTest(
     dataSource: DataSource,
     wireMockServer: WireMockServer) {
 
-    private val overføringServiceMock = mockk<OverføringService>().also {
+    private val spleisetoverføringerServiceMock = mockk<SpleisetOverføringerService>().also {
         every { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
             gitt = listOf(SpleisetOverføringGitt(
                 gjennomført = LocalDate.parse("2018-01-01"),
@@ -52,7 +52,7 @@ internal class OverføringerApiTest(
         dataSource = dataSource.cleanAndMigrate(),
         wireMockServer = wireMockServer
     ).also { builder ->
-        builder.overføringService = overføringServiceMock
+        builder.spleisetOverføringerService = spleisetoverføringerServiceMock
     }.build()
 
     @Test

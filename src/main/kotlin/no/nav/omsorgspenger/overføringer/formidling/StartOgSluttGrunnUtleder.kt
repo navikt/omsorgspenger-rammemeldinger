@@ -17,18 +17,18 @@ internal object StartOgSluttGrunnUtleder {
         ) -> null
         innvilget -> innvilgedeOverføringer.first().innvilget()
         avslått -> avslåtteOverføringer.first().avslag()
-        alleOverføringer.size == 1 && delvisInnvilgedeOverføringer.size == 1 -> enDelvis(
+        alleOverføringer.size == 1 && delvisInnvilgedeOverføringer.size == 1 -> kunEnDelvis(
             delvisInnvilget = delvisInnvilgedeOverføringer.first()
         )
-        avslåtteOverføringer.size == 1 && innvilgedeOverføringer.size == 1 -> bruktAlleDagerIÅr(
+        avslåtteOverføringer.size == 1 && innvilgedeOverføringer.size == 1 -> enAvslåttEnInnvilget(
             avslått = avslåtteOverføringer.first(),
             innvilget = innvilgedeOverføringer.first()
         )
-        delvisInnvilgedeOverføringer.size == 1 && innvilgedeOverføringer.size == 1 -> bruktNoenDagerIÅr(
+        delvisInnvilgedeOverføringer.size == 1 && innvilgedeOverføringer.size == 1 -> enDelvisEnInnvilget(
             delvisInnvilget = delvisInnvilgedeOverføringer.first(),
             innvilget = innvilgedeOverføringer.first()
         )
-        avslåtteOverføringer.size == 1 && delvisInnvilgedeOverføringer.size == 1 -> bruktAlleDagerIÅrOgFordeler(
+        avslåtteOverføringer.size == 1 && delvisInnvilgedeOverføringer.size == 1 -> enAvslåttEnDelvis(
             avslått = avslåtteOverføringer.first(),
             delvisInnvilget = delvisInnvilgedeOverføringer.first()
         )
@@ -54,7 +54,7 @@ internal object StartOgSluttGrunnUtleder {
         }
     }
 
-    private fun bruktAlleDagerIÅrOgFordeler(avslått: NyOverføring, delvisInnvilget: NyOverføring): Pair<Grunn, Grunn>? {
+    private fun enAvslåttEnDelvis(avslått: NyOverføring, delvisInnvilget: NyOverføring): Pair<Grunn, Grunn>? {
         val start = when {
             avslått.starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter, Knekkpunkt.ForbrukteDagerIÅr) &&
             delvisInnvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
@@ -69,7 +69,7 @@ internal object StartOgSluttGrunnUtleder {
         }
     }
 
-    private fun enDelvis(delvisInnvilget: NyOverføring): Pair<Grunn, Grunn>? {
+    private fun kunEnDelvis(delvisInnvilget: NyOverføring): Pair<Grunn, Grunn>? {
         val start = when {
             delvisInnvilget.starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter) &&
             delvisInnvilget.starterGrunnet.inneholderIkke(Knekkpunkt.ForbrukteDagerIÅr) &&
@@ -85,7 +85,7 @@ internal object StartOgSluttGrunnUtleder {
         }
     }
 
-    private fun bruktNoenDagerIÅr(
+    private fun enDelvisEnInnvilget(
         delvisInnvilget: NyOverføring,
         innvilget: NyOverføring
     ): Pair<Grunn, Grunn>? {
@@ -97,6 +97,9 @@ internal object StartOgSluttGrunnUtleder {
             delvisInnvilget.slutterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) &&
             innvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.BRUKT_NOEN_DAGER_I_ÅR
+            innvilget.starterGrunnet.inneholder(Knekkpunkt.FordelingGirSlutter) &&
+            innvilget.starterGrunnet.inneholderIkke(Knekkpunkt.NullstillingAvForbrukteDager) ->
+                Grunn.PÅGÅENDE_FORDELING
             else -> null
         }
 
@@ -108,11 +111,14 @@ internal object StartOgSluttGrunnUtleder {
         }
     }
 
-    private fun bruktAlleDagerIÅr(avslått: NyOverføring, innvilget: NyOverføring) : Pair<Grunn, Grunn>? {
+    private fun enAvslåttEnInnvilget(avslått: NyOverføring, innvilget: NyOverføring) : Pair<Grunn, Grunn>? {
         val start = when {
             avslått.slutterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) &&
             innvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.BRUKT_ALLE_DAGER_I_ÅR
+            innvilget.starterGrunnet.inneholder(Knekkpunkt.FordelingGirSlutter) &&
+            innvilget.starterGrunnet.inneholderIkke(Knekkpunkt.NullstillingAvForbrukteDager) ->
+                Grunn.PÅGÅENDE_FORDELING
             else -> null
         }
         val slutt = innvilget.innvilget()?.second

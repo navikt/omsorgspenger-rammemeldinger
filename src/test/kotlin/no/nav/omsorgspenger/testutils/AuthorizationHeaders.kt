@@ -7,12 +7,20 @@ internal object AuthorizationHeaders {
         clientId = "k9-aarskvantum",
         audience = "omsorgspenger-rammemeldinger",
         clientAuthenticationMode = Azure.ClientAuthenticationMode.CLIENT_SECRET,
-        accessAsApplication = false // PGA. FSS -> GCP, allow lister på ClientID
+        accessAsApplication = true
     ).let { "Bearer $it" }
+
     internal fun k9AarskvantumUnauthorized() = Azure.V2_0.generateJwt(
         clientId = "k9-aarskvantum",
         audience = "omsorgspenger-infotrygd-rammemeldinger",
         clientAuthenticationMode = Azure.ClientAuthenticationMode.CLIENT_SECRET,
-        accessAsApplication = false // PGA. FSS -> GCP, allow lister på ClientID
+        accessAsApplication = false
+    ).let { "Bearer $it" }
+
+    internal fun authorizedUser() = Azure.V2_0.generateJwt(
+        clientId = "omsorgspenger-oidc-auth-proxy",
+        audience = "omsorgspenger-rammemeldinger",
+        clientAuthenticationMode = Azure.ClientAuthenticationMode.CLIENT_SECRET,
+        accessAsApplication = false
     ).let { "Bearer $it" }
 }

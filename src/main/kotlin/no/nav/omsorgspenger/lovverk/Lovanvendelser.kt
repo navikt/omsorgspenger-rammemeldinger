@@ -34,6 +34,13 @@ internal class Lovanvendelser(
         return this
     }
 
+    internal fun kunAnvendelser() : Map<Periode, List<Lovanvendelse>> {
+        return lovanvendelser.map { (periode,lovanvendelser) ->
+            Periode(periode) to lovanvendelser.values.flatten()
+        }.toMap()
+    }
     internal fun somLøsning() = lovanvendelser.toMap()
     internal fun somJson() = objectMapper.writeValueAsString(somLøsning())
+    override fun toString(): String = somJson()
+    override fun equals(other: Any?): Boolean = other != null && other is Lovanvendelser && other.lovanvendelser == lovanvendelser
 }

@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer
+package no.nav.omsorgspenger.overføringer.apis
 
 import io.ktor.application.*
 import io.ktor.http.*
@@ -9,13 +9,13 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.correlationId
 import java.time.LocalDate
 
-internal fun Route.OverføringerApi(
-    overføringService: OverføringService) {
+internal fun Route.SpleisetOverføringerApi(
+    spleisetOverføringerService: SpleisetOverføringerService) {
 
     post("/hentOverfoeringer") {
-        val request = call.receive<HentOverføringerRequest>()
+        val request = call.receive<HentSpleisetOverføringerRequest>()
 
-        val spleisetOverføringer = overføringService.hentSpleisetOverføringer(
+        val spleisetOverføringer = spleisetOverføringerService.hentSpleisetOverføringer(
             identitetsnummer = request.identitetsnummer,
             periode = Periode(
                 fom = request.fom,
@@ -31,8 +31,7 @@ internal fun Route.OverføringerApi(
     }
 }
 
-
-private data class HentOverføringerRequest(
+private data class HentSpleisetOverføringerRequest(
     val identitetsnummer: String,
     val fom: LocalDate,
     val tom: LocalDate

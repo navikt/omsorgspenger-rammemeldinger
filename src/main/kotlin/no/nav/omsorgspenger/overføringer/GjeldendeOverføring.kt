@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.overføringer
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import java.time.ZonedDateTime
 
 internal interface GjeldendeOverføring {
@@ -11,6 +12,7 @@ internal interface GjeldendeOverføring {
     val periode: Periode
     val status: Status
     val kilder: Set<Kilde>
+    val lovanvendelser: Lovanvendelser?
     enum class Status {
         Aktiv,
         Deaktivert,
@@ -24,7 +26,9 @@ internal data class GjeldendeOverføringGitt(
     override val periode: Periode,
     override val status: GjeldendeOverføring.Status,
     override val kilder: Set<Kilde> = setOf(),
-    val til: Saksnummer
+    override val lovanvendelser: Lovanvendelser? = null,
+    val til: Saksnummer,
+    val antallDagerØnsketOverført: Int
 ) : GjeldendeOverføring
 
 internal data class GjeldendeOverføringFått(
@@ -33,6 +37,7 @@ internal data class GjeldendeOverføringFått(
     override val periode: Periode,
     override val status: GjeldendeOverføring.Status,
     override val kilder: Set<Kilde> = setOf(),
+    override val lovanvendelser: Lovanvendelser? = null,
     val fra: Saksnummer
 ) : GjeldendeOverføring
 

@@ -10,17 +10,21 @@ import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.omsorgspenger.overføringer.OverføringerApi
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerApi
 import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.auth.*
 import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenApi
+import no.nav.k9.rapid.river.hentOptionalEnv
+import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
+import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
+import org.slf4j.event.Level
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -84,23 +88,49 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         }
     }
 
-    val azureV2K9Aarskvantum = Issuers.azureV2K9Aarskvantm(
+    install(CallId) {
+        retrieveFromHeader(HttpHeaders.XCorrelationId)
+    }
+
+    install(CallLogging) {
+        val ignorePaths = setOf("/isalive", "/isready", "/metrics")
+        level = Level.INFO
+        logger = log
+        filter { call -> !ignorePaths.contains(call.request.path().toLowerCase()) }
+        callIdMdc("correlation_id")
+        callIdMdc("callId")
+    }
+
+    val accessAsApplicationIssuers = Issuers.accessAsApplication(
         env = applicationContext.env
     )
 
-    val accessAsApplicationIssuers = mapOf(
-        azureV2K9Aarskvantum.alias() to azureV2K9Aarskvantum
-    ).withoutAdditionalClaimRules()
+    val accessAsPersonIssuers = Issuers.accessAsPerson(
+        env = applicationContext.env
+    )
 
     install(Authentication) {
-        multipleJwtIssuers(accessAsApplicationIssuers)
+        multipleJwtIssuers(accessAsApplicationIssuers.plus(accessAsPersonIssuers))
     }
 
     routing {
         HealthRoute(healthService = applicationContext.healthService)
+
         authenticate(*accessAsApplicationIssuers.allIssuers()) {
-            OverføringerApi(overføringService = applicationContext.overføringService)
-            AleneOmOmsorgenApi(aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService)
+            SpleisetOverføringerApi(
+                spleisetOverføringerService = applicationContext.spleisetOverføringerService
+            )
+            SpleisetAleneOmOmsorgenApi(
+                spleisetAleneOmOmsorgenService = applicationContext.spleisetAleneOmOmsorgenService
+            )
+        }
+
+        authenticate(*accessAsPersonIssuers.allIssuers()) {
+            OverføringerApi(
+                overføringRepository = applicationContext.overføringRepository,
+                saksnummerService = applicationContext.saksnummerService,
+                enabled = applicationContext.env.hentOptionalEnv("OVERFORING_API") == "enabled"
+            )
         }
     }
 }

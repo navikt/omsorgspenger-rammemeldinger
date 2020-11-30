@@ -4,31 +4,13 @@ import no.nav.omsorgspenger.Periode
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class LovanvendelserTest {
 
     @Test
     fun `serialisering og deserialiseringstest`() {
-
-        val periode1 = Periode("2019-01-01/2019-03-05")
-        val periode2 = Periode("2020-02-03/2020-05-07")
-        val periode3 = Periode("2021-12-30/2022-02-02")
-
-        val lovanvendelser = Lovanvendelser()
-        lovanvendelser
-            .leggTil(
-                periode = periode1,
-                lovhenvisning = Lovhenvisning1, anvendelse = "En to tre § lov"
-            ).leggTil(
-                periode = periode2,
-                lovhenvisning = Lovhenvisning2, anvendelse = "By design"
-            ).leggTil(
-                periode = periode3,
-                lovhenvisning = Lovhenvisning3, anvendelse = "Det var som bare.."
-            ).leggTil(
-                periode = periode1,
-                lovhenvisning = Lovhenvisning1, anvendelse = "Samme periode."
-            )
 
         @Language("JSON")
         val forventetJson = """
@@ -45,7 +27,7 @@ internal class LovanvendelserTest {
         }
         """.trimIndent()
 
-        val serialized = lovanvendelser.somJson()
+        val serialized = TestLovanvendelser.somJson()
         JSONAssert.assertEquals(forventetJson, serialized, true)
 
         val reserialized = Lovanvendelser.fraJson(serialized).somJson()
@@ -54,7 +36,29 @@ internal class LovanvendelserTest {
 
     }
 
-    private companion object {
+    @Test
+    fun `kun anvendelser`() {
+        assertEquals(mapOf(
+            periode1 to listOf("En to tre § lov", "Samme periode."),
+            periode2 to listOf("By design"),
+            periode3 to listOf("Det var som bare..")
+        ), TestLovanvendelser.kunAnvendelser())
+    }
+
+    @Test
+    fun `ingen anvendelser`() {
+        val lovanvendelser = Lovanvendelser()
+        assertEquals(Lovanvendelser.fraJson("{}"), lovanvendelser)
+        assertTrue(lovanvendelser.somLøsning().isEmpty())
+        assertTrue(lovanvendelser.kunAnvendelser().isEmpty())
+        JSONAssert.assertEquals("{}", lovanvendelser.somJson(), true)
+    }
+
+    internal companion object {
+        private val periode1 = Periode("2019-01-01/2019-03-05")
+        private val periode2 = Periode("2020-02-03/2020-05-07")
+        private val periode3 = Periode("2021-12-30/2022-02-02")
+
         private val MinLov = object: Lov {
             override val id = "Min lov (versjon 1)"
         }
@@ -73,5 +77,20 @@ internal class LovanvendelserTest {
             override val lov = MinAndreLov
             override val henvisning = "§ 1-4 Noe kult, første ledd, fjerde punktum"
         }
+
+        internal val TestLovanvendelser = Lovanvendelser()
+            .leggTil(
+                periode = periode1,
+                lovhenvisning = Lovhenvisning1, anvendelse = "En to tre § lov"
+            ).leggTil(
+                periode = periode2,
+                lovhenvisning = Lovhenvisning2, anvendelse = "By design"
+            ).leggTil(
+                periode = periode3,
+                lovhenvisning = Lovhenvisning3, anvendelse = "Det var som bare.."
+            ).leggTil(
+                periode = periode1,
+                lovhenvisning = Lovhenvisning1, anvendelse = "Samme periode."
+            )
     }
 }

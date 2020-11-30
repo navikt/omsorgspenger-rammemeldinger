@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer
+package no.nav.omsorgspenger.overføringer.apis
 
 import io.mockk.clearMocks
 import io.mockk.every
@@ -11,7 +11,11 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdAnnenPart
 import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringFårMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdOverføringGirMelding
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
+import no.nav.omsorgspenger.overføringer.saksnummer
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -20,7 +24,7 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
-internal class OverføringServiceTest {
+internal class SpleisetOverføringerServiceTest {
 
     private val infotrygdRammeServiceMock = mockk<InfotrygdRammeService>()
 
@@ -28,7 +32,7 @@ internal class OverføringServiceTest {
 
     private val overføringRepositoryMock = mockk<OverføringRepository>()
 
-    private val overføringService = OverføringService(
+    private val spleisetOverføringerService = SpleisetOverføringerService(
         infotrygdRammeService = infotrygdRammeServiceMock,
         saksnummerService = saksnummerServiceMock,
         overføringRepository = overføringRepositoryMock
@@ -86,7 +90,8 @@ internal class OverføringServiceTest {
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
                     til = "456",
-                    kilder = kilderNyLøsning
+                    kilder = kilderNyLøsning,
+                    antallDagerØnsketOverført = 5
                 ))
             )
         ))
@@ -126,7 +131,8 @@ internal class OverføringServiceTest {
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
                     til = "456",
-                    kilder = kilderNyLøsning
+                    kilder = kilderNyLøsning,
+                    antallDagerØnsketOverført = 5
                 ))
             )
         ))
@@ -165,7 +171,8 @@ internal class OverføringServiceTest {
                     periode = periode,
                     status = GjeldendeOverføring.Status.Aktiv,
                     til = "456",
-                    kilder = setOf()
+                    kilder = setOf(),
+                    antallDagerØnsketOverført = 5
                 ))
             )
         ))
@@ -202,7 +209,7 @@ internal class OverføringServiceTest {
         every { saksnummerServiceMock.hentSaksnummerIdentitetsnummerMapping(saksnummer) }.returns(saksnummerIdentitetsnummerMapping)
     }
 
-    private fun hentSpleisetOverføringer() = overføringService.hentSpleisetOverføringer(
+    private fun hentSpleisetOverføringer() = spleisetOverføringerService.hentSpleisetOverføringer(
         identitetsnummer = identitetsnummer,
         periode = periode,
         correlationId = correlationId

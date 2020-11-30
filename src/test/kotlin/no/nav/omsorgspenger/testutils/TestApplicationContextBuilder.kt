@@ -42,14 +42,13 @@ internal fun TestApplicationContextBuilder(
     },
     dataSource = dataSource,
     env = when (wireMockServer) {
-        null -> null
+        null -> mapOf()
         else -> mapOf(
             "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
             "AZURE_V2_JWKS_URI" to wireMockServer.getAzureV2JwksUrl(),
-            "AZURE_APP_CLIENT_ID" to "omsorgspenger-rammemeldinger",
-            "AZURE_K9_AARSKVANTUM_CLIENT_ID" to "k9-aarskvantum"
+            "AZURE_APP_CLIENT_ID" to "omsorgspenger-rammemeldinger"
         )
-    }
+    }.plus("OVERFORING_API" to "enabled")
 )
 
 internal fun DataSource.cleanAndMigrate() = this.also {

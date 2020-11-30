@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.aleneom
+package no.nav.omsorgspenger.aleneom.apis
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.http.*
@@ -21,11 +21,11 @@ import java.time.LocalDate
 import javax.sql.DataSource
 
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
-internal class AleneOmOmsorgenApiTest(
+internal class SpleisetAleneOmOmsorgenApiTest(
     dataSource: DataSource,
     wireMockServer: WireMockServer) {
 
-    private val aleneOmOmsorgenServiceMock = mockk<AleneOmOmsorgenService>().also {
+    private val spleisetAleneOmOmsorgenServiceMock = mockk<SpleisetAleneOmOmsorgenService>().also {
         every { it.hentSpleisetAleneOmOmsorgen(any(), any(), any()) }.returns(
             listOf(
                 SpleisetAleneOmOmsorgen(
@@ -50,7 +50,7 @@ internal class AleneOmOmsorgenApiTest(
         dataSource = dataSource.cleanAndMigrate(),
         wireMockServer = wireMockServer
     ).also { builder ->
-        builder.aleneOmOmsorgenService = aleneOmOmsorgenServiceMock
+        builder.spleisetAleneOmOmsorgenService = spleisetAleneOmOmsorgenServiceMock
     }.build()
 
     @Test

@@ -129,14 +129,16 @@ internal class BehandleOverføringAvOmsorgsdager(
         val gjennomførtOverføringer = when (avslag) {
             true -> overføringer.somAvslått(
                 fra = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
-                til = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerTil)
+                til = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerTil),
+                antallDagerØnsketOverført = overføreOmsorgsdager.omsorgsdagerÅOverføre
             )
             false -> gjennomførOverføringService.gjennomførOverføringer(
                 fra = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
                 til = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerTil),
                 overføringer = overføringer,
                 behovssekvensId = id,
-                lovanvendelser = behandling.lovanvendelser
+                lovanvendelser = behandling.lovanvendelser,
+                antallDagerØnsketOverført = overføreOmsorgsdager.omsorgsdagerÅOverføre
             )
         }
 

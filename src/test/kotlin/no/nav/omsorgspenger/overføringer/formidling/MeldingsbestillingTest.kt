@@ -222,29 +222,37 @@ internal class MeldingsbestillingTest {
     }
 
     @Test
-    fun `Ikke brukt dager i år, men fordeler dager - delvis`() {
-        val meldingsbestillinger = meldingsbestillinger(
-            tattUtIÅr = 0,
-            girDager = 6,
-            fordelinger = listOf(FordelingGirMelding(
-                periode = Periode("1999-01-01/2050-12-31"),
-                lengde = Duration.ofDays(5),
-                kilder = setOf()
-            )),
-            barn = listOf(barn())
-        )
+    fun `Ikke brukt dager i år, men fordeler dager hele perioden - delvis`() = testFordeling(
+        tattUtIÅr = 0,
+        girDager = 6,
+        fordelingsperiode = Periode("1999-01-01/2050-12-31"),
+        fordelerDager = 5,
+        forventetDelvisInnvilgedeOverføringer = 1,
+        forventetInnvilgedeOverføringer = 0,
+        forventetAvslåtteOverføringer = 0
+    )
 
-        assertThat(meldingsbestillinger).hasSize(2)
-        val forventetStartOgSluttGrunn = Grunn.PÅGÅENDE_FORDELING to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
-        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
-        val mottatt= meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
-        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
-        assertEquals(mottatt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
-        assertFalse(gitt.formidlingsoverføringer.innvilget)
-        assertFalse(gitt.formidlingsoverføringer.avslått)
-        assertThat(gitt.formidlingsoverføringer.alleOverføringer).hasSize(1)
-        meldingsbestillinger.forEach { println(it.keyValue.second) }
-    }
+    @Test
+    fun `Ikke brukt dager i år, men fordeler alle dager ut året - delvis`() = testFordeling(
+        tattUtIÅr = 0,
+        girDager = 10,
+        fordelingsperiode = Periode("1999-01-01/2020-12-31"),
+        fordelerDager = 10,
+        forventetDelvisInnvilgedeOverføringer = 0,
+        forventetInnvilgedeOverføringer = 1,
+        forventetAvslåtteOverføringer = 1
+    )
+
+    @Test
+    fun `Ikke brukt dager i år, men fordeler noen dager ut året - delvis`() = testFordeling(
+        tattUtIÅr = 0,
+        girDager = 10,
+        fordelingsperiode = Periode("1999-01-01/2020-12-31"),
+        fordelerDager = 3,
+        forventetDelvisInnvilgedeOverføringer = 1,
+        forventetInnvilgedeOverføringer = 1,
+        forventetAvslåtteOverføringer = 0
+    )
 
     @Test
     fun `Brukt og fordelt dager i år - delvis også fra neste år pga fordeling`() {
@@ -268,6 +276,41 @@ internal class MeldingsbestillingTest {
         assertFalse(gitt.formidlingsoverføringer.innvilget)
         assertFalse(gitt.formidlingsoverføringer.avslått)
         assertThat(gitt.formidlingsoverføringer.alleOverføringer).hasSize(2)
+        meldingsbestillinger.forEach { println(it.keyValue.second) }
+    }
+
+    private fun testFordeling(
+        mottatt: ZonedDateTime = ZonedDateTime.parse("2020-11-10T15:00:00.00Z"),
+        tattUtIÅr: Int,
+        girDager: Int,
+        fordelingsperiode: Periode,
+        fordelerDager: Int,
+        forventetInnvilgedeOverføringer: Int,
+        forventetDelvisInnvilgedeOverføringer: Int,
+        forventetAvslåtteOverføringer: Int) {
+        val meldingsbestillinger = meldingsbestillinger(
+            tattUtIÅr = tattUtIÅr,
+            girDager = girDager,
+            fordelinger = listOf(FordelingGirMelding(
+                periode = fordelingsperiode,
+                lengde = Duration.ofDays(fordelerDager.toLong()),
+                kilder = setOf()
+            )),
+            barn = listOf(barn()),
+            mottatt = mottatt
+        )
+
+        assertThat(meldingsbestillinger).hasSize(2)
+        val forventetStartOgSluttGrunn = Grunn.PÅGÅENDE_FORDELING to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
+        val mottatt= meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
+        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertEquals(mottatt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertFalse(gitt.formidlingsoverføringer.innvilget)
+        assertFalse(gitt.formidlingsoverføringer.avslått)
+        assertThat(gitt.formidlingsoverføringer.innvilgedeOverføringer).hasSize(forventetInnvilgedeOverføringer)
+        assertThat(gitt.formidlingsoverføringer.delvisInnvilgedeOverføringer).hasSize(forventetDelvisInnvilgedeOverføringer)
+        assertThat(gitt.formidlingsoverføringer.avslåtteOverføringer).hasSize(forventetAvslåtteOverføringer)
         meldingsbestillinger.forEach { println(it.keyValue.second) }
     }
 
