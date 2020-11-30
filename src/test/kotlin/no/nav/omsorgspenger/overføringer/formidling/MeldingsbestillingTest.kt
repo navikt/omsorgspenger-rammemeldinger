@@ -302,15 +302,15 @@ internal class MeldingsbestillingTest {
 
         assertThat(meldingsbestillinger).hasSize(2)
         val forventetStartOgSluttGrunn = Grunn.PÅGÅENDE_FORDELING to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
-        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
-        val mottatt= meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
-        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
-        assertEquals(mottatt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
-        assertFalse(gitt.formidlingsoverføringer.innvilget)
-        assertFalse(gitt.formidlingsoverføringer.avslått)
-        assertThat(gitt.formidlingsoverføringer.innvilgedeOverføringer).hasSize(forventetInnvilgedeOverføringer)
-        assertThat(gitt.formidlingsoverføringer.delvisInnvilgedeOverføringer).hasSize(forventetDelvisInnvilgedeOverføringer)
-        assertThat(gitt.formidlingsoverføringer.avslåtteOverføringer).hasSize(forventetAvslåtteOverføringer)
+        val gittDager = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
+        val mottattDager= meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
+        assertEquals(gittDager.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertEquals(mottattDager.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertFalse(gittDager.formidlingsoverføringer.innvilget)
+        assertFalse(gittDager.formidlingsoverføringer.avslått)
+        assertThat(gittDager.formidlingsoverføringer.innvilgedeOverføringer).hasSize(forventetInnvilgedeOverføringer)
+        assertThat(gittDager.formidlingsoverføringer.delvisInnvilgedeOverføringer).hasSize(forventetDelvisInnvilgedeOverføringer)
+        assertThat(gittDager.formidlingsoverføringer.avslåtteOverføringer).hasSize(forventetAvslåtteOverføringer)
         meldingsbestillinger.forEach { println(it.keyValue.second) }
     }
 
