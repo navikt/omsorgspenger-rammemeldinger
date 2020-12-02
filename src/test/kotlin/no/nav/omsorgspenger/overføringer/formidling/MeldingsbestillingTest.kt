@@ -133,7 +133,7 @@ internal class MeldingsbestillingTest {
     @Test
     fun `Brukt noen dager i år - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
-            tattUtIÅr = 5,
+            tattUtIÅr = 15,
             girDager = 6,
             listOf(barn())
         )
@@ -153,7 +153,7 @@ internal class MeldingsbestillingTest {
     @Test
     fun `Brukt noe og fordelt noe i år - fortsatt dager tilgjengelig - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
-            tattUtIÅr = 4,
+            tattUtIÅr = 14,
             girDager = 5,
             fordelinger = listOf(FordelingGirMelding(
                 periode = Periode("1999-01-01/2050-12-31"),
@@ -199,7 +199,7 @@ internal class MeldingsbestillingTest {
     @Test
     fun `Brukt alle dager i år - fordeler dager så får delvis innvilget neste år - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
-            tattUtIÅr = 5,
+            tattUtIÅr = 15,
             girDager = 10,
             fordelinger = listOf(FordelingGirMelding(
                 periode = Periode("1999-01-01/2050-12-31"),
@@ -257,7 +257,7 @@ internal class MeldingsbestillingTest {
     @Test
     fun `Brukt og fordelt dager i år - delvis også fra neste år pga fordeling`() {
         val meldingsbestillinger = meldingsbestillinger(
-            tattUtIÅr = 4,
+            tattUtIÅr = 14,
             girDager = 6,
             fordelinger = listOf(FordelingGirMelding(
                 periode = Periode("1999-01-01/2050-12-31"),

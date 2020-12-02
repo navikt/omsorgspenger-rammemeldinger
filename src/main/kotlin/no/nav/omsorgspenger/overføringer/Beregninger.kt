@@ -99,7 +99,10 @@ internal object Beregninger {
         behandling.lovanvendelser.leggTil(
             periode = periode,
             lovhenvisning = AntallOmsorgsdager,
-            anvendelse = "Har $antallOmsorgsdager omsorgsdager"
+            anvendelser = setOf(
+                "Har $antallOmsorgsdager omsorgsdager",
+                "Har grunnrett på ${omsorgsdagerResultat.grunnrettsdager.antallDager} dager"
+            )
         )
 
         val dagerTattUt = when (grunnlag.overføreOmsorgsdager.mottaksdato.year == periode.tom.year) {
@@ -115,6 +118,18 @@ internal object Beregninger {
             false -> 0
         }
 
+        val dagerTattUtUtoverGrunnretten = when (dagerTattUt > grunnrettsdager.antallDager) {
+            true -> dagerTattUt.minus(grunnrettsdager.antallDager).also {
+                behandling.lovanvendelser.leggTil(
+                    periode = periode,
+                    lovhenvisning = AlleredeForbrukteDager,
+                    anvendelse = "Har tatt ut $it dager utover grunnretten i ${periode.tom.year}"
+                )
+            }
+            false -> 0
+        }
+
+
         val fordeltBort = fordelingGirMeldinger.sumBy { it.lengde.antallDager() }.also {
             if (it > 0) {
                 behandling.lovanvendelser.leggTil(
@@ -125,7 +140,7 @@ internal object Beregninger {
             }
         }
 
-        val tilgjengelig = antallOmsorgsdager - dagerTattUt - fordeltBort - grunnrettsdager.antallDager
+        val tilgjengelig = antallOmsorgsdager - grunnrettsdager.antallDager - dagerTattUtUtoverGrunnretten - fordeltBort
 
         val tilgjengeligDagerForOverføring = when {
             tilgjengelig > DagerMaksForOverføring -> DagerMaksForOverføring

@@ -26,13 +26,16 @@ internal class Lovanvendelser(
         )
     }
 
-    internal fun leggTil(periode: Periode, lovhenvisning: Lovhenvisning, anvendelse: Lovanvendelse) : Lovanvendelser {
+    internal fun leggTil(periode: Periode, lovhenvisning: Lovhenvisning, anvendelser: Set<Lovanvendelse>) : Lovanvendelser {
         val innenforPeriode = lovanvendelser.getOrDefault(periode.toString(), mutableMapOf())
-        val innenforLovhenvisning = innenforPeriode.getOrDefault(lovhenvisning.id(), mutableListOf()).also { it.add(anvendelse) }
+        val innenforLovhenvisning = innenforPeriode.getOrDefault(lovhenvisning.id(), mutableListOf()).also { it.addAll(anvendelser) }
         innenforPeriode[lovhenvisning.id()] = innenforLovhenvisning
         lovanvendelser[periode.toString()] = innenforPeriode
         return this
     }
+
+    internal fun leggTil(periode: Periode, lovhenvisning: Lovhenvisning, anvendelse: Lovanvendelse) =
+        leggTil(periode, lovhenvisning, setOf(anvendelse))
 
     internal fun kunAnvendelser() : Map<Periode, List<Lovanvendelse>> {
         return lovanvendelser.map { (periode,lovanvendelser) ->
