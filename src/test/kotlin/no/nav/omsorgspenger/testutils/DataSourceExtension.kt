@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import java.io.File
+import java.nio.file.Files.createTempDirectory
 import javax.sql.DataSource
 
 internal class DataSourceExtension : ParameterResolver {
@@ -17,7 +18,7 @@ internal class DataSourceExtension : ParameterResolver {
             .setDataDirectory(tempDir.resolve("datadir"))
             .start()
 
-        private val embeddedPostgres = embeddedPostgress(createTempDir("tmp_postgres"))
+        private val embeddedPostgres = embeddedPostgress(createTempDirectory("tmp_postgres").toFile())
 
         private val dataSource = DataSourceBuilder(mapOf(
             "DATABASE_HOST" to "localhost",

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.networknt.schema.JsonSchema
 import com.networknt.schema.JsonSchemaFactory
+import com.networknt.schema.SpecVersion
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -60,7 +61,7 @@ object TestSchemaHelper {
     private fun schema(schemaAsString: String): JsonSchema {
         val schemaNode = objectMapper.readTree(schemaAsString)
         disallowAdditionalProperties(schemaNode)
-        return JsonSchemaFactory.getInstance().getSchema(schemaNode)
+        return JsonSchemaFactory.builder(JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V7)).build().getSchema(schemaNode)
     }
 
     // Schemavalideringsbiblioteket har ikke støtte for å globalt validere at det ikke finnes ukjente properties
