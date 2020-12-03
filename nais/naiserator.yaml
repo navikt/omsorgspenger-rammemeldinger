@@ -30,6 +30,9 @@ spec:
     sqlInstances:
       - type: POSTGRES_11
         diskAutoresize: true
+        tier: {{ database.tier }}
+        diskSize: {{ database.diskSize }}
+        highAvailability: {{ database.highAvailability }}
         databases:
           - name: omsorgspenger-rammemeldinger
             envVarPrefix: DATABASE
