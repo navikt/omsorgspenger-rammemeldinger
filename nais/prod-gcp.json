@@ -11,6 +11,11 @@
   ],
   "azureTenant": "nav.no",
   "clusterFss": "prod-fss",
+  "database": {
+    "tier": "db-custom-4-15360",
+    "diskSize": "40",
+    "highAvailability": "true"
+  },
   "env": {
     "KAFKA_BOOTSTRAP_SERVERS": "a01apvl00145.adeo.no:8443,a01apvl00146.adeo.no:8443,a01apvl00147.adeo.no:8443,a01apvl00148.adeo.no:8443,a01apvl00149.adeo.no:8443,a01apvl00150.adeo.no:8443",
     "KAFKA_PROPERTIES_SECURITY_PROTOCOL": "SASL_SSL",

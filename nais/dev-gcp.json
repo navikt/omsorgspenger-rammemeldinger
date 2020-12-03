@@ -11,6 +11,11 @@
   ],
   "azureTenant": "trygdeetaten.no",
   "clusterFss": "dev-fss",
+  "database": {
+    "tier": "db-custom-1-3840",
+    "diskSize": "20",
+    "highAvailability": "false"
+  },
   "env": {
     "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
     "KAFKA_PROPERTIES_SECURITY_PROTOCOL": "SASL_SSL",
