@@ -99,7 +99,9 @@ internal class PubliserOverføringAvOmsorgsdager (
             else -> formidlingService.sendMeldingsbestillinger(it)
         }}
 
-        statistikkService.publiser(StatistikkMelding(
+        val skjermet = false // todo: sett denne til riktig verdi avhengig av om saken er skjermet eller ikke
+
+        statistikkService.publiser(skjermet, StatistikkMelding(
                 saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
                 behandlingId = id,
                 mottattDato = overføreOmsorgsdager.mottaksdato,

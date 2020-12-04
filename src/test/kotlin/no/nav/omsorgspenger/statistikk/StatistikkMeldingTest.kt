@@ -33,6 +33,14 @@ internal class StatistikkMeldingTest {
         assertThat(res).isEqualTo(melding)
     }
 
+    @Test
+    internal fun skjerming() {
+        val skjermet = melding.utenSkjermedeFelt()
+        assertThat(skjermet.aktorId).isEqualTo("-5")
+        assertThat(skjermet.ansvarligEnhetKode).isEqualTo("-5")
+        assertThat(skjermet.behandlendeEnhetKode).isEqualTo("-5")
+    }
+
     private val melding = StatistikkMelding(
             saksnummer = "",
             behandlingId = "",

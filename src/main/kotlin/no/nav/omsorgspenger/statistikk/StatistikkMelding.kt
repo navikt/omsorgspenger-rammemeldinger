@@ -71,6 +71,14 @@ data class StatistikkMelding(
         return objectMapper.writeValueAsString(this)
     }
 
+    fun utenSkjermedeFelt(): StatistikkMelding {
+        return copy(
+                ansvarligEnhetKode = "-5",
+                behandlendeEnhetKode = "-5",
+                aktorId = "-5"
+        )
+    }
+
     companion object {
         fun fromJson(json: String): StatistikkMelding {
             return objectMapper.readValue(json)

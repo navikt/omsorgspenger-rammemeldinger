@@ -9,10 +9,13 @@ internal class StatistikkService(
         private val enabled: Boolean
 ) {
 
-    fun publiser(statistikk: StatistikkMelding) {
+    fun publiser(skjermet: Boolean, statistikk: StatistikkMelding) {
         if(!enabled) {
             return
         }
-        kafkaProducer.send(ProducerRecord(topic, statistikk.toJson()))
+
+        val melding = if(skjermet) statistikk.utenSkjermedeFelt() else statistikk
+
+        kafkaProducer.send(ProducerRecord(topic, melding.toJson()))
     }
 }
