@@ -12,11 +12,13 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import java.net.URI
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
 
     @Test
@@ -140,27 +142,23 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
         }
     }
 
-    private companion object {
+    private val wiremock = WireMockBuilder()
+        .withAzureSupport()
+        .build()
+        .mockOmsorgspengerInfotrygdRammevedtakIsReady()
 
-        private val wiremock = WireMockBuilder()
-            .withAzureSupport()
-            .build()
-            .mockOmsorgspengerInfotrygdRammevedtakIsReady()
+    private val gateway = OmsorgspengerInfotrygdRammevedtakGateway(
+        accessTokenClient = ClientSecretAccessTokenClient(
+            clientId = "omsorgspenger-rammemeldinger",
+            clientSecret = "secret",
+            tokenEndpoint = URI(wiremock.getAzureV2TokenUrl())
+        ),
+        hentRammevedtakFraInfotrygdScopes = setOf("omsorgspenger-infotrygd-rammevedtak/.default"),
+        omsorgspengerInfotrygdRammevedtakBaseUrl = URI(wiremock.omsorgspengerInfotrygdRammevedtakBaseUrl())
+    )
 
-        private val gateway = OmsorgspengerInfotrygdRammevedtakGateway(
-            accessTokenClient = ClientSecretAccessTokenClient(
-                clientId = "omsorgspenger-rammemeldinger",
-                clientSecret = "secret",
-                tokenEndpoint = URI(wiremock.getAzureV2TokenUrl())
-            ),
-            hentRammevedtakFraInfotrygdScopes = setOf("omsorgspenger-infotrygd-rammevedtak/.default"),
-            omsorgspengerInfotrygdRammevedtakBaseUrl = URI(wiremock.omsorgspengerInfotrygdRammevedtakBaseUrl())
-        )
-
-        @JvmStatic
-        @AfterAll
-        fun afterAll() {
-            wiremock.stop()
-        }
+    @AfterAll
+    fun afterAll() {
+        wiremock.stop()
     }
 }
