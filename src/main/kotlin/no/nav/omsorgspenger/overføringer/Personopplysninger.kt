@@ -46,3 +46,7 @@ internal data class Personopplysninger(
         }
     }
 }
+
+internal data class Fellesopplysnigner(
+    internal val enhetsnummer: String
+)

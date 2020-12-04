@@ -52,10 +52,10 @@ data class StatistikkMelding(
         val ansvarligEnhetType: String = "NORG",
 
         @JsonProperty("behandlendeEnhetKode")
-        val behandlendeEnhetKode: String,
+        val behandlendeEnhetKode: String? = null,
 
         @JsonProperty("behandlendeEnhetType")
-        val behandlendeEnhetType: String = "NORG",
+        val behandlendeEnhetType: String? = null,
 
         @JsonProperty("totrinnsbehandling")
         val totrinnsbehandling: Boolean = false,

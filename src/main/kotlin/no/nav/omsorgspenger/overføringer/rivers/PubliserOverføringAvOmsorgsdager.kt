@@ -55,8 +55,8 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding.hentLøsning(packet)
-        val personopplysninger = HentPersonopplysningerMelding.hentLøsning(packet).also {
-            require(it.keys.containsAll(behandling.alleSaksnummerMapping.identitetsnummer())) {
+        val (personopplysninger, fellesopplysninger) = HentPersonopplysningerMelding.hentLøsning(packet).also {
+            require(it.first.keys.containsAll(behandling.alleSaksnummerMapping.identitetsnummer())) {
                 "Mangler personopplysninger for en eller fler av personene berørt av overføringen."
             }
         }
@@ -113,8 +113,7 @@ internal class PubliserOverføringAvOmsorgsdager (
                 },
                 aktorId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
                 tekniskTid = OffsetDateTime.now(),
-                ansvarligEnhetKode = "4487",
-                behandlendeEnhetKode = "4487"
+                ansvarligEnhetKode = fellesopplysninger.enhetsnummer
         ))
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")

@@ -16,8 +16,6 @@
     "behandlingStatus",
     "ansvarligEnhetKode",
     "ansvarligEnhetType",
-    "behandlendeEnhetKode",
-    "behandlendeEnhetType",
     "totrinnsbehandling",
     "avsender",
     "versjon"

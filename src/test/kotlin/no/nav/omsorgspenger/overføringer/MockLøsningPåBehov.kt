@@ -65,6 +65,9 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
                     "adressebeskyttelse" to "UGRADERT",
                     "gjeldendeIdentitetsnummer" to til
                 )
+            ),
+            "fellesopplysninger" to mapOf(
+                "enhetsnummer" to "1234"
             )
         )
     )

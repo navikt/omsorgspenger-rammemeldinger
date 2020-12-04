@@ -17,7 +17,7 @@ internal class StatistikkMeldingTest {
 
     @Test
     internal fun `melding er komplett med alle felt`() {
-        assertThat(melding).hasNoNullFieldsOrProperties()
+        assertThat(melding).hasNoNullFieldsOrPropertiesExcept("behandlendeEnhetKode","behandlendeEnhetType")
     }
 
     @Test
@@ -44,7 +44,6 @@ internal class StatistikkMeldingTest {
             aktorId = "12345678",
             tekniskTid = OffsetDateTime.now(),
             ansvarligEnhetType = "",
-            behandlendeEnhetKode = "",
             ansvarligEnhetKode = ""
     )
 }
