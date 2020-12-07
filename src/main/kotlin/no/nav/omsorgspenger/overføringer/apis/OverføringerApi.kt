@@ -1,7 +1,9 @@
 package no.nav.omsorgspenger.overføringer.apis
 
 import io.ktor.application.*
+import io.ktor.client.HttpClient
 import io.ktor.http.*
+import io.ktor.request.receive
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.k9.rapid.behov.Behovsformat.iso8601
@@ -9,19 +11,16 @@ import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import no.nav.omsorgspenger.overføringer.*
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import org.json.JSONArray
 import org.json.JSONObject
 
 internal fun Route.OverføringerApi(
-    overføringRepository: OverføringRepository,
-    saksnummerService: SaksnummerService,
-    enabled: Boolean) {
+        overføringRepository: OverføringRepository,
+        saksnummerService: SaksnummerService,
+        tilgangsstyringRestClient: TilgangsstyringRestClient,
+        enabled: Boolean) {
 
     get("/overforinger") {
         val saksnummer = try {
@@ -59,7 +58,16 @@ internal fun Route.OverføringerApi(
         val saksnummerIdentitetsnummerMapping = saksnummerService.hentSaksnummerIdentitetsnummerMapping(
             saksnummer = overføringer.saksnummer()
         )
-        // TODO: Legg til tilgangsstyring
+
+        val authHeader = call.request.headers[HttpHeaders.Authorization]
+                ?: return@get call.respond(HttpStatusCode.Unauthorized)
+        val identer = saksnummerIdentitetsnummerMapping.values.toSet()
+        val beskrivelse = "sjekk tilgang"
+        val harTilgangTilSaksnummer = tilgangsstyringRestClient.sjekkTilgang(identer, authHeader, beskrivelse)
+
+        if (!harTilgangTilSaksnummer) {
+            return@get call.respond(HttpStatusCode.Forbidden)
+        }
 
         call.respondJson(
             json = overføringer.getValue(saksnummer).somJson(saksnummerIdentitetsnummerMapping)

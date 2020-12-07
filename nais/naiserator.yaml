@@ -74,3 +74,5 @@ spec:
     - name: {{@key}}
       value: {{this}}
   {{/each}}
+  - name: TILGANGSSTYRING_URL
+    value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local

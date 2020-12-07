@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger
 
+import io.ktor.client.HttpClient
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
@@ -26,6 +27,7 @@ import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
+import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
 
 internal class ApplicationContext(
     internal val env: Environment,
@@ -46,6 +48,7 @@ internal class ApplicationContext(
     internal val formidlingService: FormidlingService,
     internal val saksnummerRepository: SaksnummerRepository,
     internal val saksnummerService: SaksnummerService,
+    internal val tilgangsstyringRestClient: TilgangsstyringRestClient,
     internal val dataSource: DataSource,
     internal val healthService: HealthService) {
 
@@ -68,6 +71,7 @@ internal class ApplicationContext(
         internal var gjennomførOverføringService: GjennomførOverføringService? = null,
         internal var overføringRepository: OverføringRepository? = null,
         internal var spleisetOverføringerService: SpleisetOverføringerService? = null,
+        internal var tilgangsstyringRestClient: TilgangsstyringRestClient? = null,
         internal var statistikkService: StatistikkService? = null,
         internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
         internal var spleisetAleneOmOmsorgenService: SpleisetAleneOmOmsorgenService? = null,
@@ -117,6 +121,11 @@ internal class ApplicationContext(
                 saksnummerRepository = benyttetSaksnummerRepository
             )
 
+            val benyttetTilgangsstyringRestClient = tilgangsstyringRestClient ?: TilgangsstyringRestClient(
+                    httpClient = HttpClient(),
+                    env = benyttetEnv
+            )
+
             return ApplicationContext(
                 env = benyttetEnv,
                 accessTokenClient = benyttetAccessTokenClient,
@@ -159,7 +168,8 @@ internal class ApplicationContext(
                 saksnummerService = benyttetSaksnummerService,
                 behovssekvensRepository = behovssekvensRepository ?: BehovssekvensRepository(
                     dataSource = benyttetDataSource
-                )
+                ),
+                tilgangsstyringRestClient = benyttetTilgangsstyringRestClient
             )
         }
     }
