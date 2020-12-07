@@ -9,7 +9,7 @@ import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding
+import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import org.slf4j.LoggerFactory
 
 internal class InitierOverføreKoronaOmsorgsdager(

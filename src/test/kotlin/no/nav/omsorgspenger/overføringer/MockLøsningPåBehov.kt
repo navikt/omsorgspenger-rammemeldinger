@@ -5,8 +5,8 @@ import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.Identitetsnummer
-import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
-import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
+import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
+import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 
 internal fun TestRapid.mockLøsningPåHenteOmsorgspengerSaksnummer(
     fra: Identitetsnummer, til: Identitetsnummer) {

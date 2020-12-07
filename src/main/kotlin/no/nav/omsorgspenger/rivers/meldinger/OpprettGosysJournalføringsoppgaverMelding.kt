@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer.meldinger
+package no.nav.omsorgspenger.rivers.meldinger
 
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer
@@ -12,16 +12,17 @@ internal object OpprettGosysJournalføringsoppgaverMelding :
     override fun behov(behovInput: BehovInput) = Behov(
         navn = OpprettGosysJournalføringsoppgaver,
         input = mapOf(
-            "identitetsnummer" to behovInput.fra,
-            "berørteIdentitetsnummer" to setOf(behovInput.til),
+            "identitetsnummer" to behovInput.identitetsnummer,
+            "berørteIdentitetsnummer" to behovInput.berørteIdentitetsnummer,
             "journalpostIder" to behovInput.journalpostIder,
-            "journalpostType" to "OverføreOmsorgsdager"
+            "journalpostType" to behovInput.journalpostType
         )
     )
 
     internal data class BehovInput(
-        val fra: Identitetsnummer,
-        val til: Identitetsnummer,
-        val journalpostIder: Set<JournalpostId>
+        val identitetsnummer: Identitetsnummer,
+        val berørteIdentitetsnummer: Set<Identitetsnummer>,
+        val journalpostIder: Set<JournalpostId>,
+        val journalpostType: String
     )
 }

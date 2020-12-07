@@ -13,7 +13,7 @@ import no.nav.omsorgspenger.koronaoverføringer.Grunnlag
 import no.nav.omsorgspenger.koronaoverføringer.Grunnlag.Companion.vurdert
 import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding
+import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import org.slf4j.LoggerFactory
 
 internal class BehandleOverføreKoronaOmsorgsdager(

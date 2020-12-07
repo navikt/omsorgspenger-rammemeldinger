@@ -8,6 +8,7 @@ import no.nav.k9.rapid.river.skalLøseBehov
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
+import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
 import org.slf4j.LoggerFactory
 
 internal class InitierMidlertidigAlene(
@@ -38,9 +39,10 @@ internal class InitierMidlertidigAlene(
 
         packet.leggTilBehovEtter(MidlertidigAleneMelding.MidlertidigAlene, OpprettGosysJournalføringsoppgaverMelding.behov(
             OpprettGosysJournalføringsoppgaverMelding.BehovInput(
-                søker = behovet.søker,
-                annenForelder = behovet.annenForelder,
-                journalpostIder = behovet.journalpostIder
+                identitetsnummer = behovet.søker,
+                berørteIdentitetsnummer = setOf(behovet.annenForelder),
+                journalpostIder = behovet.journalpostIder,
+                journalpostType = "MidlertidigAlene"
             )
         ))
 

@@ -9,9 +9,9 @@ import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
-import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
+import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
+import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding
+import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
