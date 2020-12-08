@@ -14,12 +14,12 @@ spec:
       tenant: {{azureTenant}}
   accessPolicy:
     outbound:
+      rules:
+        - application: omsorgspenger-tilgangsstyring
       external:
       {{#each externalHosts as |host|}}
         - host: {{host}}
       {{/each}}
-      rules:
-        - application: omsorgspenger-tilgangsstyring
     inbound:
       rules:
         - application: omsorgspenger-oidc-auth-proxy
@@ -76,5 +76,5 @@ spec:
     - name: {{@key}}
       value: {{this}}
   {{/each}}
-  - name: TILGANGSSTYRING_URL
-    value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local
+    - name: TILGANGSSTYRING_URL
+      value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local
