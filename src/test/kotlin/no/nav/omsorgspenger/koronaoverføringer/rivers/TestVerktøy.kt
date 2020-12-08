@@ -10,8 +10,8 @@ import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.JournalpostId
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
-import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
+import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
 import org.intellij.lang.annotations.Language
 import org.json.JSONObject
 import org.skyscreamer.jsonassert.JSONAssert
@@ -64,7 +64,7 @@ internal fun barn(utvidetRett: Boolean = false) = OverføreKoronaOmsorgsdagerBeh
     identitetsnummer = IdentitetsnummerGenerator.identitetsnummer(),
     fødselsdato = LocalDate.now().minusYears(1),
     aleneOmOmsorgen = false,
-    utvidetRett = false
+    utvidetRett = utvidetRett
 )
 
 internal fun JSONObject.assertGosysJournalføringsoppgave(

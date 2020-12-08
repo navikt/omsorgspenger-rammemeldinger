@@ -3,15 +3,11 @@ package no.nav.omsorgspenger.koronaoverføringer.rivers
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.OverføreKoronaOmsorgsdagerBehov
 import no.nav.omsorgspenger.Periode
-import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator
-import no.nav.omsorgspenger.overføringer.ventPå
 import no.nav.omsorgspenger.registerOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.testutils.*
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
-import no.nav.omsorgspenger.testutils.sisteMelding
-import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -46,7 +42,7 @@ internal class BehandleKoronaOverføringerTest(
         )
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
-        JSONObject(rapid.sisteMelding()).assertGosysJournalføringsoppgave(
+        rapid.sisteMeldingSomJSONObject().assertGosysJournalføringsoppgave(
             behovssekvensId = id,
             fra = fra,
             til = til,
@@ -68,7 +64,7 @@ internal class BehandleKoronaOverføringerTest(
         )
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
-        JSONObject(rapid.sisteMelding()).assertGosysJournalføringsoppgave(
+        rapid.sisteMeldingSomJSONObject().assertGosysJournalføringsoppgave(
             behovssekvensId = id,
             fra = fra,
             til = til,
@@ -101,7 +97,7 @@ internal class BehandleKoronaOverføringerTest(
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
-        rapid.sendTestMessage(rapid.sisteMelding().somJsonMessage().leggTilLøsningPåHenteOmsorgspengerSaksnummer(
+        rapid.sendTestMessage(rapid.sisteMeldingSomJsonMessage().leggTilLøsningPåHenteOmsorgspengerSaksnummer(
             fra = fra,
             til = til
         ).toJson())

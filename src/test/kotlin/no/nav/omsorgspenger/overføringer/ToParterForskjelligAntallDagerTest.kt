@@ -2,9 +2,9 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
-import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator.identitetsnummer
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Assertions.*

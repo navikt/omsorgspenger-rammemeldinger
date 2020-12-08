@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.awaitility.Awaitility
+import org.json.JSONObject
 import java.time.Duration
 
 internal fun TestRapid.ventPå(antallMeldinger: Int) =
@@ -14,3 +15,9 @@ internal fun TestRapid.sisteMelding() =
 
 internal fun String.somJsonMessage() =
     JsonMessage(toString(), MessageProblems(this)).also { it.interestedIn("@løsninger") }
+
+internal fun TestRapid.sisteMeldingSomJsonMessage() =
+    sisteMelding().somJsonMessage()
+
+internal fun TestRapid.sisteMeldingSomJSONObject() =
+    JSONObject(sisteMelding())

@@ -1,20 +1,19 @@
 package no.nav.omsorgspenger.overføringer
 
 import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
+import no.nav.omsorgspenger.testutils.sisteMeldingSomJsonMessage
 
 internal fun TestRapid.mockLøsningPåHenteOmsorgspengerSaksnummer(
     fra: Identitetsnummer, til: Identitetsnummer) {
     sendTestMessage(
-        sisteMelding()
-            .somJsonMessage()
-            .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra, til)
-            .toJson()
+        sisteMeldingSomJsonMessage()
+        .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra, til)
+        .toJson()
     )
 }
 
@@ -32,10 +31,9 @@ private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
 internal fun TestRapid.mockLøsningPåHentePersonopplysninger(
     fra: Identitetsnummer, til: Identitetsnummer) {
     sendTestMessage(
-        sisteMelding()
-            .somJsonMessage()
-            .leggTilLøsningPåHentePersonopplysninger(fra, til)
-            .toJson()
+        sisteMeldingSomJsonMessage()
+        .leggTilLøsningPåHentePersonopplysninger(fra, til)
+        .toJson()
     )
 }
 
@@ -68,7 +66,3 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
             )
         )
     )
-
-internal fun TestRapid.sisteMelding() = inspektør.message(inspektør.size - 1).toString()
-
-private fun String.somJsonMessage() = JsonMessage(toString(), MessageProblems(this)).also { it.interestedIn("@løsninger") }
