@@ -1,10 +1,20 @@
 package no.nav.omsorgspenger.overføringer.apis
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import io.ktor.http.*
-import io.ktor.server.testing.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.withCharset
+import io.ktor.server.testing.contentType
+import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.withTestApplication
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import java.time.ZonedDateTime
+import javax.sql.DataSource
+import kotlin.test.assertEquals
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.lovverk.LovanvendelserTest
@@ -24,55 +34,59 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert
-import java.time.ZonedDateTime
-import javax.sql.DataSource
-import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
 internal class OverføringerApiTest(
-    dataSource: DataSource,
-    wireMockServer: WireMockServer) {
+        dataSource: DataSource,
+        wireMockServer: WireMockServer
+) {
+
+    private val tilgangsstyringMock = mockk<TilgangsstyringRestClient>().also {
+        coEvery { it.sjekkTilgang(setOf("22", "33"), any(), any()) }
+                .returns(true)
+    }
 
     private val saksnummerServiceMock = mockk<SaksnummerService>().also {
         every { it.hentSaksnummerIdentitetsnummerMapping(any()) }.returns(mapOf(
-            "101112" to "22",
-            "131415" to "33"
+                "101112" to "22",
+                "131415" to "33"
         ))
     }
 
     private val overføringRepositoryMock = mockk<OverføringRepository>().also {
         every { it.hentAktiveOverføringer(setOf(SaksnummerHarIkkeOverføringer)) }.returns(emptyMap())
         every { it.hentAktiveOverføringer(setOf(SaksnummerHarOverføringer)) }.returns(
-            mapOf(SaksnummerHarOverføringer to GjeldendeOverføringer(
-                gitt = listOf(GjeldendeOverføringGitt(
-                    gjennomført = ZonedDateTime.parse("2020-11-24T17:34:31.227Z"),
-                    antallDager = 5,
-                    status = GjeldendeOverføring.Status.Aktiv,
-                    kilder = setOf(),
-                    lovanvendelser = LovanvendelserTest.TestLovanvendelser,
-                    periode = Periode("2020-01-01/2020-12-31"),
-                    til = "101112",
-                    antallDagerØnsketOverført = 10
-                )),
-                fått = listOf(GjeldendeOverføringFått(
-                    gjennomført = ZonedDateTime.parse("2018-11-24T17:34:31.000Z"),
-                    antallDager = 3,
-                    status = GjeldendeOverføring.Status.Aktiv,
-                    kilder = setOf(),
-                    lovanvendelser = LovanvendelserTest.TestLovanvendelser,
-                    periode = Periode("2019-01-01/2019-12-31"),
-                    fra = "131415"
+                mapOf(SaksnummerHarOverføringer to GjeldendeOverføringer(
+                        gitt = listOf(GjeldendeOverføringGitt(
+                                gjennomført = ZonedDateTime.parse("2020-11-24T17:34:31.227Z"),
+                                antallDager = 5,
+                                status = GjeldendeOverføring.Status.Aktiv,
+                                kilder = setOf(),
+                                lovanvendelser = LovanvendelserTest.TestLovanvendelser,
+                                periode = Periode("2020-01-01/2020-12-31"),
+                                til = "101112",
+                                antallDagerØnsketOverført = 10
+                        )),
+                        fått = listOf(GjeldendeOverføringFått(
+                                gjennomført = ZonedDateTime.parse("2018-11-24T17:34:31.000Z"),
+                                antallDager = 3,
+                                status = GjeldendeOverføring.Status.Aktiv,
+                                kilder = setOf(),
+                                lovanvendelser = LovanvendelserTest.TestLovanvendelser,
+                                periode = Periode("2019-01-01/2019-12-31"),
+                                fra = "131415"
+                        ))
+                )
                 ))
-            )
-        ))
     }
 
     private val applicationContext = TestApplicationContextBuilder(
-        dataSource = dataSource.cleanAndMigrate(),
-        wireMockServer = wireMockServer
+            dataSource = dataSource.cleanAndMigrate(),
+            wireMockServer = wireMockServer
     ).also { builder ->
         builder.overføringRepository = overføringRepositoryMock
         builder.saksnummerService = saksnummerServiceMock
+        builder.tilgangsstyringRestClient = tilgangsstyringMock
     }.build()
 
     @Test
@@ -171,12 +185,23 @@ internal class OverføringerApiTest(
         }
     }
 
+    @Test
+    fun `Hent overføringer uten tilgang ger http forbidden`() {
+        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
+            handleRequest(HttpMethod.Get, path(SaksnummerHarOverføringer)) {
+                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumUnauthorized())
+            }.apply {
+                assertEquals(HttpStatusCode.Forbidden, response.status())
+            }
+        }
+    }
+
     private companion object {
         private const val Path = "/overforinger"
         private const val SaksnummerHarOverføringer = "123"
         private const val SaksnummerHarIkkeOverføringer = "456"
 
         private fun path(saksnummer: Saksnummer, status: String = "Aktiv") =
-            "$Path?saksnummer=$saksnummer&status=$status"
+                "$Path?saksnummer=$saksnummer&status=$status"
     }
 }

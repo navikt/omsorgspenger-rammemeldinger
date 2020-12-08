@@ -16,6 +16,7 @@ import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdag
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.auth.*
+import io.ktor.client.HttpClient
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -27,6 +28,7 @@ import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOms
 import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
+import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
 import org.slf4j.event.Level
 
 fun main() {
@@ -148,7 +150,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
             OverføringerApi(
                 overføringRepository = applicationContext.overføringRepository,
                 saksnummerService = applicationContext.saksnummerService,
-                enabled = applicationContext.env.hentOptionalEnv("OVERFORING_API") == "enabled"
+                tilgangsstyringRestClient = applicationContext.tilgangsstyringRestClient
             )
         }
     }
