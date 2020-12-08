@@ -241,7 +241,6 @@ internal class MeldingsbestillingTest {
         assertThat(meldingsbestillinger).isEmpty()
     }
 
-
     private companion object {
         private val periode = Periode("2020-01-01/2020-12-31")
         private fun behovet(
@@ -263,7 +262,9 @@ internal class MeldingsbestillingTest {
         private fun behandling(antallDager: Int) = OverføreKoronaOmsorgsdagerBehandlingMelding.ForVidereBehandling(
             fraSaksnummer = "sak1",
             tilSaksnummer = "sak2",
-            overføring = NyOverføring(antallDager = antallDager, periode = periode)
+            overføring = NyOverføring(antallDager = antallDager, periode = periode),
+            gjeldendeOverføringer = emptyMap(),
+            alleSaksnummerMapping = emptyMap()
         )
         private val personopplysninger = mapOf(
             "id1" to Personopplysninger(
