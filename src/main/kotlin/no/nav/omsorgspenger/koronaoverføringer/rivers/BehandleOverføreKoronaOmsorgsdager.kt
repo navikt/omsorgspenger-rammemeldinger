@@ -3,10 +3,7 @@ package no.nav.omsorgspenger.koronaoverføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.river.harLøsningPåBehov
-import no.nav.k9.rapid.river.leggTilBehov
-import no.nav.k9.rapid.river.leggTilBehovEtter
-import no.nav.k9.rapid.river.skalLøseBehov
+import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.koronaoverføringer.Behandling
@@ -14,6 +11,8 @@ import no.nav.omsorgspenger.koronaoverføringer.Beregninger
 import no.nav.omsorgspenger.koronaoverføringer.Grunnlag
 import no.nav.omsorgspenger.koronaoverføringer.Grunnlag.Companion.vurdert
 import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
+import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
@@ -39,6 +38,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 it.skalLøseBehov(aktueltBehov)
                 it.harLøsningPåBehov(HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer)
                 OverføreKoronaOmsorgsdagerMelding.validateBehov(it)
+                HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
             }
         }.register(this)
     }
@@ -50,6 +50,8 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             require(it.containsKey(behovet.fra)) { "Mangler saksnummer for 'fra'"}
             require(it.containsKey(behovet.til)) { "Mangler saksnummer for 'til'"}
         }
+        val fraSaksnummer = saksnummer.getValue(behovet.fra)
+        val tilSaksnummer = saksnummer.getValue(behovet.til)
 
         val behandling = Behandling(behovet)
 
@@ -73,13 +75,31 @@ internal class BehandleOverføreKoronaOmsorgsdager(
         )
 
         // TODO: Gjennomfør overføringen
-
-        // TODO: Legg til behandlingen
-
+        val overføring = NyOverføring(
+            periode = behandling.periode,
+            antallDager = when (dagerTilgjengeligForOverføring >= behovet.omsorgsdagerÅOverføre) {
+                true -> behovet.omsorgsdagerÅOverføre
+                false -> dagerTilgjengeligForOverføring
+            }
+        )
         // TODO: Trenger egentlig for alle personer i gjeldende overføringer.
         val alleSaksnummerMapping = mapOf(
             behovet.fra to saksnummer.getValue(behovet.fra),
             behovet.til to saksnummer.getValue(behovet.til)
+        )
+
+
+        packet.leggTilBehovMedLøsninger(
+            aktueltBehov = aktueltBehov,
+            behovMedLøsninger = arrayOf(OverføreKoronaOmsorgsdagerBehandlingMelding.behovMedLøsning(
+                løsning = OverføreKoronaOmsorgsdagerBehandlingMelding.HeleBehandling(
+                    fraSaksnummer = fraSaksnummer,
+                    tilSaksnummer = tilSaksnummer,
+                    overføring = overføring,
+                    alleSaksnummerMapping = alleSaksnummerMapping,
+                    gjeldendeOverføringer = emptyMap()
+                )
+            ))
         )
 
         if (måVurderesManuelt) {

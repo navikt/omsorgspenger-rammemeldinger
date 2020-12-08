@@ -14,7 +14,13 @@ internal object OverføreKoronaOmsorgsdagerBehandlingMelding :
     HentLøsning<OverføreKoronaOmsorgsdagerBehandlingMelding.ForVidereBehandling> {
     internal const val OverføreKoronaOmsorgsdagerBehandling = "OverføreKoronaOmsorgsdagerBehandling"
 
-    internal class HeleBehandling()
+    internal class HeleBehandling(
+        internal val fraSaksnummer: Saksnummer,
+        internal val tilSaksnummer: Saksnummer,
+        internal val overføring: NyOverføring,
+        internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
+        internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>
+    )
     internal class ForVidereBehandling(
         internal val fraSaksnummer: Saksnummer,
         internal val tilSaksnummer: Saksnummer,
