@@ -131,8 +131,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
             OverføringerApi(
                 overføringRepository = applicationContext.overføringRepository,
                 saksnummerService = applicationContext.saksnummerService,
-                tilgangsstyringRestClient = applicationContext.tilgangsstyringRestClient,
-                enabled = applicationContext.env.hentOptionalEnv("OVERFORING_API") == "enabled"
+                tilgangsstyringRestClient = applicationContext.tilgangsstyringRestClient
             )
         }
     }
