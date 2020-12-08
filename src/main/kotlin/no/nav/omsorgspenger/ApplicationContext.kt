@@ -1,6 +1,12 @@
 package no.nav.omsorgspenger
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
@@ -122,7 +128,9 @@ internal class ApplicationContext(
             )
 
             val benyttetTilgangsstyringRestClient = tilgangsstyringRestClient ?: TilgangsstyringRestClient(
-                    httpClient = HttpClient(),
+                    httpClient = HttpClient {
+                        install(JsonFeature) { serializer = JacksonSerializer(jacksonObjectMapper()) }
+                    },
                     env = benyttetEnv
             )
 
@@ -172,5 +180,6 @@ internal class ApplicationContext(
                 tilgangsstyringRestClient = benyttetTilgangsstyringRestClient
             )
         }
+
     }
 }

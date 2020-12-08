@@ -59,13 +59,12 @@ internal fun Route.OverføringerApi(
             saksnummer = overføringer.saksnummer()
         )
 
-        val authHeader = call.request.headers[HttpHeaders.Authorization]
-                ?: return@get call.respond(HttpStatusCode.Unauthorized)
+        val authHeader = requireNotNull(call.request.headers[HttpHeaders.Authorization])
         val identer = saksnummerIdentitetsnummerMapping.values.toSet()
-        val beskrivelse = "sjekk tilgang"
-        val harTilgangTilSaksnummer = tilgangsstyringRestClient.sjekkTilgang(identer, authHeader, beskrivelse)
+        val beskrivelse = "hente overføringer"
+        val harTilgang = tilgangsstyringRestClient.sjekkTilgang(identer, authHeader, beskrivelse)
 
-        if (!harTilgangTilSaksnummer) {
+        if (!harTilgang) {
             return@get call.respond(HttpStatusCode.Forbidden)
         }
 

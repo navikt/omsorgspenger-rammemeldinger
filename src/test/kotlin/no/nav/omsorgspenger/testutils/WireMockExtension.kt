@@ -10,7 +10,10 @@ internal class WireMockExtension : ParameterResolver {
 
     internal companion object {
 
-        private val wireMockServer = WireMockBuilder().withAzureSupport().build()
+        private val wireMockServer = WireMockBuilder()
+                .withAzureSupport()
+                .build()
+                .stubTilgangApi()
 
         init {
             Runtime.getRuntime().addShutdownHook(
