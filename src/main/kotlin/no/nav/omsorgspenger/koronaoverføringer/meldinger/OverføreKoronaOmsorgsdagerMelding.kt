@@ -7,6 +7,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.rivers.HentBehov
 import no.nav.omsorgspenger.rivers.LeggTilLøsning
+import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
@@ -25,8 +26,16 @@ internal object OverføreKoronaOmsorgsdagerMelding :
         val mottaksdato: LocalDate,
         val journalpostIder: Set<JournalpostId>,
         val omsorgsdagerÅOverføre: Int,
-        val omsorgsdagerTattUtIÅr: Int // TODO: Rename ?
-    )
+        val omsorgsdagerTattUtIÅr: Int) {
+        internal fun somOpprettGosysJournalføringsoppgaverBehov() = OpprettGosysJournalføringsoppgaverMelding.behov(
+            behovInput = OpprettGosysJournalføringsoppgaverMelding.BehovInput(
+                identitetsnummer = fra,
+                berørteIdentitetsnummer = setOf(til),
+                journalpostIder = journalpostIder,
+                journalpostType = "OverføreKoronaOmsorgsdager"
+            )
+        )
+    }
 
     internal data class Løsningen(
         val bar: Boolean = false // TODO

@@ -13,7 +13,8 @@ import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
-import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
+import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
+import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
 import org.slf4j.LoggerFactory
 
 internal class InitierOverføreKoronaOmsorgsdager(
@@ -30,22 +31,22 @@ internal class InitierOverføreKoronaOmsorgsdager(
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(aktueltBehov)
-                it.utenLøsningPåBehov(HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer)
+                it.utenLøsningPåBehov(HentOmsorgspengerSaksnummer)
                 OverføreKoronaOmsorgsdagerMelding.validateBehov(it)
             }
         }.register(this)
     }
 
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
-        val overføringen = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
+        val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
 
-        if (overføringen.periode.erStøttetPeriode()) {
-            logger.info("Legger til behov ${HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer}")
+        if (behovet.periode.erStøttetPeriode()) {
+            logger.info("Legger til behov $HentOmsorgspengerSaksnummer")
             packet.leggTilBehov(
                 aktueltBehov = aktueltBehov,
                 behov = arrayOf(HentOmsorgspengerSaksnummerMelding.behov(
                     HentOmsorgspengerSaksnummerMelding.BehovInput(
-                        identitetsnummer = setOf(overføringen.fra, overføringen.til)
+                        identitetsnummer = setOf(behovet.fra, behovet.til)
                     )
                 ))
             )
@@ -55,16 +56,9 @@ internal class InitierOverføreKoronaOmsorgsdager(
             ))
             packet.leggTilBehovEtter(
                 aktueltBehov = aktueltBehov,
-                behov = arrayOf(OpprettGosysJournalføringsoppgaverMelding.behov(
-                    behovInput = OpprettGosysJournalføringsoppgaverMelding.BehovInput(
-                        identitetsnummer = overføringen.fra,
-                        berørteIdentitetsnummer = setOf(overføringen.til),
-                        journalpostIder = overføringen.journalpostIder,
-                        journalpostType = "OverføreKoronaOmsorgsdager" // TODO: Må legges til i journalføring
-                    )
-                ))
+                behov = arrayOf(behovet.somOpprettGosysJournalføringsoppgaverBehov())
             )
-            logger.warn("Legger til behov ${OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver}")
+            logger.warn("Legger til behov $OpprettGosysJournalføringsoppgaver")
             secureLogger.info("SuccessPacket=${packet.toJson()}")
         }
 

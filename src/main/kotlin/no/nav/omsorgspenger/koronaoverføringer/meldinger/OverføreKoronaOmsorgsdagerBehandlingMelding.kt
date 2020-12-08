@@ -2,8 +2,10 @@ package no.nav.omsorgspenger.koronaoverføringer.meldinger
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behov
+import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.rivers.BehovMedLøsning
 import no.nav.omsorgspenger.rivers.HentLøsning
 
@@ -16,7 +18,9 @@ internal object OverføreKoronaOmsorgsdagerBehandlingMelding :
     internal class ForVidereBehandling(
         internal val fraSaksnummer: Saksnummer,
         internal val tilSaksnummer: Saksnummer,
-        internal val overføring: NyOverføring
+        internal val overføring: NyOverføring,
+        internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
+        internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>
     )
 
     override fun validateLøsning(packet: JsonMessage) {
