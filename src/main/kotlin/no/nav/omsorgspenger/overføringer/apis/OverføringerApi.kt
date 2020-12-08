@@ -1,7 +1,9 @@
 package no.nav.omsorgspenger.overføringer.apis
 
 import io.ktor.application.*
+import io.ktor.client.HttpClient
 import io.ktor.http.*
+import io.ktor.request.receive
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.k9.rapid.behov.Behovsformat.iso8601
@@ -9,19 +11,15 @@ import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import no.nav.omsorgspenger.overføringer.*
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import org.json.JSONArray
 import org.json.JSONObject
 
 internal fun Route.OverføringerApi(
-    overføringRepository: OverføringRepository,
-    saksnummerService: SaksnummerService,
-    enabled: Boolean) {
+        overføringRepository: OverføringRepository,
+        saksnummerService: SaksnummerService,
+        tilgangsstyringRestClient: TilgangsstyringRestClient) {
 
     get("/overforinger") {
         val saksnummer = try {
@@ -31,14 +29,6 @@ internal fun Route.OverføringerApi(
             call.respondJson(
                 json = """{"melding":"Ugylidg request ${cause.message}"}""",
                 status = HttpStatusCode.BadRequest
-            )
-            return@get
-        }
-
-        if (!enabled) {
-            call.respondJson(
-                json = """{"melding":"Henting av overføringer ikke implementert."}""",
-                status = HttpStatusCode.NotImplemented
             )
             return@get
         }
@@ -59,7 +49,15 @@ internal fun Route.OverføringerApi(
         val saksnummerIdentitetsnummerMapping = saksnummerService.hentSaksnummerIdentitetsnummerMapping(
             saksnummer = overføringer.saksnummer()
         )
-        // TODO: Legg til tilgangsstyring
+
+        val authHeader = requireNotNull(call.request.headers[HttpHeaders.Authorization])
+        val identer = saksnummerIdentitetsnummerMapping.values.toSet()
+        val beskrivelse = "hente overføringer"
+        val harTilgang = tilgangsstyringRestClient.sjekkTilgang(identer, authHeader, beskrivelse)
+
+        if (!harTilgang) {
+            return@get call.respond(HttpStatusCode.Forbidden)
+        }
 
         call.respondJson(
             json = overføringer.getValue(saksnummer).somJson(saksnummerIdentitetsnummerMapping)
