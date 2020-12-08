@@ -9,7 +9,7 @@ import no.nav.k9.rapid.river.skalLøseBehov
 import no.nav.k9.rapid.river.utenLøsningPåBehov
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
-import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
+import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
@@ -40,17 +40,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
 
-        if (behovet.periode.erStøttetPeriode()) {
-            logger.info("Legger til behov $HentOmsorgspengerSaksnummer")
-            packet.leggTilBehov(
-                aktueltBehov = aktueltBehov,
-                behov = arrayOf(HentOmsorgspengerSaksnummerMelding.behov(
-                    HentOmsorgspengerSaksnummerMelding.BehovInput(
-                        identitetsnummer = setOf(behovet.fra, behovet.til)
-                    )
-                ))
-            )
-        } else {
+        if (ManuellVurdering.måVurderesManuelt(behovet)) {
             packet.leggTilLøsningPar(OverføreKoronaOmsorgsdagerMelding.løsning(
                 OverføreKoronaOmsorgsdagerMelding.Løsningen()
             ))
@@ -60,8 +50,17 @@ internal class InitierOverføreKoronaOmsorgsdager(
             )
             logger.warn("Legger til behov $OpprettGosysJournalføringsoppgaver")
             secureLogger.info("SuccessPacket=${packet.toJson()}")
+        } else {
+            logger.info("Legger til behov $HentOmsorgspengerSaksnummer")
+            packet.leggTilBehov(
+                aktueltBehov = aktueltBehov,
+                behov = arrayOf(HentOmsorgspengerSaksnummerMelding.behov(
+                    HentOmsorgspengerSaksnummerMelding.BehovInput(
+                        identitetsnummer = setOf(behovet.fra, behovet.til)
+                    )
+                ))
+            )
         }
-
         return true
     }
 

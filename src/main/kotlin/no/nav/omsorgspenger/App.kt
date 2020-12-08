@@ -22,6 +22,9 @@ import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
+import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOverføreKoronaOmsorgsdager
+import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOmsorgsdager
+import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
 import org.slf4j.event.Level
@@ -68,6 +71,22 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
             applicationContext.stop()
         }
     })
+}
+
+internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationContext: ApplicationContext) {
+    InitierOverføreKoronaOmsorgsdager(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository
+    )
+    BehandleOverføreKoronaOmsorgsdager(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository
+    )
+    PubliserOverføreKoronaOmsorgsdager(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        formidlingService = applicationContext.formidlingService
+    )
 }
 
 internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {
