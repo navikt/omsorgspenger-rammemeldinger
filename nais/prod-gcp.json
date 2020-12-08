@@ -7,8 +7,7 @@
   ],
   "externalHosts": [
     "omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
-    "login.microsoftonline.com",
-    "https://omsorgspenger-proxy.prod-fss-pub.nais.io"
+    "login.microsoftonline.com"
   ],
   "azureTenant": "nav.no",
   "clusterFss": "prod-fss",

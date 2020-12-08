@@ -18,6 +18,8 @@ spec:
       {{#each externalHosts as |host|}}
         - host: {{host}}
       {{/each}}
+      rules:
+        - application: omsorgspenger-tilgangsstyring
     inbound:
       rules:
         - application: omsorgspenger-oidc-auth-proxy
