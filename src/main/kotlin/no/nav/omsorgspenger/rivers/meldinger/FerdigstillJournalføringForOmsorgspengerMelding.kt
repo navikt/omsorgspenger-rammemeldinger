@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer.meldinger
+package no.nav.omsorgspenger.rivers.meldinger
 
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer

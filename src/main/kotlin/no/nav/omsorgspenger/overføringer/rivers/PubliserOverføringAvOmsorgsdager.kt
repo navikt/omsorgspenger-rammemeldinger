@@ -9,13 +9,13 @@ import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
-import no.nav.omsorgspenger.overføringer.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
+import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.statistikk.StatistikkMelding
 import no.nav.omsorgspenger.statistikk.StatistikkService
@@ -45,7 +45,7 @@ internal class PubliserOverføringAvOmsorgsdager (
             validate {
                 OverføreOmsorgsdagerMelding.validateBehov(it)
                 OverføreOmsorgsdagerBehandlingMelding.validateLøsning(it)
-                HentPersonopplysningerMelding.validateLøsning(it)
+                OverføreOmsorgsdagerPersonopplysningerMelding.validateLøsning(it)
             }
         }.register(this)
     }
@@ -55,7 +55,7 @@ internal class PubliserOverføringAvOmsorgsdager (
 
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreOmsorgsdagerBehandlingMelding.hentLøsning(packet)
-        val personopplysninger = HentPersonopplysningerMelding.hentLøsning(packet).also {
+        val personopplysninger = OverføreOmsorgsdagerPersonopplysningerMelding.hentLøsning(packet).personopplysninger.also {
             require(it.keys.containsAll(behandling.alleSaksnummerMapping.identitetsnummer())) {
                 "Mangler personopplysninger for en eller fler av personene berørt av overføringen."
             }

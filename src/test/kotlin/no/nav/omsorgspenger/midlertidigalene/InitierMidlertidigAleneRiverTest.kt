@@ -2,12 +2,12 @@ package no.nav.omsorgspenger.midlertidigalene
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.MidlertidigAleneBehov
-import no.nav.omsorgspenger.overføringer.sisteMelding
-import no.nav.omsorgspenger.overføringer.ventPå
 import no.nav.omsorgspenger.registerApplicationContext
+import no.nav.omsorgspenger.testutils.*
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
+import no.nav.omsorgspenger.testutils.ventPå
 import org.intellij.lang.annotations.Language
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach

@@ -3,7 +3,9 @@ package no.nav.omsorgspenger.overføringer
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
 import no.nav.omsorgspenger.registerApplicationContext
+import no.nav.omsorgspenger.testutils.*
 import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Assertions.assertTrue

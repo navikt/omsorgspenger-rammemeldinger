@@ -8,9 +8,9 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.fordelinger.FordelingService
-import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.DataSourceExtension
+import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator.identitetsnummer
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService

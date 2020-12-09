@@ -10,7 +10,7 @@ import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Behandling
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
-import no.nav.omsorgspenger.overføringer.meldinger.SerDes.JacksonObjectMapper
+import no.nav.omsorgspenger.rivers.meldinger.SerDes.JacksonObjectMapper
 import no.nav.omsorgspenger.rivers.BehovMedLøsning
 import no.nav.omsorgspenger.rivers.HentLøsning
 

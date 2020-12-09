@@ -21,16 +21,18 @@ import no.nav.omsorgspenger.overføringer.meldinger.*
 import no.nav.omsorgspenger.overføringer.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding.HentMidlertidigAleneVedtak
-import no.nav.omsorgspenger.overføringer.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
-import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding
-import no.nav.omsorgspenger.overføringer.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
+import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding.HentUtvidetRettVedtak
-import no.nav.omsorgspenger.overføringer.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
+import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
+import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerInput
+import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding.Companion.HentPersonopplysninger
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
+import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
+import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 
@@ -181,9 +183,10 @@ internal class BehandleOverføringAvOmsorgsdager(
                 behov = arrayOf(
                     OpprettGosysJournalføringsoppgaverMelding.behov(
                         OpprettGosysJournalføringsoppgaverMelding.BehovInput(
-                            fra = overføreOmsorgsdager.overførerFra,
-                            til = overføreOmsorgsdager.overførerTil,
-                            journalpostIder = overføreOmsorgsdager.journalpostIder
+                            identitetsnummer = overføreOmsorgsdager.overførerFra,
+                            berørteIdentitetsnummer = setOf(overføreOmsorgsdager.overførerTil),
+                            journalpostIder = overføreOmsorgsdager.journalpostIder,
+                            journalpostType = "OverføreOmsorgsdager"
                         )
                     )
                 )
@@ -194,8 +197,8 @@ internal class BehandleOverføringAvOmsorgsdager(
             packet.leggTilBehov(
                 aktueltBehov = OverføreOmsorgsdager,
                 behov = arrayOf(
-                    HentPersonopplysningerMelding.behov(
-                        HentPersonopplysningerMelding.BehovInput(
+                    OverføreOmsorgsdagerPersonopplysningerMelding.behov(
+                        HentPersonopplysningerInput(
                             identitetsnummer = alleSaksnummerMapping.identitetsnummer()
                         )
                     )

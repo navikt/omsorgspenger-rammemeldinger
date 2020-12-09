@@ -10,27 +10,19 @@ import no.nav.k9.rapid.losning.somMelding
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.Oslo
-import no.nav.omsorgspenger.overføringer.IdentitetsnummerGenerator.identitetsnummer
-import org.awaitility.Awaitility
+import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator.identitetsnummer
+import no.nav.omsorgspenger.testutils.sisteMelding
+import no.nav.omsorgspenger.testutils.ventPå
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
 import java.util.*
 
-internal object IdentitetsnummerGenerator {
-    private var teller = 10000000000
-    internal fun identitetsnummer(): Identitetsnummer {
-        return "%011d".format(teller++)
-    }
-
-}
 internal fun TestRapid.løsningOverføreOmsorgsdager() = sisteMelding().somMelding().løsningPå(OverføreOmsorgsdagerLøsningResolver.Instance)
-internal fun TestRapid.ventPå(antallMeldinger: Int) = Awaitility.await().atMost(Duration.ofSeconds(1)).until { inspektør.size == antallMeldinger }
 internal fun TestRapid.ventPåLøsning(
     behovssekvens: String,
     fra: Identitetsnummer,

@@ -8,6 +8,8 @@ import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjeng
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
+import no.nav.omsorgspenger.personopplysninger.Navn
+import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -378,11 +380,11 @@ internal class MeldingsbestillingTest {
                 behovssekvensId = "foo",
                 personopplysninger = mapOf(
                     fra to Personopplysninger(gjeldendeIdentitetsnummer = fra, fødselsdato = LocalDate.now(),
-                        navn = Personopplysninger.Navn("Ola","En","Nordmann"), aktørId = "123", adressebeskyttet = false),
+                        navn = Navn("Ola","En","Nordmann"), aktørId = "123", adressebeskyttet = false),
                     til to Personopplysninger(gjeldendeIdentitetsnummer = til, fødselsdato = LocalDate.now(),
-                        navn = Personopplysninger.Navn("Kari","To", "Nordmann"), aktørId = "345", adressebeskyttet = false),
+                        navn = Navn("Kari","To", "Nordmann"), aktørId = "345", adressebeskyttet = false),
                     tidligerePartner to  Personopplysninger(gjeldendeIdentitetsnummer = til, fødselsdato = LocalDate.now(),
-                        navn = Personopplysninger.Navn("Heidi","Tre", "Nordmann"), aktørId = "789", adressebeskyttet = false)
+                        navn = Navn("Heidi","Tre", "Nordmann"), aktørId = "789", adressebeskyttet = false)
                 ),
                 overføreOmsorgsdager = overføreOmsorgsdager,
                 behandling = OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling(

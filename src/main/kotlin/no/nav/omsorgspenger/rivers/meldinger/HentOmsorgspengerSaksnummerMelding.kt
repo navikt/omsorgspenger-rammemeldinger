@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer.meldinger
+package no.nav.omsorgspenger.rivers.meldinger
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.helse.rapids_rivers.JsonMessage
