@@ -1,17 +1,18 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
 import de.huxhorn.sulky.ulid.ULID
-import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovsformat
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.OverføreKoronaOmsorgsdagerBehov
-import no.nav.k9.rapid.river.leggTilLøsning
+import no.nav.k9.rapid.losning.OverføreKoronaOmsorgsdagerLøsningResolver
+import no.nav.k9.rapid.losning.somMelding
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.JournalpostId
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
-import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
+import no.nav.omsorgspenger.testutils.sisteMelding
 import org.intellij.lang.annotations.Language
 import org.json.JSONObject
 import org.skyscreamer.jsonassert.JSONAssert
@@ -29,7 +30,7 @@ internal fun behovssekvensOverføreKoronaOmsorgsdager(
     omsorgsdagerÅOverføre: Int,
     periode: Periode = Periode("2021-01-01/2021-12-31"),
     mottatt: ZonedDateTime = ZonedDateTime.now(),
-    barn: List<OverføreKoronaOmsorgsdagerBehov.Barn> = listOf(barn()),
+    barn: List<OverføreKoronaOmsorgsdagerBehov.Barn> = listOf(koronaBarn()),
     journalpostIder: List<String> = listOf("1234")
 ) = Behovssekvens(
     id = id,
@@ -49,18 +50,7 @@ internal fun behovssekvensOverføreKoronaOmsorgsdager(
     ))
 ).keyValue
 
-internal fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
-    fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
-    behov = HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer,
-    løsning = mapOf(
-        "saksnummer" to mapOf(
-            fra to "foo",
-            til to "bar"
-        )
-    )
-)
-
-internal fun barn(utvidetRett: Boolean = false) = OverføreKoronaOmsorgsdagerBehov.Barn(
+internal fun koronaBarn(utvidetRett: Boolean = false) = OverføreKoronaOmsorgsdagerBehov.Barn(
     identitetsnummer = IdentitetsnummerGenerator.identitetsnummer(),
     fødselsdato = LocalDate.now().minusYears(1),
     aleneOmOmsorgen = false,
@@ -94,3 +84,6 @@ internal fun JSONObject.assertGosysJournalføringsoppgave(
         actual = getJSONObject("@løsninger").keySet()
     )
 }
+
+internal fun TestRapid.løsningOverføreKoronaOmsorgsdager() =
+    sisteMelding().somMelding().løsningPå(OverføreKoronaOmsorgsdagerLøsningResolver.Instance)

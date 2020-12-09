@@ -102,7 +102,10 @@ internal object OverføreKoronaOmsorgsdagerMelding :
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
         return OverføreKoronaOmsorgsdager to mapOf( // TODO
-            "versjon" to "1.0.0"
+            "versjon" to "1.0.0",
+            "utfall" to "Gjennomført",
+            "begrunnelser" to listOf<String>(),
+            "overføringer" to mapOf<String, Any>()
         )
     }
 

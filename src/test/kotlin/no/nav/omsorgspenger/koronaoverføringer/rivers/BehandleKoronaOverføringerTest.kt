@@ -1,7 +1,6 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import no.nav.k9.rapid.behov.OverføreKoronaOmsorgsdagerBehov
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.registerOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.testutils.*
@@ -11,8 +10,8 @@ import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.time.LocalDate
 import javax.sql.DataSource
+import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class)
 internal class BehandleKoronaOverføringerTest(
@@ -78,28 +77,32 @@ internal class BehandleKoronaOverføringerTest(
     }
 
     @Test
-    fun `Innvilget overføring`() {
+    fun `Gjennomført overføring`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
 
-        val (id, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
+        val (idStart, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
             fra = fra,
             til = til,
             omsorgsdagerTattUtIÅr = 0,
             omsorgsdagerÅOverføre = 10,
-            barn = listOf(OverføreKoronaOmsorgsdagerBehov.Barn(
-                identitetsnummer = IdentitetsnummerGenerator.identitetsnummer(),
-                fødselsdato = LocalDate.now().minusYears(1),
-                aleneOmOmsorgen = false,
-                utvidetRett = false
-            ))
+            barn = listOf(koronaBarn())
         )
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
-        rapid.sendTestMessage(rapid.sisteMeldingSomJsonMessage().leggTilLøsningPåHenteOmsorgspengerSaksnummer(
+        rapid.mockHentOmsorgspengerSaksnummer(
             fra = fra,
             til = til
-        ).toJson())
+        )
+        rapid.ventPå(2)
+        rapid.mockHentPersonopplysninger(
+            fra = fra,
+            til = til
+        )
+        rapid.ventPå(3)
+        val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
+        assertEquals("Gjennomført", løsning.utfall)
+        assertEquals(idStart, idSlutt)
     }
 }

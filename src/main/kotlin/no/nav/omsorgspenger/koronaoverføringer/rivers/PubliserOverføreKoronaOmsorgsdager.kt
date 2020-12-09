@@ -11,6 +11,7 @@ import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.koronaoverføringer.formidling.Formidling
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding
 import org.slf4j.LoggerFactory
@@ -36,7 +37,7 @@ internal class PubliserOverføreKoronaOmsorgsdager(
                 )
                 OverføreKoronaOmsorgsdagerMelding.validateBehov(it)
                 OverføreKoronaOmsorgsdagerBehandlingMelding.validateLøsning(it)
-                HentPersonopplysningerMelding.validateLøsning(it)
+                OverføreKoronaOmsorgsdagerPersonopplysningerMelding.validateLøsning(it)
             }
         }.register(this)
     }
@@ -44,7 +45,7 @@ internal class PubliserOverføreKoronaOmsorgsdager(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreKoronaOmsorgsdagerBehandlingMelding.hentLøsning(packet)
-        val personopplysninger = HentPersonopplysningerMelding.hentLøsning(packet)
+        val personopplysninger = OverføreKoronaOmsorgsdagerPersonopplysningerMelding.hentLøsning(packet).personopplysninger
 
         packet.leggTilLøsningPar(OverføreKoronaOmsorgsdagerMelding.løsning(
             OverføreKoronaOmsorgsdagerMelding.Løsningen()

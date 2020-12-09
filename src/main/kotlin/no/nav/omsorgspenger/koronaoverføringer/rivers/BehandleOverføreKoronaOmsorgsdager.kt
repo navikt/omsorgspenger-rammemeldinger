@@ -14,10 +14,11 @@ import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
+import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerInput
+import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding.Companion.HentPersonopplysninger
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
-import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding
-import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
@@ -37,6 +38,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             validate {
                 it.skalLøseBehov(aktueltBehov)
                 it.harLøsningPåBehov(HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer)
+                it.utenLøsningPåBehov(HentPersonopplysninger)
                 OverføreKoronaOmsorgsdagerMelding.validateBehov(it)
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
             }
@@ -117,8 +119,8 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             packet.leggTilBehov(
                 aktueltBehov = aktueltBehov,
                 behov = arrayOf(
-                    HentPersonopplysningerMelding.behov(
-                        HentPersonopplysningerMelding.BehovInput(
+                    OverføreKoronaOmsorgsdagerPersonopplysningerMelding.behov(
+                        HentPersonopplysningerInput(
                             identitetsnummer = alleSaksnummerMapping.identitetsnummer()
                         )
                     )

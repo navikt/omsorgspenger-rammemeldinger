@@ -70,7 +70,7 @@ internal object OverføreKoronaOmsorgsdagerBehandlingMelding :
     }
 
     private object LøsningKeys {
-        const val Overføring = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.overføringer"
+        const val Overføring = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.overføring"
         const val GjeldendeOverføringer = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.gjeldendeOverføringer"
         const val AlleSaksnummerMapping = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.alleSaksnummerMapping"
         const val FraSaksnummer = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.fraSaksnummer"

@@ -5,6 +5,7 @@ import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.formidling.Meldingsbestilling
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.Personopplysninger
 import org.slf4j.LoggerFactory
 
@@ -15,7 +16,7 @@ internal object Formidling {
 
     internal fun opprettMeldingsbestillinger(
         behovssekvensId: BehovssekvensId,
-        personopplysninger: Map<Identitetsnummer, Personopplysninger>,
+        personopplysninger: Map<Identitetsnummer, OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger>,
         behovet: OverføreKoronaOmsorgsdagerMelding.Behovet,
         behandling: OverføreKoronaOmsorgsdagerBehandlingMelding.ForVidereBehandling
         ) : List<Meldingsbestilling> {

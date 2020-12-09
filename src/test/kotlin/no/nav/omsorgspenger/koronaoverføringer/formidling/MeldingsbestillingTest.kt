@@ -5,7 +5,8 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
-import no.nav.omsorgspenger.overføringer.Personopplysninger
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
+import no.nav.omsorgspenger.personopplysninger.Navn
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
@@ -267,10 +268,9 @@ internal class MeldingsbestillingTest {
             alleSaksnummerMapping = emptyMap()
         )
         private val personopplysninger = mapOf(
-            "id1" to Personopplysninger(
-                gjeldendeIdentitetsnummer = "id1",
+            "id1" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(
                 fødselsdato = LocalDate.parse("1990-09-29"),
-                navn = Personopplysninger.Navn(
+                navn = Navn(
                     fornavn = "Ola",
                     mellomnavn = null,
                     etternavn = "Nordmann"
@@ -278,10 +278,9 @@ internal class MeldingsbestillingTest {
                 aktørId = "aktør1",
                 adressebeskyttet = false
             ),
-            "id2" to Personopplysninger(
-                gjeldendeIdentitetsnummer = "id2",
+            "id2" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(
                 fødselsdato = LocalDate.parse("1991-02-03"),
-                navn = Personopplysninger.Navn(
+                navn = Navn(
                     fornavn = "Kari",
                     mellomnavn = "Johnson",
                     etternavn = "Nordmann"
@@ -289,10 +288,9 @@ internal class MeldingsbestillingTest {
                 aktørId = "aktør2",
                 adressebeskyttet = false
             ),
-            "id3" to Personopplysninger(
-                gjeldendeIdentitetsnummer = "id3",
+            "id3" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(
                 fødselsdato = LocalDate.now(),
-                navn = Personopplysninger.Navn(
+                navn = Navn(
                     fornavn = "Svein",
                     mellomnavn = null,
                     etternavn = "Nordmann"

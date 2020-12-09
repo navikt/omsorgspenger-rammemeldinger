@@ -21,3 +21,6 @@ internal fun TestRapid.sisteMeldingSomJsonMessage() =
 
 internal fun TestRapid.sisteMeldingSomJSONObject() =
     JSONObject(sisteMelding())
+
+internal fun TestRapid.printSisteMelding() =
+    println(sisteMeldingSomJSONObject().toString(1))

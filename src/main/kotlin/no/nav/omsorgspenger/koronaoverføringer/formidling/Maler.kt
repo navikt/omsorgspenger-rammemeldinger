@@ -2,13 +2,13 @@ package no.nav.omsorgspenger.koronaoverføringer.formidling
 
 import no.nav.omsorgspenger.formidling.Melding
 import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
-import no.nav.omsorgspenger.overføringer.Personopplysninger
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
 
 internal class GittDager(
-    val til: Personopplysninger, // TODO: Personopplysninger...
+    val til: OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger,
     val mottaksdato: LocalDate,
     val antallDagerØnsketOverført: Int,
     val overføring: NyOverføring) : Melding {
@@ -28,7 +28,7 @@ internal class GittDager(
 }
 
 internal class MottattDager(
-    val fra: Personopplysninger,
+    val fra: OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger,
     val mottaksdato: LocalDate,
     val overføring: NyOverføring) : Melding {
     override val mal = "KORONA_OVERFORE_MOTTATT_DAGER"
@@ -48,7 +48,7 @@ internal class MottattDager(
 internal class Avslag(
     val mottaksdato: LocalDate,
     val antallDagerØnsketOverført: Int,
-    val til: Personopplysninger
+    val til: OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger
 ) : Melding {
     override val mal = "KORONA_OVERFORE_AVSLAG"
     override val data = {
@@ -60,7 +60,7 @@ internal class Avslag(
     }()
 }
 
-private fun Personopplysninger.somJSONObject() = JSONObject().also { root ->
+private fun OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger.somJSONObject() = JSONObject().also { root ->
     root.put("navn", mapOf(
         "fornavn" to navn!!.fornavn,
         "mellomnavn" to navn.mellomnavn,
