@@ -22,14 +22,14 @@ import no.nav.omsorgspenger.overføringer.meldinger.HentFordelingGirMeldingerMel
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentMidlertidigAleneVedtakMelding.HentMidlertidigAleneVedtak
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
-import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding
-import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding
 import no.nav.omsorgspenger.overføringer.meldinger.HentUtvidetRettVedtakMelding.HentUtvidetRettVedtak
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
+import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerInput
+import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding.Companion.HentPersonopplysninger
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
@@ -197,8 +197,8 @@ internal class BehandleOverføringAvOmsorgsdager(
             packet.leggTilBehov(
                 aktueltBehov = OverføreOmsorgsdager,
                 behov = arrayOf(
-                    HentPersonopplysningerMelding.behov(
-                        HentPersonopplysningerMelding.BehovInput(
+                    OverføreOmsorgsdagerPersonopplysningerMelding.behov(
+                        HentPersonopplysningerInput(
                             identitetsnummer = alleSaksnummerMapping.identitetsnummer()
                         )
                     )

@@ -13,7 +13,6 @@ import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgs
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
-import no.nav.omsorgspenger.rivers.meldinger.HentPersonopplysningerMelding
 import org.slf4j.LoggerFactory
 
 internal class PubliserOverføreKoronaOmsorgsdager(
@@ -33,7 +32,7 @@ internal class PubliserOverføreKoronaOmsorgsdager(
                 it.skalLøseBehov(aktueltBehov)
                 it.harLøsningPåBehov(
                     OverføreKoronaOmsorgsdagerBehandlingMelding.OverføreKoronaOmsorgsdagerBehandling,
-                    HentPersonopplysningerMelding.HentPersonopplysninger
+                    OverføreKoronaOmsorgsdagerPersonopplysningerMelding.HentPersonopplysninger
                 )
                 OverføreKoronaOmsorgsdagerMelding.validateBehov(it)
                 OverføreKoronaOmsorgsdagerBehandlingMelding.validateLøsning(it)
