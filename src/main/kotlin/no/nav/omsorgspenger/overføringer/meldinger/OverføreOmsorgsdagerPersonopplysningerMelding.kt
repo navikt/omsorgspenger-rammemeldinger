@@ -13,7 +13,7 @@ import no.nav.omsorgspenger.personopplysninger.PersonopplysningerVerktøy.navn
 
 internal object OverføreOmsorgsdagerPersonopplysningerMelding
     : HentPersonopplysningerMelding<Personopplysninger, Any>(
-    defaultAttributter = setOf("navn", "fødseldato", "adressebeskyttelse", "aktørId", "gjeldendeIdentitetsnummer")) {
+    defaultAttributter = setOf("navn", "fødselsdato", "adressebeskyttelse", "aktørId", "gjeldendeIdentitetsnummer")) {
     internal val HentPersonopplysninger = HentPersonopplysningerMelding.HentPersonopplysninger
 
     override fun mapPersonopplysninger(input: Map<Identitetsnummer, ObjectNode>): Map<Identitetsnummer, Personopplysninger> {

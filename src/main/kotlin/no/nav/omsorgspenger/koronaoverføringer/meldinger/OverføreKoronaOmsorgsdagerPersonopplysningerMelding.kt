@@ -14,7 +14,7 @@ import java.time.LocalDate
 
 internal object OverføreKoronaOmsorgsdagerPersonopplysningerMelding
     : HentPersonopplysningerMelding<OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger, Any>(
-    defaultAttributter = setOf("navn", "fødseldato", "adressebeskyttelse", "aktørId")) {
+    defaultAttributter = setOf("navn", "fødselsdato", "adressebeskyttelse", "aktørId")) {
     internal val HentPersonopplysninger = HentPersonopplysningerMelding.HentPersonopplysninger
 
     internal data class Personopplysninger(

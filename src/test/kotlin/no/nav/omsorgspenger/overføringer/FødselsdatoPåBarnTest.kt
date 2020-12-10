@@ -16,7 +16,7 @@ import java.time.LocalDate
 import javax.sql.DataSource
 
 @ExtendWith(DataSourceExtension::class)
-internal class FødseldatoPåBarnTest(
+internal class FødselsdatoPåBarnTest(
     dataSource: DataSource) {
     private val rapid = TestRapid().apply {
         this.registerApplicationContext(
