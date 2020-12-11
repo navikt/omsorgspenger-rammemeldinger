@@ -23,6 +23,7 @@ import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
+import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
@@ -62,6 +63,10 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         statistikkService = applicationContext.statistikkService
     )
     InitierMidlertidigAlene(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository
+    )
+    InitierFordelingAvOmsorgsdager(
         rapidsConnection = this,
         behovssekvensRepository = applicationContext.behovssekvensRepository
     )
