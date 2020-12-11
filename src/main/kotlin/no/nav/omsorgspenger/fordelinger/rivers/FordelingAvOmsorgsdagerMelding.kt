@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.fordelinger.rivers
 
 import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.JournalpostId
@@ -9,7 +10,7 @@ import no.nav.omsorgspenger.rivers.LeggTilLøsning
 import java.time.ZonedDateTime
 
 internal object FordelingAvOmsorgsdagerMelding : HentBehov<FordelingAvOmsorgsdagerMelding.Behovet>, LeggTilLøsning<FordelingAvOmsorgsdagerMelding.Løsningen> {
-    internal const val FordelingAvOmsorgsdager = "FordelingAvOmsorgsdager"
+    internal const val FordelingAvOmsorgsdager = "FordeleOmsorgsdager"
 
     override fun validateBehov(packet: JsonMessage) {
         packet.requireValue(BehovKeys.Versjon, "1.0.0")
@@ -17,7 +18,8 @@ internal object FordelingAvOmsorgsdagerMelding : HentBehov<FordelingAvOmsorgsdag
             BehovKeys.Fra,
             BehovKeys.Til,
             BehovKeys.Mottatt,
-            BehovKeys.JournalpostIder
+            BehovKeys.JournalpostIder,
+            BehovKeys.Barn
         )
     }
 
@@ -26,7 +28,7 @@ internal object FordelingAvOmsorgsdagerMelding : HentBehov<FordelingAvOmsorgsdag
         fra = packet[BehovKeys.Fra].asText(),
         til = packet[BehovKeys.Til].asText(),
         mottatt = packet[BehovKeys.Mottatt].asText().let { ZonedDateTime.parse(it) },
-        barn = packet[BehovKeys.Barn].asText(),
+        barn = (packet[BehovKeys.Barn] as ArrayNode).map { it as ObjectNode }.map { it["identitetsnummer"].asText() },
         journalpostIder = (packet[BehovKeys.JournalpostIder] as ArrayNode).map { it.asText() }.toSet().also {
             require(it.isNotEmpty()) { "Må inneholde minst en journalpostId"}
         }
@@ -41,7 +43,7 @@ internal object FordelingAvOmsorgsdagerMelding : HentBehov<FordelingAvOmsorgsdag
         val mottatt: ZonedDateTime,
         val fra:  Identitetsnummer,
         val til: Identitetsnummer,
-        val barn: Identitetsnummer,
+        val barn: List<Identitetsnummer>,
         val journalpostIder: Set<JournalpostId>
     )
 
@@ -52,7 +54,7 @@ internal object FordelingAvOmsorgsdagerMelding : HentBehov<FordelingAvOmsorgsdag
         val Mottatt = "@behov.${FordelingAvOmsorgsdager}.mottatt"
         val Fra = "@behov.${FordelingAvOmsorgsdager}.fra.identitetsnummer"
         val Til = "@behov.${FordelingAvOmsorgsdager}.til.identitetsnummer"
-        val Barn = "@behov.${FordelingAvOmsorgsdager}.barn.identitetsnummer"
+        val Barn = "@behov.${FordelingAvOmsorgsdager}.barn"
         val JournalpostIder = "@behov.${FordelingAvOmsorgsdager}.journalpostIder"
     }
 }

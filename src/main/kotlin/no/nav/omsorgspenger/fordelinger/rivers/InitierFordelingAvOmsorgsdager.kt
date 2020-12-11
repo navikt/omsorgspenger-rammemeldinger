@@ -40,7 +40,7 @@ internal class InitierFordelingAvOmsorgsdager(
         packet.leggTilBehovEtter(FordelingAvOmsorgsdager, OpprettGosysJournalføringsoppgaverMelding.behov(
             OpprettGosysJournalføringsoppgaverMelding.BehovInput(
                 identitetsnummer = behovet.fra,
-                berørteIdentitetsnummer = setOf(behovet.til),
+                berørteIdentitetsnummer = setOf(behovet.til).plus(behovet.barn),
                 journalpostIder = behovet.journalpostIder,
                 journalpostType = "FordeleOmsorgsdager"
             )
