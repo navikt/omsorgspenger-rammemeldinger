@@ -18,7 +18,10 @@ internal class BehandleKoronaOverføringerTest(
     dataSource: DataSource) {
     private val rapid = TestRapid().apply {
         this.registerOverføreKoronaOmsorgsdager(
-            TestApplicationContextBuilder(dataSource.cleanAndMigrate()).build()
+            TestApplicationContextBuilder(
+                dataSource = dataSource.cleanAndMigrate(),
+                additionalEnv = mapOf("KORONA_BEHANDLING" to "enabled")
+            ).build()
         )
     }
 

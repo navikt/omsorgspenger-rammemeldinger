@@ -16,7 +16,6 @@ import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdag
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.auth.*
-import io.ktor.client.HttpClient
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -29,7 +28,6 @@ import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOms
 import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
-import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
 import org.slf4j.event.Level
 
 fun main() {
@@ -81,19 +79,23 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
 }
 
 internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationContext: ApplicationContext) {
+    val behandlingEnabled = applicationContext.env.hentOptionalEnv("KORONA_BEHANDLING") == "enabled"
     InitierOverføreKoronaOmsorgsdager(
         rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
-    )
-    BehandleOverføreKoronaOmsorgsdager(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
-    )
-    PubliserOverføreKoronaOmsorgsdager(
-        rapidsConnection = this,
         behovssekvensRepository = applicationContext.behovssekvensRepository,
-        formidlingService = applicationContext.formidlingService
+        enableBehandling = behandlingEnabled
     )
+    if (behandlingEnabled) {
+        BehandleOverføreKoronaOmsorgsdager(
+            rapidsConnection = this,
+            behovssekvensRepository = applicationContext.behovssekvensRepository
+        )
+        PubliserOverføreKoronaOmsorgsdager(
+            rapidsConnection = this,
+            behovssekvensRepository = applicationContext.behovssekvensRepository,
+            formidlingService = applicationContext.formidlingService
+        )
+    }
 }
 
 internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {

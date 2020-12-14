@@ -28,7 +28,7 @@ internal class StatistikkServiceTest {
     }
 
     @Test
-    internal fun name() {
+    fun `Sending av statistikkmeldinger`() {
         val meldinger = mutableListOf<ProducerRecord<String, String>>()
 
         every { kafkaProducer.send(capture(meldinger)) }.returns(CompletableFuture.completedFuture(null))
