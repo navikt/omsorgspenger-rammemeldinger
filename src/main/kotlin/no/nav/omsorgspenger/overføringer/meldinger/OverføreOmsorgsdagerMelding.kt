@@ -44,8 +44,6 @@ internal object OverføreOmsorgsdagerMelding :
     }
 
     override fun hentBehov(packet: JsonMessage) = Relasjon.valueOf(packet[BehovKeys.Relasjon].asText()).let { relasjon ->
-
-
         Behovet(
             barn = (packet[BehovKeys.Barn] as ArrayNode).map { it.somBarn() },
             overførerFra = packet[BehovKeys.OverførerFra].textValue(),

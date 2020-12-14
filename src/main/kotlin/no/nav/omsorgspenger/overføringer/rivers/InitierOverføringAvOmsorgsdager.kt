@@ -52,9 +52,18 @@ internal class InitierOverføringAvOmsorgsdager(
         }.register(this)
     }
 
+    override fun doHandlePacket(id: String, packet: JsonMessage): Boolean {
+        return when (OverføreOmsorgsdagerMelding.hentBehov(packet).erMottattFør2021()) {
+            true -> super.doHandlePacket(id, packet)
+            false -> logger.warn("Behandling av overføringer mottatt etter 2020 er ikke skrudd på").let { false }
+        }
+    }
+
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("InitierOverføringAvOmsorgsdager for $id")
-        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
+        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet).also {
+            require(it.erMottattFør2021()) { "Behandling av overføringer mottatt etter 2020 er ikke skrudd på" }
+        }
         val periode = overføreOmsorgsdager.overordnetPeriode
         val correlationId = packet.correlationId()
 
@@ -108,4 +117,6 @@ internal class InitierOverføringAvOmsorgsdager(
         )
         return true
     }
+
+    private fun OverføreOmsorgsdagerMelding.Behovet.erMottattFør2021() = mottaksdato.year <= 2020
 }
