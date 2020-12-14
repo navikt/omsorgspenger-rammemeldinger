@@ -20,7 +20,8 @@ import javax.sql.DataSource
 
 internal fun TestApplicationContextBuilder(
     dataSource: DataSource,
-    wireMockServer: WireMockServer? = null
+    wireMockServer: WireMockServer? = null,
+    additionalEnv: Map<String, String> = emptyMap()
 ) = ApplicationContext.Builder(
     accessTokenClient = mockk<AccessTokenClient>().also {
         every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
@@ -51,7 +52,7 @@ internal fun TestApplicationContextBuilder(
             "AZURE_APP_CLIENT_ID" to "omsorgspenger-rammemeldinger",
             "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl()
         )
-    }.plus("OVERFORING_API" to "enabled")
+    }.plus(additionalEnv)
 )
 
 internal fun DataSource.cleanAndMigrate() = this.also {

@@ -41,7 +41,7 @@ internal fun behovssekvensOverføreOmsorgsdager(
     overføringTil: Identitetsnummer = identitetsnummer(),
     omsorgsdagerTattUtIÅr: Int = 0,
     omsorgsdagerÅOverføre: Int = 10,
-    mottaksdato: LocalDate = LocalDate.now(),
+    mottaksdato: LocalDate = LocalDate.parse("2020-12-15"),
     barn: List<OverføreOmsorgsdagerBehov.Barn> = emptyList(),
     jobberINorge: Boolean = true,
     relasjon: OverføreOmsorgsdagerBehov.Relasjon = OverføreOmsorgsdagerBehov.Relasjon.NåværendeEktefelle,
