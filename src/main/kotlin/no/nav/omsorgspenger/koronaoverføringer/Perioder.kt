@@ -20,7 +20,10 @@ internal object Perioder {
         }
 
         return Periode(
-            fom = mottaksdato,
+            fom = when (mottaksdato.isBefore(fraOgMed)) {
+                true -> fraOgMed
+                false -> mottaksdato
+            },
             tom = tilOgMed
         )
     }
