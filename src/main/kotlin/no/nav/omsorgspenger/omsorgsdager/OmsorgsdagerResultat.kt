@@ -11,8 +11,18 @@ internal data class OmsorgsdagerResultat(
         utvidetRettDager.antallDager +
         aleneomsorgOgUtvidetRettDager.antallDager
 
-    internal data class Omsorgsdager(
-        val antallBarn: Int,
-        val antallDager: Int
+    internal fun kopier(faktor: Int) = copy(
+        grunnrettsdager = grunnrettsdager.kopier(faktor),
+        aleneomsorgsdager = aleneomsorgsdager.kopier(faktor),
+        utvidetRettDager = utvidetRettDager.kopier(faktor),
+        aleneomsorgOgUtvidetRettDager = aleneomsorgOgUtvidetRettDager.kopier(faktor)
     )
+
+    internal data class Omsorgsdager(
+        internal val antallBarn: Int,
+        internal val antallDager: Int) {
+        internal fun kopier(faktor: Int) = copy(
+            antallDager = antallDager * faktor
+        )
+    }
 }

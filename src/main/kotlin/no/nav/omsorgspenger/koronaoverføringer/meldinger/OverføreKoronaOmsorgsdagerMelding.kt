@@ -8,6 +8,7 @@ import no.nav.omsorgspenger.JournalpostId
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.extensions.toLocalDateOslo
+import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBarn
 import no.nav.omsorgspenger.rivers.HentBehov
 import no.nav.omsorgspenger.rivers.LeggTilLøsning
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
@@ -47,18 +48,8 @@ internal object OverføreKoronaOmsorgsdagerMelding :
     internal data class Barn(
         internal val identitetsnummer: String,
         internal val fødselsdato: LocalDate,
-        internal val aleneOmOmsorgen: Boolean,
-        internal val utvidetRett: Boolean) {
-        internal val omsorgenFor = Periode(
-            fom = fødselsdato,
-            tom = fødselsdato
-                .plusYears(when (utvidetRett) {
-                    true -> 18L
-                    false -> 12L
-                })
-                .sisteDagIÅret()
-        )
-    }
+        override val aleneOmOmsorgen: Boolean,
+        override val utvidetRett: Boolean) : OmsorgsdagerBarn
 
     override fun validateBehov(packet: JsonMessage) {
         packet.requireValue(BehovKeys.Versjon, "1.0.0")
