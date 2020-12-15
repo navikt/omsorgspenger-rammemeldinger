@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.harLøsningPåBehov
+import no.nav.k9.rapid.river.leggTilBehovEtter
 import no.nav.k9.rapid.river.skalLøseBehov
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
@@ -13,6 +14,7 @@ import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgs
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
+import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import org.slf4j.LoggerFactory
 
 internal class PubliserOverføreKoronaOmsorgsdager(
@@ -59,6 +61,19 @@ internal class PubliserOverføreKoronaOmsorgsdager(
             it.isEmpty() -> secureLogger.warn("Melding(er) må sendes manuelt.")
             else -> formidlingService.sendMeldingsbestillinger(it)
         }}
+
+        packet.leggTilBehovEtter(
+            aktueltBehov = aktueltBehov,
+            behov = arrayOf(
+                FerdigstillJournalføringForOmsorgspengerMelding.behov(
+                    FerdigstillJournalføringForOmsorgspengerMelding.BehovInput(
+                        identitetsnummer = behovet.fra,
+                        journalpostIder = behovet.journalpostIder,
+                        saksnummer = behandling.fraSaksnummer
+                    )
+                )
+            )
+        )
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")
 

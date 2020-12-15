@@ -10,10 +10,10 @@ internal object ManuellVurdering {
     internal fun måVurderesManuelt(
         behovet: OverføreKoronaOmsorgsdagerMelding.Behovet
     ) : Boolean {
-        val grunnetJobberIkkeINorge = !behovet.jobberINorge.also { if (it) {
+        val grunnetJobberIkkeINorge = (!behovet.jobberINorge).also { if (it) {
             logger.warn("Må vurderes manuelt grunnet at personen ikke jobber i Norge.")
         }}
-        val grunnetPeriode = !behovet.periode.erStøttetPeriode().also { if(it) {
+        val grunnetPeriode = (!behovet.periode.erStøttetPeriode()).also { if (it) {
             logger.warn("Må vurderes manuelt grunnet at overføringen gjelder for perioden ${behovet.periode} som ikke støttes.")
         }}
         return grunnetJobberIkkeINorge || grunnetPeriode
