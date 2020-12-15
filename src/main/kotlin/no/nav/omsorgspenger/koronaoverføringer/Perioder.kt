@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.koronaoverføringer
 
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.extensions.erFørEllerLik
 import java.time.LocalDate
 
 internal object Perioder {
@@ -14,13 +15,12 @@ internal object Perioder {
         require(periode.erStøttetPeriode()) {
             "Støtter ikke å behandle koronaoverføring for periode $periode"
         }
-        val niMånederTilbakeITid = mottaksdato.minusMonths(9)
+        require(mottaksdato.erFørEllerLik(tilOgMed)) {
+            "Behandler ikke søknader mottatt $mottaksdato for perioden $periode"
+        }
 
         return Periode(
-            fom = when (niMånederTilbakeITid.isAfter(fraOgMed)) {
-                true -> niMånederTilbakeITid
-                false -> fraOgMed
-            },
+            fom = mottaksdato,
             tom = tilOgMed
         )
     }
