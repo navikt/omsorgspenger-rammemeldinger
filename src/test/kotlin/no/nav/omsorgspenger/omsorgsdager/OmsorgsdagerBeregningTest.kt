@@ -9,7 +9,7 @@ internal class OmsorgsdagerBeregningTest {
     @Test
     fun `Ingen barn gir 0 dager`() {
         val omsorgsdagerResultat = beregnOmsorgsdager(listOf())
-        assertEquals(omsorgsdagerResultat.antallOmsorgsdager, 0)
+        omsorgsdagerResultat.assertAntallOmsorgsdager(0)
     }
 
     @Test
@@ -23,7 +23,7 @@ internal class OmsorgsdagerBeregningTest {
             val omsorgsdagerResultat = beregnOmsorgsdager(
                 barnMedOmsorgenFor = 1.rangeTo(antallBarn).map { etBarn }
             )
-            assertEquals(omsorgsdagerResultat.antallOmsorgsdager, 10)
+            omsorgsdagerResultat.assertAntallOmsorgsdager(10)
         }
     }
 
@@ -38,7 +38,7 @@ internal class OmsorgsdagerBeregningTest {
             val omsorgsdagerResultat = beregnOmsorgsdager(
                 barnMedOmsorgenFor = 1.rangeTo(antallBarn).map { etBarn }
             )
-            assertEquals(omsorgsdagerResultat.antallOmsorgsdager, 15)
+            omsorgsdagerResultat.assertAntallOmsorgsdager(15)
         }
     }
 
@@ -54,8 +54,7 @@ internal class OmsorgsdagerBeregningTest {
             val omsorgsdagerResultat = beregnOmsorgsdager(
                 barnMedOmsorgenFor = 1.rangeTo(antallBarn).map { etBarn }
             )
-
-            assertEquals(omsorgsdagerResultat.antallOmsorgsdager, 20)
+            omsorgsdagerResultat.assertAntallOmsorgsdager(20)
         }
     }
 
@@ -70,8 +69,7 @@ internal class OmsorgsdagerBeregningTest {
             val omsorgsdagerResultat = beregnOmsorgsdager(
                 barnMedOmsorgenFor = 1.rangeTo(antallBarn).map { etBarn }
             )
-
-            assertEquals(omsorgsdagerResultat.antallOmsorgsdager, 30)
+            omsorgsdagerResultat.assertAntallOmsorgsdager(30)
         }
     }
 
@@ -93,8 +91,7 @@ internal class OmsorgsdagerBeregningTest {
             val omsorgsdagerResultat = beregnOmsorgsdager(
                 barnMedOmsorgenFor = vanligeBarn.plus(1.rangeTo(antallUtvidetRett).map { utvidetRettBarn })
             )
-
-            assertEquals(omsorgsdagerResultat.antallOmsorgsdager, 15 + (10 * antallUtvidetRett))
+            omsorgsdagerResultat.assertAntallOmsorgsdager(15 + (10 * antallUtvidetRett))
         }
     }
 
@@ -109,7 +106,7 @@ internal class OmsorgsdagerBeregningTest {
             val omsorgsdagerResultat = beregnOmsorgsdager(
                 barnMedOmsorgenFor = 1.rangeTo(antallUtvidetOgAlene).map { aleneOgUtvidetRettBarn }
             )
-            assertEquals(omsorgsdagerResultat.antallOmsorgsdager, 20 + (20 * antallUtvidetOgAlene))
+            omsorgsdagerResultat.assertAntallOmsorgsdager(20 + (20 * antallUtvidetOgAlene))
         }
 
         val vanligBarn = Barn(
@@ -123,13 +120,18 @@ internal class OmsorgsdagerBeregningTest {
             val omsorgsdagerResultat = beregnOmsorgsdager(
                 barnMedOmsorgenFor = vanligeBarn.plus(1.rangeTo(antallUtvidetOgAlene).map { aleneOgUtvidetRettBarn })
             )
-
-            assertEquals(omsorgsdagerResultat.antallOmsorgsdager, 30 + (20 * antallUtvidetOgAlene))
+            omsorgsdagerResultat.assertAntallOmsorgsdager(30 + (20 * antallUtvidetOgAlene))
         }
     }
     
 
     private companion object {
+
+        private fun OmsorgsdagerResultat.assertAntallOmsorgsdager(forventetAntallOmsorgsdager: Int) {
+            assertEquals(forventetAntallOmsorgsdager, antallOmsorgsdager)
+            assertEquals(forventetAntallOmsorgsdager * 2, kopier(faktor = 2).antallOmsorgsdager)
+        }
+
         private data class Barn(
             override val aleneOmOmsorgen: Boolean,
             override val utvidetRett: Boolean) : OmsorgsdagerBarn
