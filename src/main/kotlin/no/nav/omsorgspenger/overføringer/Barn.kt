@@ -3,13 +3,14 @@ package no.nav.omsorgspenger.overføringer
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.sisteDagIÅret
+import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBarn
 import java.time.LocalDate
 
 internal data class Barn(
     internal val identitetsnummer: String,
     internal val fødselsdato: LocalDate,
-    internal val aleneOmOmsorgen: Boolean,
-    internal val utvidetRett: Boolean) {
+    override val aleneOmOmsorgen: Boolean,
+    override val utvidetRett: Boolean) : OmsorgsdagerBarn {
 
     private val omsorgenForBarnetUtÅretBarnetFyller = when (utvidetRett) {
         true -> 18

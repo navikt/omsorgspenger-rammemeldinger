@@ -2,18 +2,10 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.AntallDager.antallDager
+import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning.beregnOmsorgsdager
 
 internal object Beregninger {
     private const val DagerMaksForOverføring = 10
-
-    private const val DagerMedGrunnrettOppTilToBarn = 10
-    private const val DagerMedGrunnrettTreEllerFlerBarn = 15
-
-    private const val DagerMedAleneOmsorgOppTilToBarn = 10
-    private const val DagerMedAleneOmsorgTreEllerFlerBarn = 15
-
-    private const val DagerMedUtvidetRettPerBarn = 10
-    private const val DagerMedUtvidetRettOgAleneOmsorgPerBarn = 20
 
     internal fun beregnOmsorgsdagerTilgjengeligForOverføring(
         grunnlag: Grunnlag,
@@ -38,7 +30,9 @@ internal object Beregninger {
         }
 
         val fordelingGirMeldinger = grunnlag.fordelingGirMeldinger.filter { it.periode.inneholder(periode) }
-        val omsorgsdagerResultat = beregnOmsorgsdager(grunnlag.overføreOmsorgsdager.barn, periode)
+        val omsorgsdagerResultat = beregnOmsorgsdager(
+            barnMedOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.omsorgenFor.inneholder(periode) }
+        )
         val (
             grunnrettsdager,
             aleneomsorgsdager,
@@ -94,7 +88,7 @@ internal object Beregninger {
             )
         }
 
-        val antallOmsorgsdager = omsorgsdagerResultat.antallOmsorgsdager()
+        val antallOmsorgsdager = omsorgsdagerResultat.antallOmsorgsdager
 
         behandling.lovanvendelser.leggTil(
             periode = periode,
@@ -156,61 +150,4 @@ internal object Beregninger {
 
         return tilgjengeligDagerForOverføring
     }
-
-    internal fun beregnOmsorgsdager(barn: List<Barn>, periode: Periode): OmsorgsdagerResultat {
-        val barnMedOmsorgenFor = barn.filter { it.omsorgenFor.inneholder(periode) }
-        val barnMedAleneOmOmsorgen = barnMedOmsorgenFor.filter { it.aleneOmOmsorgen }
-        val barnMedKunUtvidetRett = barnMedOmsorgenFor.filter { it.utvidetRett && !it.aleneOmOmsorgen }
-        val barnMedUtvidetRettOgAleneOmOmsorgen = barnMedOmsorgenFor.filter { it.utvidetRett && it.aleneOmOmsorgen }
-
-        val grunnrett = when (barnMedOmsorgenFor.size) {
-            0 -> DagerForBarn(antallBarn = 0, antallDager = 0)
-            in 1..2 -> DagerForBarn(antallBarn = barnMedOmsorgenFor.size, antallDager = DagerMedGrunnrettOppTilToBarn)
-            else -> DagerForBarn(antallBarn = barnMedOmsorgenFor.size, antallDager = DagerMedGrunnrettTreEllerFlerBarn)
-        }
-
-        val aleneOmsorg = when (barnMedAleneOmOmsorgen.size) {
-            0 -> DagerForBarn(antallBarn = 0, antallDager = 0)
-            in 1..2 -> DagerForBarn(antallBarn = barnMedAleneOmOmsorgen.size, antallDager = DagerMedAleneOmsorgOppTilToBarn)
-            else -> DagerForBarn(antallBarn = barnMedAleneOmOmsorgen.size, antallDager = DagerMedAleneOmsorgTreEllerFlerBarn)
-        }
-
-        val utvidetRett = when (barnMedKunUtvidetRett.size) {
-            0 -> DagerForBarn(antallBarn = 0, antallDager = 0)
-            else -> DagerForBarn(antallBarn = barnMedKunUtvidetRett.size, antallDager = DagerMedUtvidetRettPerBarn * barnMedKunUtvidetRett.size)
-        }
-
-        val aleneomsorgOgUtvidetRett = when (barnMedUtvidetRettOgAleneOmOmsorgen.size) {
-            0 -> DagerForBarn(antallBarn = 0, antallDager = 0)
-            else -> DagerForBarn(
-                antallBarn = barnMedUtvidetRettOgAleneOmOmsorgen.size,
-                antallDager = DagerMedUtvidetRettOgAleneOmsorgPerBarn * barnMedUtvidetRettOgAleneOmOmsorgen.size
-            )
-        }
-
-        return OmsorgsdagerResultat(
-            grunnrettsdager = grunnrett,
-            aleneomsorgsdager = aleneOmsorg,
-            utvidetRettDager = utvidetRett,
-            aleneomsorgOgUtvidetRettDager = aleneomsorgOgUtvidetRett
-        )
-    }
 }
-
-data class DagerForBarn(
-    val antallBarn: Int,
-    val antallDager: Int
-)
-
-data class OmsorgsdagerResultat(
-    val grunnrettsdager: DagerForBarn,
-    val aleneomsorgsdager: DagerForBarn,
-    val utvidetRettDager: DagerForBarn,
-    val aleneomsorgOgUtvidetRettDager: DagerForBarn,
-)
-
-fun OmsorgsdagerResultat.antallOmsorgsdager(): Int =
-    grunnrettsdager.antallDager +
-        aleneomsorgsdager.antallDager +
-        utvidetRettDager.antallDager +
-        aleneomsorgOgUtvidetRettDager.antallDager
