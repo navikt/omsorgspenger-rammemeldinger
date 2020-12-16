@@ -23,7 +23,7 @@ internal object ManuellVurdering {
         behandling: Behandling,
         grunnlag: Grunnlag,
         dagerTilgjengeligForOverføring: Int) : Boolean {
-        val grunnetUtvidetRett = behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett() &&
+        val grunnetUtvidetRett = behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett &&
             dagerTilgjengeligForOverføring < grunnlag.behovet.omsorgsdagerÅOverføre
 
         if (grunnetUtvidetRett) {

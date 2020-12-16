@@ -1,9 +1,7 @@
 package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
-import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
-import org.slf4j.LoggerFactory
-import java.time.LocalDate
+import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtakVurderinger.inneholderRammevedtakFor
 
 internal object Vurderinger {
 
@@ -50,8 +48,11 @@ internal object Vurderinger {
         val barnMedUtvidetRettSomIkkeKanVerifiseres = grunnlag
             .overføreOmsorgsdager
             .barn
-            .filter { it.utvidetRett && !utvidetRettVedtak.inneholderRammevedtakFor(it, mottaksdato) }
-            .onEach {
+            .filter { it.utvidetRett && !utvidetRettVedtak.inneholderRammevedtakFor(
+                barnetsFødselsdato = it.fødselsdato,
+                omsorgenForBarnet = it.omsorgenFor,
+                mottaksdato = mottaksdato
+            )}.onEach {
                 val periode = when (it.omsorgenFor.fom.isBefore(mottaksdato)) {
                     true -> it.omsorgenFor.copy(fom = mottaksdato)
                     false -> it.omsorgenFor
@@ -75,29 +76,4 @@ internal object Vurderinger {
             )
         )
     }
-
-    private fun List<UtvidetRettVedtak>.inneholderRammevedtakFor(barn: Barn, mottaksdato: LocalDate) =
-        filter {
-            it.barnetsFødselsdato.isEqual(barn.fødselsdato)
-        }
-        .also { if (it.size > 1) {
-            logger.warn("Fant ${it.size} utvidet rett vedtak på barn født ${barn.fødselsdato}")
-        }}
-        .also { if (it.isNotEmpty()) {
-            it.filter { vedtak ->
-                vedtak.periode.tom != barn.omsorgenFor.tom
-            }.also { uforventetTom -> if(uforventetTom.isNotEmpty()) {
-                logger.warn("Fant ${uforventetTom.size} utvidet rett vedtak med 'tom' satt til noe annet enn ut året barnet fyller 18.")
-            }}
-            it.filter { vedtak ->
-                vedtak.periode.fom.isAfter(mottaksdato)
-            }.also { uforventetFom -> if(uforventetFom.isNotEmpty()) {
-                logger.warn("Fant ${uforventetFom.size} utvidet rett vedtak med 'fom' satt til etter mottaksdato for overføringen.")
-            }}
-        }}
-        .isNotEmpty()
-
-
-    private val logger = LoggerFactory.getLogger(Vurderinger::class.java)
-
 }
