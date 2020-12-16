@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer.meldinger
+package no.nav.omsorgspenger.utvidetrett.meldinger
 
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.readValue

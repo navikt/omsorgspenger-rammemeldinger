@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.overføringer.meldinger
+package no.nav.omsorgspenger.fordelinger.meldinger
 
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -27,6 +27,4 @@ internal object HentFordelingGirMeldingerMelding :
     override fun hentLøsning(packet: JsonMessage): List<FordelingGirMelding> {
         return JacksonObjectMapper.readValue(packet[MeldingerKey].toString())
     }
-
-
 }

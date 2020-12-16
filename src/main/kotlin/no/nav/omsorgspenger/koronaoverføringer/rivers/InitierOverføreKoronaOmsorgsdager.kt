@@ -3,24 +3,31 @@ package no.nav.omsorgspenger.koronaoverføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.river.leggTilBehov
-import no.nav.k9.rapid.river.leggTilBehovEtter
-import no.nav.k9.rapid.river.skalLøseBehov
-import no.nav.k9.rapid.river.utenLøsningPåBehov
+import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
+import no.nav.omsorgspenger.correlationId
+import no.nav.omsorgspenger.fordelinger.FordelingService
+import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding
+import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
 import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
+import no.nav.omsorgspenger.koronaoverføringer.Perioder
 import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
+import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
+import no.nav.omsorgspenger.utvidetrett.meldinger.HentUtvidetRettVedtakMelding
+import no.nav.omsorgspenger.utvidetrett.meldinger.HentUtvidetRettVedtakMelding.HentUtvidetRettVedtak
 import org.slf4j.LoggerFactory
 
 internal class InitierOverføreKoronaOmsorgsdager(
     rapidsConnection: RapidsConnection,
     behovssekvensRepository: BehovssekvensRepository,
+    private val fordelingService: FordelingService,
+    private val utvidetRettService: UtvidetRettService,
     private val enableBehandling: Boolean
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføreKoronaOmsorgsdager",
@@ -63,13 +70,49 @@ internal class InitierOverføreKoronaOmsorgsdager(
                 aktueltBehov = aktueltBehov,
                 behov = arrayOf(behovet.somOpprettGosysJournalføringsoppgaverBehov())
             )
-            logger.warn("Legger til behov $OpprettGosysJournalføringsoppgaver")
+            logger.info("Legger til behov $OpprettGosysJournalføringsoppgaver")
             secureLogger.info("SuccessPacket=${packet.toJson()}")
         } else {
             require(enableBehandling) {
                 "Behandling av koronaoverføringer er ikke skrudd på."
             }
+
+            val identitetsnummer = behovet.fra
+            val correlationId = packet.correlationId()
+            val periode = Perioder.behandlingsPeriode(
+                mottaksdato = behovet.mottaksdato,
+                periode = behovet.periode
+            )
+
+            logger.info("Henter rammemeldinger & rammevedtak")
+            val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
+                identitetsnummer = identitetsnummer,
+                periode = periode,
+                correlationId = correlationId
+            )
+
+            val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
+                identitetsnummer = identitetsnummer,
+                periode = periode,
+                correlationId = correlationId
+            )
+
+            logger.info("legger til behov med løsninger [${HentFordelingGirMeldinger}, ${HentUtvidetRettVedtak}]")
+            logger.warn("Løsning på behov [${HentUtvidetRettVedtak}] bør flyttes til 'omsorgspenger-rammevedtak'")
+            val inputHentingAvRammer = mapOf(
+                "periode" to "$periode",
+                "identitetsnummer" to identitetsnummer
+            )
+            packet.leggTilBehovMedLøsninger(
+                aktueltBehov = aktueltBehov,
+                behovMedLøsninger = arrayOf(
+                    HentFordelingGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, fordelingGirMeldinger),
+                    HentUtvidetRettVedtakMelding.behovMedLøsning(inputHentingAvRammer, utvidetRettVedtak)
+                )
+            )
+
             logger.info("Legger til behov $HentOmsorgspengerSaksnummer")
+            // TODO: Her skal vi også legge til behov for `VurderRelasjoenr`
             packet.leggTilBehov(
                 aktueltBehov = aktueltBehov,
                 behov = arrayOf(HentOmsorgspengerSaksnummerMelding.behov(

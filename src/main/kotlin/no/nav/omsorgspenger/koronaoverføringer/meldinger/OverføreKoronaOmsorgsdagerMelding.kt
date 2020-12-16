@@ -49,7 +49,17 @@ internal object OverføreKoronaOmsorgsdagerMelding :
         internal val identitetsnummer: String,
         internal val fødselsdato: LocalDate,
         override val aleneOmOmsorgen: Boolean,
-        override val utvidetRett: Boolean) : OmsorgsdagerBarn
+        override val utvidetRett: Boolean) : OmsorgsdagerBarn {
+        internal val omsorgenFor = Periode(
+            fom = fødselsdato,
+            tom = fødselsdato
+                .plusYears(when (utvidetRett) {
+                    true -> 18L
+                    false -> 12L
+                })
+                .sisteDagIÅret()
+        )
+    }
 
     override fun validateBehov(packet: JsonMessage) {
         packet.requireValue(BehovKeys.Versjon, "1.0.0")
