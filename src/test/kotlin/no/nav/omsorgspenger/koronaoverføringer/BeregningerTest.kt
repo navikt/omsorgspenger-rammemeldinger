@@ -117,7 +117,7 @@ internal class BeregningerTest {
             utvidetRett: Boolean = false
         ) = OverføreKoronaOmsorgsdagerMelding.Barn(
             identitetsnummer = IdentitetsnummerGenerator.identitetsnummer(),
-            fødselsdato = LocalDate.now().minusYears(5),
+            fødselsdato = fødselsdato,
             aleneOmOmsorgen = aleneOmOmsorgen,
             utvidetRett = utvidetRett
         )
