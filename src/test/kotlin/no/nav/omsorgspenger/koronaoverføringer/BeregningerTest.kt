@@ -81,6 +81,26 @@ internal class BeregningerTest {
         assertEquals(0, dagerTilgjengeligForOverføring)
     }
 
+    @Test
+    fun `barn utenfor omsorgen for telles ikke med`() {
+        val behovet = behovet(
+            omsorgsdagerTattUtIÅr = 0,
+            barn = listOf(
+                barn(fødselsdato = LocalDate.now().minusYears(13)),
+                barn(fødselsdato = LocalDate.now().minusYears(19), utvidetRett = true)
+            )
+        )
+        val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
+            behandling = Behandling(
+                overføringen = behovet
+            ),
+            grunnlag = grunnlag(
+                behovet = behovet
+            )
+        )
+        assertEquals(0, dagerTilgjengeligForOverføring)
+    }
+
     private companion object {
         private fun grunnlag(
             behovet: OverføreKoronaOmsorgsdagerMelding.Behovet,
