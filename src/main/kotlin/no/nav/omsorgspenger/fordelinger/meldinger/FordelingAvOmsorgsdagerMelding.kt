@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.fordelinger.rivers
+package no.nav.omsorgspenger.fordelinger.meldinger
 
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -9,7 +9,9 @@ import no.nav.omsorgspenger.rivers.HentBehov
 import no.nav.omsorgspenger.rivers.LeggTilLøsning
 import java.time.ZonedDateTime
 
-internal object FordelingAvOmsorgsdagerMelding : HentBehov<FordelingAvOmsorgsdagerMelding.Behovet>, LeggTilLøsning<FordelingAvOmsorgsdagerMelding.Løsningen> {
+internal object FordelingAvOmsorgsdagerMelding :
+    HentBehov<FordelingAvOmsorgsdagerMelding.Behovet>,
+    LeggTilLøsning<FordelingAvOmsorgsdagerMelding.Løsningen> {
     internal const val FordelingAvOmsorgsdager = "FordeleOmsorgsdager"
 
     override fun validateBehov(packet: JsonMessage) {
@@ -50,11 +52,11 @@ internal object FordelingAvOmsorgsdagerMelding : HentBehov<FordelingAvOmsorgsdag
     internal class Løsningen
 
     private object BehovKeys {
-        val Versjon = "@behov.${FordelingAvOmsorgsdager}.versjon"
-        val Mottatt = "@behov.${FordelingAvOmsorgsdager}.mottatt"
-        val Fra = "@behov.${FordelingAvOmsorgsdager}.fra.identitetsnummer"
-        val Til = "@behov.${FordelingAvOmsorgsdager}.til.identitetsnummer"
-        val Barn = "@behov.${FordelingAvOmsorgsdager}.barn"
-        val JournalpostIder = "@behov.${FordelingAvOmsorgsdager}.journalpostIder"
+        val Versjon = "@behov.$FordelingAvOmsorgsdager.versjon"
+        val Mottatt = "@behov.$FordelingAvOmsorgsdager.mottatt"
+        val Fra = "@behov.$FordelingAvOmsorgsdager.fra.identitetsnummer"
+        val Til = "@behov.$FordelingAvOmsorgsdager.til.identitetsnummer"
+        val Barn = "@behov.$FordelingAvOmsorgsdager.barn"
+        val JournalpostIder = "@behov.$FordelingAvOmsorgsdager.journalpostIder"
     }
 }
