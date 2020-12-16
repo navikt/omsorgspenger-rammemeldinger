@@ -15,7 +15,7 @@ internal object Beregninger {
         grunnlag: Grunnlag) : Int {
 
         val omsorgsdagerResultat = beregnOmsorgsdager(
-            barnMedOmsorgenFor = grunnlag.overføringen.barn.filter { behandling.periode.inneholder(it.fødselsdato) },
+            barnMedOmsorgenFor = grunnlag.overføringen.barn.filter { it.omsorgenFor.overlapperMedMinstEnDag(behandling.periode) },
         ).kopier(faktor = KoronaFaktor)
 
         val antallDagerFordelt = grunnlag.fordelinger
