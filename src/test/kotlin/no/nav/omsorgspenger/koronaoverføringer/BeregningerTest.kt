@@ -21,7 +21,7 @@ internal class BeregningerTest {
         )
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
             behandling = Behandling(
-                overføringen = behovet
+                behovet = behovet
             ),
             grunnlag = grunnlag(
                 behovet = behovet
@@ -38,7 +38,7 @@ internal class BeregningerTest {
         )
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
             behandling = Behandling(
-                overføringen = behovet
+                behovet = behovet
             ),
             grunnlag = grunnlag(
                 behovet = behovet
@@ -55,7 +55,7 @@ internal class BeregningerTest {
         )
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
             behandling = Behandling(
-                overføringen = behovet
+                behovet = behovet
             ),
             grunnlag = grunnlag(
                 behovet = behovet
@@ -72,7 +72,7 @@ internal class BeregningerTest {
         )
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
             behandling = Behandling(
-                overføringen = behovet
+                behovet = behovet
             ),
             grunnlag = grunnlag(
                 behovet = behovet
@@ -92,7 +92,7 @@ internal class BeregningerTest {
         )
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
             behandling = Behandling(
-                overføringen = behovet
+                behovet = behovet
             ),
             grunnlag = grunnlag(
                 behovet = behovet
@@ -109,7 +109,7 @@ internal class BeregningerTest {
             koronaoverføringer: List<GjeldendeOverføringGitt> = emptyList(),
             utvidetRett: List<UtvidetRettVedtak> = emptyList()
         ) = Grunnlag(
-            overføringen = behovet,
+            behovet = behovet,
             overføringer = overføringer,
             fordelinger = fordelinger,
             koronaoverføringer = koronaoverføringer,

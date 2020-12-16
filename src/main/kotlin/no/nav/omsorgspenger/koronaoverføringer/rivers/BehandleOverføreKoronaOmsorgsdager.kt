@@ -6,6 +6,7 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
+import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding
 import no.nav.omsorgspenger.koronaoverføringer.Behandling
 import no.nav.omsorgspenger.koronaoverføringer.Beregninger
 import no.nav.omsorgspenger.koronaoverføringer.Grunnlag
@@ -21,6 +22,7 @@ import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
+import no.nav.omsorgspenger.utvidetrett.meldinger.HentUtvidetRettVedtakMelding
 import org.slf4j.LoggerFactory
 
 internal class BehandleOverføreKoronaOmsorgsdager(
@@ -40,6 +42,8 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 it.harLøsningPåBehov(HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer)
                 it.utenLøsningPåBehov(HentPersonopplysninger)
                 OverføreKoronaOmsorgsdagerMelding.validateBehov(it)
+                HentFordelingGirMeldingerMelding.validateLøsning(it)
+                HentUtvidetRettVedtakMelding.validateLøsning(it)
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
             }
         }.register(this)
@@ -47,6 +51,8 @@ internal class BehandleOverføreKoronaOmsorgsdager(
 
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
+        val fordelingGirMeldinger = HentFordelingGirMeldingerMelding.hentLøsning(packet)
+        val utvidetRettVedtak = HentUtvidetRettVedtakMelding.hentLøsning(packet)
 
         val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet).also {
             require(it.containsKey(behovet.fra)) { "Mangler saksnummer for 'fra'"}
@@ -58,9 +64,9 @@ internal class BehandleOverføreKoronaOmsorgsdager(
         val behandling = Behandling(behovet)
 
         val grunnlag = Grunnlag(
-            overføringen = behovet,
-            utvidetRett = listOf(), // TODO
-            fordelinger = listOf(), // TODO
+            behovet = behovet,
+            utvidetRett = utvidetRettVedtak,
+            fordelinger = fordelingGirMeldinger,
             overføringer = listOf(), // TODO
             koronaoverføringer = listOf() // TODO
         ).vurdert(behandling)

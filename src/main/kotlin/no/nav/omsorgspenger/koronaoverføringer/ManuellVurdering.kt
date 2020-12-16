@@ -24,7 +24,7 @@ internal object ManuellVurdering {
         grunnlag: Grunnlag,
         dagerTilgjengeligForOverføring: Int) : Boolean {
         val grunnetUtvidetRett = behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett() &&
-            dagerTilgjengeligForOverføring < grunnlag.overføringen.omsorgsdagerÅOverføre
+            dagerTilgjengeligForOverføring < grunnlag.behovet.omsorgsdagerÅOverføre
 
         if (grunnetUtvidetRett) {
             logger.warn("Må vurderes manuelt grunnet vedtak om utvidet rett vi ikke kunne verifisere.")
