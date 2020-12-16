@@ -7,6 +7,7 @@ import no.nav.k9.rapid.river.leggTilBehovEtter
 import no.nav.k9.rapid.river.skalLøseBehov
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
+import no.nav.omsorgspenger.midlertidigalene.meldinger.MidlertidigAleneMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
 import org.slf4j.LoggerFactory

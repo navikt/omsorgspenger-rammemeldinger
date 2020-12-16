@@ -1,4 +1,4 @@
-package no.nav.omsorgspenger.midlertidigalene.rivers
+package no.nav.omsorgspenger.midlertidigalene.meldinger
 
 import com.fasterxml.jackson.databind.node.ArrayNode
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -46,10 +46,10 @@ internal object MidlertidigAleneMelding : HentBehov<MidlertidigAleneMelding.Beho
     internal class Løsningen
 
     private object BehovKeys {
-        val Versjon = "@behov.${MidlertidigAlene}.versjon"
-        val Mottatt = "@behov.${MidlertidigAlene}.mottatt"
-        val SøkerIdentitetsnummer = "@behov.${MidlertidigAlene}.søker.identitetsnummer"
-        val AnnenForelderIdentitetsnummer = "@behov.${MidlertidigAlene}.annenForelder.identitetsnummer"
-        val JournalpostIder = "@behov.${MidlertidigAlene}.journalpostIder"
+        val Versjon = "@behov.$MidlertidigAlene.versjon"
+        val Mottatt = "@behov.$MidlertidigAlene.mottatt"
+        val SøkerIdentitetsnummer = "@behov.$MidlertidigAlene.søker.identitetsnummer"
+        val AnnenForelderIdentitetsnummer = "@behov.$MidlertidigAlene.annenForelder.identitetsnummer"
+        val JournalpostIder = "@behov.$MidlertidigAlene.journalpostIder"
     }
 }

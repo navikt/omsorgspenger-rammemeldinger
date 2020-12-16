@@ -4,7 +4,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.MidlertidigAleneBehov
-import no.nav.omsorgspenger.midlertidigalene.rivers.MidlertidigAleneMelding
+import no.nav.omsorgspenger.midlertidigalene.meldinger.MidlertidigAleneMelding
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
