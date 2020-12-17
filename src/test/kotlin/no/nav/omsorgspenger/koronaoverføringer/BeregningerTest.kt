@@ -5,6 +5,8 @@ import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.barn
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.behovet
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.grunnlag
+import no.nav.omsorgspenger.overføringer.apis.Motpart
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -120,10 +122,7 @@ internal class BeregningerTest {
                     // Sjekker kun på overlapp med minst èn dag og tar den hvor man fordeler bort flest dager.
                     // Derfor skal det kun regnes med den over på 6 dager
                     FordelingGirMelding(
-                        periode = Periode(
-                            fom = behovet.periode.fom.plusMonths(1),
-                            tom = behovet.periode.tom.minusMonths(1)
-                        ),
+                        periode = Periode("2021-02-05/2022-05-05"),
                         lengde = Duration.ofDays(5),
                         kilder = emptySet()
                     )
@@ -131,5 +130,38 @@ internal class BeregningerTest {
             )
         )
         assertEquals(14, dagerTilgjengeligForOverføring)
+    }
+
+    @Test
+    fun `trekker fra overførte dager`() {
+        val behovet = behovet(
+            omsorgsdagerTattUtIÅr = 0,
+            barn = listOf(barn())
+        )
+        val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
+            behandling = Behandling(
+                behovet = behovet
+            ),
+            grunnlag = grunnlag(
+                behovet = behovet,
+                overføringer = listOf(
+                    overføring(periode = Periode("2020-01-01/2020-12-31"), antallDager = 10), // Er før perioden
+                    overføring(periode = behovet.periode, antallDager = 6), // Regnes ikke med siden det også finnes en på 7
+                    overføring(periode = Periode("2021-02-01/2025-04-10"), antallDager = 7) // Skal trekkes fra
+                )
+            )
+        )
+        assertEquals(13, dagerTilgjengeligForOverføring)
+    }
+
+    private companion object {
+        private fun overføring(periode: Periode, antallDager: Int) = SpleisetOverføringGitt(
+            gjennomført = LocalDate.now(),
+            gyldigFraOgMed = periode.fom,
+            gyldigTilOgMed = periode.tom,
+            lengde = Duration.ofDays(antallDager.toLong()),
+            kilder = emptySet(),
+            til = Motpart(id = "foo", type = "bar")
+        )
     }
 }
