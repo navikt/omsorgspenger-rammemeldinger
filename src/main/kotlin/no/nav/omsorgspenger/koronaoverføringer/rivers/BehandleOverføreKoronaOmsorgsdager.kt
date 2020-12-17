@@ -106,7 +106,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 løsning = OverføreKoronaOmsorgsdagerBehandlingMelding.HeleBehandling(
                     fraSaksnummer = fraSaksnummer,
                     tilSaksnummer = tilSaksnummer,
-                    overføring = overføring,
+                    overføringer = listOf(overføring),
                     alleSaksnummerMapping = alleSaksnummerMapping,
                     gjeldendeOverføringer = emptyMap()
                 )
