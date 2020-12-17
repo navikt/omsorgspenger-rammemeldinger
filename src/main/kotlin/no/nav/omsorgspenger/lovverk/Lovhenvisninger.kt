@@ -55,6 +55,16 @@ object FordeltBortOmsorgsdager : Lovhenvisning {
     override val henvisning = "§ 9-6 femte ledd"
 }
 
+object OverførtBortOmsorgsdager : Lovhenvisning {
+    override val lov = Folketrygdeloven
+    override val henvisning = "§ 9-6 femte ledd TODO: Overføring, ikke fordeling" // TODO
+}
+
+object KoronaOverførtBortOmsorgsdager : Lovhenvisning {
+    override val lov = Folketrygdeloven
+    override val henvisning = "§ 9-6 femte ledd TODO: KoronaOverføring, ikke fordeling eller ordinær oveføring" // TODO
+}
+
 object EktefelleEllerSamboer : Lovhenvisning {
     override val lov = Folketrygdeloven
     override val henvisning = "§ 9-6 sjette ledd"
