@@ -263,7 +263,7 @@ internal class MeldingsbestillingTest {
         private fun behandling(antallDager: Int) = OverføreKoronaOmsorgsdagerBehandlingMelding.ForVidereBehandling(
             fraSaksnummer = "sak1",
             tilSaksnummer = "sak2",
-            overføring = NyOverføring(antallDager = antallDager, periode = periode),
+            overføringer = listOf(NyOverføring(antallDager = antallDager, periode = periode)),
             gjeldendeOverføringer = emptyMap(),
             alleSaksnummerMapping = emptyMap()
         )

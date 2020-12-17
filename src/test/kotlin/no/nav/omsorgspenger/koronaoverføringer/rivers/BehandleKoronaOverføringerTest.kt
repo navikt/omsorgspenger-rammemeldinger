@@ -1,7 +1,12 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringer
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
 import no.nav.omsorgspenger.registerOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.testutils.*
 import no.nav.omsorgspenger.testutils.DataSourceExtension
@@ -21,7 +26,9 @@ internal class BehandleKoronaOverføringerTest(
             TestApplicationContextBuilder(
                 dataSource = dataSource.cleanAndMigrate(),
                 additionalEnv = mapOf("KORONA_BEHANDLING" to "enabled")
-            ).build()
+            ).also { builder ->
+                builder.spleisetOverføringerService = overføringerMock
+            }.build()
         )
     }
 
@@ -107,5 +114,18 @@ internal class BehandleKoronaOverføringerTest(
         val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
         assertEquals("Gjennomført", løsning.utfall)
         assertEquals(idStart, idSlutt)
+    }
+
+    private companion object {
+        private val overføringerMock = mockk<SpleisetOverføringerService>().also {
+            every { it.hentSpleisetOverføringer(any(), any(), any()) }
+                .returns(SpleisetOverføringer(
+                    gitt = listOf(overføring(
+                        periode = Periode("2021-01-01/2021-12-31"),
+                        antallDager = 7
+                    )),
+                    fått = emptyList()
+                ))
+        }
     }
 }

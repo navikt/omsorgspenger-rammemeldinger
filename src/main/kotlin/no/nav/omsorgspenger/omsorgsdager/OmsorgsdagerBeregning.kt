@@ -1,5 +1,9 @@
 package no.nav.omsorgspenger.omsorgsdager
 
+import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.lovverk.*
+import no.nav.omsorgspenger.lovverk.Lovanvendelser
+
 internal object OmsorgsdagerBeregning {
     private const val DagerMedGrunnrettOppTilToBarn = 10
     private const val DagerMedGrunnrettTreEllerFlerBarn = 15
@@ -45,6 +49,59 @@ internal object OmsorgsdagerBeregning {
             aleneomsorgsdager = aleneOmsorg,
             utvidetRettDager = utvidetRett,
             aleneomsorgOgUtvidetRettDager = aleneomsorgOgUtvidetRett
+        )
+    }
+
+    internal fun OmsorgsdagerResultat.leggTilLovanvendelser(
+        lovanvendelser: Lovanvendelser,
+        periode: Periode) {
+
+        if (grunnrettsdager.antallBarn in 1..2) {
+            lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = GrunnrettOppTilToBarn,
+                anvendelse = "Har omsorgen for ${grunnrettsdager.antallBarn} barn"
+            )
+        }
+        if (grunnrettsdager.antallBarn >= 3) {
+            lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = GrunnrettTreEllerFlerBarn,
+                anvendelse = "Har omsorgen for ${grunnrettsdager.antallBarn} barn"
+            )
+        }
+
+        if (aleneomsorgsdager.antallBarn > 0) {
+            lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = AleneOmOmsorgenForBarnet,
+                anvendelse = "Har aleneomsorg for ${aleneomsorgsdager.antallBarn} barn"
+            )
+        }
+
+        if (utvidetRettDager.antallBarn > 0) {
+            lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = UtvidetRettForBarnet,
+                anvendelse = "Har utvidet rett for ${utvidetRettDager.antallBarn} barn"
+            )
+        }
+
+        if (aleneomsorgOgUtvidetRettDager.antallBarn > 0) {
+            lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = UtvidetRettOgAleneOmOmsorgenForBarnet,
+                anvendelse = "Har aleneomsorg og utvidet rett for ${aleneomsorgOgUtvidetRettDager.antallBarn} barn"
+            )
+        }
+
+        lovanvendelser.leggTil(
+            periode = periode,
+            lovhenvisning = AntallOmsorgsdager,
+            anvendelser = setOf(
+                "Har $antallOmsorgsdager omsorgsdager",
+                "Har grunnrett på ${grunnrettsdager.antallDager} dager"
+            )
         )
     }
 }

@@ -14,6 +14,8 @@ import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.Perioder
 import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
+import no.nav.omsorgspenger.overføringer.meldinger.HentOverføringGirMeldingerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
@@ -28,6 +30,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
     behovssekvensRepository: BehovssekvensRepository,
     private val fordelingService: FordelingService,
     private val utvidetRettService: UtvidetRettService,
+    private val spleisetOverføringerService: SpleisetOverføringerService,
     private val enableBehandling: Boolean
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføreKoronaOmsorgsdager",
@@ -91,6 +94,12 @@ internal class InitierOverføreKoronaOmsorgsdager(
                 correlationId = correlationId
             )
 
+            val overføringGirMeldinger = spleisetOverføringerService.hentSpleisetOverføringer(
+                identitetsnummer = identitetsnummer,
+                periode = periode,
+                correlationId = correlationId
+            ).gitt
+
             val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
                 identitetsnummer = identitetsnummer,
                 periode = periode,
@@ -107,6 +116,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
                 aktueltBehov = aktueltBehov,
                 behovMedLøsninger = arrayOf(
                     HentFordelingGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, fordelingGirMeldinger),
+                    HentOverføringGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, overføringGirMeldinger),
                     HentUtvidetRettVedtakMelding.behovMedLøsning(inputHentingAvRammer, utvidetRettVedtak)
                 )
             )

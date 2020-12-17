@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.overføringer.db
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.lovverk.JobberINorge
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.testutils.DataSourceExtension

@@ -6,7 +6,6 @@ import no.nav.omsorgspenger.formidling.Meldingsbestilling
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
-import no.nav.omsorgspenger.overføringer.Personopplysninger
 import org.slf4j.LoggerFactory
 
 internal object Formidling {
@@ -30,9 +29,13 @@ internal object Formidling {
             return emptyList()
         }
 
+        val overføring = behandling.overføringer.also { require(it.size == 1) {
+            "Støtter kun en overføring"
+        }}.first()
+        
         val meldingsbestillinger = mutableListOf<Meldingsbestilling>()
 
-        if (behandling.overføring.antallDager <= 0) {
+        if (overføring.antallDager <= 0) {
             // Avslagsmelding til den som forsøkte å overføre dager
             meldingsbestillinger.add(Meldingsbestilling(
                 behovssekvensId = behovssekvensId,
@@ -57,7 +60,7 @@ internal object Formidling {
                     mottaksdato = behovet.mottaksdato,
                     antallDagerØnsketOverført = behovet.omsorgsdagerÅOverføre,
                     til = personopplysninger.getValue(behovet.til),
-                    overføring = behandling.overføring
+                    overføring = overføring
                 )
             ))
             // Melding til den som mottar
@@ -69,7 +72,7 @@ internal object Formidling {
                 melding = MottattDager(
                     mottaksdato = behovet.mottaksdato,
                     fra = personopplysninger.getValue(behovet.fra),
-                    overføring = behandling.overføring
+                    overføring = overføring
                 )
             ))
             require(meldingsbestillinger.size == 2)

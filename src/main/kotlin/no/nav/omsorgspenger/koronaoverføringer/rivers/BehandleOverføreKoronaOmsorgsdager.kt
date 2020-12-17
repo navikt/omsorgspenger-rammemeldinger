@@ -16,6 +16,7 @@ import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.HentOverføringGirMeldingerMelding
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerInput
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding.Companion.HentPersonopplysninger
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
@@ -43,6 +44,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 it.utenLøsningPåBehov(HentPersonopplysninger)
                 OverføreKoronaOmsorgsdagerMelding.validateBehov(it)
                 HentFordelingGirMeldingerMelding.validateLøsning(it)
+                HentOverføringGirMeldingerMelding.validateLøsning(it)
                 HentUtvidetRettVedtakMelding.validateLøsning(it)
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
             }
@@ -52,6 +54,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
         val fordelingGirMeldinger = HentFordelingGirMeldingerMelding.hentLøsning(packet)
+        val overføringGirMeldinger = HentOverføringGirMeldingerMelding.hentLøsning(packet)
         val utvidetRettVedtak = HentUtvidetRettVedtakMelding.hentLøsning(packet)
 
         val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet).also {
@@ -67,7 +70,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             behovet = behovet,
             utvidetRett = utvidetRettVedtak,
             fordelinger = fordelingGirMeldinger,
-            overføringer = listOf(), // TODO
+            overføringer = overføringGirMeldinger,
             koronaoverføringer = listOf() // TODO
         ).vurdert(behandling)
 
@@ -103,9 +106,10 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 løsning = OverføreKoronaOmsorgsdagerBehandlingMelding.HeleBehandling(
                     fraSaksnummer = fraSaksnummer,
                     tilSaksnummer = tilSaksnummer,
-                    overføring = overføring,
+                    overføringer = listOf(overføring),
                     alleSaksnummerMapping = alleSaksnummerMapping,
-                    gjeldendeOverføringer = emptyMap()
+                    gjeldendeOverføringer = emptyMap(),
+                    behandling = behandling
                 )
             ))
         )

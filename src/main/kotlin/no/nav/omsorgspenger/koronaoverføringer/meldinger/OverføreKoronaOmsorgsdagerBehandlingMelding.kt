@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.koronaoverføringer.meldinger
 
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -7,6 +8,7 @@ import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.koronaoverføringer.Behandling
 import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.rivers.BehovMedLøsning
@@ -21,21 +23,22 @@ internal object OverføreKoronaOmsorgsdagerBehandlingMelding :
     internal class HeleBehandling(
         internal val fraSaksnummer: Saksnummer,
         internal val tilSaksnummer: Saksnummer,
-        internal val overføring: NyOverføring,
+        internal val overføringer: List<NyOverføring>,
         internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
-        internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>
+        internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>,
+        internal val behandling: Behandling
     )
     internal class ForVidereBehandling(
         internal val fraSaksnummer: Saksnummer,
         internal val tilSaksnummer: Saksnummer,
-        internal val overføring: NyOverføring,
+        internal val overføringer: List<NyOverføring>,
         internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
         internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>
     )
 
     override fun validateLøsning(packet: JsonMessage) {
         packet.requireKey(
-            LøsningKeys.Overføring,
+            LøsningKeys.Overføringer,
             LøsningKeys.GjeldendeOverføringer,
             LøsningKeys.AlleSaksnummerMapping,
             LøsningKeys.FraSaksnummer,
@@ -47,7 +50,7 @@ internal object OverføreKoronaOmsorgsdagerBehandlingMelding :
         return ForVidereBehandling(
             fraSaksnummer = packet[LøsningKeys.FraSaksnummer].asText(),
             tilSaksnummer = packet[LøsningKeys.TilSaksnummer].asText(),
-            overføring = (packet[LøsningKeys.Overføring] as ObjectNode).let { NyOverføring(
+            overføringer = (packet[LøsningKeys.Overføringer] as ArrayNode).map { it as ObjectNode }.map { NyOverføring(
                 antallDager = it.get("antallDager").asInt(),
                 periode = Periode(it.get("periode").asText())
             )},
@@ -58,19 +61,21 @@ internal object OverføreKoronaOmsorgsdagerBehandlingMelding :
 
     override fun behovMedLøsning(behovInput: Map<String, *>, løsning: HeleBehandling): Pair<Behov, Map<String, *>> {
         return Behov(navn = OverføreKoronaOmsorgsdagerBehandling, input = behovInput) to mapOf(
-            "overføring" to mapOf(
-                "periode" to løsning.overføring.periode.toString(),
-                "antallDager" to løsning.overføring.antallDager
-            ),
+            "overføringer" to løsning.overføringer.map { mapOf(
+                "periode" to it.periode.toString(),
+                "antallDager" to it.antallDager
+            )},
             "fraSaksnummer" to løsning.fraSaksnummer,
             "tilSaksnummer" to løsning.tilSaksnummer,
             "alleSaksnummerMapping" to løsning.alleSaksnummerMapping,
+            "lovanvendelser" to løsning.behandling.lovanvendelser.somLøsning(),
+            "inneholderIkkeVerifiserbareVedtakOmUtvidetRett" to løsning.behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett,
             "gjeldendeOverføringer" to emptyMap<String,String>() // TODO
         )
     }
 
     private object LøsningKeys {
-        const val Overføring = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.overføring"
+        const val Overføringer = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.overføringer"
         const val GjeldendeOverføringer = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.gjeldendeOverføringer"
         const val AlleSaksnummerMapping = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.alleSaksnummerMapping"
         const val FraSaksnummer = "@løsninger.$OverføreKoronaOmsorgsdagerBehandling.fraSaksnummer"
