@@ -4,6 +4,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.AntallDager.antallDager
 import no.nav.omsorgspenger.lovverk.*
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning.beregnOmsorgsdager
+import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning.leggTilLovanvendelser
 
 internal object Beregninger {
     private const val DagerMaksForOverføring = 10
@@ -34,70 +35,20 @@ internal object Beregninger {
         val omsorgsdagerResultat = beregnOmsorgsdager(
             barnMedOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.omsorgenFor.inneholder(periode) }
         )
-        val (
-            grunnrettsdager,
-            aleneomsorgsdager,
-            utvidetRettDager,
-            aleneomsorgOgUtvidetRettDager
-        ) = omsorgsdagerResultat
-
-        when (grunnrettsdager.antallBarn) {
-            0 -> {
-                return behandling.lovanvendelser.leggTil(
-                    periode = periode,
-                    lovhenvisning = AleneOmOmsorgenForBarnet,
-                    anvendelse = "Må være alene om omsorgen for minst ett barn for å kunne overføre omsorgsdager."
-                ).let { 0 }
-            }
-            in 1..2 -> {
-                behandling.lovanvendelser.leggTil(
-                    periode = periode,
-                    lovhenvisning = GrunnrettOppTilToBarn,
-                    anvendelse = "Har omsorgen for ${grunnrettsdager.antallBarn} barn"
-                )
-            }
-            else -> {
-                behandling.lovanvendelser.leggTil(
-                    periode = periode,
-                    lovhenvisning = GrunnrettTreEllerFlerBarn,
-                    anvendelse = "Har omsorgen for ${grunnrettsdager.antallBarn} barn"
-                )
-            }
-        }
-
-        if (aleneomsorgsdager.antallBarn > 0) {
-            behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = AleneOmOmsorgenForBarnet,
-                anvendelse = "Har aleneomsorg for ${aleneomsorgsdager.antallBarn} barn"
-            )
-        }
-
-        if (utvidetRettDager.antallBarn > 0) {
-            behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = UtvidetRettForBarnet,
-                anvendelse = "Har utvidet rett for ${utvidetRettDager.antallBarn} barn"
-            )
-        }
-
-        if (aleneomsorgOgUtvidetRettDager.antallBarn > 0) {
-            behandling.lovanvendelser.leggTil(
-                periode = periode,
-                lovhenvisning = UtvidetRettOgAleneOmOmsorgenForBarnet,
-                anvendelse = "Har aleneomsorg og utvidet rett for ${aleneomsorgOgUtvidetRettDager.antallBarn} barn"
-            )
-        }
-
+        val grunnrettsdager = omsorgsdagerResultat.grunnrettsdager
         val antallOmsorgsdager = omsorgsdagerResultat.antallOmsorgsdager
 
-        behandling.lovanvendelser.leggTil(
-            periode = periode,
-            lovhenvisning = AntallOmsorgsdager,
-            anvendelser = setOf(
-                "Har $antallOmsorgsdager omsorgsdager",
-                "Har grunnrett på ${omsorgsdagerResultat.grunnrettsdager.antallDager} dager"
-            )
+        if (grunnrettsdager.antallBarn == 0) {
+            return behandling.lovanvendelser.leggTil(
+                periode = periode,
+                lovhenvisning = AleneOmOmsorgenForBarnet,
+                anvendelse = "Må være alene om omsorgen for minst ett barn for å kunne overføre omsorgsdager."
+            ).let { 0 }
+        }
+
+        omsorgsdagerResultat.leggTilLovanvendelser(
+            lovanvendelser = behandling.lovanvendelser,
+            periode = periode
         )
 
         val dagerTattUt = when (grunnlag.overføreOmsorgsdager.mottaksdato.year == periode.tom.year) {
