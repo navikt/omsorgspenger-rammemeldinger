@@ -8,6 +8,7 @@ import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.koronaoverføringer.Behandling
 import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.rivers.BehovMedLøsning
@@ -24,7 +25,8 @@ internal object OverføreKoronaOmsorgsdagerBehandlingMelding :
         internal val tilSaksnummer: Saksnummer,
         internal val overføringer: List<NyOverføring>,
         internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
-        internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>
+        internal val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>,
+        internal val behandling: Behandling
     )
     internal class ForVidereBehandling(
         internal val fraSaksnummer: Saksnummer,
@@ -66,6 +68,8 @@ internal object OverføreKoronaOmsorgsdagerBehandlingMelding :
             "fraSaksnummer" to løsning.fraSaksnummer,
             "tilSaksnummer" to løsning.tilSaksnummer,
             "alleSaksnummerMapping" to løsning.alleSaksnummerMapping,
+            "lovanvendelser" to løsning.behandling.lovanvendelser.somLøsning(),
+            "inneholderIkkeVerifiserbareVedtakOmUtvidetRett" to løsning.behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett,
             "gjeldendeOverføringer" to emptyMap<String,String>() // TODO
         )
     }

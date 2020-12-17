@@ -2,6 +2,8 @@ package no.nav.omsorgspenger.koronaoverføringer
 
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
+import no.nav.omsorgspenger.lovverk.JobberINorge
+import no.nav.omsorgspenger.lovverk.UtvidetRettForBarnet
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
@@ -16,6 +18,15 @@ internal data class Grunnlag(
     internal companion object {
         internal fun Grunnlag.vurdert(behandling: Behandling) : Grunnlag {
 
+            behandling.lovanvendelser.leggTil(
+                periode = behandling.periode,
+                lovhenvisning = JobberINorge,
+                anvendelse = when (behovet.jobberINorge) {
+                    true -> "Jobber i Norge."
+                    false -> throw IllegalStateException("Skal ikke havne inn til behandling.")
+                }
+            )
+
             val barnMedUtvidetRettSomIkkeKanVerifiseres = behovet.barn
                 .filter { it.utvidetRett && !utvidetRett.inneholderRammevedtakFor(
                     barnetsFødselsdato = it.fødselsdato,
@@ -23,7 +34,13 @@ internal data class Grunnlag(
                     mottaksdato = behovet.mottaksdato
                 )}.also { if (it.isNotEmpty()) {
                     behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett = true
-                }}
+                }}.onEach {
+                    behandling.lovanvendelser.leggTil(
+                        periode = behandling.periode,
+                        lovhenvisning = UtvidetRettForBarnet,
+                        anvendelse = "Kunne ikke verifiser utvidet rett for barnet født ${it.fødselsdato}"
+                    )
+                }
 
             return copy(
                 behovet = behovet.copy(

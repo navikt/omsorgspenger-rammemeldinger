@@ -1,5 +1,8 @@
 package no.nav.omsorgspenger.overføringer
 
+import no.nav.omsorgspenger.lovverk.EktefelleEllerSamboer
+import no.nav.omsorgspenger.lovverk.JobberINorge
+import no.nav.omsorgspenger.lovverk.UtvidetRettForBarnet
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtakVurderinger.inneholderRammevedtakFor
 

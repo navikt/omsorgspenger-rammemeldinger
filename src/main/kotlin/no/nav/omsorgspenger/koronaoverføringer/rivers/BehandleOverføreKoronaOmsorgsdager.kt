@@ -108,7 +108,8 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                     tilSaksnummer = tilSaksnummer,
                     overføringer = listOf(overføring),
                     alleSaksnummerMapping = alleSaksnummerMapping,
-                    gjeldendeOverføringer = emptyMap()
+                    gjeldendeOverføringer = emptyMap(),
+                    behandling = behandling
                 )
             ))
         )

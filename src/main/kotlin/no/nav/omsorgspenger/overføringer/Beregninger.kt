@@ -2,6 +2,7 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.AntallDager.antallDager
+import no.nav.omsorgspenger.lovverk.*
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning.beregnOmsorgsdager
 
 internal object Beregninger {
