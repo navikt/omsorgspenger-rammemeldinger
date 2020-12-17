@@ -5,8 +5,7 @@ import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.barn
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.behovet
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.grunnlag
-import no.nav.omsorgspenger.overføringer.apis.Motpart
-import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
+import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -152,16 +151,5 @@ internal class BeregningerTest {
             )
         )
         assertEquals(13, dagerTilgjengeligForOverføring)
-    }
-
-    private companion object {
-        private fun overføring(periode: Periode, antallDager: Int) = SpleisetOverføringGitt(
-            gjennomført = LocalDate.now(),
-            gyldigFraOgMed = periode.fom,
-            gyldigTilOgMed = periode.tom,
-            lengde = Duration.ofDays(antallDager.toLong()),
-            kilder = emptySet(),
-            til = Motpart(id = "foo", type = "bar")
-        )
     }
 }
