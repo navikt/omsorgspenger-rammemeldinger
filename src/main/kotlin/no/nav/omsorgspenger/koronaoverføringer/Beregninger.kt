@@ -60,6 +60,14 @@ internal object Beregninger {
             )
         }
 
+        if (grunnlag.behovet.omsorgsdagerTattUtIÅr > 0) {
+            behandling.lovanvendelser.leggTil(
+                periode = behandling.periode,
+                lovhenvisning = AlleredeForbrukteDager,
+                anvendelse = "Har allerede tatt ut ${grunnlag.behovet.omsorgsdagerTattUtIÅr} dager i ${behandling.periode.tom.year}"
+            )
+        }
+
         val antallDagerTilgjengelig = antallOmsorgsdagerEtterDobling -
             antallDagerFordelt -
             antallDagerOverført -
@@ -105,7 +113,7 @@ internal object Beregninger {
 }
 
 internal object KoronaForskrift2021 : Lov {
-    override val id = "TODO (LOV-X)"
+    override val id = "TODO (LOV-X)" // TODO
 }
 
 internal object DoblingAvAntallDagerKorona2021 : Lovhenvisning {
