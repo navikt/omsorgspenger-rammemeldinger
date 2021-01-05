@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
+import KoronaoverføringRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
@@ -28,7 +29,8 @@ import org.slf4j.LoggerFactory
 
 internal class BehandleOverføreKoronaOmsorgsdager(
     rapidsConnection: RapidsConnection,
-    behovssekvensRepository: BehovssekvensRepository
+    behovssekvensRepository: BehovssekvensRepository,
+    private val koronaoverføringRepository: KoronaoverføringRepository
 ) : PersistentBehovssekvensPacketListener(
     steg = "BehandleOverføreKoronaOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
@@ -85,7 +87,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             dagerTilgjengeligForOverføring = dagerTilgjengeligForOverføring
         )
 
-        // TODO: Gjennomfør overføringen
+
         val overføring = NyOverføring(
             periode = behandling.periode,
             antallDager = when (dagerTilgjengeligForOverføring >= behovet.omsorgsdagerÅOverføre) {
@@ -93,6 +95,20 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 false -> dagerTilgjengeligForOverføring
             }
         )
+
+        if (overføring.skalGjennomføres) {
+            koronaoverføringRepository.gjennomførOverføringer(
+                behovssekvensId = id,
+                fra = fraSaksnummer,
+                til = tilSaksnummer,
+                lovanvendelser = behandling.lovanvendelser,
+                antallDagerØnsketOverført = behovet.omsorgsdagerÅOverføre,
+                overføringer = listOf(overføring)
+            )
+        }
+
+
+
         // TODO: Trenger egentlig for alle personer i gjeldende overføringer.
         val alleSaksnummerMapping = mapOf(
             behovet.fra to saksnummer.getValue(behovet.fra),

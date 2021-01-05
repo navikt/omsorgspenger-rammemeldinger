@@ -4,5 +4,6 @@ import no.nav.omsorgspenger.Periode
 
 internal data class NyOverføring(
     val antallDager: Int,
-    val periode: Periode
-)
+    val periode: Periode) {
+    internal val skalGjennomføres = antallDager > 0
+}

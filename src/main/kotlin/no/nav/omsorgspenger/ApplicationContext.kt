@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger
 
+import KoronaoverføringRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -56,7 +57,8 @@ internal class ApplicationContext(
     internal val saksnummerService: SaksnummerService,
     internal val tilgangsstyringRestClient: TilgangsstyringRestClient,
     internal val dataSource: DataSource,
-    internal val healthService: HealthService) {
+    internal val healthService: HealthService,
+    internal val koronaoverføringRepository: KoronaoverføringRepository) {
 
     internal fun start() {
         dataSource.migrate()
@@ -85,7 +87,8 @@ internal class ApplicationContext(
         internal var formidlingService: FormidlingService? = null,
         internal var saksnummerRepository: SaksnummerRepository? = null,
         internal var saksnummerService: SaksnummerService? = null,
-        internal var dataSource: DataSource? = null) {
+        internal var dataSource: DataSource? = null,
+        internal var koronaoverføringRepository: KoronaoverføringRepository? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
             val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
@@ -177,7 +180,10 @@ internal class ApplicationContext(
                 behovssekvensRepository = behovssekvensRepository ?: BehovssekvensRepository(
                     dataSource = benyttetDataSource
                 ),
-                tilgangsstyringRestClient = benyttetTilgangsstyringRestClient
+                tilgangsstyringRestClient = benyttetTilgangsstyringRestClient,
+                koronaoverføringRepository = koronaoverføringRepository ?: KoronaoverføringRepository(
+                    dataSource = benyttetDataSource
+                )
             )
         }
 
