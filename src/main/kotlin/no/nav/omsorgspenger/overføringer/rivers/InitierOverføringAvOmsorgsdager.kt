@@ -65,7 +65,7 @@ internal class InitierOverføringAvOmsorgsdager(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("InitierOverføringAvOmsorgsdager for $id")
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet).also {
-            require(it.erMottattFør2021()) { "Behandling av overføringer mottatt etter 2020 er ikke skrudd på" }
+            require(enableBehandling || it.erMottattFør2021()) { "Behandling av overføringer mottatt etter 2020 er ikke skrudd på" }
         }
         val periode = overføreOmsorgsdager.overordnetPeriode
         val correlationId = packet.correlationId()
