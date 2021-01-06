@@ -28,13 +28,15 @@ internal class InitierOverføringAvOmsorgsdager(
     private val fordelingService: FordelingService,
     private val utvidetRettService: UtvidetRettService,
     private val midlertidigAleneService: MidlertidigAleneService,
-    behovssekvensRepository: BehovssekvensRepository
+    behovssekvensRepository: BehovssekvensRepository,
+    private val enableBehandling: Boolean
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføringAvOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
     logger = LoggerFactory.getLogger(InitierOverføringAvOmsorgsdager::class.java)) {
 
     init {
+        logger.info("EnableBehandling=$enableBehandling")
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(OverføreOmsorgsdager)
@@ -53,7 +55,8 @@ internal class InitierOverføringAvOmsorgsdager(
     }
 
     override fun doHandlePacket(id: String, packet: JsonMessage): Boolean {
-        return when (OverføreOmsorgsdagerMelding.hentBehov(packet).erMottattFør2021()) {
+        return if (enableBehandling) true
+        else when (OverføreOmsorgsdagerMelding.hentBehov(packet).erMottattFør2021()) {
             true -> super.doHandlePacket(id, packet)
             false -> logger.warn("Behandling av overføringer mottatt etter 2020 er ikke skrudd på").let { false }
         }
