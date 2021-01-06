@@ -4,6 +4,7 @@ import no.nav.omsorgspenger.koronaoverføringer.Grunnlag.Companion.vurdert
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.barn
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.behovet
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.grunnlag
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -54,8 +55,11 @@ internal class GrunnlagVurderingTest {
             barn = listOf(barnUtenUtvidetRett, barnMedUtvidetRett)
         )
         val behandling = Behandling(behovet)
+        val relasjoner = setOf(VurderRelasjonerMelding.Relasjon(
+            identitetsnummer = barnMedUtvidetRett.identitetsnummer, borSammen = true, relasjon = "BARN"))
         val grunnlag = grunnlag(
-            behovet = behovet
+            behovet = behovet,
+            relasjoner = relasjoner
         )
         val vurdertGrunnlag = grunnlag.vurdert(behandling)
         assertFalse(grunnlag == vurdertGrunnlag)

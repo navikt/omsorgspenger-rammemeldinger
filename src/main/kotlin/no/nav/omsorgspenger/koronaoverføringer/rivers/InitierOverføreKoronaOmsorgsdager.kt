@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.koronaoverføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
@@ -16,6 +17,7 @@ import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
 import no.nav.omsorgspenger.overføringer.meldinger.HentOverføringGirMeldingerMelding
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
@@ -35,7 +37,8 @@ internal class InitierOverføreKoronaOmsorgsdager(
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføreKoronaOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
-    logger = LoggerFactory.getLogger(InitierOverføreKoronaOmsorgsdager::class.java)) {
+    logger = LoggerFactory.getLogger(InitierOverføreKoronaOmsorgsdager::class.java)
+) {
 
     private val aktueltBehov = OverføreKoronaOmsorgsdagerMelding.OverføreKoronaOmsorgsdager
 
@@ -66,9 +69,11 @@ internal class InitierOverføreKoronaOmsorgsdager(
         val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
 
         if (ManuellVurdering.måVurderesManuelt(behovet)) {
-            packet.leggTilLøsningPar(OverføreKoronaOmsorgsdagerMelding.løsning(
-                OverføreKoronaOmsorgsdagerMelding.Løsningen()
-            ))
+            packet.leggTilLøsningPar(
+                OverføreKoronaOmsorgsdagerMelding.løsning(
+                    OverføreKoronaOmsorgsdagerMelding.Løsningen()
+                )
+            )
             packet.leggTilBehovEtter(
                 aktueltBehov = aktueltBehov,
                 behov = arrayOf(behovet.somOpprettGosysJournalføringsoppgaverBehov())
@@ -121,15 +126,22 @@ internal class InitierOverføreKoronaOmsorgsdager(
                 )
             )
 
-            logger.info("Legger til behov $HentOmsorgspengerSaksnummer")
-            // TODO: Her skal vi også legge til behov for `VurderRelasjoenr`
+            logger.info("Legger til behov $HentOmsorgspengerSaksnummer & ${VurderRelasjonerMelding.VurderRelasjoner}")
             packet.leggTilBehov(
                 aktueltBehov = aktueltBehov,
-                behov = arrayOf(HentOmsorgspengerSaksnummerMelding.behov(
-                    HentOmsorgspengerSaksnummerMelding.BehovInput(
-                        identitetsnummer = setOf(behovet.fra, behovet.til)
+                behov = arrayOf(
+                    HentOmsorgspengerSaksnummerMelding.behov(
+                        HentOmsorgspengerSaksnummerMelding.BehovInput(
+                            identitetsnummer = setOf(behovet.fra, behovet.til)
+                        )
+                    ),
+                    VurderRelasjonerMelding.behov(
+                        VurderRelasjonerMelding.BehovInput(
+                            identitetsnummer = behovet.fra,
+                            til = behovet.barn.map { it.identitetsnummer }.toSet()
+                        )
                     )
-                ))
+                )
             )
         }
         return true

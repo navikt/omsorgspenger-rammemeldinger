@@ -101,11 +101,12 @@ internal class BehandleKoronaOverføringerTest(
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
-        rapid.mockHentOmsorgspengerSaksnummer(
+        rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
             fra = fra,
             til = til
         )
         rapid.ventPå(2)
+
         rapid.mockHentPersonopplysninger(
             fra = fra,
             til = til
