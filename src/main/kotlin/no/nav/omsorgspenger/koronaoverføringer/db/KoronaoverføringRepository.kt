@@ -18,6 +18,14 @@ import javax.sql.DataSource
 internal class KoronaoverføringRepository(
     private val dataSource: DataSource) {
 
+    internal fun hentAlleOverføringer(
+        saksnummer: Set<Saksnummer>
+    ) : Map<Saksnummer, GjeldendeOverføringer> {
+        return using(sessionOf(dataSource)) { session ->
+            session.hentOverføringer(saksnummer).somGjeldendeOverføringer()
+        }
+    }
+
     internal fun gjennomførOverføringer(
         behovssekvensId: BehovssekvensId,
         fra: Saksnummer,
@@ -39,9 +47,9 @@ internal class KoronaoverføringRepository(
                             overføring = overføring
                         )
                     }
+                    transactionalSession.hentOverføringer(berørteSaksnummer)
                 }
-            }
-            session.hentOverføringer(berørteSaksnummer)
+            }()
         }
 
         return GjennomførtOverføringer(
@@ -90,7 +98,7 @@ internal class KoronaoverføringRepository(
             queryOf(
                 statement = LagreOverføringStatement,
                 paramMap = mapOf(
-                    "behovssekvensId" to behovssekvensId,
+                    "behovssekvens_id" to behovssekvensId,
                     "fom" to overføring.periode.fom,
                     "tom" to overføring.periode.tom,
                     "fra" to fra,
