@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.koronaoverføringer
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.lovverk.JobberINorge
+import no.nav.omsorgspenger.lovverk.OmsorgenForBarnet
 import no.nav.omsorgspenger.lovverk.UtvidetRettForBarnet
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
@@ -46,14 +47,18 @@ internal data class Grunnlag(
 
             val borSammenMed = relasjoner.filter { it.borSammen }.map { it.identitetsnummer }
             val barnSomBorNånAnnenstans = behovet.barn
-                .filterNot { it.identitetsnummer in borSammenMed
-                }.onEach {
-                    behandling.lovanvendelser.leggTil(
-                        periode = behandling.periode,
-                        lovhenvisning = UtvidetRettForBarnet, // TODO: Var står det att man måste bo med barnet?
-                        anvendelse = "Bor ikke sammen med barnet født ${it.fødselsdato}"
-                    )
-                }
+                .filterNot { it.identitetsnummer in borSammenMed }
+
+            behovet.barn.forEach { barn ->
+                behandling.lovanvendelser.leggTil(
+                    periode = behandling.periode,
+                    lovhenvisning = OmsorgenForBarnet,
+                    anvendelse = when (barn in barnSomBorNånAnnenstans) {
+                        true -> "Bor ikke sammen med barnet født ${barn.fødselsdato}"
+                        false -> "Bor sammen med barnet født ${barn.fødselsdato}"
+                    }
+                )
+            }
 
             return copy(
                 behovet = behovet.copy(
