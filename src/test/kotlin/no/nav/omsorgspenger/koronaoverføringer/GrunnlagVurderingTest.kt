@@ -80,4 +80,26 @@ internal class GrunnlagVurderingTest {
         assertTrue(behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett)
     }
 
+    @Test
+    fun `grunnlag med barn med ett barn som inte borsammen`() {
+        val borSammen = barn()
+        val borIkkeSammen = barn()
+        val behovet = behovet(
+            barn = listOf(borSammen, borIkkeSammen)
+        )
+        val behandling = Behandling(behovet)
+        val grunnlag = grunnlag(
+            behovet = behovet,
+            relasjoner = setOf(
+                VurderRelasjonerMelding.Relasjon("", borSammen = true, identitetsnummer = borSammen.identitetsnummer),
+                VurderRelasjonerMelding.Relasjon("", borSammen = false, identitetsnummer = borIkkeSammen.identitetsnummer)
+            )
+        )
+
+        val løsning = grunnlag.vurdert(behandling)
+
+        assertTrue(borSammen in løsning.behovet.barn)
+        assertFalse(borIkkeSammen in løsning.behovet.barn)
+    }
+
 }
