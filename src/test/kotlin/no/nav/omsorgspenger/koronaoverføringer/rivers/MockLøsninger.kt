@@ -5,29 +5,35 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.testutils.sisteMeldingSomJsonMessage
 
 internal fun TestRapid.mockHentPersonopplysninger(
-    fra: Identitetsnummer, til: Identitetsnummer) {
+    fra: Identitetsnummer, til: Identitetsnummer
+) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()
-        .leggTilLøsningPåHentePersonopplysninger(fra = fra, til = til)
-        .toJson()
+            .leggTilLøsningPåHentePersonopplysninger(fra = fra, til = til)
+            .toJson()
     )
 }
 
-internal fun TestRapid.mockHentOmsorgspengerSaksnummer(
-    fra: Identitetsnummer, til: Identitetsnummer) {
+internal fun TestRapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
+    fra: Identitetsnummer, til: Identitetsnummer,
+    barn: Set<Identitetsnummer> = emptySet(), borSammen: Boolean = false
+) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()
-        .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
-        .toJson()
+            .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
+            .leggTilLøsningPåVurderRelasjonerTilBarn(til = barn, borSammen = borSammen)
+            .toJson()
     )
 }
 
 private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
-    fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
+    fra: Identitetsnummer, til: Identitetsnummer
+) = leggTilLøsning(
     behov = HentPersonopplysningerMelding.HentPersonopplysninger,
     løsning = mapOf(
         "personopplysninger" to mapOf(
@@ -55,12 +61,29 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
 )
 
 private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
-    fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
+    fra: Identitetsnummer, til: Identitetsnummer
+) = leggTilLøsning(
     behov = HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer,
     løsning = mapOf(
         "saksnummer" to mapOf(
             fra to "foo",
             til to "bar"
         )
+    )
+)
+
+private fun JsonMessage.leggTilLøsningPåVurderRelasjonerTilBarn(
+    til: Set<Identitetsnummer>,
+    borSammen: Boolean = true
+) = leggTilLøsning(
+    behov = VurderRelasjonerMelding.VurderRelasjoner,
+    løsning = mapOf(
+        "relasjoner" to til.map {
+            mapOf(
+                "relasjon" to "BARN",
+                "identitetsnummer" to it,
+                "borSammen" to borSammen
+            )
+        }
     )
 )

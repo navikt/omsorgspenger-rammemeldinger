@@ -6,6 +6,7 @@ import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgs
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.apis.Motpart
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import java.time.Duration
@@ -18,13 +19,15 @@ internal object TestVerktøy {
         overføringer: List<SpleisetOverføringGitt> = emptyList(),
         fordelinger: List<FordelingGirMelding> = emptyList(),
         koronaoverføringer: List<GjeldendeOverføringGitt> = emptyList(),
-        utvidetRett: List<UtvidetRettVedtak> = emptyList()
+        utvidetRett: List<UtvidetRettVedtak> = emptyList(),
+        relasjoner: Set<VurderRelasjonerMelding.Relasjon> = emptySet()
     ) = Grunnlag(
         behovet = behovet,
         overføringer = overføringer,
         fordelinger = fordelinger,
         koronaoverføringer = koronaoverføringer,
-        utvidetRett = utvidetRett)
+        utvidetRett = utvidetRett,
+        relasjoner = relasjoner)
 
     internal fun behovet(
         omsorgsdagerTattUtIÅr: Int = 10,
