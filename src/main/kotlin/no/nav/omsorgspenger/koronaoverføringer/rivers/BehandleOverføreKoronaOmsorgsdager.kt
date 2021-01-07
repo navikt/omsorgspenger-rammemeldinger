@@ -148,7 +148,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
 
         if (måVurderesManuelt) {
             packet.leggTilLøsningPar(OverføreKoronaOmsorgsdagerMelding.løsning(
-                OverføreKoronaOmsorgsdagerMelding.Løsningen() // TODO
+                OverføreKoronaOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
             ))
             packet.leggTilBehovEtter(
                 aktueltBehov = aktueltBehov,

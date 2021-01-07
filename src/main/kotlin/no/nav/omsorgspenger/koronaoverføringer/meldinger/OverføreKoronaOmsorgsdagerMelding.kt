@@ -6,9 +6,12 @@ import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.JournalpostId
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.extensions.toLocalDateOslo
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBarn
+import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
+import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.rivers.HentBehov
 import no.nav.omsorgspenger.rivers.LeggTilLøsning
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
@@ -42,8 +45,24 @@ internal object OverføreKoronaOmsorgsdagerMelding :
     }
 
     internal data class Løsningen(
-        val bar: Boolean = false // TODO
-    )
+        internal val utfall: Utfall,
+        internal val gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer>,
+        private val personopplysninger: Map<Identitetsnummer, OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger>,
+        private val alleSaksnummerMapping: Map<Identitetsnummer, Saksnummer>) {
+        private val saksnummerTilIdentitetsnummer = alleSaksnummerMapping.entries.associate { (k, v) -> v to k }
+        internal fun personopplysninger(sak: Saksnummer) =
+            personopplysninger.getValue(saksnummerTilIdentitetsnummer.getValue(sak))
+        internal fun identitetsnummer(sak: Saksnummer) =
+            personopplysninger(sak).gjeldendeIdentitetsnummer
+        internal companion object {
+            internal val GosysJournalføringsoppgaver = Løsningen(
+                utfall = Utfall.GosysJournalføringsoppgaver,
+                gjeldendeOverføringer = emptyMap(),
+                alleSaksnummerMapping = emptyMap(),
+                personopplysninger = emptyMap()
+            )
+        }
+    }
 
     internal data class Barn(
         internal val identitetsnummer: String,
@@ -102,11 +121,11 @@ internal object OverføreKoronaOmsorgsdagerMelding :
     }
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
-        return OverføreKoronaOmsorgsdager to mapOf( // TODO
+        return OverføreKoronaOmsorgsdager to mapOf(
             "versjon" to "1.0.0",
-            "utfall" to "Gjennomført",
+            "utfall" to løsning.utfall.name,
             "begrunnelser" to listOf<String>(),
-            "overføringer" to mapOf<String, Any>()
+            "overføringer" to mapOf<String, Any>() // TODO
         )
     }
 

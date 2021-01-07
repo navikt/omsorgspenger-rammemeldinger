@@ -13,6 +13,7 @@ import no.nav.omsorgspenger.koronaoverføringer.formidling.Formidling
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
+import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import org.slf4j.LoggerFactory
@@ -49,7 +50,15 @@ internal class PubliserOverføreKoronaOmsorgsdager(
         val personopplysninger = OverføreKoronaOmsorgsdagerPersonopplysningerMelding.hentLøsning(packet).personopplysninger
 
         packet.leggTilLøsningPar(OverføreKoronaOmsorgsdagerMelding.løsning(
-            OverføreKoronaOmsorgsdagerMelding.Løsningen()
+            OverføreKoronaOmsorgsdagerMelding.Løsningen(
+                utfall = when (behandling.gjennomførtOverføringer) {
+                    true -> Utfall.Gjennomført
+                    false -> Utfall.Avslått
+                },
+                gjeldendeOverføringer = behandling.gjeldendeOverføringer,
+                alleSaksnummerMapping = behandling.alleSaksnummerMapping,
+                personopplysninger = personopplysninger
+            )
         ))
 
         Formidling.opprettMeldingsbestillinger(
