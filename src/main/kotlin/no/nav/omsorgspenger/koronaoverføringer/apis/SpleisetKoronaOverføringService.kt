@@ -26,16 +26,15 @@ internal class SpleisetKoronaOverføringService(
 
         val gjeldendeOverføringer = koronaoverføringRepository.hentAlleOverføringer(setOf(saksnummer))
 
-        if (gjeldendeOverføringer.isEmpty()) return SpleisetOverføringer.ingenOverføringer()
-
-        require(gjeldendeOverføringer.keys == setOf(saksnummer))
+        val gjeldendeOverføringerForEtterspurtPerson = gjeldendeOverføringer[saksnummer]
+            ?:return SpleisetOverføringer.ingenOverføringer()
 
         val saksnummerIdentitetsnummerMapping = saksnummerService.hentSaksnummerIdentitetsnummerMapping(
             saksnummer = gjeldendeOverføringer.saksnummer()
         )
 
         return SpleisetOverføringer.fraNyLøsning(
-            overføringerINyLøsning = gjeldendeOverføringer.getValue(saksnummer),
+            overføringerINyLøsning = gjeldendeOverføringerForEtterspurtPerson,
             saksnummerIdentitetsnummerMapping = saksnummerIdentitetsnummerMapping,
             periode = periode
         )

@@ -71,6 +71,9 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             require(it.containsKey(behovet.til)) { "Mangler saksnummer for 'til'"}
         }
 
+        saksnummerRepository.lagreMapping(saksnummer)
+        // TODO: Skal vi også lagre alene om omsorgen?
+
         val fraSaksnummer = saksnummer.getValue(behovet.fra)
         val tilSaksnummer = saksnummer.getValue(behovet.til)
 
