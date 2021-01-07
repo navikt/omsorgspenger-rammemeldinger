@@ -95,7 +95,8 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         BehandleOverføreKoronaOmsorgsdager(
             rapidsConnection = this,
             behovssekvensRepository = applicationContext.behovssekvensRepository,
-            koronaoverføringRepository = applicationContext.koronaoverføringRepository
+            koronaoverføringRepository = applicationContext.koronaoverføringRepository,
+            saksnummerRepository = applicationContext.saksnummerRepository
         )
         PubliserOverføreKoronaOmsorgsdager(
             rapidsConnection = this,

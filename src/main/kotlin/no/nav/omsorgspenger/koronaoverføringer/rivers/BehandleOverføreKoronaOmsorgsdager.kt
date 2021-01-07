@@ -23,6 +23,7 @@ import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding.Com
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
+import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import no.nav.omsorgspenger.utvidetrett.meldinger.HentUtvidetRettVedtakMelding
 import org.slf4j.LoggerFactory
@@ -30,7 +31,8 @@ import org.slf4j.LoggerFactory
 internal class BehandleOverføreKoronaOmsorgsdager(
     rapidsConnection: RapidsConnection,
     behovssekvensRepository: BehovssekvensRepository,
-    private val koronaoverføringRepository: KoronaoverføringRepository
+    private val koronaoverføringRepository: KoronaoverføringRepository,
+    private val saksnummerRepository: SaksnummerRepository
 ) : PersistentBehovssekvensPacketListener(
     steg = "BehandleOverføreKoronaOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
@@ -87,7 +89,6 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             dagerTilgjengeligForOverføring = dagerTilgjengeligForOverføring
         )
 
-
         val overføring = NyOverføring(
             periode = behandling.periode,
             antallDager = when (dagerTilgjengeligForOverføring >= behovet.omsorgsdagerÅOverføre) {
@@ -96,25 +97,32 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             }
         )
 
-        if (overføring.skalGjennomføres) {
-            koronaoverføringRepository.gjennomførOverføringer(
+        val skalGjennomføres = !måVurderesManuelt && overføring.skalGjennomføres
+        logger.info("SkalGjennomføres=$skalGjennomføres")
+
+        val gjennomførtOverføringer = when (skalGjennomføres) {
+            true -> koronaoverføringRepository.gjennomførOverføringer(
                 behovssekvensId = id,
                 fra = fraSaksnummer,
                 til = tilSaksnummer,
                 lovanvendelser = behandling.lovanvendelser,
                 antallDagerØnsketOverført = behovet.omsorgsdagerÅOverføre,
                 overføringer = listOf(overføring)
+            ).kunGjeldendeOverføringerForBerørteParter()
+            false -> overføring.somAvslått(
+                behovssekvensId = id,
+                fra = fraSaksnummer,
+                til = tilSaksnummer,
+                antallDagerØnsketOverført = behovet.omsorgsdagerÅOverføre
             )
         }
 
-
-
-        // TODO: Trenger egentlig for alle personer i gjeldende overføringer.
-        val alleSaksnummerMapping = mapOf(
-            behovet.fra to saksnummer.getValue(behovet.fra),
-            behovet.til to saksnummer.getValue(behovet.til)
-        )
-
+        val alleSaksnummerMapping = when (skalGjennomføres) {
+            true -> saksnummer
+            false -> saksnummerRepository.hentSisteMappingFor(
+                saksnummer = gjennomførtOverføringer.alleSaksnummer
+            )
+        }
 
         packet.leggTilBehovMedLøsninger(
             aktueltBehov = aktueltBehov,
@@ -124,7 +132,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                     tilSaksnummer = tilSaksnummer,
                     overføringer = listOf(overføring),
                     alleSaksnummerMapping = alleSaksnummerMapping,
-                    gjeldendeOverføringer = emptyMap(),
+                    gjeldendeOverføringer = gjennomførtOverføringer.gjeldendeOverføringer,
                     behandling = behandling
                 )
             ))
@@ -132,7 +140,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
 
         if (måVurderesManuelt) {
             packet.leggTilLøsningPar(OverføreKoronaOmsorgsdagerMelding.løsning(
-                OverføreKoronaOmsorgsdagerMelding.Løsningen()
+                OverføreKoronaOmsorgsdagerMelding.Løsningen() // TODO
             ))
             packet.leggTilBehovEtter(
                 aktueltBehov = aktueltBehov,
