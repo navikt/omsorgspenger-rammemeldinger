@@ -45,8 +45,10 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         fordelingService = applicationContext.fordelingService,
         utvidetRettService = applicationContext.utvidetRettService,
         midlertidigAleneService = applicationContext.midlertidigAleneService,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        enableBehandling = applicationContext.env.hentOptionalEnv("OVERFORING_BEHANDLING") == "enabled"
     )
+
     BehandleOverføringAvOmsorgsdager(
         rapidsConnection = this,
         gjennomførOverføringService = applicationContext.gjennomførOverføringService,

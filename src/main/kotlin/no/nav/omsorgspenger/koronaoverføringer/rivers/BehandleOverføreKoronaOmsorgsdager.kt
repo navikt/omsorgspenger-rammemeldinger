@@ -20,6 +20,7 @@ import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgs
 import no.nav.omsorgspenger.overføringer.meldinger.HentOverføringGirMeldingerMelding
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerInput
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding.Companion.HentPersonopplysninger
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver
@@ -51,6 +52,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 HentOverføringGirMeldingerMelding.validateLøsning(it)
                 HentUtvidetRettVedtakMelding.validateLøsning(it)
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
+                VurderRelasjonerMelding.validateLøsning(it)
             }
         }.register(this)
     }
@@ -65,16 +67,20 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             require(it.containsKey(behovet.fra)) { "Mangler saksnummer for 'fra'"}
             require(it.containsKey(behovet.til)) { "Mangler saksnummer for 'til'"}
         }
+
         val fraSaksnummer = saksnummer.getValue(behovet.fra)
         val tilSaksnummer = saksnummer.getValue(behovet.til)
 
         val behandling = Behandling(behovet)
+
+        val relasjoner = VurderRelasjonerMelding.hentLøsning(packet)
 
         val grunnlag = Grunnlag(
             behovet = behovet,
             utvidetRett = utvidetRettVedtak,
             fordelinger = fordelingGirMeldinger,
             overføringer = overføringGirMeldinger,
+            relasjoner = relasjoner,
             koronaoverføringer = listOf() // TODO
         ).vurdert(behandling)
 
