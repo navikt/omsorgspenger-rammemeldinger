@@ -108,7 +108,9 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 lovanvendelser = behandling.lovanvendelser,
                 antallDagerØnsketOverført = behovet.omsorgsdagerÅOverføre,
                 overføringer = listOf(overføring)
-            ).kunGjeldendeOverføringerForBerørteParter()
+            ).kunGjeldendeOverføringerForBerørteParter().also {
+                behandling.gjennomførtOverføringer = true
+            }
             false -> overføring.somAvslått(
                 behovssekvensId = id,
                 fra = fraSaksnummer,

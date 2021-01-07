@@ -5,6 +5,7 @@ import no.nav.omsorgspenger.lovverk.Lovanvendelser
 
 internal class Behandling(behovet: OverføreKoronaOmsorgsdagerMelding.Behovet) {
     internal var inneholderIkkeVerifiserbareVedtakOmUtvidetRett = false
+    internal var gjennomførtOverføringer = false
 
     internal val lovanvendelser = Lovanvendelser()
 

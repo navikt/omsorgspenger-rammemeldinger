@@ -265,7 +265,8 @@ internal class MeldingsbestillingTest {
             tilSaksnummer = "sak2",
             overføringer = listOf(NyOverføring(antallDager = antallDager, periode = periode)),
             gjeldendeOverføringer = emptyMap(),
-            alleSaksnummerMapping = emptyMap()
+            alleSaksnummerMapping = emptyMap(),
+            gjennomførtOverføringer = antallDager > 0
         )
         private val personopplysninger = mapOf(
             "id1" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(

@@ -36,6 +36,7 @@ internal object Formidling {
         val meldingsbestillinger = mutableListOf<Meldingsbestilling>()
 
         if (overføring.antallDager <= 0) {
+            require(!behandling.gjennomførtOverføringer)
             // Avslagsmelding til den som forsøkte å overføre dager
             meldingsbestillinger.add(Meldingsbestilling(
                 behovssekvensId = behovssekvensId,
@@ -50,6 +51,7 @@ internal object Formidling {
             ))
             require(meldingsbestillinger.size == 1)
         } else {
+            require(behandling.gjennomførtOverføringer)
             // Melding til den som overfører
             meldingsbestillinger.add(Meldingsbestilling(
                 behovssekvensId = behovssekvensId,
