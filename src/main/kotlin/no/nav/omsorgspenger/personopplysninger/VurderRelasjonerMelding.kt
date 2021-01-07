@@ -18,7 +18,7 @@ internal object VurderRelasjonerMelding :
         navn = VurderRelasjoner,
         input = mapOf(
             "identitetsnummer" to behovInput.identitetsnummer,
-            "til" to arrayOf(behovInput.til)
+            "til" to behovInput.til
         )
     )
 
