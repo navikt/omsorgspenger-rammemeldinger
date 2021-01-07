@@ -132,10 +132,10 @@ internal class BehandleOverføreKoronaOmsorgsdager(
         }
 
         val alleSaksnummerMapping = when (skalGjennomføres) {
-            true -> saksnummer
-            false -> saksnummerRepository.hentSisteMappingFor(
+            true -> saksnummerRepository.hentSisteMappingFor(
                 saksnummer = gjennomførtOverføringer.alleSaksnummer
             )
+            false -> saksnummer
         }
 
         packet.leggTilBehovMedLøsninger(
