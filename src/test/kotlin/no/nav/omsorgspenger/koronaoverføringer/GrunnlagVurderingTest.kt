@@ -16,12 +16,17 @@ internal class GrunnlagVurderingTest {
 
     @Test
     fun `grunnlag uten barn med utvidet rett`() {
+        val barn = listOf(barn(), barn())
         val behovet = behovet(
-            barn = listOf(barn(), barn())
+            barn = barn
         )
         val behandling = Behandling(behovet)
         val grunnlag = grunnlag(
-            behovet = behovet
+            behovet = behovet,
+            relasjoner = setOf(
+                VurderRelasjonerMelding.Relasjon("", borSammen = true, identitetsnummer = barn.first().identitetsnummer),
+                VurderRelasjonerMelding.Relasjon("", borSammen = true, identitetsnummer = barn.last().identitetsnummer)
+            )
         )
         assertEquals(grunnlag, grunnlag.vurdert(behandling))
         assertFalse(behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett)
@@ -41,7 +46,11 @@ internal class GrunnlagVurderingTest {
                 periode = behovet.periode,
                 barnetsFødselsdato = barnMedUtvidetRett.fødselsdato,
                 kilder = emptySet()
-            ))
+            )),
+            relasjoner = setOf(
+                VurderRelasjonerMelding.Relasjon("", borSammen = true, identitetsnummer = barnMedUtvidetRett.identitetsnummer),
+                VurderRelasjonerMelding.Relasjon("", borSammen = true, identitetsnummer = barnUtenUtvidetRett.identitetsnummer)
+            )
         )
         assertEquals(grunnlag, grunnlag.vurdert(behandling))
         assertFalse(behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett)
@@ -55,8 +64,10 @@ internal class GrunnlagVurderingTest {
             barn = listOf(barnUtenUtvidetRett, barnMedUtvidetRett)
         )
         val behandling = Behandling(behovet)
-        val relasjoner = setOf(VurderRelasjonerMelding.Relasjon(
-            identitetsnummer = barnMedUtvidetRett.identitetsnummer, borSammen = true, relasjon = "BARN"))
+        val relasjoner = setOf(
+            VurderRelasjonerMelding.Relasjon("", borSammen = true, identitetsnummer = barnMedUtvidetRett.identitetsnummer),
+            VurderRelasjonerMelding.Relasjon("", borSammen = true, identitetsnummer = barnUtenUtvidetRett.identitetsnummer)
+        )
         val grunnlag = grunnlag(
             behovet = behovet,
             relasjoner = relasjoner
@@ -68,4 +79,5 @@ internal class GrunnlagVurderingTest {
         assertThat(vurdertGrunnlag.behovet.barn).contains(barnMedUtvidetRett.copy(utvidetRett = false))
         assertTrue(behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett)
     }
+
 }

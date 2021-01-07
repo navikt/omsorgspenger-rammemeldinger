@@ -119,6 +119,7 @@ internal class BehandleKoronaOverføringerTest(
     }
 
     @Test
+    @Disabled("Behøver implementeras")
     fun `Avslått overføring ifall alle barn er borSammen = false`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
