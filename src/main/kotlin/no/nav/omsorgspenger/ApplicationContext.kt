@@ -23,6 +23,7 @@ import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.GjennomførOverføringService
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
@@ -58,7 +59,8 @@ internal class ApplicationContext(
     internal val tilgangsstyringRestClient: TilgangsstyringRestClient,
     internal val dataSource: DataSource,
     internal val healthService: HealthService,
-    internal val koronaoverføringRepository: KoronaoverføringRepository) {
+    internal val koronaoverføringRepository: KoronaoverføringRepository,
+    internal val spleisetKoronaOverføringService: SpleisetKoronaOverføringService) {
 
     internal fun start() {
         dataSource.migrate()
@@ -88,7 +90,8 @@ internal class ApplicationContext(
         internal var saksnummerRepository: SaksnummerRepository? = null,
         internal var saksnummerService: SaksnummerService? = null,
         internal var dataSource: DataSource? = null,
-        internal var koronaoverføringRepository: KoronaoverføringRepository? = null) {
+        internal var koronaoverføringRepository: KoronaoverføringRepository? = null,
+        internal var spleisetKoronaOverføringService: SpleisetKoronaOverføringService? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
             val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
@@ -137,6 +140,10 @@ internal class ApplicationContext(
                     env = benyttetEnv
             )
 
+            val benyttetKoronaoverføringRepository = koronaoverføringRepository ?: KoronaoverføringRepository(
+                dataSource = benyttetDataSource
+            )
+
             return ApplicationContext(
                 env = benyttetEnv,
                 accessTokenClient = benyttetAccessTokenClient,
@@ -181,11 +188,12 @@ internal class ApplicationContext(
                     dataSource = benyttetDataSource
                 ),
                 tilgangsstyringRestClient = benyttetTilgangsstyringRestClient,
-                koronaoverføringRepository = koronaoverføringRepository ?: KoronaoverføringRepository(
-                    dataSource = benyttetDataSource
+                koronaoverføringRepository = benyttetKoronaoverføringRepository,
+                spleisetKoronaOverføringService = spleisetKoronaOverføringService ?: SpleisetKoronaOverføringService(
+                    koronaoverføringRepository = benyttetKoronaoverføringRepository,
+                    saksnummerService = benyttetSaksnummerService
                 )
             )
         }
-
     }
 }

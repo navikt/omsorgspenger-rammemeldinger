@@ -1,6 +1,9 @@
 package no.nav.omsorgspenger.lovverk
 
-// https://lovdata.no/dokument/NL/lov/1997-02-28-19/KAPITTEL_5-5#%C2%A79-5
+object OmsorgenForBarnet: Lovhenvisning {
+    override val lov = Folketrygdeloven
+    override val henvisning = "§ 9-5 første ledd første punktum"
+}
 
 object RettenGjelderTilOgMedÅretBarnetFyller12: Lovhenvisning{
     override val lov = Folketrygdeloven
@@ -37,9 +40,6 @@ object UtvidetRettOgAleneOmOmsorgenForBarnet: Lovhenvisning {
     override val henvisning = "§ 9-6 andre ledd andre punktum"
 }
 
-
-// TODO https://github.com/navikt/omsorgspenger-rammemeldinger/issues/9
-
 object AlleredeForbrukteDager : Lovhenvisning {
     override val lov = Folketrygdeloven
     override val henvisning = "§ 9-6"
@@ -57,12 +57,12 @@ object FordeltBortOmsorgsdager : Lovhenvisning {
 
 object OverførtBortOmsorgsdager : Lovhenvisning {
     override val lov = Folketrygdeloven
-    override val henvisning = "§ 9-6 femte ledd TODO: Overføring, ikke fordeling" // TODO
+    override val henvisning = "§ 9-6 sjette ledd"
 }
 
-object KoronaOverførtBortOmsorgsdager : Lovhenvisning {
-    override val lov = Folketrygdeloven
-    override val henvisning = "§ 9-6 femte ledd TODO: KoronaOverføring, ikke fordeling eller ordinær oveføring" // TODO
+object KoronaOverføreOmsorgsdager : Lovhenvisning {
+    override val lov = MidlertidigForskriftIfbmCovid19
+    override val henvisning = "§ 4-2"
 }
 
 object EktefelleEllerSamboer : Lovhenvisning {

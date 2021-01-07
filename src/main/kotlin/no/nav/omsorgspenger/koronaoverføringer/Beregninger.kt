@@ -48,14 +48,12 @@ internal object Beregninger {
             )
         }
 
-        val antallDagerKoronaoverført = grunnlag.koronaoverføringer
-            .filter { koronaOverføringer -> koronaOverføringer.periode.overlapperMedMinstEnDag(behandling.periode) }
-            .sumBy { it.antallDager }
+        val antallDagerKoronaoverført = grunnlag.antallDagerKoronaOverført(behandling.periode)
 
         if (antallDagerKoronaoverført > 0) {
             behandling.lovanvendelser.leggTil(
                 periode = behandling.periode,
-                lovhenvisning = KoronaOverførtBortOmsorgsdager,
+                lovhenvisning = KoronaOverføreOmsorgsdager,
                 anvendelse = "Har overført $antallDagerKoronaoverført dager ifbm. Koronapandemien til andre personer"
             )
         }
@@ -81,11 +79,13 @@ internal object Beregninger {
 
         behandling.lovanvendelser.leggTil(
             periode = behandling.periode,
-            lovhenvisning = DoblingAvAntallDagerKorona2021,
-            anvendelser = setOf(
-                "Får doblet antall omsorgsdager fra $antallOmsorgsdagerFørDobling til $antallOmsorgsdagerEtterDobling",
-                "Har $antallDagerTilgjengeligForOverføring omsorgsdager tilgjengelig for overføring ifbm. Koronapandemien"
-            )
+            lovhenvisning = DoblingAvAntallDagerKorona,
+            anvendelse = "Får doblet antall omsorgsdager fra $antallOmsorgsdagerFørDobling til $antallOmsorgsdagerEtterDobling"
+        )
+        behandling.lovanvendelser.leggTil(
+            periode = behandling.periode,
+            lovhenvisning = KoronaOverføreOmsorgsdager,
+            anvendelse = "Har $antallDagerTilgjengeligForOverføring omsorgsdager tilgjengelig for overføring ifbm. Koronapandemien"
         )
 
         return antallDagerTilgjengeligForOverføring
@@ -110,14 +110,14 @@ internal object Beregninger {
                 overlappendeOverføringer.maxByOrNull { it.lengde }!!.lengde.antallDager()
             }
         }}
+
+    private fun Grunnlag.antallDagerKoronaOverført(periode: Periode) = koronaoverføringer
+        .filter { overføringer -> overføringer.periode().overlapperMedMinstEnDag(periode) }
+        .sumBy { overføring -> overføring.lengde.antallDager() }
 }
 
-internal object KoronaForskrift2021 : Lov {
-    override val id = "TODO (LOV-X)" // TODO
-}
-
-internal object DoblingAvAntallDagerKorona2021 : Lovhenvisning {
-    override val lov = KoronaForskrift2021
-    override val henvisning = "§ TODO" // TODO
+private object DoblingAvAntallDagerKorona : Lovhenvisning {
+    override val lov = MidlertidigForskriftIfbmCovid19
+    override val henvisning = "§ 4-3"
 }
 

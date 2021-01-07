@@ -3,7 +3,6 @@ package no.nav.omsorgspenger.koronaoverføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
@@ -14,9 +13,13 @@ import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMeldi
 import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.Perioder
 import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringService
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding.HentKoronaOverføringGirMeldinger
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
 import no.nav.omsorgspenger.overføringer.meldinger.HentOverføringGirMeldingerMelding
+import no.nav.omsorgspenger.overføringer.meldinger.HentOverføringGirMeldingerMelding.HentOverføringGirMeldinger
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
@@ -33,6 +36,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
     private val fordelingService: FordelingService,
     private val utvidetRettService: UtvidetRettService,
     private val spleisetOverføringerService: SpleisetOverføringerService,
+    private val spleisetKoronaOverføringService: SpleisetKoronaOverføringService,
     private val enableBehandling: Boolean
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføreKoronaOmsorgsdager",
@@ -105,13 +109,19 @@ internal class InitierOverføreKoronaOmsorgsdager(
                 correlationId = correlationId
             ).gitt
 
+            val koronaoverføringGirMeldinger = spleisetKoronaOverføringService.hentSpleisetOverføringer(
+                identitetsnummer = identitetsnummer,
+                periode = periode,
+                correlationId = correlationId
+            ).gitt
+
             val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
                 identitetsnummer = identitetsnummer,
                 periode = periode,
                 correlationId = correlationId
             )
 
-            logger.info("legger til behov med løsninger [${HentFordelingGirMeldinger}, ${HentUtvidetRettVedtak}]")
+            logger.info("legger til behov med løsninger [${HentFordelingGirMeldinger}, ${HentUtvidetRettVedtak}, ${HentOverføringGirMeldinger}, ${HentKoronaOverføringGirMeldinger}]")
             logger.warn("Løsning på behov [${HentUtvidetRettVedtak}] bør flyttes til 'omsorgspenger-rammevedtak'")
             val inputHentingAvRammer = mapOf(
                 "periode" to "$periode",
@@ -122,6 +132,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
                 behovMedLøsninger = arrayOf(
                     HentFordelingGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, fordelingGirMeldinger),
                     HentOverføringGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, overføringGirMeldinger),
+                    HentKoronaOverføringGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, koronaoverføringGirMeldinger),
                     HentUtvidetRettVedtakMelding.behovMedLøsning(inputHentingAvRammer, utvidetRettVedtak)
                 )
             )

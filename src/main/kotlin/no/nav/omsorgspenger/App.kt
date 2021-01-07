@@ -91,6 +91,7 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         utvidetRettService = applicationContext.utvidetRettService,
         fordelingService = applicationContext.fordelingService,
         spleisetOverføringerService = applicationContext.spleisetOverføringerService,
+        spleisetKoronaOverføringService = applicationContext.spleisetKoronaOverføringService,
         enableBehandling = enableBehandling
     )
     if (enableBehandling) {
