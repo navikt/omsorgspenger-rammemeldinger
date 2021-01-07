@@ -48,9 +48,7 @@ internal object Beregninger {
             )
         }
 
-        val antallDagerKoronaoverført = grunnlag.koronaoverføringer
-            .filter { koronaOverføringer -> koronaOverføringer.periode.overlapperMedMinstEnDag(behandling.periode) }
-            .sumBy { it.antallDager }
+        val antallDagerKoronaoverført = grunnlag.antallDagerKoronaOverført(behandling.periode)
 
         if (antallDagerKoronaoverført > 0) {
             behandling.lovanvendelser.leggTil(
@@ -112,6 +110,10 @@ internal object Beregninger {
                 overlappendeOverføringer.maxByOrNull { it.lengde }!!.lengde.antallDager()
             }
         }}
+
+    private fun Grunnlag.antallDagerKoronaOverført(periode: Periode) = koronaoverføringer
+        .filter { overføringer -> overføringer.periode().overlapperMedMinstEnDag(periode) }
+        .sumBy { overføring -> overføring.lengde.antallDager() }
 }
 
 private object DoblingAvAntallDagerKorona : Lovhenvisning {

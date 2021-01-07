@@ -22,7 +22,7 @@ internal data class NyOverføring(
         antallDagerØnsketOverført: Int
     ) = GjennomførtOverføringer(
         berørteSaksnummer = setOf(fra, til),
-        gjeldendeOverføringer =         mapOf(
+        gjeldendeOverføringer = mapOf(
             fra to GjeldendeOverføringer(
                 gitt = listOf(GjeldendeOverføringGitt(
                     gjennomført = ZonedDateTime.now(),

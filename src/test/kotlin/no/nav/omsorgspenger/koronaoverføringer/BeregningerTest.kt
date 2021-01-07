@@ -152,4 +152,26 @@ internal class BeregningerTest {
         )
         assertEquals(13, dagerTilgjengeligForOverføring)
     }
+
+    @Test
+    fun `trekker fra koronaoverførte dager`() {
+        val behovet = behovet(
+            omsorgsdagerTattUtIÅr = 0,
+            barn = listOf(barn())
+        )
+        val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
+            behandling = Behandling(
+                behovet = behovet
+            ),
+            grunnlag = grunnlag(
+                behovet = behovet,
+                koronaoverføringer = listOf(
+                    overføring(periode = Periode("2020-01-01/2020-12-31"), antallDager = 10), // Er før perioden
+                    overføring(periode = behovet.periode, antallDager = 6),
+                    overføring(periode = Periode("2021-02-01/2025-04-10"), antallDager = 4) // koronaoveføringer summeres så skal bli 6+4
+                )
+            )
+        )
+        assertEquals(10, dagerTilgjengeligForOverføring)
+    }
 }

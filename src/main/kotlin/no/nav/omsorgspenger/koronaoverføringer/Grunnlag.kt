@@ -5,7 +5,6 @@ import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgs
 import no.nav.omsorgspenger.lovverk.JobberINorge
 import no.nav.omsorgspenger.lovverk.OmsorgenForBarnet
 import no.nav.omsorgspenger.lovverk.UtvidetRettForBarnet
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
@@ -17,7 +16,7 @@ internal data class Grunnlag(
     internal val fordelinger: List<FordelingGirMelding>,
     internal val overføringer: List<SpleisetOverføringGitt>,
     internal val relasjoner: Set<VurderRelasjonerMelding.Relasjon>,
-    internal val koronaoverføringer : List<GjeldendeOverføringGitt>) {
+    internal val koronaoverføringer : List<SpleisetOverføringGitt>) {
     internal companion object {
         internal fun Grunnlag.vurdert(behandling: Behandling) : Grunnlag {
 

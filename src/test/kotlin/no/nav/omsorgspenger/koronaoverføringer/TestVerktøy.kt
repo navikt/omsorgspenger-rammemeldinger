@@ -18,7 +18,7 @@ internal object TestVerktøy {
         behovet: OverføreKoronaOmsorgsdagerMelding.Behovet,
         overføringer: List<SpleisetOverføringGitt> = emptyList(),
         fordelinger: List<FordelingGirMelding> = emptyList(),
-        koronaoverføringer: List<GjeldendeOverføringGitt> = emptyList(),
+        koronaoverføringer: List<SpleisetOverføringGitt> = emptyList(),
         utvidetRett: List<UtvidetRettVedtak> = emptyList(),
         relasjoner: Set<VurderRelasjonerMelding.Relasjon> = emptySet()
     ) = Grunnlag(

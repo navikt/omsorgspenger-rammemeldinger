@@ -14,6 +14,7 @@ import no.nav.omsorgspenger.koronaoverføringer.Grunnlag
 import no.nav.omsorgspenger.koronaoverføringer.Grunnlag.Companion.vurdert
 import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
@@ -50,6 +51,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
                 OverføreKoronaOmsorgsdagerMelding.validateBehov(it)
                 HentFordelingGirMeldingerMelding.validateLøsning(it)
                 HentOverføringGirMeldingerMelding.validateLøsning(it)
+                HentKoronaOverføringGirMeldingerMelding.validateLøsning(it)
                 HentUtvidetRettVedtakMelding.validateLøsning(it)
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
                 VurderRelasjonerMelding.validateLøsning(it)
@@ -61,6 +63,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
         val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
         val fordelingGirMeldinger = HentFordelingGirMeldingerMelding.hentLøsning(packet)
         val overføringGirMeldinger = HentOverføringGirMeldingerMelding.hentLøsning(packet)
+        val koronaOverføringGirMeldinger = HentKoronaOverføringGirMeldingerMelding.hentLøsning(packet)
         val utvidetRettVedtak = HentUtvidetRettVedtakMelding.hentLøsning(packet)
 
         val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet).also {
@@ -81,7 +84,7 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             fordelinger = fordelingGirMeldinger,
             overføringer = overføringGirMeldinger,
             relasjoner = relasjoner,
-            koronaoverføringer = listOf() // TODO
+            koronaoverføringer = koronaOverføringGirMeldinger
         ).vurdert(behandling)
 
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
