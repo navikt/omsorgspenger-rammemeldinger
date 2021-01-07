@@ -20,12 +20,13 @@ internal fun TestRapid.mockHentPersonopplysninger(
 }
 
 internal fun TestRapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
-    fra: Identitetsnummer, til: Identitetsnummer
+    fra: Identitetsnummer, til: Identitetsnummer,
+    barn: Set<Identitetsnummer> = emptySet(), borSammen: Boolean = false
 ) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()
             .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
-            .leggTilLøsningPåVurderRelasjoner(til = setOf(til).plus(fra))
+            .leggTilLøsningPåVurderRelasjonerTilBarn(til = barn, borSammen = borSammen)
             .toJson()
     )
 }
@@ -71,16 +72,17 @@ private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
     )
 )
 
-private fun JsonMessage.leggTilLøsningPåVurderRelasjoner(
-    til: Set<Identitetsnummer>
+private fun JsonMessage.leggTilLøsningPåVurderRelasjonerTilBarn(
+    til: Set<Identitetsnummer>,
+    borSammen: Boolean = true
 ) = leggTilLøsning(
     behov = VurderRelasjonerMelding.VurderRelasjoner,
     løsning = mapOf(
         "relasjoner" to til.map {
             mapOf(
-                "relasjon" to "INGEN",
+                "relasjon" to "BARN",
                 "identitetsnummer" to it,
-                "borSammen" to false
+                "borSammen" to borSammen
             )
         }
     )

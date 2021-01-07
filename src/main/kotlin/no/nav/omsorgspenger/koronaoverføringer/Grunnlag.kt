@@ -44,10 +44,9 @@ internal data class Grunnlag(
                     )
                 }
 
+            val borSammenMed = relasjoner.filter { it.borSammen }.map { it.identitetsnummer }
             val barnSomBorNånAnnenstans = behovet.barn
-                .filter { barnMedUtvidetRettSomIkkeKanVerifiseres.contains(it) }
-                .filterNot { barn ->
-                    relasjoner.first { it.identitetsnummer == barn.identitetsnummer }.borSammen
+                .filterNot { it.identitetsnummer in borSammenMed
                 }.onEach {
                     behandling.lovanvendelser.leggTil(
                         periode = behandling.periode,
@@ -62,7 +61,6 @@ internal data class Grunnlag(
                         .minus(barnMedUtvidetRettSomIkkeKanVerifiseres)
                         .plus(barnMedUtvidetRettSomIkkeKanVerifiseres.map { it.copy(utvidetRett = false) })
                         .minus(barnSomBorNånAnnenstans)
-                        .plus(barnSomBorNånAnnenstans.map { it.copy(utvidetRett = false)})
                 )
             )
         }

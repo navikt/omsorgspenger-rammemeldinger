@@ -13,6 +13,7 @@ import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import javax.sql.DataSource
@@ -114,6 +115,40 @@ internal class BehandleKoronaOverføringerTest(
         rapid.ventPå(3)
         val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
         assertEquals("Gjennomført", løsning.utfall)
+        assertEquals(idStart, idSlutt)
+    }
+
+    @Test
+    fun `Avslått overføring ifall alle barn er borSammen = false`() {
+        val fra = IdentitetsnummerGenerator.identitetsnummer()
+        val til = IdentitetsnummerGenerator.identitetsnummer()
+        val barn = koronaBarn()
+
+        val (idStart, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
+            fra = fra,
+            til = til,
+            omsorgsdagerTattUtIÅr = 0,
+            omsorgsdagerÅOverføre = 10,
+            barn = listOf(barn)
+        )
+
+        rapid.sendTestMessage(behovssekvens)
+        rapid.ventPå(1)
+        rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
+            fra = fra,
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borSammen = false
+        )
+        rapid.ventPå(2)
+
+        rapid.mockHentPersonopplysninger(
+            fra = fra,
+            til = til
+        )
+        rapid.ventPå(3)
+        val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
+        assert(løsning.erAvslått())
         assertEquals(idStart, idSlutt)
     }
 
