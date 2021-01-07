@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringService
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringer
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
 import no.nav.omsorgspenger.registerOverføreKoronaOmsorgsdager
@@ -29,6 +30,7 @@ internal class BehandleKoronaOverføringerTest(
                 additionalEnv = mapOf("KORONA_BEHANDLING" to "enabled")
             ).also { builder ->
                 builder.spleisetOverføringerService = overføringerMock
+                builder.spleisetKoronaOverføringService = koronaoverføringerMock
             }.build()
         )
     }
@@ -163,6 +165,16 @@ internal class BehandleKoronaOverføringerTest(
                     gitt = listOf(overføring(
                         periode = Periode("2021-01-01/2021-12-31"),
                         antallDager = 7
+                    )),
+                    fått = emptyList()
+                ))
+        }
+        private val koronaoverføringerMock = mockk<SpleisetKoronaOverføringService>().also {
+            every { it.hentSpleisetOverføringer(any(), any(), any()) }
+                .returns(SpleisetOverføringer(
+                    gitt = listOf(overføring(
+                        periode = Periode("2021-01-01/2021-12-31"),
+                        antallDager = 3
                     )),
                     fått = emptyList()
                 ))
