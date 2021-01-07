@@ -265,7 +265,8 @@ internal class MeldingsbestillingTest {
             tilSaksnummer = "sak2",
             overføringer = listOf(NyOverføring(antallDager = antallDager, periode = periode)),
             gjeldendeOverføringer = emptyMap(),
-            alleSaksnummerMapping = emptyMap()
+            alleSaksnummerMapping = emptyMap(),
+            gjennomførtOverføringer = antallDager > 0
         )
         private val personopplysninger = mapOf(
             "id1" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(
@@ -276,7 +277,8 @@ internal class MeldingsbestillingTest {
                     etternavn = "Nordmann"
                 ),
                 aktørId = "aktør1",
-                adressebeskyttet = false
+                adressebeskyttet = false,
+                gjeldendeIdentitetsnummer = "id1"
             ),
             "id2" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(
                 fødselsdato = LocalDate.parse("1991-02-03"),
@@ -286,7 +288,9 @@ internal class MeldingsbestillingTest {
                     etternavn = "Nordmann"
                 ),
                 aktørId = "aktør2",
-                adressebeskyttet = false
+                adressebeskyttet = false,
+                gjeldendeIdentitetsnummer = "id2"
+
             ),
             "id3" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(
                 fødselsdato = LocalDate.now(),
@@ -296,7 +300,8 @@ internal class MeldingsbestillingTest {
                     etternavn = "Nordmann"
                 ),
                 aktørId = "aktør3",
-                adressebeskyttet = true
+                adressebeskyttet = true,
+                gjeldendeIdentitetsnummer = "id3"
             )
         )
 

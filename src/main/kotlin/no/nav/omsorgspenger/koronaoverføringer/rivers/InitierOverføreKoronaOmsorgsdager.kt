@@ -71,7 +71,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
         if (ManuellVurdering.måVurderesManuelt(behovet)) {
             packet.leggTilLøsningPar(
                 OverføreKoronaOmsorgsdagerMelding.løsning(
-                    OverføreKoronaOmsorgsdagerMelding.Løsningen()
+                    OverføreKoronaOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
                 )
             )
             packet.leggTilBehovEtter(

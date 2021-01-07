@@ -13,11 +13,11 @@ import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import javax.sql.DataSource
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(DataSourceExtension::class)
 internal class BehandleKoronaOverføringerTest(
@@ -92,19 +92,23 @@ internal class BehandleKoronaOverføringerTest(
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
 
+        val barnet = koronaBarn()
+
         val (idStart, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
             fra = fra,
             til = til,
             omsorgsdagerTattUtIÅr = 0,
             omsorgsdagerÅOverføre = 10,
-            barn = listOf(koronaBarn())
+            barn = listOf(barnet)
         )
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
         rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barnet.identitetsnummer),
+            borSammen = true
         )
         rapid.ventPå(2)
 
@@ -114,12 +118,11 @@ internal class BehandleKoronaOverføringerTest(
         )
         rapid.ventPå(3)
         val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
-        assertEquals("Gjennomført", løsning.utfall)
+        assertTrue(løsning.erGjennomført())
         assertEquals(idStart, idSlutt)
     }
 
     @Test
-    @Disabled("Behøver implementeras")
     fun `Avslått overføring ifall alle barn er borSammen = false`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
@@ -149,7 +152,7 @@ internal class BehandleKoronaOverføringerTest(
         )
         rapid.ventPå(3)
         val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
-        assert(løsning.erAvslått())
+        assertTrue(løsning.erAvslått())
         assertEquals(idStart, idSlutt)
     }
 
