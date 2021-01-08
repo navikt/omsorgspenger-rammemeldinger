@@ -125,7 +125,7 @@ internal object OverføreKoronaOmsorgsdagerMelding :
             "versjon" to "1.0.0",
             "utfall" to løsning.utfall.name,
             "begrunnelser" to listOf<String>(),
-            "overføringer" to mapOf<String, Any>() // TODO
+            "overføringer" to mapOf<String, Any>() // TODO https://github.com/navikt/omsorgspenger-rammemeldinger/issues/72
         )
     }
 

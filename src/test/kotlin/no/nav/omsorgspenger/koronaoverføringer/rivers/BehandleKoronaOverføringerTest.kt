@@ -41,55 +41,6 @@ internal class BehandleKoronaOverføringerTest(
     }
 
     @Test
-    fun `Annen periode enn støttet blir til Gosys journalføringsoppgaver`() {
-        val fra = IdentitetsnummerGenerator.identitetsnummer()
-        val til = IdentitetsnummerGenerator.identitetsnummer()
-
-        val (id, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
-            fra = fra,
-            til = til,
-            omsorgsdagerÅOverføre = 10,
-            periode = Periode("2020-06-01/2020-12-31"),
-            journalpostIder = listOf("88124")
-        )
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(1)
-        rapid.sisteMeldingSomJSONObject().assertGosysJournalføringsoppgave(
-            behovssekvensId = id,
-            fra = fra,
-            til = til,
-            journalpostId = "88124"
-        )
-    }
-
-    @Test
-    fun `Svart at man ikke jobber i Norge blir til Gosys journalføringsoppgaver`() {
-        val fra = IdentitetsnummerGenerator.identitetsnummer()
-        val til = IdentitetsnummerGenerator.identitetsnummer()
-
-        val (id, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
-            fra = fra,
-            til = til,
-            omsorgsdagerÅOverføre = 10,
-            jobberINorge = false,
-            journalpostIder = listOf("88126")
-        )
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(1)
-        rapid.sisteMeldingSomJSONObject().assertGosysJournalføringsoppgave(
-            behovssekvensId = id,
-            fra = fra,
-            til = til,
-            journalpostId = "88126"
-        )
-    }
-
-    @Test
-    fun `Ikke funnet vedtak om utvidet rett som gjør at hele overføringen ikke kan gjennomføres blir til Gosys journalføringsoppgaver`() {
-        // TODO
-    }
-
-    @Test
     fun `Gjennomført overføring`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()

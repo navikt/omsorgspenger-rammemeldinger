@@ -72,7 +72,6 @@ internal class BehandleOverføreKoronaOmsorgsdager(
         }
 
         saksnummerRepository.lagreMapping(saksnummer)
-        // TODO: Skal vi også lagre alene om omsorgen?
 
         val fraSaksnummer = saksnummer.getValue(behovet.fra)
         val tilSaksnummer = saksnummer.getValue(behovet.til)
@@ -89,6 +88,8 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             relasjoner = relasjoner,
             koronaoverføringer = koronaOverføringGirMeldinger
         ).vurdert(behandling)
+
+        // TODO: Lagre alene om omsorgen https://github.com/navikt/omsorgspenger-rammemeldinger/issues/73
 
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
             behandling = behandling,

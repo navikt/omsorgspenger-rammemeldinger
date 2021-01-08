@@ -43,9 +43,9 @@ internal class AntallKoronaoverførteDagerSomSkalTrekkesFraTilgjengeligTest {
         assertEquals(50, omsorgsdagerResultat3Barn.koronaKopi().antallOmsorgsdager)
 
          // Koronaoverført 40 -> Trekker ikke fra noe
-        omsorgsdagerResultat3Barn.assertTrekkesFra(0, 40)
+        omsorgsdagerResultat3Barn.assertTrekkesFra(forventet = 0, koronaoverført = 40)
         // Koronaoverført 45 -> Trekker fra 5
-        omsorgsdagerResultat3Barn.assertTrekkesFra(5, 45)
+        omsorgsdagerResultat3Barn.assertTrekkesFra(forventet = 5, koronaoverført = 45)
     }
 
     private companion object {

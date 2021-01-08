@@ -13,6 +13,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
 import no.nav.omsorgspenger.testutils.sisteMelding
+import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.json.JSONObject
 import org.skyscreamer.jsonassert.JSONAssert
@@ -61,12 +62,12 @@ internal fun JSONObject.assertGosysJournalføringsoppgave(
     behovssekvensId: BehovssekvensId,
     fra: Identitetsnummer,
     til: Identitetsnummer,
-    journalpostId: JournalpostId
+    journalpostId: JournalpostId,
+    forventetLøsninger: List<String> = listOf("OverføreKoronaOmsorgsdager")
 ) {
     assertEquals(getString(Behovsformat.Id), behovssekvensId)
-    assertEquals(
-        expected = listOf("OverføreKoronaOmsorgsdager", "OpprettGosysJournalføringsoppgaver"),
-        actual = getJSONArray(Behovsformat.Behovsrekkefølge).map { it.toString() }
+    assertThat(forventetLøsninger.plus("OpprettGosysJournalføringsoppgaver")).hasSameElementsAs(
+        getJSONArray(Behovsformat.Behovsrekkefølge).map { it.toString() }
     )
     @Language("JSON")
     val forventetBehovInput = """
@@ -79,9 +80,8 @@ internal fun JSONObject.assertGosysJournalføringsoppgave(
             """.trimIndent()
     val faktiskBehovInput = getJSONObject("@behov").getJSONObject("OpprettGosysJournalføringsoppgaver").toString()
     JSONAssert.assertEquals(forventetBehovInput, faktiskBehovInput, true)
-    assertEquals(
-        expected = setOf("OverføreKoronaOmsorgsdager"),
-        actual = getJSONObject("@løsninger").keySet()
+    assertThat(forventetLøsninger).hasSameElementsAs(
+        getJSONObject("@løsninger").keySet()
     )
 }
 
