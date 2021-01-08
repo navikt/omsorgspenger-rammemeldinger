@@ -39,26 +39,23 @@ internal class TilgangsstyringRestClient(
     }
 
     private suspend fun Result<HttpResponse>.håndterResponse(): Boolean = fold(
-            onSuccess = { response ->
-                when (response.status) {
-                    HttpStatusCode.NoContent -> true
-                    HttpStatusCode.Forbidden -> false
-                    else -> {
-                        response.logError()
-                        throw RuntimeException("Uventet response code (${response.status}) ved tilgangssjekk")
-                    }
-                }
-            },
+            onSuccess = { response -> response.boolify() },
             onFailure = { cause ->
                 when (cause is ResponseException) {
-                    true -> {
-                        cause.response.logError()
-                        throw RuntimeException("Uventet feil ved tilgangssjekk")
-                    }
+                    true -> cause.response.boolify()
                     else -> throw cause
                 }
             }
     )
+
+    private suspend fun HttpResponse.boolify() = when (status) {
+        HttpStatusCode.NoContent -> true
+        HttpStatusCode.Forbidden -> false
+        else -> {
+            logError()
+            throw RuntimeException("Uventet response code (${status}) ved tilgangssjekk")
+        }
+    }
 
     private suspend fun HttpResponse.logError() =
             logger.error("HTTP ${status.value} fra omsorgspenger-tilgangsstyring, response: ${String(content.toByteArray())}")
