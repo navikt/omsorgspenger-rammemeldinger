@@ -5,6 +5,7 @@ import no.nav.omsorgspenger.extensions.AntallDager.antallDager
 import no.nav.omsorgspenger.lovverk.*
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning.beregnOmsorgsdager
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning.leggTilLovanvendelser
+import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerResultat
 
 internal object Beregninger {
     private const val DagerMaksForOverføring = 10
@@ -101,5 +102,23 @@ internal object Beregninger {
         )
 
         return tilgjengeligDagerForOverføring
+    }
+
+    internal fun antallKoronaoverførteDagerSomSkalTrekkesFraTilgjengelig(
+        koronaoverførteDager: Int,
+        omsorgsdagerResultat: OmsorgsdagerResultat
+    ) : Int {
+        // Kan koronaoverføre alle ekstradager uten at det påvirker hvor mange dager man ordinært kan overføre.
+        val ekstradager = omsorgsdagerResultat.antallOmsorgsdager
+        // Kan koronaoverføre alle grunnrettsdager uten at det påvirker hvor mange dager man ordinært kan overføre.
+        val grunnrettdager = omsorgsdagerResultat.grunnrettsdager.antallDager
+        // Dagene vi sitter igjen med er å anse som dager som kunne vært både ordinært- og korona-overført
+        // Derfor trekkes disse fra dagene man har tilgjengelig for ordinær overføring.
+        // Dette regnes utifra nåværende grunnlag/omsorgsdagerresultat som ikke nødvendigvis er det samme
+        // som da koronaoverførignen ble gjennomført.
+        return (koronaoverførteDager - ekstradager - grunnrettdager).let { when (it < 0) {
+            true -> 0
+            false -> it
+        }}
     }
 }
