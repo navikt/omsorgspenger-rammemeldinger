@@ -29,7 +29,6 @@ internal class SpleisetKoronaOverføringerService(
             gitt = fraNyLøsning.gitt.plus(fraInfotrygd.gitt),
             fått = fraNyLøsning.fått.plus(fraInfotrygd.fått)
         )
-
     }
 
     private fun fraNyLøsning(
@@ -44,7 +43,7 @@ internal class SpleisetKoronaOverføringerService(
         val gjeldendeOverføringer = koronaoverføringRepository.hentAlleOverføringer(setOf(saksnummer))
 
         val gjeldendeOverføringerForEtterspurtPerson = gjeldendeOverføringer[saksnummer]
-            ?:return SpleisetOverføringer.ingenOverføringer()
+            ?: return SpleisetOverføringer.ingenOverføringer()
 
         val saksnummerIdentitetsnummerMapping = saksnummerService.hentSaksnummerIdentitetsnummerMapping(
             saksnummer = gjeldendeOverføringer.saksnummer()
@@ -91,8 +90,8 @@ internal class SpleisetKoronaOverføringerService(
         return SpleisetOverføringer(gitt = gitt, fått = fått)
     }
 
-    private companion object {
+    internal companion object {
         private val År2021 = Periode("2021-01-01/2021-12-31")
-        fun Periode.inneholderDagerI2021() = overlapperMedMinstEnDag(År2021)
+        internal fun Periode.inneholderDagerI2021() = overlapperMedMinstEnDag(År2021)
     }
 }

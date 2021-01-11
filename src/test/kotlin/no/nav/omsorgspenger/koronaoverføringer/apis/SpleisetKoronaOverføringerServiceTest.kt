@@ -10,6 +10,7 @@ import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.infotrygd.*
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService.Companion.inneholderDagerI2021
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.apis.Motpart
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringFått
@@ -21,6 +22,8 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 internal class SpleisetKoronaOverføringerServiceTest {
 
@@ -203,6 +206,15 @@ internal class SpleisetKoronaOverføringerServiceTest {
                 kilder = setOf(Kilde(type = "foo", id = "bar"))
             )
         ))
+    }
+
+    @Test
+    fun `Perioden inneholder en dag i 2021`() {
+        assertFalse(Periode("1998-01-01/2020-12-31").inneholderDagerI2021())
+        assertTrue(Periode("1998-01-01/2021-01-01").inneholderDagerI2021())
+        assertFalse(Periode("1998-01-01/2020-01-01").inneholderDagerI2021())
+        assertFalse(Periode("2022-01-01/2022-05-01").inneholderDagerI2021())
+        assertTrue(Periode("2021-01-01/2021-12-31").inneholderDagerI2021())
     }
 
     private fun mockInfotrygd(
