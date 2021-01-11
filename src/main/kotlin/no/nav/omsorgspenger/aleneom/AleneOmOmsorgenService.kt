@@ -18,7 +18,7 @@ internal class AleneOmOmsorgenService(
         saksnummer = saksnummer,
         dato = dato,
         aleneOmOmsorgenFor = aleneOmOmsorgenFor,
-        registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.Overføring,
+        registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.Overføring
     )
 
     internal fun lagreIForbindelseMedKoronaOverføring(
@@ -30,7 +30,7 @@ internal class AleneOmOmsorgenService(
         saksnummer = saksnummer,
         dato = dato,
         aleneOmOmsorgenFor = aleneOmOmsorgenFor,
-        registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.KoronaOverføring,
+        registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.KoronaOverføring
     )
 
     private fun lagre(
