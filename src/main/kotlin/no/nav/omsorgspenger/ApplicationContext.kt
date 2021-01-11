@@ -188,7 +188,8 @@ internal class ApplicationContext(
                 koronaoverføringRepository = benyttetKoronaoverføringRepository,
                 spleisetKoronaOverføringerService = spleisetKoronaOverføringerService ?: SpleisetKoronaOverføringerService(
                     koronaoverføringRepository = benyttetKoronaoverføringRepository,
-                    saksnummerService = benyttetSaksnummerService
+                    saksnummerService = benyttetSaksnummerService,
+                    infotrygdRammeService = benyttetInfotrygdRammeService
                 )
             )
         }
