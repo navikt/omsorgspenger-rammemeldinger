@@ -54,7 +54,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         rapidsConnection = this,
         gjennomførOverføringService = applicationContext.gjennomførOverføringService,
         saksnummerRepository = applicationContext.saksnummerRepository,
-        aleneOmOmsorgenRepository = applicationContext.aleneOmOmsorgenRepository,
+        aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService,
         behovssekvensRepository = applicationContext.behovssekvensRepository
     )
     PubliserOverføringAvOmsorgsdager(

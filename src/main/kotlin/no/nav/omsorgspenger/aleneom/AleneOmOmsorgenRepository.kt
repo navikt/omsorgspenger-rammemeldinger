@@ -13,7 +13,8 @@ internal class AleneOmOmsorgenRepository(
     private val dataSource: DataSource) {
 
     internal enum class RegistreresIForbindelseMed {
-        Overføring
+        Overføring,
+        KoronaOverføring
     }
 
     internal fun lagre(
