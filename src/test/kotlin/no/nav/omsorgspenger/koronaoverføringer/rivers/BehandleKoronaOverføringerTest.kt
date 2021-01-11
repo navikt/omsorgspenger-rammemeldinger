@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.koronaoverføringer.rivers
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import no.nav.k9.rapid.losning.OverføreKoronaOmsorgsdagerLøsning
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
@@ -77,6 +78,29 @@ internal class BehandleKoronaOverføringerTest(
         rapid.ventPå(3)
         val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
         assertTrue(løsning.erGjennomført())
+
+        assertThat(løsning.overføringer.keys).hasSameElementsAs(setOf(fra, til))
+        assertThat(løsning.overføringer.getValue(fra).fått).isEmpty()
+        assertThat(løsning.overføringer.getValue(fra).gitt).hasSameElementsAs(setOf(OverføreKoronaOmsorgsdagerLøsning.OverføringGitt(
+            til = OverføreKoronaOmsorgsdagerLøsning.Person(
+                navn = OverføreKoronaOmsorgsdagerLøsning.Navn(fornavn = "Kari", mellomnavn = "Persdatter", etternavn = "Nordmann"),
+                fødselsdato = LocalDate.parse("1992-09-01")
+            ),
+            antallDager = 10,
+            gjelderFraOgMed = LocalDate.now(),
+            gjelderTilOgMed = LocalDate.parse("2021-12-31")
+        )))
+        assertThat(løsning.overføringer.getValue(til).gitt).isEmpty()
+        assertThat(løsning.overføringer.getValue(til).fått).hasSameElementsAs(setOf(OverføreKoronaOmsorgsdagerLøsning.OverføringFått(
+            fra = OverføreKoronaOmsorgsdagerLøsning.Person(
+                navn = OverføreKoronaOmsorgsdagerLøsning.Navn(fornavn = "Ola", mellomnavn = null, etternavn = "Nordmann"),
+                fødselsdato = LocalDate.parse("1990-09-01")
+            ),
+            antallDager = 10,
+            gjelderFraOgMed = LocalDate.now(),
+            gjelderTilOgMed = LocalDate.parse("2021-12-31")
+        )))
+
         assertEquals(idStart, idSlutt)
 
         hentKoronaoverføringerFor(fra).also {
