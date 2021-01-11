@@ -8,7 +8,7 @@ val mockkVersion = "1.10.4"
 val ulidVersion = "8.2.0"
 val ktorVersion = "1.5.0"
 val assertjVersion = "3.18.1"
-val dusseldorfVersion = "1.5.0.3315e68"
+val dusseldorfVersion = "1.5.0.8b77f1d"
 val schemaValidatorVersion = "1.0.46"
 
 // Database
@@ -103,7 +103,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "6.7.1"
+        gradleVersion = "6.8"
     }
 
 }
