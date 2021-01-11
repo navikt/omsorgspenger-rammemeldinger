@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger.testutils
 
-import com.opentable.db.postgres.embedded.EmbeddedPostgres
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.omsorgspenger.DataSourceBuilder
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
