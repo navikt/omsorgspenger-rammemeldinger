@@ -5,6 +5,8 @@ import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringer
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
@@ -17,6 +19,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDate
+import java.time.ZonedDateTime
 import javax.sql.DataSource
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -45,7 +49,8 @@ internal class BehandleKoronaOverføringerTest(
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
 
-        val barnet = koronaBarn()
+        val barnetsFødselsdato = LocalDate.parse("2020-10-05")
+        val barnet = koronaBarn(fødselsdato = barnetsFødselsdato, aleneOmOmsorgen = true)
 
         val (idStart, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
             fra = fra,
@@ -81,6 +86,15 @@ internal class BehandleKoronaOverføringerTest(
         hentKoronaoverføringerFor(til).also {
             assertThat(it.fått).hasSize(1)
             assertThat(it.gitt).isEmpty()
+        }
+        hentAleneOmOmsorgen("foo").also {
+            assertThat(it).hasSameElementsAs(setOf(AleneOmOmsorgen(
+                registrert = registrert,
+                periode = Periode(fom = LocalDate.now(), tom = LocalDate.parse("2038-12-31")), // Ut året barnet fyller 18
+                behovssekvensId = idStart,
+                barn = AleneOmOmsorgen.Barn(identitetsnummer = barnet.identitetsnummer, fødselsdato = barnet.fødselsdato),
+                regstrertIForbindelseMed = "KoronaOverføring"
+            )))
         }
     }
 
@@ -125,7 +139,12 @@ internal class BehandleKoronaOverføringerTest(
             correlationId = "test"
         )
 
+    private fun hentAleneOmOmsorgen(saksnummer: Saksnummer) = applicationContext.aleneOmOmsorgenRepository.hent(saksnummer).map {
+        it.copy(registrert = registrert)
+    }
+
     private companion object {
+        val registrert = ZonedDateTime.parse("2021-01-10T12:15:00.000+01:00")
         private val overføringerMock = mockk<SpleisetOverføringerService>().also {
             every { it.hentSpleisetOverføringer(any(), any(), any()) }
                 .returns(SpleisetOverføringer(

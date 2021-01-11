@@ -51,10 +51,13 @@ internal fun behovssekvensOverføreKoronaOmsorgsdager(
     ))
 ).keyValue
 
-internal fun koronaBarn(utvidetRett: Boolean = false) = OverføreKoronaOmsorgsdagerBehov.Barn(
+internal fun koronaBarn(
+    utvidetRett: Boolean = false,
+    aleneOmOmsorgen: Boolean = false,
+    fødselsdato: LocalDate = LocalDate.now().minusYears(1)) = OverføreKoronaOmsorgsdagerBehov.Barn(
     identitetsnummer = IdentitetsnummerGenerator.identitetsnummer(),
-    fødselsdato = LocalDate.now().minusYears(1),
-    aleneOmOmsorgen = false,
+    fødselsdato = fødselsdato,
+    aleneOmOmsorgen = aleneOmOmsorgen,
     utvidetRett = utvidetRett
 )
 

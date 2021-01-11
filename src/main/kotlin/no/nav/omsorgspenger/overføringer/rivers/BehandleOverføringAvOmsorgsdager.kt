@@ -4,14 +4,10 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
-import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
-import no.nav.omsorgspenger.Periode
-import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenFor
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
-import no.nav.omsorgspenger.extensions.sisteDagIÅret
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
@@ -43,7 +39,7 @@ internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
     private val gjennomførOverføringService: GjennomførOverføringService,
     private val saksnummerRepository: SaksnummerRepository,
-    private val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
+    private val aleneOmOmsorgenService: AleneOmOmsorgenService,
     behovssekvensRepository: BehovssekvensRepository
 ) : PersistentBehovssekvensPacketListener(
     steg = "BehandleOverføringAvOmsorgsdager",
@@ -86,11 +82,6 @@ internal class BehandleOverføringAvOmsorgsdager(
         val midlertidigAleneVedtak = HentMidlertidigAleneVedtakMelding.hentLøsning(packet)
 
         saksnummerRepository.lagreMapping(fraTilSaksnummerMapping)
-        lagreAleneOmOmsorgen(
-            behovssekvensId = id,
-            saksnummer = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
-            overføreOmsorgsdager = overføreOmsorgsdager
-        )
 
         val behandling = Behandling(
             sendtPerBrev = overføreOmsorgsdager.sendtPerBrev,
@@ -110,6 +101,16 @@ internal class BehandleOverføringAvOmsorgsdager(
         vurderInngangsvilkår(
             grunnlag = grunnlag,
             behandling = behandling
+        )
+
+        aleneOmOmsorgenService.lagreIForbindelseMedOverføring(
+            behovssekvensId = id,
+            saksnummer = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
+            dato = grunnlag.overføreOmsorgsdager.mottaksdato,
+            aleneOmOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.aleneOmOmsorgen }.map { AleneOmOmsorgen.Barn(
+                identitetsnummer = it.identitetsnummer,
+                fødselsdato = it.fødselsdato,
+            )}
         )
 
         val omsorgsdagerTilgjengeligForOverføring = beregnOmsorgsdagerTilgjengeligForOverføring(
@@ -208,34 +209,5 @@ internal class BehandleOverføringAvOmsorgsdager(
         }
 
         return true
-    }
-
-    private fun lagreAleneOmOmsorgen(
-        behovssekvensId: BehovssekvensId,
-        saksnummer: Saksnummer,
-        overføreOmsorgsdager: OverføreOmsorgsdagerMelding.Behovet)  {
-        aleneOmOmsorgenRepository.lagre(
-            saksnummer = saksnummer,
-            behovssekvensId = behovssekvensId,
-            registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.Overføring,
-            aleneOmOmsorgenFor = overføreOmsorgsdager.barn.filter { it.aleneOmOmsorgen }.mapNotNull {
-                /**
-                 * Lagrer nå alene om omsorgen ut året barnet fyller 18 uavhengig av det utvidet rett eller ikke.
-                 * Dette for å unngå ev. problemer om man skulle få utvidet rett for barnet senere.
-                 */
-                val aleneOmOmsorgenTilOgMed = it.fødselsdato.plusYears(18).sisteDagIÅret()
-                when (overføreOmsorgsdager.mottaksdato.isAfter(aleneOmOmsorgenTilOgMed)) {
-                    true -> null
-                    false -> AleneOmOmsorgenFor(
-                        identitetsnummer = it.identitetsnummer,
-                        fødselsdato = it.fødselsdato,
-                        aleneOmOmsorgenI = Periode(
-                            fom = overføreOmsorgsdager.mottaksdato,
-                            tom = aleneOmOmsorgenTilOgMed
-                        )
-                    )
-                }
-            }.toSet()
-        )
     }
 }
