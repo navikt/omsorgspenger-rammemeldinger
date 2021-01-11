@@ -121,11 +121,46 @@ internal object OverføreKoronaOmsorgsdagerMelding :
     }
 
     override fun løsning(løsning: Løsningen): Pair<String, Map<String, *>> {
+
+        val overføringer = løsning.gjeldendeOverføringer
+            .mapKeys { (saksnummer) -> løsning.identitetsnummer(saksnummer) }
+            .mapValues { (_,gjeldendeOverføringer) ->
+                mapOf(
+                    "gitt" to gjeldendeOverføringer.gitt.map { gitt -> mapOf(
+                        "antallDager" to gitt.antallDager,
+                        "gjelderFraOgMed" to gitt.periode.fom,
+                        "gjelderTilOgMed" to gitt.periode.tom,
+                        "til" to mapOf(
+                            "navn" to løsning.personopplysninger(gitt.til).navnTilLøsning(),
+                            "fødselsdato" to løsning.personopplysninger(gitt.til).fødselsdato.toString()
+                        )
+                    )},
+                    "fått" to gjeldendeOverføringer.fått.map { fått -> mapOf(
+                        "antallDager" to fått.antallDager,
+                        "gjelderFraOgMed" to fått.periode.fom,
+                        "gjelderTilOgMed" to fått.periode.tom,
+                        "fra" to mapOf(
+                            "navn" to løsning.personopplysninger(fått.fra).navnTilLøsning(),
+                            "fødselsdato" to løsning.personopplysninger(fått.fra).fødselsdato.toString()
+                        )
+                    )}
+                )
+            }
+
         return OverføreKoronaOmsorgsdager to mapOf(
             "versjon" to "1.0.0",
             "utfall" to løsning.utfall.name,
             "begrunnelser" to listOf<String>(),
-            "overføringer" to mapOf<String, Any>() // TODO https://github.com/navikt/omsorgspenger-rammemeldinger/issues/72
+            "overføringer" to overføringer
+        )
+    }
+
+    private fun OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger.navnTilLøsning() = when (navn) {
+        null -> null
+        else -> mapOf(
+            "fornavn" to navn.fornavn,
+            "mellomnavn" to navn.mellomnavn,
+            "etternavn" to navn.etternavn
         )
     }
 
