@@ -9,7 +9,6 @@ import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -117,6 +116,28 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
                     type = "Fødselsdato",
                     fødselsdato = LocalDate.parse("1990-09-29")
                 )
+            ),
+            InfotrygdKoronaOverføringGirMelding(
+                vedtatt = LocalDate.parse("2018-06-17"),
+                periode = Periode("2017-06-17/2018-06-20"),
+                kilder = setOf(),
+                lengde = Duration.parse("P1DT12H"),
+                til = InfotrygdAnnenPart(
+                    id = "29099011666",
+                    type = "Identitetsnummer",
+                    fødselsdato = LocalDate.parse("1990-09-29")
+                )
+            ),
+            InfotrygdKoronaOverføringFårMelding(
+                vedtatt = LocalDate.parse("2018-06-17"),
+                periode = Periode("2017-06-17/2018-06-20"),
+                kilder = setOf(),
+                lengde = Duration.parse("P1D"),
+                fra = InfotrygdAnnenPart(
+                    id = "1991-09-29",
+                    type = "Fødselsdato",
+                    fødselsdato = LocalDate.parse("1991-09-29")
+                )
             )
         )
 
@@ -131,8 +152,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             correlationId = UUID.randomUUID().toString()
         )
 
-        assertEquals(8, infotrygdRammer.size)
-        assertThat(infotrygdRammer).containsAll(forventedeInfotrygdRammer)
+        assertThat(infotrygdRammer).hasSameElementsAs(forventedeInfotrygdRammer)
     }
 
     @Test

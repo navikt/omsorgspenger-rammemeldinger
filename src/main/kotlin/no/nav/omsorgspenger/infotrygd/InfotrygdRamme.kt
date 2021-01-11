@@ -83,6 +83,20 @@ internal data class InfotrygdOverføringGirMelding(
         val til: InfotrygdAnnenPart,
         val lengde: Duration) : InfotrygdRamme
 
+internal data class InfotrygdKoronaOverføringFårMelding(
+    override val periode: Periode,
+    override val vedtatt: LocalDate,
+    override val kilder: Set<Kilde>,
+    val fra: InfotrygdAnnenPart,
+    val lengde: Duration) : InfotrygdRamme
+
+internal data class InfotrygdKoronaOverføringGirMelding(
+    override val periode: Periode,
+    override val vedtatt: LocalDate,
+    override val kilder: Set<Kilde>,
+    val til: InfotrygdAnnenPart,
+    val lengde: Duration) : InfotrygdRamme
+
 internal data class InfotrygdAnnenPart(
     internal val id: String,
     internal val fødselsdato: LocalDate,

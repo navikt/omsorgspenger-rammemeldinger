@@ -23,6 +23,7 @@ import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerApi
 import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
@@ -91,7 +92,7 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         utvidetRettService = applicationContext.utvidetRettService,
         fordelingService = applicationContext.fordelingService,
         spleisetOverføringerService = applicationContext.spleisetOverføringerService,
-        spleisetKoronaOverføringService = applicationContext.spleisetKoronaOverføringService,
+        spleisetKoronaOverføringerService = applicationContext.spleisetKoronaOverføringerService,
         enableBehandling = enableBehandling
     )
     if (enableBehandling) {
@@ -161,6 +162,9 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
             )
             SpleisetAleneOmOmsorgenApi(
                 spleisetAleneOmOmsorgenService = applicationContext.spleisetAleneOmOmsorgenService
+            )
+            SpleisetKoronaOverføringerApi(
+                spleisetKoronaOverføringerService = applicationContext.spleisetKoronaOverføringerService
             )
         }
 
