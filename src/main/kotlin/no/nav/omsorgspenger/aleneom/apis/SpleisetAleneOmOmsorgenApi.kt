@@ -5,19 +5,18 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.ApiTyper
 import no.nav.omsorgspenger.extensions.correlationId
-import java.time.LocalDate
 
 internal fun Route.SpleisetAleneOmOmsorgenApi(
     spleisetAleneOmOmsorgenService: SpleisetAleneOmOmsorgenService) {
 
     post("/hentAleneOmOmsorgen") {
-        val request = call.receive<HentAleneOmOmsorgenRequest>()
+        val request = call.receive<ApiTyper.HentRammemeldingerRequest>()
 
         val aleneOmOmsorgen = spleisetAleneOmOmsorgenService.hentSpleisetAleneOmOmsorgen(
             identitetsnummer = request.identitetsnummer,
-            periode = Periode(request.fom, request.tom),
+            periode = request.periode,
             correlationId = call.request.correlationId()
         )
 
@@ -29,12 +28,6 @@ internal fun Route.SpleisetAleneOmOmsorgenApi(
         )
     }
 }
-
-private data class HentAleneOmOmsorgenRequest(
-    val identitetsnummer: String, 
-    val fom: LocalDate,
-    val tom: LocalDate
-)
 
 private data class HentAleneOmOmsorgenResponse(
     val aleneOmOmsorgen : List<SpleisetAleneOmOmsorgen>

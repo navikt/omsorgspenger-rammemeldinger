@@ -1,9 +1,6 @@
 package no.nav.omsorgspenger
 
 import KoronaoverføringRepository
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JacksonSerializer
@@ -23,7 +20,7 @@ import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
-import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringService
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.GjennomførOverføringService
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
@@ -60,7 +57,7 @@ internal class ApplicationContext(
     internal val dataSource: DataSource,
     internal val healthService: HealthService,
     internal val koronaoverføringRepository: KoronaoverføringRepository,
-    internal val spleisetKoronaOverføringService: SpleisetKoronaOverføringService) {
+    internal val spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService) {
 
     internal fun start() {
         dataSource.migrate()
@@ -91,7 +88,7 @@ internal class ApplicationContext(
         internal var saksnummerService: SaksnummerService? = null,
         internal var dataSource: DataSource? = null,
         internal var koronaoverføringRepository: KoronaoverføringRepository? = null,
-        internal var spleisetKoronaOverføringService: SpleisetKoronaOverføringService? = null) {
+        internal var spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
             val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
@@ -189,7 +186,7 @@ internal class ApplicationContext(
                 ),
                 tilgangsstyringRestClient = benyttetTilgangsstyringRestClient,
                 koronaoverføringRepository = benyttetKoronaoverføringRepository,
-                spleisetKoronaOverføringService = spleisetKoronaOverføringService ?: SpleisetKoronaOverføringService(
+                spleisetKoronaOverføringerService = spleisetKoronaOverføringerService ?: SpleisetKoronaOverføringerService(
                     koronaoverføringRepository = benyttetKoronaoverføringRepository,
                     saksnummerService = benyttetSaksnummerService
                 )

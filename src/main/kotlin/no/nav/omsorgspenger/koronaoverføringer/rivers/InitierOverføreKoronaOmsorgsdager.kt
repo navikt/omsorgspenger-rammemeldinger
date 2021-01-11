@@ -13,7 +13,7 @@ import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMeldi
 import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.Perioder
 import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
-import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringService
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding.HentKoronaOverføringGirMeldinger
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
@@ -36,7 +36,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
     private val fordelingService: FordelingService,
     private val utvidetRettService: UtvidetRettService,
     private val spleisetOverføringerService: SpleisetOverføringerService,
-    private val spleisetKoronaOverføringService: SpleisetKoronaOverføringService,
+    private val spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService,
     private val enableBehandling: Boolean
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføreKoronaOmsorgsdager",
@@ -109,7 +109,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
                 correlationId = correlationId
             ).gitt
 
-            val koronaoverføringGirMeldinger = spleisetKoronaOverføringService.hentSpleisetOverføringer(
+            val koronaoverføringGirMeldinger = spleisetKoronaOverføringerService.hentSpleisetOverføringer(
                 identitetsnummer = identitetsnummer,
                 periode = periode,
                 correlationId = correlationId

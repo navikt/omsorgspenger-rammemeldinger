@@ -119,7 +119,7 @@ internal class BehandleKoronaOverføringerTest(
     }
 
     private fun hentKoronaoverføringerFor(identitetsnummer: Identitetsnummer) =
-        applicationContext.spleisetKoronaOverføringService.hentSpleisetOverføringer(
+        applicationContext.spleisetKoronaOverføringerService.hentSpleisetOverføringer(
             identitetsnummer = identitetsnummer,
             periode = Periode("2021-01-01/2021-12-31"),
             correlationId = "test"

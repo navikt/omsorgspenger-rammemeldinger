@@ -12,7 +12,7 @@ import no.nav.omsorgspenger.saksnummer.SaksnummerService
  * TODO: Spleiser nå ikke sammen med Overføringer fra Infotrygd.
  *  - https://github.com/navikt/omsorgspenger-rammemeldinger/issues/71
  */
-internal class SpleisetKoronaOverføringService(
+internal class SpleisetKoronaOverføringerService(
     private val koronaoverføringRepository: KoronaoverføringRepository,
     private val saksnummerService: SaksnummerService) {
     internal fun hentSpleisetOverføringer(
