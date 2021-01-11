@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
+import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
@@ -102,12 +103,11 @@ internal class BehandleOverføringAvOmsorgsdager(
             behandling = behandling
         )
 
-        // Lagrer kun etter vurdering av grunnlaget er gjort & man har omsorgen for alle barna som er igjen.
         aleneOmOmsorgenService.lagreIForbindelseMedOverføring(
             behovssekvensId = id,
             saksnummer = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
             dato = grunnlag.overføreOmsorgsdager.mottaksdato,
-            aleneOmOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.aleneOmOmsorgen }.map { AleneOmOmsorgenService.Barn(
+            aleneOmOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.aleneOmOmsorgen }.map { AleneOmOmsorgen.Barn(
                 identitetsnummer = it.identitetsnummer,
                 fødselsdato = it.fødselsdato,
             )}

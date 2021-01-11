@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger.aleneom
 
-import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
@@ -14,7 +13,7 @@ internal class AleneOmOmsorgenService(
         behovssekvensId: BehovssekvensId,
         saksnummer: Saksnummer,
         dato: LocalDate,
-        aleneOmOmsorgenFor: List<Barn>) = lagre(
+        aleneOmOmsorgenFor: List<AleneOmOmsorgen.Barn>) = lagre(
         behovssekvensId = behovssekvensId,
         saksnummer = saksnummer,
         dato = dato,
@@ -26,7 +25,7 @@ internal class AleneOmOmsorgenService(
         behovssekvensId: BehovssekvensId,
         saksnummer: Saksnummer,
         dato: LocalDate,
-        aleneOmOmsorgenFor: List<Barn>) = lagre(
+        aleneOmOmsorgenFor: List<AleneOmOmsorgen.Barn>) = lagre(
         behovssekvensId = behovssekvensId,
         saksnummer = saksnummer,
         dato = dato,
@@ -38,7 +37,7 @@ internal class AleneOmOmsorgenService(
         behovssekvensId: BehovssekvensId,
         saksnummer: Saksnummer,
         dato: LocalDate,
-        aleneOmOmsorgenFor: List<Barn>,
+        aleneOmOmsorgenFor: List<AleneOmOmsorgen.Barn>,
         registreresIForbindelseMed: AleneOmOmsorgenRepository.RegistreresIForbindelseMed) {
         aleneOmOmsorgenRepository.lagre(
             behovssekvensId = behovssekvensId,
@@ -64,9 +63,4 @@ internal class AleneOmOmsorgenService(
             }.toSet()
         )
     }
-
-    internal data class Barn(
-        internal val identitetsnummer: Identitetsnummer,
-        internal val fødselsdato: LocalDate,
-    )
 }
