@@ -101,6 +101,22 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             periode = it.periode()
         )}
 
+        val koronaOverføringGir = rammevedtak.getArray("KoronaOverføringGir").mapJSONObject().map { InfotrygdKoronaOverføringGirMelding(
+            vedtatt = it.vedtatt(),
+            kilder = it.kilder(),
+            til = it.getJSONObject("mottaker").somInfotrygdAnnenPart(),
+            lengde = it.lengde(),
+            periode = it.periode()
+        )}
+
+        val koronaOverføringFår = rammevedtak.getArray("KoronaOverføringFår").mapJSONObject().map { InfotrygdKoronaOverføringFårMelding(
+            vedtatt = it.vedtatt(),
+            kilder = it.kilder(),
+            fra = it.getJSONObject("avsender").somInfotrygdAnnenPart(),
+            lengde = it.lengde(),
+            periode = it.periode()
+        )}
+
         rammevedtak.getArray("Uidentifisert").also { if (!it.isEmpty) {
             logger.info("Antall Uidentifiserte rammevedtak fra Infotrygd = ${it.length()}")
         }}
@@ -112,6 +128,8 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             .plus(aleneOmOmsorgen)
             .plus(overføringGir)
             .plus(overføringFår)
+            .plus(koronaOverføringGir)
+            .plus(koronaOverføringFår)
             .toList()
     }
 

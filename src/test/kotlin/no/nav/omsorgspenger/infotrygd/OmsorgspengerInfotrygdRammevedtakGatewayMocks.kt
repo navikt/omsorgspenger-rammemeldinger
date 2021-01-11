@@ -180,6 +180,34 @@ private val AlleTypeRammevedtak = """
         "lengde": "P1D",
         "kilder": []
       }
+    ],
+    "KoronaOverføringGir": [
+      {
+        "vedtatt": "2018-06-17",
+        "gyldigFraOgMed": "2017-06-17",
+        "gyldigTilOgMed": "2018-06-20",
+        "mottaker": {   
+          "id": "29099011666",
+          "type": "PersonIdent",
+          "fødselsdato": "1990-09-29"
+        },
+        "lengde": "P1DT12H",
+        "kilder": []
+      }
+    ],
+    "KoronaOverføringFår": [
+      {
+        "vedtatt": "2018-06-17",
+        "gyldigFraOgMed": "2017-06-17",
+        "gyldigTilOgMed": "2018-06-20",
+        "avsender": {   
+          "id": "1991-09-29",
+          "type": "Fødselsdato",
+          "fødselsdato": "1991-09-29"
+        },
+        "lengde": "P1D",
+        "kilder": []
+      }
     ]
   }
 }
