@@ -5,14 +5,14 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import no.nav.omsorgspenger.ApiTyper
+import no.nav.omsorgspenger.apis.HentRammemeldingerRequest
 import no.nav.omsorgspenger.extensions.correlationId
 
 internal fun Route.SpleisetOverføringerApi(
     spleisetOverføringerService: SpleisetOverføringerService) {
 
     post("/hentOverfoeringer") {
-        val request = call.receive<ApiTyper.HentRammemeldingerRequest>()
+        val request = call.receive<HentRammemeldingerRequest>()
 
         val spleisetOverføringer = spleisetOverføringerService.hentSpleisetOverføringer(
             identitetsnummer = request.identitetsnummer,
