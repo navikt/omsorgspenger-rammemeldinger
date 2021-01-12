@@ -1,22 +1,23 @@
-package no.nav.omsorgspenger.overføringer.apis
+package no.nav.omsorgspenger.koronaoverføringer.apis
 
 import io.ktor.routing.*
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.apis.GjeldendeOverføringerAdapter
 import no.nav.omsorgspenger.apis.GjeldendeOverføringerApi
-import no.nav.omsorgspenger.overføringer.db.OverføringRepository
+import no.nav.omsorgspenger.koronaoverføringer.db.KoronaoverføringRepository
+import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 
-internal fun Route.OverføringerApi(
-    overføringRepository: OverføringRepository,
+internal fun Route.KoronaOverføringerApi(
+    koronaoverføringRepository: KoronaoverføringRepository,
     saksnummerService: SaksnummerService,
     tilgangsstyringRestClient: TilgangsstyringRestClient) = GjeldendeOverføringerApi(
-    path = "/overforinger",
-    oppslagBeskrivelse = "hente overføringer",
+    path = "/korona-overforinger",
+    oppslagBeskrivelse = "hente koronaoverføringer",
     saksnummerService = saksnummerService,
     tilgangsstyringRestClient = tilgangsstyringRestClient,
     gjeldendeOverføringerAdapter = object : GjeldendeOverføringerAdapter {
         override fun hentGjeldendeOverføringer(saksnummer: Saksnummer) =
-            overføringRepository.hentAktiveOverføringer(setOf(saksnummer))
+            koronaoverføringRepository.hentAlleOverføringer(setOf(saksnummer))
     }
 )

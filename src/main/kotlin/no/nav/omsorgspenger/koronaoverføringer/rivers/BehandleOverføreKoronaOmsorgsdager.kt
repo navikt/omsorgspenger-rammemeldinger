@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
-import KoronaoverføringRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
@@ -16,6 +15,7 @@ import no.nav.omsorgspenger.koronaoverføringer.Grunnlag
 import no.nav.omsorgspenger.koronaoverføringer.Grunnlag.Companion.vurdert
 import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
+import no.nav.omsorgspenger.koronaoverføringer.db.KoronaoverføringRepository
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding

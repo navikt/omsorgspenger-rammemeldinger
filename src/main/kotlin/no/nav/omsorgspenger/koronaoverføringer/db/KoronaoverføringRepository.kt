@@ -1,3 +1,5 @@
+package no.nav.omsorgspenger.koronaoverføringer.db
+
 import kotliquery.*
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode

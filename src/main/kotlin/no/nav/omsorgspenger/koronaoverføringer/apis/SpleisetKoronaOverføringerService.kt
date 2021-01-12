@@ -1,10 +1,10 @@
 package no.nav.omsorgspenger.koronaoverføringer.apis
 
-import KoronaoverføringRepository
 import no.nav.omsorgspenger.CorrelationId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
+import no.nav.omsorgspenger.koronaoverføringer.db.KoronaoverføringRepository
 import no.nav.omsorgspenger.overføringer.apis.Motpart
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringFått
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
