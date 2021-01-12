@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger
 
-import KoronaoverføringRepository
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JacksonSerializer
@@ -22,6 +21,7 @@ import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService
+import no.nav.omsorgspenger.koronaoverføringer.db.KoronaoverføringRepository
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.GjennomførOverføringService
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository

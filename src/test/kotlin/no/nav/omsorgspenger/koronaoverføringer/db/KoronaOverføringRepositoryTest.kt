@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger.koronaoverføringer.db
 
-import KoronaoverføringRepository
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer

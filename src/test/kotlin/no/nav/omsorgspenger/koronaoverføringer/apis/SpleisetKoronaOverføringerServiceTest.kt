@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger.koronaoverføringer.apis
 
-import KoronaoverføringRepository
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -11,6 +10,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.infotrygd.*
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService.Companion.inneholderDagerI2021
+import no.nav.omsorgspenger.koronaoverføringer.db.KoronaoverføringRepository
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.apis.Motpart
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringFått
