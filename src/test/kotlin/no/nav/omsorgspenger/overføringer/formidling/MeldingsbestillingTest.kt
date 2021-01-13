@@ -355,7 +355,8 @@ internal class MeldingsbestillingTest {
                 overføreOmsorgsdager = overføreOmsorgsdager,
                 utvidetRettVedtak = listOf(),
                 midlertidigAleneVedtak = listOf(),
-                fordelingGirMeldinger = fordelinger
+                fordelingGirMeldinger = fordelinger,
+                koronaOverføringer = listOf() // TODO
             )
 
             val behandling = Behandling(

@@ -6,6 +6,7 @@ import no.nav.omsorgspenger.lovverk.*
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning.beregnOmsorgsdager
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning.leggTilLovanvendelser
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerResultat
+import no.nav.omsorgspenger.overføringer.apis.periode
 
 internal object Beregninger {
     private const val DagerMaksForOverføring = 10
@@ -33,6 +34,7 @@ internal object Beregninger {
         }
 
         val fordelingGirMeldinger = grunnlag.fordelingGirMeldinger.filter { it.periode.inneholder(periode) }
+        val koronaOverføringer = grunnlag.koronaOverføringer.filter { it.periode().inneholder(periode) }
         val omsorgsdagerResultat = beregnOmsorgsdager(
             barnMedOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.omsorgenFor.inneholder(periode) }
         )
@@ -87,7 +89,30 @@ internal object Beregninger {
             }
         }
 
-        val tilgjengelig = antallOmsorgsdager - grunnrettsdager.antallDager - dagerTattUtUtoverGrunnretten - fordeltBort
+        val koronaOverførtTrekkesFra = koronaOverføringer.sumBy { it.lengde.antallDager() }.let { totaltAntallDagerKoronaOverført ->
+            if (totaltAntallDagerKoronaOverført <= 0) 0
+            else {
+                val anvendelser = mutableSetOf(
+                    "Har overført $totaltAntallDagerKoronaOverført dager ifbm. Koronapandemien til andre personer"
+                )
+                val trekkesFra = antallKoronaoverførteDagerSomSkalTrekkesFraTilgjengelig(
+                    koronaoverførteDager = totaltAntallDagerKoronaOverført,
+                    omsorgsdagerResultat = omsorgsdagerResultat
+                )
+                if (trekkesFra > 0) anvendelser.add(
+                    "$trekkesFra av disse er overført utover ekstradagene ifbm. Koronapandemien og trekkes fra tilgjengelige dager for overføring"
+                )
+
+                behandling.lovanvendelser.leggTil(
+                    periode = periode,
+                    lovhenvisning = KoronaOverføreOmsorgsdager,
+                    anvendelser = anvendelser
+                )
+                trekkesFra
+            }
+        }
+
+        val tilgjengelig = antallOmsorgsdager - grunnrettsdager.antallDager - dagerTattUtUtoverGrunnretten - fordeltBort - koronaOverførtTrekkesFra
 
         val tilgjengeligDagerForOverføring = when {
             tilgjengelig > DagerMaksForOverføring -> DagerMaksForOverføring

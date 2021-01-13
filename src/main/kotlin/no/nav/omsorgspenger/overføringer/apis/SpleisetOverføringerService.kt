@@ -168,7 +168,11 @@ internal data class SpleisetOverføringGitt(
     val gyldigTilOgMed: LocalDate,
     val til: Motpart,
     val lengde: Duration,
-    val kilder: Set<Kilde>
+    val kilder: Set<Kilde>)
+
+internal fun SpleisetOverføringGitt.periode() = Periode(
+    fom = gyldigFraOgMed,
+    tom = gyldigTilOgMed
 )
 
 internal data class SpleisetOverføringFått(

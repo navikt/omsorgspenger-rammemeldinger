@@ -93,7 +93,8 @@ internal class BehandleOverføringAvOmsorgsdager(
                 overføreOmsorgsdager = overføreOmsorgsdager,
                 utvidetRettVedtak = utvidetRettVedtak,
                 fordelingGirMeldinger = fordelingGirMeldinger,
-                midlertidigAleneVedtak = midlertidigAleneVedtak
+                midlertidigAleneVedtak = midlertidigAleneVedtak,
+                koronaOverføringer = listOf() // TODO
             ),
             behandling = behandling
         )
