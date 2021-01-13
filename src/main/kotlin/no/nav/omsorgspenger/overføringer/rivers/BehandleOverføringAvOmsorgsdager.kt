@@ -27,6 +27,8 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerInput
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding.Companion.HentPersonopplysninger
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
@@ -54,7 +56,8 @@ internal class BehandleOverføringAvOmsorgsdager(
                     HentOmsorgspengerSaksnummer,
                     HentFordelingGirMeldinger,
                     HentUtvidetRettVedtak,
-                    HentMidlertidigAleneVedtak
+                    HentMidlertidigAleneVedtak,
+                    VurderRelasjoner
                 )
                 it.utenLøsningPåBehov(
                     OverføreOmsorgsdagerBehandling
@@ -66,6 +69,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 HentFordelingGirMeldingerMelding.validateLøsning(it)
                 HentUtvidetRettVedtakMelding.validateLøsning(it)
                 HentMidlertidigAleneVedtakMelding.validateLøsning(it)
+                VurderRelasjonerMelding.validateLøsning(it)
             }
         }.register(this)
     }
@@ -87,6 +91,16 @@ internal class BehandleOverføringAvOmsorgsdager(
             sendtPerBrev = overføreOmsorgsdager.sendtPerBrev,
             periode = overføreOmsorgsdager.overordnetPeriode
         )
+
+        val relasjoner = VurderRelasjonerMelding.hentLøsning(packet)
+        val borSammenMed = relasjoner.filter { it.borSammen }
+            .map { it.identitetsnummer }
+
+        TODO("Var hanterer vi dessa?")
+        val borSammenMedTil = overføreOmsorgsdager.overførerTil in borSammenMed
+        val borSammenMedBarn = overføreOmsorgsdager.barn
+            .map { barn -> barn.identitetsnummer }
+            .filter { identitetsnummer -> identitetsnummer in borSammenMed }
 
         val grunnlag = vurderGrunnlag(
             grunnlag = Grunnlag(

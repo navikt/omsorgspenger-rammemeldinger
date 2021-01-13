@@ -20,6 +20,8 @@ import no.nav.omsorgspenger.utvidetrett.meldinger.HentUtvidetRettVedtakMelding.H
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.slf4j.LoggerFactory
 
@@ -45,7 +47,8 @@ internal class InitierOverføringAvOmsorgsdager(
                     HentFordelingGirMeldinger,
                     HentUtvidetRettVedtak,
                     HentMidlertidigAleneVedtak,
-                    OverføreOmsorgsdagerBehandling
+                    OverføreOmsorgsdagerBehandling,
+                    VurderRelasjoner
                 )
             }
             validate {
@@ -104,7 +107,7 @@ internal class InitierOverføringAvOmsorgsdager(
             )
         )
 
-        logger.info("legger til behov [$HentOmsorgspengerSaksnummer]")
+        logger.info("legger til behov [$HentOmsorgspengerSaksnummer] & [$VurderRelasjoner]")
         packet.leggTilBehov(
             aktueltBehov = OverføreOmsorgsdager,
             behov = arrayOf(
@@ -114,6 +117,15 @@ internal class InitierOverføringAvOmsorgsdager(
                             overføreOmsorgsdager.overførerFra,
                             overføreOmsorgsdager.overførerTil
                         )
+                    )
+                ),
+                VurderRelasjonerMelding.behov(
+                    VurderRelasjonerMelding.BehovInput(
+                        identitetsnummer = overføreOmsorgsdager.overførerFra,
+                        til = overføreOmsorgsdager.barn
+                            .map { it.identitetsnummer }
+                            .plus(overføreOmsorgsdager.overførerTil)
+                            .toSet()
                     )
                 )
             )
