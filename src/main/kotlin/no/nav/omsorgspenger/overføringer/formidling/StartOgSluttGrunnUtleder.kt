@@ -44,6 +44,9 @@ internal object StartOgSluttGrunnUtleder {
             delvisEn.starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter, Knekkpunkt.ForbrukteDagerIÅr) &&
             delvisTo.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.PÅGÅENDE_FORDELING
+            delvisEn.starterGrunnet.inneholder(Knekkpunkt.KoronaOverføringGirStarter, Knekkpunkt.ForbrukteDagerIÅr) &&
+            delvisTo.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
+                Grunn.PÅGÅENDE_FORDELING
             else -> null
         }
         val slutt = delvisTo.innvilget()?.second
@@ -59,6 +62,9 @@ internal object StartOgSluttGrunnUtleder {
             avslått.starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter, Knekkpunkt.ForbrukteDagerIÅr) &&
             delvisInnvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.BRUKT_ALLE_DAGER_I_ÅR_OG_PÅGÅENDE_FORDELING
+            avslått.starterGrunnet.inneholder(Knekkpunkt.KoronaOverføringGirStarter, Knekkpunkt.ForbrukteDagerIÅr) &&
+            delvisInnvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
+                Grunn.BRUKT_ALLE_DAGER_I_ÅR_OG_PÅGÅENDE_FORDELING
             else -> null
         }
         val slutt = delvisInnvilget.innvilget()?.second
@@ -71,9 +77,9 @@ internal object StartOgSluttGrunnUtleder {
 
     private fun kunEnDelvis(delvisInnvilget: NyOverføring): Pair<Grunn, Grunn>? {
         val start = when {
-            delvisInnvilget.starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter) &&
+            delvisInnvilget.starterGrunnet.inneholderMinstEn(Knekkpunkt.FordelingGirStarter, Knekkpunkt.KoronaOverføringGirStarter) &&
             delvisInnvilget.starterGrunnet.inneholderIkke(Knekkpunkt.ForbrukteDagerIÅr) &&
-            delvisInnvilget.slutterGrunnet.inneholder(Knekkpunkt.FordelingGirSlutter) ->
+            delvisInnvilget.slutterGrunnet.inneholderMinstEn(Knekkpunkt.FordelingGirSlutter, Knekkpunkt.KoronaOverføringGirSlutter) ->
                 Grunn.PÅGÅENDE_FORDELING
             else -> null
         }
@@ -93,11 +99,14 @@ internal object StartOgSluttGrunnUtleder {
             delvisInnvilget.starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter, Knekkpunkt.ForbrukteDagerIÅr) &&
             innvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.BRUKT_NOEN_DAGER_I_ÅR_OG_PÅGÅENDE_FORDELING
+            delvisInnvilget.starterGrunnet.inneholder(Knekkpunkt.KoronaOverføringGirStarter, Knekkpunkt.ForbrukteDagerIÅr) &&
+            innvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
+                Grunn.BRUKT_NOEN_DAGER_I_ÅR_OG_PÅGÅENDE_FORDELING
             delvisInnvilget.starterGrunnet.inneholder(Knekkpunkt.ForbrukteDagerIÅr) &&
             delvisInnvilget.slutterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) &&
             innvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.BRUKT_NOEN_DAGER_I_ÅR
-            innvilget.starterGrunnet.inneholder(Knekkpunkt.FordelingGirSlutter) &&
+            innvilget.starterGrunnet.inneholderMinstEn(Knekkpunkt.FordelingGirSlutter, Knekkpunkt.KoronaOverføringGirSlutter) &&
             innvilget.starterGrunnet.inneholderIkke(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.PÅGÅENDE_FORDELING
             else -> null
@@ -116,7 +125,7 @@ internal object StartOgSluttGrunnUtleder {
             avslått.slutterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) &&
             innvilget.starterGrunnet.inneholder(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.BRUKT_ALLE_DAGER_I_ÅR
-            innvilget.starterGrunnet.inneholder(Knekkpunkt.FordelingGirSlutter) &&
+            innvilget.starterGrunnet.inneholderMinstEn(Knekkpunkt.FordelingGirSlutter, Knekkpunkt.KoronaOverføringGirSlutter) &&
             innvilget.starterGrunnet.inneholderIkke(Knekkpunkt.NullstillingAvForbrukteDager) ->
                 Grunn.PÅGÅENDE_FORDELING
             else -> null
@@ -139,7 +148,7 @@ private fun NyOverføring.innvilget() = when {
 }
 
 private fun NyOverføring.avslag() = when {
-    starterGrunnet.inneholder(Knekkpunkt.FordelingGirStarter) ->
+    starterGrunnet.inneholderMinstEn(Knekkpunkt.FordelingGirStarter, Knekkpunkt.KoronaOverføringGirStarter) ->
         Grunn.PÅGÅENDE_FORDELING to Grunn.PÅGÅENDE_FORDELING
     else -> null
 }
@@ -157,6 +166,8 @@ internal enum class Grunn {
 
 private fun List<Knekkpunkt>.inneholder(vararg others: Knekkpunkt) =
     containsAll(others.toList())
+
+private fun List<Knekkpunkt>.inneholderMinstEn(vararg others: Knekkpunkt) = intersect(others.toList()).isNotEmpty()
 
 private fun List<Knekkpunkt>.inneholderIkke(vararg others: Knekkpunkt) =
     !inneholder(*others)

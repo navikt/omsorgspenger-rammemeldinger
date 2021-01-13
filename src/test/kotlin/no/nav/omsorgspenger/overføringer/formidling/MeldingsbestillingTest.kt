@@ -5,6 +5,8 @@ import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.formidling.Meldingsbestilling
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
+import no.nav.omsorgspenger.overføringer.apis.Motpart
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
@@ -281,6 +283,115 @@ internal class MeldingsbestillingTest {
         meldingsbestillinger.forEach { println(it.keyValue.second) }
     }
 
+    @Test
+    fun `Koronaoverført i 2021 - full innvilgelse`() {
+        val meldingsbestillinger = meldingsbestillinger(
+            mottatt = ZonedDateTime.parse("2021-01-15T14:15:00.000Z"),
+            tattUtIÅr = 0,
+            girDager = 10,
+            koronaOverføringer = listOf(SpleisetOverføringGitt(
+                gjennomført = LocalDate.now(),
+                gyldigFraOgMed = LocalDate.parse("2021-01-01"),
+                gyldigTilOgMed = LocalDate.parse("2021-12-31"),
+                lengde = Duration.ofDays(30),
+                kilder = setOf(),
+                til = Motpart(id = "foo", type = "bar")
+            )),
+            barn = listOf(barn())
+        )
+
+        meldingsbestillinger.assertInnvilgelse(
+            forventetStartOgSluttGrunn = Grunn.MOTTAKSDATO to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+        )
+    }
+
+    @Test
+    fun `Koronaoverført i 2021 - delvis`() {
+        val meldingsbestillinger = meldingsbestillinger(
+            mottatt = ZonedDateTime.parse("2021-01-15T14:15:00.000Z"),
+            tattUtIÅr = 0,
+            girDager = 10,
+            koronaOverføringer = listOf(SpleisetOverføringGitt(
+                gjennomført = LocalDate.now(),
+                gyldigFraOgMed = LocalDate.parse("2021-01-01"),
+                gyldigTilOgMed = LocalDate.parse("2021-12-31"),
+                lengde = Duration.ofDays(32),
+                kilder = setOf(),
+                til = Motpart(id = "foo", type = "bar")
+            )),
+            barn = listOf(barn())
+        )
+
+        assertThat(meldingsbestillinger).hasSize(2)
+        val forventetStartOgSluttGrunn = Grunn.PÅGÅENDE_FORDELING to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
+        val mottatt = meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
+        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertEquals(mottatt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertFalse(gitt.formidlingsoverføringer.innvilget)
+        assertFalse(gitt.formidlingsoverføringer.avslått)
+        assertThat(gitt.formidlingsoverføringer.alleOverføringer).hasSize(2)
+        meldingsbestillinger.forEach { println(it.keyValue.second) }
+    }
+
+    @Test
+    fun `Koronaoverført i 2021 og brukt i år - delvis`() {
+        val meldingsbestillinger = meldingsbestillinger(
+            mottatt = ZonedDateTime.parse("2021-01-15T14:15:00.000Z"),
+            tattUtIÅr = 2,
+            girDager = 10,
+            koronaOverføringer = listOf(SpleisetOverføringGitt(
+                gjennomført = LocalDate.now(),
+                gyldigFraOgMed = LocalDate.parse("2021-01-01"),
+                gyldigTilOgMed = LocalDate.parse("2021-12-31"),
+                lengde = Duration.ofDays(32),
+                kilder = setOf(),
+                til = Motpart(id = "foo", type = "bar")
+            )),
+            barn = listOf(barn())
+        )
+
+        assertThat(meldingsbestillinger).hasSize(2)
+        val forventetStartOgSluttGrunn = Grunn.BRUKT_NOEN_DAGER_I_ÅR_OG_PÅGÅENDE_FORDELING to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
+        val mottatt = meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
+        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertEquals(mottatt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertFalse(gitt.formidlingsoverføringer.innvilget)
+        assertFalse(gitt.formidlingsoverføringer.avslått)
+        assertThat(gitt.formidlingsoverføringer.alleOverføringer).hasSize(2)
+        meldingsbestillinger.forEach { println(it.keyValue.second) }
+    }
+
+    @Test
+    fun `Koronaoverført i 2021 - avslag i 2021`() {
+        val meldingsbestillinger = meldingsbestillinger(
+            mottatt = ZonedDateTime.parse("2021-01-15T14:15:00.000Z"),
+            tattUtIÅr = 0,
+            girDager = 10,
+            koronaOverføringer = listOf(SpleisetOverføringGitt(
+                gjennomført = LocalDate.now(),
+                gyldigFraOgMed = LocalDate.parse("2021-01-01"),
+                gyldigTilOgMed = LocalDate.parse("2021-12-31"),
+                lengde = Duration.ofDays(40),
+                kilder = setOf(),
+                til = Motpart(id = "foo", type = "bar")
+            )),
+            barn = listOf(barn())
+        )
+
+        assertThat(meldingsbestillinger).hasSize(2)
+        val forventetStartOgSluttGrunn = Grunn.PÅGÅENDE_FORDELING to Grunn.OMSORGEN_FOR_BARN_OPPHØRER
+        val gitt = meldingsbestillinger.first { it.melding is GittDager }.melding as GittDager
+        val mottatt= meldingsbestillinger.first { it.melding is MottattDager }.melding as MottattDager
+        assertEquals(gitt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertEquals(mottatt.formidlingsoverføringer.startOgSluttGrunn, forventetStartOgSluttGrunn)
+        assertFalse(gitt.formidlingsoverføringer.innvilget)
+        assertFalse(gitt.formidlingsoverføringer.avslått)
+        assertThat(gitt.formidlingsoverføringer.alleOverføringer).hasSize(2)
+        meldingsbestillinger.forEach { println(it.keyValue.second) }
+    }
+
     private fun testFordeling(
         mottatt: ZonedDateTime = ZonedDateTime.parse("2020-11-10T15:00:00.00Z"),
         tattUtIÅr: Int,
@@ -335,6 +446,7 @@ internal class MeldingsbestillingTest {
             girDager: Int,
             barn: List<Barn>,
             fordelinger: List<FordelingGirMelding> = listOf(),
+            koronaOverføringer: List<SpleisetOverføringGitt> = listOf(),
             medTidligerePartner: Boolean = false,
             mottatt: ZonedDateTime = ZonedDateTime.now()
         ) : List<Meldingsbestilling> {
@@ -356,7 +468,7 @@ internal class MeldingsbestillingTest {
                 utvidetRettVedtak = listOf(),
                 midlertidigAleneVedtak = listOf(),
                 fordelingGirMeldinger = fordelinger,
-                koronaOverføringer = listOf() // TODO
+                koronaOverføringer = koronaOverføringer
             )
 
             val behandling = Behandling(
