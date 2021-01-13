@@ -5,6 +5,7 @@ import no.nav.omsorgspenger.extensions.Oslo
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneVedtak
 import no.nav.omsorgspenger.overføringer.Barn.Companion.sisteDatoMedOmsorgenForOgAleneOmOmsorgen
+import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import org.assertj.core.api.Assertions.assertThat
@@ -71,7 +72,8 @@ internal class KnekkingTest {
             barn: List<Barn>,
             utvidetRett: List<UtvidetRettVedtak> = listOf(),
             fordelingGir: List<FordelingGirMelding> = listOf(),
-            midlertidigAlene: List<MidlertidigAleneVedtak> = listOf()
+            midlertidigAlene: List<MidlertidigAleneVedtak> = listOf(),
+            koronaOverføringer: List<SpleisetOverføringGitt> = listOf()
         ) = Grunnlag(
             overføreOmsorgsdager = OverføreOmsorgsdagerMelding.Behovet(
                 overførerFra = "11111111111",
@@ -88,7 +90,8 @@ internal class KnekkingTest {
             ),
             fordelingGirMeldinger = fordelingGir,
             utvidetRettVedtak = utvidetRett,
-            midlertidigAleneVedtak = midlertidigAlene
+            midlertidigAleneVedtak = midlertidigAlene,
+            koronaOverføringer = koronaOverføringer
         )
     }
 }

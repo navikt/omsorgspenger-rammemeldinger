@@ -2,6 +2,7 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.extensions.førsteDagNesteÅr
+import no.nav.omsorgspenger.overføringer.apis.periode
 import no.nav.omsorgspenger.periodiser
 import java.time.LocalDate
 
@@ -19,6 +20,8 @@ internal enum class Knekkpunkt {
     OmsorgenForEtBarnSlutter,
     FordelingGirStarter,
     FordelingGirSlutter,
+    KoronaOverføringGirStarter,
+    KoronaOverføringGirSlutter,
     MidlertidigAleneStarter,
     MidlertidigAleneSlutter,
     OmsorgenForSlutter,
@@ -70,6 +73,15 @@ internal fun Grunnlag.knekk(overordnetPeriode: Periode) : List<KnektPeriode>  {
             periode = fordelingGirMelding.periode,
             fomKnekkpunkt = Knekkpunkt.FordelingGirStarter,
             tomKnekkpunkt = Knekkpunkt.FordelingGirSlutter,
+            boundary = boundary
+        )
+    }
+
+    koronaOverføringer.forEach { koronaOverføring ->
+        knekkpunkt.leggTil(
+            periode = koronaOverføring.periode(),
+            fomKnekkpunkt = Knekkpunkt.KoronaOverføringGirStarter,
+            tomKnekkpunkt = Knekkpunkt.KoronaOverføringGirSlutter,
             boundary = boundary
         )
     }

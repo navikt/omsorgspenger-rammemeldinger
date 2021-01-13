@@ -11,6 +11,9 @@ import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding.HentKoronaOverføringGirMeldinger
 import no.nav.omsorgspenger.midlertidigalene.meldinger.HentMidlertidigAleneVedtakMelding
 import no.nav.omsorgspenger.midlertidigalene.meldinger.HentMidlertidigAleneVedtakMelding.HentMidlertidigAleneVedtak
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
@@ -26,6 +29,7 @@ import org.slf4j.LoggerFactory
 internal class InitierOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
     private val fordelingService: FordelingService,
+    private val spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService,
     private val utvidetRettService: UtvidetRettService,
     private val midlertidigAleneService: MidlertidigAleneService,
     behovssekvensRepository: BehovssekvensRepository,
@@ -77,6 +81,12 @@ internal class InitierOverføringAvOmsorgsdager(
             correlationId = correlationId
         )
 
+        val koronaoverføringGirMeldinger = spleisetKoronaOverføringerService.hentSpleisetOverføringer(
+            identitetsnummer = overføreOmsorgsdager.overførerFra,
+            periode = periode,
+            correlationId = correlationId
+        ).gitt
+
         val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
             periode = periode,
@@ -89,7 +99,7 @@ internal class InitierOverføringAvOmsorgsdager(
             correlationId = correlationId
         )
 
-        logger.info("legger til behov med løsninger [$HentFordelingGirMeldinger, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak]")
+        logger.info("legger til behov med løsninger [$HentFordelingGirMeldinger, $HentKoronaOverføringGirMeldinger, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak]")
         logger.warn("Løsning på behov [$HentUtvidetRettVedtak,$HentMidlertidigAleneVedtak] bør flyttes til 'omsorgspenger-rammevedtak'")
         val inputHentingAvRammer = mapOf(
             "periode" to "$periode",
@@ -99,6 +109,7 @@ internal class InitierOverføringAvOmsorgsdager(
             aktueltBehov = OverføreOmsorgsdager,
             behovMedLøsninger = arrayOf(
                 HentFordelingGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, fordelingGirMeldinger),
+                HentKoronaOverføringGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, koronaoverføringGirMeldinger),
                 HentUtvidetRettVedtakMelding.behovMedLøsning(inputHentingAvRammer, utvidetRettVedtak),
                 HentMidlertidigAleneVedtakMelding.behovMedLøsning(inputHentingAvRammer, midlertidigAleneVedtak)
             )
