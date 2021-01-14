@@ -89,6 +89,10 @@ internal object Vurderinger {
             )
         }
 
+        if(grunnlag.overføreOmsorgsdager.overførerTil !in borSammenMed) {
+            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
+        }
+
         return grunnlag.copy(
             overføreOmsorgsdager = grunnlag.overføreOmsorgsdager.copy(
                 barn = alleBarn

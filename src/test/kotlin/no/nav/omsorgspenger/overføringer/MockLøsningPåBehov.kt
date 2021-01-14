@@ -9,7 +9,7 @@ import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
 import no.nav.omsorgspenger.testutils.sisteMeldingSomJsonMessage
 
-internal fun TestRapid.mockLøsningPåHenteOmsorgspengerSaksnummer(
+internal fun TestRapid.mockLøsningPåHenteOmsorgspengerSaksnummerOchVurderRelasjoner(
     fra: Identitetsnummer, til: Identitetsnummer, barn: Set<Identitetsnummer> = emptySet() ,borSammen: Boolean = true) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()

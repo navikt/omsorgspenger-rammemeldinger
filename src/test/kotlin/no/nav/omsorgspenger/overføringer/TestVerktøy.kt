@@ -31,7 +31,7 @@ internal fun TestRapid.ventPåLøsning(
     borsammen: Boolean) {
     sendTestMessage(behovssekvens)
     ventPå(antallMeldinger = 1)
-    mockLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til, barn = barn, borSammen = borsammen)
+    mockLøsningPåHenteOmsorgspengerSaksnummerOchVurderRelasjoner(fra = fra, til = til, barn = barn, borSammen = borsammen)
     ventPå(antallMeldinger = 2)
     mockLøsningPåHentePersonopplysninger(fra = fra, til = til)
     ventPå(antallMeldinger = 3)
