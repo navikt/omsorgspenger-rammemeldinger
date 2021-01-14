@@ -35,6 +35,10 @@ internal class ToParterForskjelligAntallDagerTest(
         val id = "01EJ6M5B1YF1EGFABH2WC57KDC"
         val omsorgsdagerÅOverføre = 5
 
+        val barn = overføreOmsorgsdagerBarn(
+            aleneOmOmsorgen = true,
+            fødselsdato = LocalDate.parse("2018-09-29")
+        )
         val (behovssekvensId, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             id = id,
             omsorgsdagerTattUtIÅr = 0,
@@ -42,10 +46,7 @@ internal class ToParterForskjelligAntallDagerTest(
             overføringFra = fra,
             overføringTil = til,
             mottaksdato = LocalDate.parse("2020-09-29"),
-            barn = listOf(overføreOmsorgsdagerBarn(
-                aleneOmOmsorgen = true,
-                fødselsdato = LocalDate.parse("2018-09-29")
-            ))
+            barn = listOf(barn)
         )
 
         assertEquals(id, behovssekvensId)
@@ -53,7 +54,9 @@ internal class ToParterForskjelligAntallDagerTest(
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (løsningId, løsning) = rapid.løsningOverføreOmsorgsdager()
@@ -76,6 +79,10 @@ internal class ToParterForskjelligAntallDagerTest(
         val id = "01EJ6M744H38HJCJVMKEJPQ9KP"
         val omsorgsdagerÅOverføre = 5
 
+        val barn = overføreOmsorgsdagerBarn(
+        aleneOmOmsorgen = true,
+        fødselsdato = LocalDate.parse("2018-09-29")
+        )
         val (behovssekvensId, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             id = id,
             overføringFra = fra,
@@ -83,10 +90,7 @@ internal class ToParterForskjelligAntallDagerTest(
             omsorgsdagerTattUtIÅr = 17,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre,
             mottaksdato = LocalDate.parse("2020-09-29"),
-            barn = listOf(overføreOmsorgsdagerBarn(
-                aleneOmOmsorgen = true,
-                fødselsdato = LocalDate.parse("2018-09-29")
-            ))
+            barn = listOf(barn)
         )
 
         assertEquals(id, behovssekvensId)
@@ -94,7 +98,9 @@ internal class ToParterForskjelligAntallDagerTest(
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (løsningId, løsning) = rapid.løsningOverføreOmsorgsdager()
@@ -119,6 +125,10 @@ internal class ToParterForskjelligAntallDagerTest(
         val id = "01EJ6M7E83DJQQR5ABS0XAKTC6"
         val omsorgsdagerÅOverføre = 11
 
+        val barn = overføreOmsorgsdagerBarn(
+            aleneOmOmsorgen = true,
+            fødselsdato = LocalDate.parse("2018-09-29")
+        )
         val (behovssekvensId, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             id = id,
             overføringFra = fra,
@@ -126,10 +136,7 @@ internal class ToParterForskjelligAntallDagerTest(
             omsorgsdagerTattUtIÅr = 0,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre,
             mottaksdato = LocalDate.parse("2020-09-29"),
-            barn = listOf(overføreOmsorgsdagerBarn(
-                aleneOmOmsorgen = true,
-                fødselsdato = LocalDate.parse("2018-09-29")
-            ))
+            barn = listOf(barn)
         )
 
         assertEquals(id, behovssekvensId)
@@ -137,7 +144,9 @@ internal class ToParterForskjelligAntallDagerTest(
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (løsningId, løsning) = rapid.løsningOverføreOmsorgsdager()

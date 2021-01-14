@@ -93,14 +93,6 @@ internal class BehandleOverføringAvOmsorgsdager(
         )
 
         val relasjoner = VurderRelasjonerMelding.hentLøsning(packet)
-        val borSammenMed = relasjoner.filter { it.borSammen }
-            .map { it.identitetsnummer }
-
-        TODO("Var hanterer vi dessa?")
-        val borSammenMedTil = overføreOmsorgsdager.overførerTil in borSammenMed
-        val borSammenMedBarn = overføreOmsorgsdager.barn
-            .map { barn -> barn.identitetsnummer }
-            .filter { identitetsnummer -> identitetsnummer in borSammenMed }
 
         val grunnlag = vurderGrunnlag(
             grunnlag = Grunnlag(
@@ -109,6 +101,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 fordelingGirMeldinger = fordelingGirMeldinger,
                 midlertidigAleneVedtak = midlertidigAleneVedtak
             ),
+            relasjoner = relasjoner,
             behandling = behandling
         )
 

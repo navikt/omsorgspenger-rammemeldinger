@@ -35,22 +35,25 @@ internal class IngenDagerTilgjengeligInneværendeÅrTest(
         val barnetsFødselsdato = LocalDate.parse("2019-09-29")
         val mottaksdato = LocalDate.parse("2020-01-15")
 
+        val barn = overføreOmsorgsdagerBarn(
+            aleneOmOmsorgen = true,
+            fødselsdato = barnetsFødselsdato
+        )
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             overføringFra = fra,
             overføringTil = til,
             omsorgsdagerTattUtIÅr = 20,
             omsorgsdagerÅOverføre = 9,
             mottaksdato = mottaksdato,
-            barn = listOf(overføreOmsorgsdagerBarn(
-                aleneOmOmsorgen = true,
-                fødselsdato = barnetsFødselsdato
-            ))
+            barn = listOf(barn)
         )
 
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()

@@ -2,8 +2,10 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.lovverk.EktefelleEllerSamboer
 import no.nav.omsorgspenger.lovverk.JobberINorge
+import no.nav.omsorgspenger.lovverk.OmsorgenForBarnet
 import no.nav.omsorgspenger.lovverk.UtvidetRettForBarnet
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtakVurderinger.inneholderRammevedtakFor
 
 internal object Vurderinger {
@@ -43,6 +45,7 @@ internal object Vurderinger {
 
     internal fun vurderGrunnlag(
         grunnlag: Grunnlag,
+        relasjoner: Set<VurderRelasjonerMelding.Relasjon>,
         behandling: Behandling) : Grunnlag {
         val utvidetRettVedtak = grunnlag.utvidetRettVedtak
         val alleBarn = grunnlag.overføreOmsorgsdager.barn
@@ -71,9 +74,25 @@ internal object Vurderinger {
                 }
             }
 
+        val borSammenMed = relasjoner.filter { it.borSammen }.map { it.identitetsnummer }
+        val barnSomBorNånAnnenstans = alleBarn
+            .filterNot { it.identitetsnummer in borSammenMed }
+
+        alleBarn.forEach { barn ->
+            behandling.lovanvendelser.leggTil(
+                periode = behandling.periode,
+                lovhenvisning = OmsorgenForBarnet,
+                anvendelse = when (barn in barnSomBorNånAnnenstans) {
+                    true -> "Bor ikke sammen med barnet født ${barn.fødselsdato}"
+                    false -> "Bor sammen med barnet født ${barn.fødselsdato}"
+                }
+            )
+        }
+
         return grunnlag.copy(
             overføreOmsorgsdager = grunnlag.overføreOmsorgsdager.copy(
                 barn = alleBarn
+                    .minus(barnSomBorNånAnnenstans)
                     .minus(barnMedUtvidetRettSomIkkeKanVerifiseres)
                     .plus(barnMedUtvidetRettSomIkkeKanVerifiseres.map { it.copy(utvidetRett = false) }),
             )

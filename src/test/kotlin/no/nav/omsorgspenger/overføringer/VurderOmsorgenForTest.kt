@@ -1,13 +1,7 @@
 package no.nav.omsorgspenger.overføringer
 
-import io.mockk.every
-import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.koronaoverføringer.rivers.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner
-import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
-import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneVedtak
-import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
@@ -37,7 +31,7 @@ internal class VurderOmsorgenForTest(
     }
 
     @Test
-    fun `Søker bor inte sammen med Barn`() {
+    fun `Søker bor inte sammen med barn ger avslag`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
         val barn = overføreOmsorgsdagerBarn()

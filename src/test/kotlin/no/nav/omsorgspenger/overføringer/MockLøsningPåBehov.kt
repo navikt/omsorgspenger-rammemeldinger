@@ -10,11 +10,11 @@ import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.
 import no.nav.omsorgspenger.testutils.sisteMeldingSomJsonMessage
 
 internal fun TestRapid.mockLøsningPåHenteOmsorgspengerSaksnummer(
-    fra: Identitetsnummer, til: Identitetsnummer, borSammen: Boolean = true) {
+    fra: Identitetsnummer, til: Identitetsnummer, barn: Set<Identitetsnummer> = emptySet() ,borSammen: Boolean = true) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()
         .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra, til)
-        .leggTilLøsningPåVurderRelasjoner(setOf(til), borSammen)
+        .leggTilLøsningPåVurderRelasjoner(barn.plus(til), borSammen)
         .toJson()
     )
 }
