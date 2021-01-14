@@ -45,6 +45,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     InitierOverføringAvOmsorgsdager(
         rapidsConnection = this,
         fordelingService = applicationContext.fordelingService,
+        spleisetKoronaOverføringerService = applicationContext.spleisetKoronaOverføringerService,
         utvidetRettService = applicationContext.utvidetRettService,
         midlertidigAleneService = applicationContext.midlertidigAleneService,
         behovssekvensRepository = applicationContext.behovssekvensRepository,

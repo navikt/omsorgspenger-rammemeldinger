@@ -16,6 +16,7 @@ import no.nav.omsorgspenger.overføringer.Vurderinger.vurderGrunnlag
 import no.nav.omsorgspenger.overføringer.Vurderinger.vurderInngangsvilkår
 import no.nav.omsorgspenger.overføringer.meldinger.*
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding
 import no.nav.omsorgspenger.midlertidigalene.meldinger.HentMidlertidigAleneVedtakMelding
 import no.nav.omsorgspenger.midlertidigalene.meldinger.HentMidlertidigAleneVedtakMelding.HentMidlertidigAleneVedtak
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
@@ -67,6 +68,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 OverføreOmsorgsdagerMelding.validateBehov(it)
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
                 HentFordelingGirMeldingerMelding.validateLøsning(it)
+                HentKoronaOverføringGirMeldingerMelding.validateLøsning(it)
                 HentUtvidetRettVedtakMelding.validateLøsning(it)
                 HentMidlertidigAleneVedtakMelding.validateLøsning(it)
                 VurderRelasjonerMelding.validateLøsning(it)
@@ -82,6 +84,7 @@ internal class BehandleOverføringAvOmsorgsdager(
             require(it.containsKey(overføreOmsorgsdager.overførerTil)) { "Mangler saksnummer for 'overførerTil'"}
         }
         val fordelingGirMeldinger = HentFordelingGirMeldingerMelding.hentLøsning(packet)
+        val koronaOverføringer = HentKoronaOverføringGirMeldingerMelding.hentLøsning(packet)
         val utvidetRettVedtak = HentUtvidetRettVedtakMelding.hentLøsning(packet)
         val midlertidigAleneVedtak = HentMidlertidigAleneVedtakMelding.hentLøsning(packet)
 
@@ -99,7 +102,8 @@ internal class BehandleOverføringAvOmsorgsdager(
                 overføreOmsorgsdager = overføreOmsorgsdager,
                 utvidetRettVedtak = utvidetRettVedtak,
                 fordelingGirMeldinger = fordelingGirMeldinger,
-                midlertidigAleneVedtak = midlertidigAleneVedtak
+                midlertidigAleneVedtak = midlertidigAleneVedtak,
+                koronaOverføringer = koronaOverføringer
             ),
             relasjoner = relasjoner,
             behandling = behandling
