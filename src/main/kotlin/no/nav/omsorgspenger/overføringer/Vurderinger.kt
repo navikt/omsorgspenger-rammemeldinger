@@ -2,6 +2,7 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.lovverk.EktefelleEllerSamboer
 import no.nav.omsorgspenger.lovverk.JobberINorge
+import no.nav.omsorgspenger.lovverk.Lovanvendelse
 import no.nav.omsorgspenger.lovverk.OmsorgenForBarnet
 import no.nav.omsorgspenger.lovverk.UtvidetRettForBarnet
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
@@ -91,6 +92,10 @@ internal object Vurderinger {
 
         if(grunnlag.overføreOmsorgsdager.overførerTil !in borSammenMed) {
             behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
+            behandling.lovanvendelser.leggTil(
+                periode = behandling.periode,
+                lovhenvisning = EktefelleEllerSamboer,
+                anvendelse = "Kunne ikke verifiser samme adress som mottaker")
         }
 
         return grunnlag.copy(
