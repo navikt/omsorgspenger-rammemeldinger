@@ -118,7 +118,7 @@ internal class InitierOverføringAvOmsorgsdager(
             )
         )
 
-        logger.info("legger til behov [$HentOmsorgspengerSaksnummer] & [$VurderRelasjoner]")
+        logger.info("legger til behov [$HentOmsorgspengerSaksnummer, $VurderRelasjoner]")
         packet.leggTilBehov(
             aktueltBehov = OverføreOmsorgsdager,
             behov = arrayOf(

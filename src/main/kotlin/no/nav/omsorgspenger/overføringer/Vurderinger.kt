@@ -95,7 +95,7 @@ internal object Vurderinger {
             behandling.lovanvendelser.leggTil(
                 periode = behandling.periode,
                 lovhenvisning = EktefelleEllerSamboer,
-                anvendelse = "Kunne ikke verifiser samme adress som mottaker")
+                anvendelse = "Bor ikke sammen med mottaker")
         }
 
         return grunnlag.copy(
