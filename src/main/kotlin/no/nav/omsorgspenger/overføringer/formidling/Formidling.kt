@@ -109,7 +109,7 @@ internal class Formidlingsoverføringer(
     internal val støtterAutomatiskMelding = when {
         personopplysninger.any { (identitetsnummer,personopplysninger) ->
             identitetsnummer in berørteIdentitetsnummer && personopplysninger.adressebeskyttet
-        } -> meldingMåSendesManuelt("adresssebeskyttede parter")
+        } -> meldingMåSendesManuelt("adressebeskyttede parter")
         behandling.oppfyllerIkkeInngangsvilkår -> meldingMåSendesManuelt("avslag på inngangsvilkår")
         behandling.overføringer.size !in 1..2 -> meldingMåSendesManuelt("${behandling.overføringer.size} overføringer")
         startOgSluttGrunn == null -> meldingMåSendesManuelt("dette scenarioet")

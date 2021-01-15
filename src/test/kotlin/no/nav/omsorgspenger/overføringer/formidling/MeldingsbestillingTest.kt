@@ -5,13 +5,16 @@ import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.formidling.Meldingsbestilling
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.Beregninger.beregnOmsorgsdagerTilgjengeligForOverføring
+import no.nav.omsorgspenger.overføringer.Vurderinger.vurderGrunnlag
 import no.nav.omsorgspenger.overføringer.apis.Motpart
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.personopplysninger.Navn
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
+import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -427,12 +430,12 @@ internal class MeldingsbestillingTest {
         meldingsbestillinger.forEach { println(it.keyValue.second) }
     }
 
-    private companion object {
+    internal companion object {
         private const val fra = "11111111111"
         private const val til = "22222222222"
         private const val tidligerePartner = "44444444444"
 
-        private fun barn(
+        internal fun barn(
             fødselsdato: LocalDate = LocalDate.now().minusYears(1),
             utvidetRett: Boolean = false,
             aleneOmOmsorgen: Boolean = true) = Barn(
@@ -441,12 +444,21 @@ internal class MeldingsbestillingTest {
             aleneOmOmsorgen = aleneOmOmsorgen,
             utvidetRett = utvidetRett
         )
-        private fun meldingsbestillinger(
+        internal fun meldingsbestillinger(
             tattUtIÅr: Int,
             girDager: Int,
             barn: List<Barn>,
             fordelinger: List<FordelingGirMelding> = listOf(),
             koronaOverføringer: List<SpleisetOverføringGitt> = listOf(),
+            relasjoner: Set<VurderRelasjonerMelding.Relasjon> = barn.map { VurderRelasjonerMelding.Relasjon(
+                relasjon = "BARN",
+                identitetsnummer = it.identitetsnummer,
+                borSammen = true
+            )}.plus(VurderRelasjonerMelding.Relasjon(
+                relasjon = "INGEN",
+                identitetsnummer = til,
+                borSammen = true
+            )).toSet(),
             medTidligerePartner: Boolean = false,
             mottatt: ZonedDateTime = ZonedDateTime.now()
         ) : List<Meldingsbestilling> {
@@ -463,17 +475,27 @@ internal class MeldingsbestillingTest {
                 omsorgsdagerÅOverføre = girDager,
                 barn = barn
             )
-            val grunnlag = Grunnlag(
-                overføreOmsorgsdager = overføreOmsorgsdager,
-                utvidetRettVedtak = listOf(),
-                midlertidigAleneVedtak = listOf(),
-                fordelingGirMeldinger = fordelinger,
-                koronaOverføringer = koronaOverføringer
-            )
 
             val behandling = Behandling(
                 sendtPerBrev = overføreOmsorgsdager.sendtPerBrev,
                 periode = overføreOmsorgsdager.overordnetPeriode
+            )
+
+            val grunnlag = vurderGrunnlag(
+                grunnlag = Grunnlag(
+                    overføreOmsorgsdager = overføreOmsorgsdager,
+                    utvidetRettVedtak = barn.filter { it.utvidetRett }.map { UtvidetRettVedtak(
+                        periode = overføreOmsorgsdager.overordnetPeriode,
+                        barnetsFødselsdato = it.fødselsdato,
+                        barnetsIdentitetsnummer = it.identitetsnummer,
+                        kilder = setOf()
+                    )},
+                    midlertidigAleneVedtak = listOf(),
+                    fordelingGirMeldinger = fordelinger,
+                    koronaOverføringer = koronaOverføringer,
+                    relasjoner = relasjoner
+                ),
+                behandling = behandling
             )
 
             val nyeOverføringer = beregnOmsorgsdagerTilgjengeligForOverføring(

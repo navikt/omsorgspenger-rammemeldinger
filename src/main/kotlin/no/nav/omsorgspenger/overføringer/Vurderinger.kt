@@ -46,7 +46,6 @@ internal object Vurderinger {
 
     internal fun vurderGrunnlag(
         grunnlag: Grunnlag,
-        relasjoner: Set<VurderRelasjonerMelding.Relasjon>,
         behandling: Behandling) : Grunnlag {
         val utvidetRettVedtak = grunnlag.utvidetRettVedtak
         val alleBarn = grunnlag.overføreOmsorgsdager.barn
@@ -75,7 +74,7 @@ internal object Vurderinger {
                 }
             }
 
-        val borSammenMed = relasjoner.filter { it.borSammen }.map { it.identitetsnummer }
+        val borSammenMed = grunnlag.relasjoner.filter { it.borSammen }.map { it.identitetsnummer }
         val barnSomBorNånAnnenstans = alleBarn
             .filterNot { it.identitetsnummer in borSammenMed }
 

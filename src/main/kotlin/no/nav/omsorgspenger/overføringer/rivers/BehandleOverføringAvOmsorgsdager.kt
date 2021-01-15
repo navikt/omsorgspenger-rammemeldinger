@@ -105,9 +105,9 @@ internal class BehandleOverføringAvOmsorgsdager(
                 utvidetRettVedtak = utvidetRettVedtak,
                 fordelingGirMeldinger = fordelingGirMeldinger,
                 midlertidigAleneVedtak = midlertidigAleneVedtak,
-                koronaOverføringer = koronaOverføringer
+                koronaOverføringer = koronaOverføringer,
+                relasjoner = relasjoner
             ),
-            relasjoner = relasjoner,
             behandling = behandling
         )
 
