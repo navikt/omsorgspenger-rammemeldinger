@@ -74,6 +74,7 @@ internal class Formidlingsoverføringer(
     personopplysninger: Map<Identitetsnummer, Personopplysninger>) {
 
     // TODO: Her bør det ryddes opp litt..
+    val avslåttBehandling = behandling.karakteristikker.avslag()
 
     internal val alleOverføringer =
         behandling.overføringer

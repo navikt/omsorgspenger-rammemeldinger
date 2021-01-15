@@ -17,11 +17,11 @@ internal object StartOgSluttGrunnUtleder {
         alleOverføringer.map { it.starterGrunnet.plus(it.slutterGrunnet) }.flatten().inneholder(
             Knekkpunkt.MidlertidigAleneStarter, Knekkpunkt.MidlertidigAleneSlutter
         ) -> null
-        innvilget -> innvilgedeOverføringer.first().innvilget()
         avslått -> avslag(
             karakteristikker = karakteristikker,
             overføring = avslåtteOverføringer.firstOrNull()
         )
+        innvilget -> innvilgedeOverføringer.first().innvilget()
         alleOverføringer.size == 1 && delvisInnvilgedeOverføringer.size == 1 -> kunEnDelvis(
             delvisInnvilget = delvisInnvilgedeOverføringer.first()
         )

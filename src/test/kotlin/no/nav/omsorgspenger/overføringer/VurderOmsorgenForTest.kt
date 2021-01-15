@@ -55,8 +55,8 @@ internal class VurderOmsorgenForTest(
             fra = fra,
             til = til,
             relasjoner = setOf(
-                VurderRelasjonerMelding.Relasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = true),
-                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = false)
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = false),
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = true)
             )
         )
 
