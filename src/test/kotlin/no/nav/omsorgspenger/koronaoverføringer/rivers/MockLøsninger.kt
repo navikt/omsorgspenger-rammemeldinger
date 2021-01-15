@@ -5,7 +5,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding
-import no.nav.omsorgspenger.personopplysninger.TestRelasjon
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.testutils.sisteMeldingSomJsonMessage
@@ -22,7 +22,7 @@ internal fun TestRapid.mockHentPersonopplysninger(
 
 internal fun TestRapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
     fra: Identitetsnummer, til: Identitetsnummer,
-    relasjoner: Set<TestRelasjon> = emptySet()
+    relasjoner: Set<VurderRelasjonerMelding.Relasjon> = emptySet()
 ) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()
@@ -76,7 +76,7 @@ private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
 )
 
 private fun JsonMessage.leggTilLøsningPåVurderRelasjonerTilBarn(
-    relasjoner: Set<TestRelasjon>
+    relasjoner: Set<VurderRelasjonerMelding.Relasjon>
 ) = leggTilLøsning(
     behov = VurderRelasjoner,
     løsning = mapOf(

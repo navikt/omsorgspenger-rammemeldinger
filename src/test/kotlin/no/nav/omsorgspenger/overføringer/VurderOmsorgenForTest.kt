@@ -2,7 +2,7 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.koronaoverføringer.rivers.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner
-import no.nav.omsorgspenger.personopplysninger.TestRelasjon
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
@@ -55,8 +55,8 @@ internal class VurderOmsorgenForTest(
             fra = fra,
             til = til,
             relasjoner = setOf(
-                TestRelasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = true),
-                TestRelasjon(identitetsnummer = til, borSammen = false)
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = true),
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = false)
             )
         )
 
@@ -95,8 +95,8 @@ internal class VurderOmsorgenForTest(
             fra = fra,
             til = til,
             relasjoner = setOf(
-                TestRelasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = true),
-                TestRelasjon(identitetsnummer = til, borSammen = false)
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = true),
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = false)
             )
         )
 
