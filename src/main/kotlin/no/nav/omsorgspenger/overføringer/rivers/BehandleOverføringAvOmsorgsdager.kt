@@ -131,12 +131,15 @@ internal class BehandleOverføringAvOmsorgsdager(
             behandling = behandling
         )
 
-        logger.info("identifiserer overføringer som skal gjennomføres.")
-        val overføringer = omsorgsdagerTilgjengeligForOverføring.somNyeOverføringer(
-            ønsketOmsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
-        )
-
         logger.info("karakteristikker = ${behandling.karakteristikker()}")
+
+        logger.info("identifiserer overføringer som skal gjennomføres.")
+        val overføringer = when (behandling.avslag()) {
+            true -> emptyList()
+            false -> omsorgsdagerTilgjengeligForOverføring.somNyeOverføringer(
+                ønsketOmsorgsdagerÅOverføre = overføreOmsorgsdager.omsorgsdagerÅOverføre
+            )
+        }
 
         val måBehandlesSomGosysJournalføringsoppgaver = behandling.inneholderIkkeVerifiserbareVedtakOmUtvidetRett() || !overføreOmsorgsdager.jobberINorge
         val avslag = behandling.avslag() || måBehandlesSomGosysJournalføringsoppgaver || overføringer.fjernOverføringerUtenDager().isEmpty()

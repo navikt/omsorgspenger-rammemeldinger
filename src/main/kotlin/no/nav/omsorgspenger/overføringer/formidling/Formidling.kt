@@ -3,7 +3,6 @@ package no.nav.omsorgspenger.overføringer.formidling
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.formidling.Meldingsbestilling
-import no.nav.omsorgspenger.overføringer.Behandling.Karakteristikk.Companion.avslag
 import no.nav.omsorgspenger.overføringer.Personopplysninger
 import no.nav.omsorgspenger.overføringer.formidling.StartOgSluttGrunnUtleder.startOgSluttGrunn
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
@@ -73,9 +72,6 @@ internal class Formidlingsoverføringer(
     behandling: OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling,
     personopplysninger: Map<Identitetsnummer, Personopplysninger>) {
 
-    // TODO: Her bør det ryddes opp litt..
-    val avslåttBehandling = behandling.karakteristikker.avslag()
-
     internal val alleOverføringer =
         behandling.overføringer
     internal val avslåtteOverføringer =
@@ -88,11 +84,9 @@ internal class Formidlingsoverføringer(
         alleOverføringer.filter { it.antallDager > 0 }
 
     internal val avslått =
-        behandling.karakteristikker.avslag() || (
-            avslåtteOverføringer.size == 1 &&
-                delvisInnvilgedeOverføringer.isEmpty() &&
-                innvilgedeOverføringer.isEmpty()
-            )
+        avslåtteOverføringer.size in (0..1) &&
+        delvisInnvilgedeOverføringer.isEmpty() &&
+        innvilgedeOverføringer.isEmpty()
 
     internal val innvilget =
         !avslått &&
@@ -119,7 +113,7 @@ internal class Formidlingsoverføringer(
             identitetsnummer in berørteIdentitetsnummer && personopplysninger.adressebeskyttet
         } -> meldingMåSendesManuelt("adressebeskyttede parter")
         behandling.oppfyllerIkkeInngangsvilkår -> meldingMåSendesManuelt("avslag på inngangsvilkår")
-        behandling.overføringer.size !in 1..2 -> meldingMåSendesManuelt("${behandling.overføringer.size} overføringer")
+        behandling.overføringer.size !in 0..2 -> meldingMåSendesManuelt("${behandling.overføringer.size} overføringer")
         startOgSluttGrunn == null -> meldingMåSendesManuelt("dette scenarioet")
         else -> true
     }
