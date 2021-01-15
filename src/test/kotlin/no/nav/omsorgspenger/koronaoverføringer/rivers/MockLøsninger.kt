@@ -6,6 +6,7 @@ import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.testutils.sisteMeldingSomJsonMessage
 
@@ -21,12 +22,12 @@ internal fun TestRapid.mockHentPersonopplysninger(
 
 internal fun TestRapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
     fra: Identitetsnummer, til: Identitetsnummer,
-    barn: Set<Identitetsnummer> = emptySet(), borSammen: Boolean = false
+    relasjoner: Set<VurderRelasjonerMelding.Relasjon> = emptySet()
 ) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()
             .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
-            .leggTilLøsningPåVurderRelasjonerTilBarn(til = barn, borSammen = borSammen)
+            .leggTilLøsningPåVurderRelasjonerTilBarn(relasjoner = relasjoner)
             .toJson()
     )
 }
@@ -75,16 +76,15 @@ private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
 )
 
 private fun JsonMessage.leggTilLøsningPåVurderRelasjonerTilBarn(
-    til: Set<Identitetsnummer>,
-    borSammen: Boolean = true
+    relasjoner: Set<VurderRelasjonerMelding.Relasjon>
 ) = leggTilLøsning(
-    behov = VurderRelasjonerMelding.VurderRelasjoner,
+    behov = VurderRelasjoner,
     løsning = mapOf(
-        "relasjoner" to til.map {
+        "relasjoner" to relasjoner.map {
             mapOf(
-                "relasjon" to "BARN",
-                "identitetsnummer" to it,
-                "borSammen" to borSammen
+                "relasjon" to it.relasjon,
+                "identitetsnummer" to it.identitetsnummer,
+                "borSammen" to it.borSammen
             )
         }
     )

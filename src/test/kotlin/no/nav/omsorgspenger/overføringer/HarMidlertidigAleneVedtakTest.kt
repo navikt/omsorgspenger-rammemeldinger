@@ -49,21 +49,23 @@ internal class HarMidlertidigAleneVedtakTest(
                 periode = Periode("2017-02-15/2025-04-04"),
                 kilder = setOf()
             )))
-
+        val barn = overføreOmsorgsdagerBarn(
+            aleneOmOmsorgen = true,
+            fødselsdato = barnetsFødselsdato
+        )
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             overføringFra = fra,
             overføringTil = til,
             mottaksdato = mottaksdato,
-            barn = listOf(overføreOmsorgsdagerBarn(
-                aleneOmOmsorgen = true,
-                fødselsdato = barnetsFødselsdato
-            ))
+            barn = listOf(barn)
         )
 
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
@@ -92,20 +94,24 @@ internal class HarMidlertidigAleneVedtakTest(
                 kilder = setOf()
             )))
 
+        val barn = overføreOmsorgsdagerBarn(
+            aleneOmOmsorgen = true,
+            fødselsdato = barnetsFødselsdato
+        )
+
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             overføringFra = fra,
             overføringTil = til,
             mottaksdato = mottaksdato,
-            barn = listOf(overføreOmsorgsdagerBarn(
-                aleneOmOmsorgen = true,
-                fødselsdato = barnetsFødselsdato
-            ))
+            barn = listOf(barn)
         )
 
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()

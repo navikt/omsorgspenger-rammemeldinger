@@ -48,7 +48,7 @@ internal class InngangsvilkårTest(
 
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(antallMeldinger = 1)
-        rapid.mockLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
+        rapid.mockLøsningPåHenteOmsorgspengerSaksnummerOchVurderRelasjoner(fra = fra, til = til)
         rapid.ventPå(antallMeldinger = 2)
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
@@ -59,6 +59,9 @@ internal class InngangsvilkårTest(
 
     @Test
     fun `Ikke bodd med samboer minst ett år`() {
+        val barn = overføreOmsorgsdagerBarn(
+            aleneOmOmsorgen = true
+        )
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             overføringFra = fra,
             overføringTil = til,
@@ -66,17 +69,15 @@ internal class InngangsvilkårTest(
             omsorgsdagerÅOverføre = 10,
             relasjon = OverføreOmsorgsdagerBehov.Relasjon.NåværendeSamboer,
             harBoddSammenMinstEttÅr = false,
-            barn = listOf(
-                overføreOmsorgsdagerBarn(
-                    aleneOmOmsorgen = true
-                )
-            )
+            barn = listOf(barn)
         )
 
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()

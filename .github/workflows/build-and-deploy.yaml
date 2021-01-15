@@ -46,7 +46,7 @@ jobs:
           VARS: nais/dev-gcp.json
 
       - name: Deploy til prod-gcp
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/disabled'
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}

@@ -47,6 +47,10 @@ internal class TidligereKoronaoverførtTest(
         val til = IdentitetsnummerGenerator.identitetsnummer()
         val id = "01EVXYA9JTY4W0F49MA8ZJAT8M"
 
+        val barn = overføreOmsorgsdagerBarn(
+            aleneOmOmsorgen = true,
+            fødselsdato = LocalDate.parse("2018-09-29")
+        )
         val (behovssekvensId, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             id = id,
             omsorgsdagerTattUtIÅr = 0,
@@ -54,10 +58,7 @@ internal class TidligereKoronaoverførtTest(
             overføringFra = fra,
             overføringTil = til,
             mottaksdato = LocalDate.parse("2021-03-01"),
-            barn = listOf(overføreOmsorgsdagerBarn(
-                aleneOmOmsorgen = true,
-                fødselsdato = LocalDate.parse("2018-09-29")
-            ))
+            barn = listOf(barn)
         )
 
         assertEquals(id, behovssekvensId)
@@ -65,7 +66,9 @@ internal class TidligereKoronaoverførtTest(
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (løsningId, løsning) = rapid.løsningOverføreOmsorgsdager()

@@ -11,6 +11,7 @@ import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringer
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.registerOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.testutils.*
 import no.nav.omsorgspenger.testutils.DataSourceExtension
@@ -66,8 +67,10 @@ internal class BehandleKoronaOverføringerTest(
         rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
             fra = fra,
             til = til,
-            barn = setOf(barnet.identitetsnummer),
-            borSammen = true
+            relasjoner = setOf(
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = barnet.identitetsnummer, relasjon = "barn", borSammen = true),
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = true)
+            )
         )
         rapid.ventPå(2)
 
@@ -141,8 +144,10 @@ internal class BehandleKoronaOverføringerTest(
         rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
             fra = fra,
             til = til,
-            barn = setOf(barn.identitetsnummer),
-            borSammen = false
+            relasjoner = setOf(
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = false),
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = true)
+            )
         )
         rapid.ventPå(2)
 

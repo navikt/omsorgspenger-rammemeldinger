@@ -2,6 +2,7 @@ package no.nav.omsorgspenger.koronaoverføringer.rivers
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Periode
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.registerOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
@@ -97,8 +98,10 @@ internal class GosysKoronaOverføringerTest(
         rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
             fra = fra,
             til = til,
-            barn = setOf(barnet.identitetsnummer),
-            borSammen = true
+            relasjoner = setOf(
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = barnet.identitetsnummer, relasjon = "barn", borSammen = true),
+                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = true)
+            )
         )
         rapid.ventPå(2)
 

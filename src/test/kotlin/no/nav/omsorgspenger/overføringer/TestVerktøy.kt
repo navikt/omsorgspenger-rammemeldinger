@@ -26,10 +26,12 @@ internal fun TestRapid.løsningOverføreOmsorgsdager() = sisteMelding().somMeldi
 internal fun TestRapid.ventPåLøsning(
     behovssekvens: String,
     fra: Identitetsnummer,
-    til: Identitetsnummer) {
+    til: Identitetsnummer,
+    barn: Set<Identitetsnummer>,
+    borsammen: Boolean) {
     sendTestMessage(behovssekvens)
     ventPå(antallMeldinger = 1)
-    mockLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
+    mockLøsningPåHenteOmsorgspengerSaksnummerOchVurderRelasjoner(fra = fra, til = til, barn = barn, borSammen = borsammen)
     ventPå(antallMeldinger = 2)
     mockLøsningPåHentePersonopplysninger(fra = fra, til = til)
     ventPå(antallMeldinger = 3)

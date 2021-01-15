@@ -17,6 +17,7 @@ import no.nav.omsorgspenger.overføringer.Vurderinger.vurderInngangsvilkår
 import no.nav.omsorgspenger.overføringer.meldinger.*
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding.HentKoronaOverføringGirMeldinger
 import no.nav.omsorgspenger.midlertidigalene.meldinger.HentMidlertidigAleneVedtakMelding
 import no.nav.omsorgspenger.midlertidigalene.meldinger.HentMidlertidigAleneVedtakMelding.HentMidlertidigAleneVedtak
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
@@ -28,6 +29,8 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerInput
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding.Companion.HentPersonopplysninger
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
+import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
@@ -55,7 +58,9 @@ internal class BehandleOverføringAvOmsorgsdager(
                     HentOmsorgspengerSaksnummer,
                     HentFordelingGirMeldinger,
                     HentUtvidetRettVedtak,
-                    HentMidlertidigAleneVedtak
+                    HentMidlertidigAleneVedtak,
+                    HentKoronaOverføringGirMeldinger,
+                    VurderRelasjoner
                 )
                 it.utenLøsningPåBehov(
                     OverføreOmsorgsdagerBehandling
@@ -68,6 +73,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 HentKoronaOverføringGirMeldingerMelding.validateLøsning(it)
                 HentUtvidetRettVedtakMelding.validateLøsning(it)
                 HentMidlertidigAleneVedtakMelding.validateLøsning(it)
+                VurderRelasjonerMelding.validateLøsning(it)
             }
         }.register(this)
     }
@@ -91,6 +97,8 @@ internal class BehandleOverføringAvOmsorgsdager(
             periode = overføreOmsorgsdager.overordnetPeriode
         )
 
+        val relasjoner = VurderRelasjonerMelding.hentLøsning(packet)
+
         val grunnlag = vurderGrunnlag(
             grunnlag = Grunnlag(
                 overføreOmsorgsdager = overføreOmsorgsdager,
@@ -99,6 +107,7 @@ internal class BehandleOverføringAvOmsorgsdager(
                 midlertidigAleneVedtak = midlertidigAleneVedtak,
                 koronaOverføringer = koronaOverføringer
             ),
+            relasjoner = relasjoner,
             behandling = behandling
         )
 

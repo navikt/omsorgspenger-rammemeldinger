@@ -36,22 +36,25 @@ internal class FødselsdatoPåBarnTest(
         val mottaksdato = LocalDate.parse("2020-09-29")
         val barnetsFødselsdato = LocalDate.parse("2021-02-15")
 
+        val barn = overføreOmsorgsdagerBarn(
+            fødselsdato = barnetsFødselsdato,
+            aleneOmOmsorgen = true
+        )
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             mottaksdato = mottaksdato,
             overføringFra = fra,
             overføringTil = til,
             omsorgsdagerTattUtIÅr = 0,
             omsorgsdagerÅOverføre = 10,
-            barn = listOf(overføreOmsorgsdagerBarn(
-                fødselsdato = barnetsFødselsdato,
-                aleneOmOmsorgen = true
-            ))
+            barn = listOf(barn)
         )
 
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
@@ -72,24 +75,25 @@ internal class FødselsdatoPåBarnTest(
         val til = IdentitetsnummerGenerator.identitetsnummer()
         val mottaksdato = LocalDate.parse("2020-09-29")
 
+        val barn = overføreOmsorgsdagerBarn(
+            fødselsdato = mottaksdato.minusYears(13),
+            aleneOmOmsorgen = true
+        )
         val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
             mottaksdato = mottaksdato,
             overføringFra = fra,
             overføringTil = til,
             omsorgsdagerTattUtIÅr = 0,
             omsorgsdagerÅOverføre = 10,
-            barn = listOf(
-                overføreOmsorgsdagerBarn(
-                    fødselsdato = mottaksdato.minusYears(13),
-                    aleneOmOmsorgen = true
-                )
-            )
+            barn = listOf(barn)
         )
 
         rapid.ventPåLøsning(
             behovssekvens = behovssekvens,
             fra = fra,
-            til = til
+            til = til,
+            barn = setOf(barn.identitetsnummer),
+            borsammen = true
         )
 
         val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
