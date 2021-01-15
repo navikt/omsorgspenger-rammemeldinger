@@ -432,7 +432,7 @@ internal class MeldingsbestillingTest {
 
     internal companion object {
         private const val fra = "11111111111"
-        private const val til = "22222222222"
+        internal const val til = "22222222222"
         private const val tidligerePartner = "44444444444"
 
         internal fun barn(

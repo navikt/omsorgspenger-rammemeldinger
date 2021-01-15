@@ -2,6 +2,7 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
+import no.nav.omsorgspenger.overføringer.Behandling.Karakteristikk.Companion.avslag
 
 internal class Behandling(
     sendtPerBrev: Boolean,
@@ -23,11 +24,23 @@ internal class Behandling(
 
     internal fun karakteristikker() = karakteristikker.toSet()
 
-    internal fun avslag() = karakteristikker.contains(Karakteristikk.OppfyllerIkkeInngangsvilkår)
+    internal fun avslag() = karakteristikker.avslag()
 
     internal enum class Karakteristikk {
         OppfyllerIkkeInngangsvilkår,
+        IkkeOmsorgenForNoenBarn,
+        IkkeSammeAdresseSomMottaker,
         InneholderIkkeVerifiserbareVedtakOmUtvidetRett,
-        MåBesvaresPerBrev
+        MåBesvaresPerBrev;
+
+        internal companion object {
+            private val AvslagsKarakteristikker = setOf(
+                OppfyllerIkkeInngangsvilkår,
+                IkkeOmsorgenForNoenBarn,
+                IkkeSammeAdresseSomMottaker
+            )
+            internal fun Set<Karakteristikk>.avslag() = AvslagsKarakteristikker.intersect(this).isNotEmpty()
+        }
+
     }
 }

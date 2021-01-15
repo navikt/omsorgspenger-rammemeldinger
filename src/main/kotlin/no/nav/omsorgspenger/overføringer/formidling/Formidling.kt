@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.overføringer.formidling
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.formidling.Meldingsbestilling
+import no.nav.omsorgspenger.overføringer.Behandling.Karakteristikk.Companion.avslag
 import no.nav.omsorgspenger.overføringer.Personopplysninger
 import no.nav.omsorgspenger.overføringer.formidling.StartOgSluttGrunnUtleder.startOgSluttGrunn
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
@@ -72,6 +73,8 @@ internal class Formidlingsoverføringer(
     behandling: OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling,
     personopplysninger: Map<Identitetsnummer, Personopplysninger>) {
 
+    // TODO: Her bør det ryddes opp litt..
+
     internal val alleOverføringer =
         behandling.overføringer
     internal val avslåtteOverføringer =
@@ -83,15 +86,18 @@ internal class Formidlingsoverføringer(
     internal val utenAvslåtteOverføringer =
         alleOverføringer.filter { it.antallDager > 0 }
 
+    internal val avslått =
+        behandling.karakteristikker.avslag() || (
+            avslåtteOverføringer.size == 1 &&
+                delvisInnvilgedeOverføringer.isEmpty() &&
+                innvilgedeOverføringer.isEmpty()
+            )
+
     internal val innvilget =
+        !avslått &&
         avslåtteOverføringer.isEmpty() &&
         delvisInnvilgedeOverføringer.isEmpty() &&
         innvilgedeOverføringer.size == 1
-
-    internal val avslått =
-        avslåtteOverføringer.size == 1 &&
-        delvisInnvilgedeOverføringer.isEmpty() &&
-        innvilgedeOverføringer.isEmpty()
 
     internal val startOgSluttGrunn = startOgSluttGrunn(
         innvilget = innvilget,
@@ -99,7 +105,8 @@ internal class Formidlingsoverføringer(
         alleOverføringer = alleOverføringer,
         innvilgedeOverføringer = innvilgedeOverføringer,
         delvisInnvilgedeOverføringer = delvisInnvilgedeOverføringer,
-        avslåtteOverføringer = avslåtteOverføringer
+        avslåtteOverføringer = avslåtteOverføringer,
+        karakteristikker = behandling.karakteristikker
     )
 
     private val berørteIdentitetsnummer = behandling.alleSaksnummerMapping.filterValues {

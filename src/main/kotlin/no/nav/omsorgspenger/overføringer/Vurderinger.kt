@@ -89,15 +89,15 @@ internal object Vurderinger {
             )
         }
 
-        if(grunnlag.overføreOmsorgsdager.overførerTil !in borSammenMed) {
-            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.OppfyllerIkkeInngangsvilkår)
+        if (grunnlag.overføreOmsorgsdager.overførerTil !in borSammenMed) {
+            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.IkkeSammeAdresseSomMottaker)
             behandling.lovanvendelser.leggTil(
                 periode = behandling.periode,
                 lovhenvisning = EktefelleEllerSamboer,
                 anvendelse = "Bor ikke sammen med mottaker")
         }
 
-        return grunnlag.copy(
+        val nyttGrunnlag = grunnlag.copy(
             overføreOmsorgsdager = grunnlag.overføreOmsorgsdager.copy(
                 barn = alleBarn
                     .minus(barnSomBorNånAnnenstans)
@@ -105,5 +105,11 @@ internal object Vurderinger {
                     .plus(barnMedUtvidetRettSomIkkeKanVerifiseres.map { it.copy(utvidetRett = false) }),
             )
         )
+
+        if (nyttGrunnlag.overføreOmsorgsdager.barn.isEmpty()) {
+            behandling.leggTilKarakteristikk(Behandling.Karakteristikk.IkkeOmsorgenForNoenBarn)
+        }
+
+        return nyttGrunnlag
     }
 }
