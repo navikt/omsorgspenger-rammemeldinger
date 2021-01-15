@@ -2,6 +2,7 @@ package no.nav.omsorgspenger.overføringer
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.koronaoverføringer.rivers.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner
+import no.nav.omsorgspenger.personopplysninger.TestRelasjon
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
@@ -53,8 +54,10 @@ internal class VurderOmsorgenForTest(
         rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
             fra = fra,
             til = til,
-            barn = setOf(barn.identitetsnummer),
-            borSammen = false
+            relasjoner = setOf(
+                TestRelasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = true),
+                TestRelasjon(identitetsnummer = til, borSammen = false)
+            )
         )
 
         rapid.ventPå(2)
@@ -68,4 +71,43 @@ internal class VurderOmsorgenForTest(
         assertTrue(løsning.erAvslått())
     }
 
+    @Test
+    fun `Søker bor inte sammen med mottaker ger avslag`() {
+        val fra = IdentitetsnummerGenerator.identitetsnummer()
+        val til = IdentitetsnummerGenerator.identitetsnummer()
+        val barn = overføreOmsorgsdagerBarn()
+
+        val (_, behovssekvens) = behovssekvensOverføreOmsorgsdager(
+            overføringFra = fra,
+            overføringTil = til,
+            mottaksdato = LocalDate.of(2020, 12, 1),
+            barn = listOf(overføreOmsorgsdagerBarn(
+                aleneOmOmsorgen = true,
+                fødselsdato = barn.fødselsdato
+            ))
+        )
+
+        rapid.sendTestMessage(behovssekvens)
+
+        rapid.ventPå(1)
+
+        rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
+            fra = fra,
+            til = til,
+            relasjoner = setOf(
+                TestRelasjon(identitetsnummer = barn.identitetsnummer, relasjon = "barn", borSammen = true),
+                TestRelasjon(identitetsnummer = til, borSammen = false)
+            )
+        )
+
+        rapid.ventPå(2)
+
+        rapid.mockLøsningPåHentePersonopplysninger(fra=fra, til=til)
+
+        rapid.ventPå(3)
+
+        val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
+
+        assertTrue(løsning.erAvslått())
+    }
 }
