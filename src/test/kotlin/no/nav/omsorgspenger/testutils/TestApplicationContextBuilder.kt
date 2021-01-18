@@ -24,20 +24,11 @@ internal fun TestApplicationContextBuilder(
     additionalEnv: Map<String, String> = emptyMap()
 ) = ApplicationContext.Builder(
     formidlingService = RecordingFormidlingService(),
+    statistikkService = RecordingStatistikkService(),
     accessTokenClient = mockk<AccessTokenClient>().also {
         every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
     },
-    kafkaProducer = mockk<KafkaProducer<String, String>>().also {
-        every { it.send(any()) }.returns(CompletableFuture.completedFuture(RecordMetadata(
-            TopicPartition("foo", 1),
-            1L,
-            1L,
-            System.currentTimeMillis(),
-            1L,
-            1,
-            1
-        )))
-    },
+    kafkaProducer = mockk(),
     omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
         every { it.hent(any(), any(), any())}.returns(listOf())
         coEvery { it.check() }.returns(Healthy("OmsorgspengerInfotrygdRammevedtakGateway", "Mock helsesjekk OK!"))

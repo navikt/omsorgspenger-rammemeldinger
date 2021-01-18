@@ -35,6 +35,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
 import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
+import no.nav.omsorgspenger.statistikk.KafkaStatistikkService
 
 internal class ApplicationContext(
     internal val env: Environment,
@@ -117,9 +118,9 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource
             )
 
-            val benyttetStatistikkService = statistikkService ?: StatistikkService(
-                    kafkaProducer = benyttetKafkaProducer,
-                    enabled = benyttetEnv.hentOptionalEnv("SEND_STATISTIKK") == "enabled"
+            val benyttetStatistikkService = statistikkService ?: KafkaStatistikkService(
+                kafkaProducer = benyttetKafkaProducer,
+                enabled = benyttetEnv.hentOptionalEnv("SEND_STATISTIKK") == "enabled"
             )
 
             val benyttetAleneOmOmsorgenRepository = aleneOmOmsorgenRepository ?: AleneOmOmsorgenRepository(
@@ -139,10 +140,10 @@ internal class ApplicationContext(
             )
 
             val benyttetTilgangsstyringRestClient = tilgangsstyringRestClient ?: TilgangsstyringRestClient(
-                    httpClient = HttpClient {
-                        install(JsonFeature) { serializer = JacksonSerializer(jacksonObjectMapper()) }
-                    },
-                    env = benyttetEnv
+                httpClient = HttpClient {
+                    install(JsonFeature) { serializer = JacksonSerializer(jacksonObjectMapper()) }
+                },
+                env = benyttetEnv
             )
 
             val benyttetKoronaoverføringRepository = koronaoverføringRepository ?: KoronaoverføringRepository(

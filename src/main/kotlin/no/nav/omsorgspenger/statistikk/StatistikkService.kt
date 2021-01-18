@@ -3,16 +3,19 @@ package no.nav.omsorgspenger.statistikk
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-internal class StatistikkService(
+internal interface StatistikkService {
+    fun publiser(statistikkMelding: StatistikkMelding)
+}
+
+internal class KafkaStatistikkService(
         private val kafkaProducer: KafkaProducer<String, String>,
         private val topic: String = "aapen-omsorgspengerRammemeldinger-statistikk-v1",
-        private val enabled: Boolean
-) {
+        private val enabled: Boolean) : StatistikkService {
 
-    fun publiser(statistikk: StatistikkMelding) {
+    override fun publiser(statistikkMelding: StatistikkMelding) {
         if(!enabled) {
             return
         }
-        kafkaProducer.send(ProducerRecord(topic, statistikk.toJson()))
+        kafkaProducer.send(ProducerRecord(topic, statistikkMelding.toJson()))
     }
 }

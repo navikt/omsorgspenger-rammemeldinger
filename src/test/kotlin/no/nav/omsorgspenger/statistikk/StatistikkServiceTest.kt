@@ -18,7 +18,7 @@ internal class StatistikkServiceTest {
     private val kafkaProducer = mockk<KafkaProducer<String, String>>()
     private val topic = "topic"
 
-    private val statistikkService = StatistikkService(
+    private val statistikkService = KafkaStatistikkService(
             kafkaProducer = kafkaProducer,
             topic = topic,
             enabled = true
