@@ -11,6 +11,8 @@ import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
+import no.nav.omsorgspenger.personopplysninger.Enhet
+import no.nav.omsorgspenger.personopplysninger.Enhetstype
 import no.nav.omsorgspenger.personopplysninger.Navn
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
@@ -119,6 +121,7 @@ internal class MeldingsbestillingTest {
     }
 
     @Test
+
     fun `Brukt fler dager enn man har tilgjengelig i år - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
             tattUtIÅr = 50,
@@ -431,6 +434,7 @@ internal class MeldingsbestillingTest {
     }
 
     internal companion object {
+        private val enhet = Enhet(enhetsnummer = "1234", enhetstype = Enhetstype.VANLIG)
         private const val fra = "11111111111"
         internal const val til = "22222222222"
         private const val tidligerePartner = "44444444444"
@@ -515,11 +519,11 @@ internal class MeldingsbestillingTest {
                 behovssekvensId = "foo",
                 personopplysninger = mapOf(
                     fra to Personopplysninger(gjeldendeIdentitetsnummer = fra, fødselsdato = LocalDate.now(),
-                        navn = Navn("Ola","En","Nordmann"), aktørId = "123", adressebeskyttet = false),
+                        navn = Navn("Ola","En","Nordmann"), aktørId = "123", adressebeskyttet = false, enhet = enhet),
                     til to Personopplysninger(gjeldendeIdentitetsnummer = til, fødselsdato = LocalDate.now(),
-                        navn = Navn("Kari","To", "Nordmann"), aktørId = "345", adressebeskyttet = false),
+                        navn = Navn("Kari","To", "Nordmann"), aktørId = "345", adressebeskyttet = false, enhet = enhet),
                     tidligerePartner to  Personopplysninger(gjeldendeIdentitetsnummer = til, fødselsdato = LocalDate.now(),
-                        navn = Navn("Heidi","Tre", "Nordmann"), aktørId = "789", adressebeskyttet = false)
+                        navn = Navn("Heidi","Tre", "Nordmann"), aktørId = "789", adressebeskyttet = false, enhet = enhet)
                 ),
                 overføreOmsorgsdager = overføreOmsorgsdager,
                 behandling = OverføreOmsorgsdagerBehandlingMelding.ForVidereBehandling(

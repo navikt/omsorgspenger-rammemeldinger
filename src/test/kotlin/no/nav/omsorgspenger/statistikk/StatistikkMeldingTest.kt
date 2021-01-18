@@ -6,22 +6,24 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.networknt.schema.JsonSchema
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
+import no.nav.omsorgspenger.personopplysninger.Enhet
+import no.nav.omsorgspenger.personopplysninger.Enhetstype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 internal class StatistikkMeldingTest {
     val schema = TestSchemaHelper.schema
     val objectMapper = TestSchemaHelper.objectMapper
 
     @Test
-    internal fun `melding er komplett med alle felt`() {
-        assertThat(melding).hasNoNullFieldsOrProperties()
+    fun `melding er komplett med alle felt`() {
+        assertThat(melding).hasNoNullFieldsOrPropertiesExcept("behandlendeEnhetKode","behandlendeEnhetType")
     }
 
     @Test
-    internal fun `melding validerer mot schema`() {
+    fun `melding validerer mot schema`() {
         val node = objectMapper.readTree(melding.toJson())
         val errors = schema.validate(node)
         assertThat(errors).isEmpty()
@@ -33,16 +35,20 @@ internal class StatistikkMeldingTest {
         assertThat(res).isEqualTo(melding)
     }
 
-    private val melding = StatistikkMelding(
-            saksnummer = "",
-            behandlingId = "",
-            mottattDato = LocalDate.parse("2020-01-01"),
-            registrertDato = LocalDate.parse("2020-01-01"),
-            behandlingType = "",
-            behandlingStatus = "",
-            funksjonellTid = OffsetDateTime.now(),
-            aktorId = "12345678",
-            tekniskTid = OffsetDateTime.now(),
+    private val melding = StatistikkMelding.instance(
+        saksnummer = "1",
+        behovssekvensId = "2",
+        mottaksdato = LocalDate.parse("2020-01-01"),
+        registreringsdato = LocalDate.parse("2020-01-01"),
+        behandlingType = "type",
+        behandlingStatus = "status",
+        undertype = "under",
+        mottatt = ZonedDateTime.now(),
+        aktørId = "12345678",
+        enhet = Enhet(
+            enhetstype = Enhetstype.VANLIG,
+            enhetsnummer = "1234"
+        )
     )
 }
 

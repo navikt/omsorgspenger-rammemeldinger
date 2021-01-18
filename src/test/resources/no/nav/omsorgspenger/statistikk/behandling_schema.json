@@ -5,7 +5,6 @@
   "required": [
     "funksjonellTid",
     "tekniskTid",
-    "sakId",
     "aktorId",
     "saksnummer",
     "ytelseType",
@@ -16,8 +15,6 @@
     "behandlingStatus",
     "ansvarligEnhetKode",
     "ansvarligEnhetType",
-    "behandlendeEnhetKode",
-    "behandlendeEnhetType",
     "totrinnsbehandling",
     "avsender",
     "versjon"
@@ -34,30 +31,9 @@
       "format": "date-time",
       "description":"Tidspunktet da kildesystemet ble klar over hendelsen. (format:yyyy-mm-ddThh24:mn:ss.FF6). Dette er tidspunkt hendelsen ble endret i dato systemet. Sammen med funksjonellTid, vil vi kunne holde rede på hva som er blitt rapportert tidligere og når det skjer endringer tilbake i tid."
     },
-    "sakId": {
-      "type": "string",
-      "description": "Nøkkelen til saken i kildesystemet. Noen kildesystem har valgt å kalle dette objektet fagsak. Denne identifiserer samlingen av behandlinger som vil kunne oppstå i forbindelse med saken. Skal kunne spores i kilden."
-    },
     "aktorId": {
       "type": "string",
       "description":"Aktør IDen til primær mottager av ytelsen om denne blir godkjent. Altså, den som saken omhandler."
-    },
-    "aktorer": {
-      "type": "array",
-      "properties": {
-        "aktorId": {
-          "type": "number",
-          "description": "Aktør IDen til aktuell person."
-        },
-        "rolle": {
-          "type": "string",
-          "description": "Kode som beskriver personens rolle i forbindelse med saken. Eksempelvis medmor, medfar, far samboer, barn o.l. "
-        },
-        "rolleBeskrivelse": {
-          "type": "string",
-          "description": "Beskriver den funksjonelle verdien av koden. Finnes ikke den enda, regner vi med å få den senere."
-        }
-      }
     },
     "saksnummer": {
       "type": "string",
