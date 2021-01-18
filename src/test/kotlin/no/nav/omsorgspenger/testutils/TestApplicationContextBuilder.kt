@@ -23,6 +23,7 @@ internal fun TestApplicationContextBuilder(
     wireMockServer: WireMockServer? = null,
     additionalEnv: Map<String, String> = emptyMap()
 ) = ApplicationContext.Builder(
+    formidlingService = RecordingFormidlingService(),
     accessTokenClient = mockk<AccessTokenClient>().also {
         every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
     },

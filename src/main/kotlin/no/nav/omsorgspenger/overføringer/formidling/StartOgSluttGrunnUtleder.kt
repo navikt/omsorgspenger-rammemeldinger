@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.overføringer.formidling
 
+import no.nav.omsorgspenger.overføringer.Behandling
 import no.nav.omsorgspenger.overføringer.Knekkpunkt
 import no.nav.omsorgspenger.overføringer.NyOverføring
 
@@ -11,12 +12,16 @@ internal object StartOgSluttGrunnUtleder {
         innvilgedeOverføringer: List<NyOverføring>,
         delvisInnvilgedeOverføringer: List<NyOverføring>,
         avslåtteOverføringer: List<NyOverføring>,
+        karakteristikker: Set<Behandling.Karakteristikk>
     ) : Pair<Grunn, Grunn>? = when {
         alleOverføringer.map { it.starterGrunnet.plus(it.slutterGrunnet) }.flatten().inneholder(
             Knekkpunkt.MidlertidigAleneStarter, Knekkpunkt.MidlertidigAleneSlutter
         ) -> null
+        avslått -> avslag(
+            karakteristikker = karakteristikker,
+            overføring = avslåtteOverføringer.firstOrNull()
+        )
         innvilget -> innvilgedeOverføringer.first().innvilget()
-        avslått -> avslåtteOverføringer.first().avslag()
         alleOverføringer.size == 1 && delvisInnvilgedeOverføringer.size == 1 -> kunEnDelvis(
             delvisInnvilget = delvisInnvilgedeOverføringer.first()
         )
@@ -147,8 +152,14 @@ private fun NyOverføring.innvilget() = when {
     else -> null
 }
 
-private fun NyOverføring.avslag() = when {
-    starterGrunnet.inneholderMinstEn(Knekkpunkt.FordelingGirStarter, Knekkpunkt.KoronaOverføringGirStarter) ->
+private fun avslag(
+    overføring: NyOverføring?,
+    karakteristikker: Set<Behandling.Karakteristikk>) = when {
+    karakteristikker.contains(Behandling.Karakteristikk.IkkeSammeAdresseSomMottaker) ->
+        Grunn.IKKE_SAMME_ADRESSE_SOM_MOTTAKER to Grunn.IKKE_SAMME_ADRESSE_SOM_MOTTAKER
+    karakteristikker.contains(Behandling.Karakteristikk.IkkeOmsorgenForNoenBarn) ->
+        Grunn.IKKE_OMSORGEN_FOR_NOEN_BARN to Grunn.IKKE_OMSORGEN_FOR_NOEN_BARN
+    overføring != null && overføring.starterGrunnet.inneholderMinstEn(Knekkpunkt.FordelingGirStarter, Knekkpunkt.KoronaOverføringGirStarter) ->
         Grunn.PÅGÅENDE_FORDELING to Grunn.PÅGÅENDE_FORDELING
     else -> null
 }
@@ -161,7 +172,9 @@ internal enum class Grunn {
     BRUKT_ALLE_DAGER_I_ÅR_OG_PÅGÅENDE_FORDELING,
     PÅGÅENDE_FORDELING,
     OMSORGEN_FOR_BARN_OPPHØRER,
-    OMSORGEN_FOR_BARN_MED_UTVIDET_RETT_OPPHØRER
+    OMSORGEN_FOR_BARN_MED_UTVIDET_RETT_OPPHØRER,
+    IKKE_OMSORGEN_FOR_NOEN_BARN,
+    IKKE_SAMME_ADRESSE_SOM_MOTTAKER
 }
 
 private fun List<Knekkpunkt>.inneholder(vararg others: Knekkpunkt) =

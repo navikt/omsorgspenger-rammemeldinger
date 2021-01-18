@@ -91,7 +91,8 @@ internal class KnekkingTest {
             fordelingGirMeldinger = fordelingGir,
             utvidetRettVedtak = utvidetRett,
             midlertidigAleneVedtak = midlertidigAlene,
-            koronaOverføringer = koronaOverføringer
+            koronaOverføringer = koronaOverføringer,
+            relasjoner = setOf()
         )
     }
 }

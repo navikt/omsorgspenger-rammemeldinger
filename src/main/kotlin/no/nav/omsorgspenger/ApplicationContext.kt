@@ -18,6 +18,7 @@ import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenService
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.formidling.FormidlingService
+import no.nav.omsorgspenger.formidling.KafkaFormidlingService
 import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService
@@ -176,7 +177,7 @@ internal class ApplicationContext(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
                 )),
                 kafkaProducer = benyttetKafkaProducer,
-                formidlingService = formidlingService ?: FormidlingService(
+                formidlingService = formidlingService ?: KafkaFormidlingService(
                     kafkaProducer = benyttetKafkaProducer
                 ),
                 dataSource = benyttetDataSource,

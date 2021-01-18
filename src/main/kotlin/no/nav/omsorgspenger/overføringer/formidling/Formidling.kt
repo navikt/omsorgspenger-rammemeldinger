@@ -83,15 +83,16 @@ internal class Formidlingsoverføringer(
     internal val utenAvslåtteOverføringer =
         alleOverføringer.filter { it.antallDager > 0 }
 
+    internal val avslått =
+        avslåtteOverføringer.size in (0..1) &&
+        delvisInnvilgedeOverføringer.isEmpty() &&
+        innvilgedeOverføringer.isEmpty()
+
     internal val innvilget =
+        !avslått &&
         avslåtteOverføringer.isEmpty() &&
         delvisInnvilgedeOverføringer.isEmpty() &&
         innvilgedeOverføringer.size == 1
-
-    internal val avslått =
-        avslåtteOverføringer.size == 1 &&
-        delvisInnvilgedeOverføringer.isEmpty() &&
-        innvilgedeOverføringer.isEmpty()
 
     internal val startOgSluttGrunn = startOgSluttGrunn(
         innvilget = innvilget,
@@ -99,7 +100,8 @@ internal class Formidlingsoverføringer(
         alleOverføringer = alleOverføringer,
         innvilgedeOverføringer = innvilgedeOverføringer,
         delvisInnvilgedeOverføringer = delvisInnvilgedeOverføringer,
-        avslåtteOverføringer = avslåtteOverføringer
+        avslåtteOverføringer = avslåtteOverføringer,
+        karakteristikker = behandling.karakteristikker
     )
 
     private val berørteIdentitetsnummer = behandling.alleSaksnummerMapping.filterValues {
@@ -109,9 +111,9 @@ internal class Formidlingsoverføringer(
     internal val støtterAutomatiskMelding = when {
         personopplysninger.any { (identitetsnummer,personopplysninger) ->
             identitetsnummer in berørteIdentitetsnummer && personopplysninger.adressebeskyttet
-        } -> meldingMåSendesManuelt("adresssebeskyttede parter")
+        } -> meldingMåSendesManuelt("adressebeskyttede parter")
         behandling.oppfyllerIkkeInngangsvilkår -> meldingMåSendesManuelt("avslag på inngangsvilkår")
-        behandling.overføringer.size !in 1..2 -> meldingMåSendesManuelt("${behandling.overføringer.size} overføringer")
+        behandling.overføringer.size !in 0..2 -> meldingMåSendesManuelt("${behandling.overføringer.size} overføringer")
         startOgSluttGrunn == null -> meldingMåSendesManuelt("dette scenarioet")
         else -> true
     }
