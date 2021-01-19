@@ -47,14 +47,6 @@
       "type": "string",
       "description":"Noen kildesystemer vil ha en under-type som gir finere oppløsning på hva saken omhandler. For eksempel vil foreldrepenger være en ytelseType, i FPSAK, mens underType vil da angi hva slags type foreldrepenge-sak det er snakk, som Adopsjon, Fødsel o.l. Dette er sakens underType. Hvis dette ikke finnes eller allerede er bakt inn i ytelseType kan denne være tom."
     },
-    "ytelseTypeBeskrivelse": {
-      "type": "string",
-      "description": "Beskriver den funksjonelle verdien av koden. Finnes ikke den enda, regner vi med å få den senere."
-    },
-    "underTypeBeskrivelse": {
-      "type": "string",
-      "description": "Beskriver den funksjonelle verdien av koden. Finnes ikke den enda, regner vi med å få den senere."
-    },
     "mottattDato": {
       "type": "string",
       "format": "date",
