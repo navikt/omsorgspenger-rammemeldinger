@@ -61,7 +61,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
         val perioden = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet).periode
         logger.info("Vurderer videre steg for søknad for perioden $perioden")
         return when (perioden.erStøttetPeriode()) {
-            true -> when (enableBehandling) {
+            true -> when (enableBehandling || (id in SlippGjennom)) {
                 true -> super.doHandlePacket(id, packet)
                 false -> logger.warn("Behandling av koronaoverføringer er ikke skrudd på").let { false }
             }
@@ -158,4 +158,9 @@ internal class InitierOverføreKoronaOmsorgsdager(
         return true
     }
 
+    private companion object {
+        private val SlippGjennom = setOf(
+            "01EV1K28C61R2X1H05MFSXKS60"
+        )
+    }
 }

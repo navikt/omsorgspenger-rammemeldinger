@@ -62,7 +62,9 @@ internal class InitierOverføringAvOmsorgsdager(
     }
 
     override fun doHandlePacket(id: String, packet: JsonMessage): Boolean {
-        return if (enableBehandling) true
+        return if (enableBehandling || (id in SlippGjennom)) {
+            super.doHandlePacket(id, packet)
+        }
         else when (OverføreOmsorgsdagerMelding.hentBehov(packet).erMottattFør2021()) {
             true -> super.doHandlePacket(id, packet)
             false -> logger.warn("Behandling av overføringer mottatt etter 2020 er ikke skrudd på").let { false }
@@ -144,5 +146,11 @@ internal class InitierOverføringAvOmsorgsdager(
         return true
     }
 
-    private fun OverføreOmsorgsdagerMelding.Behovet.erMottattFør2021() = mottaksdato.year <= 2020
+    private companion object {
+        private fun OverføreOmsorgsdagerMelding.Behovet.erMottattFør2021() = mottaksdato.year <= 2020
+
+        private val SlippGjennom = setOf(
+            "01ETZ1139JXHN49Q4QGCW43QG4"
+        )
+    }
 }
