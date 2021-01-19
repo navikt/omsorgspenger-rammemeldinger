@@ -31,16 +31,16 @@ private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
     )
 
 internal fun TestRapid.mockLøsningPåHentePersonopplysninger(
-    fra: Identitetsnummer, til: Identitetsnummer) {
+    fra: Identitetsnummer, til: Identitetsnummer, skjermetTil: Boolean = false) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()
-        .leggTilLøsningPåHentePersonopplysninger(fra, til)
+        .leggTilLøsningPåHentePersonopplysninger(fra, til, skjermetTil)
         .toJson()
     )
 }
 
 private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
-    fra: Identitetsnummer, til: Identitetsnummer) = leggTilLøsning(
+    fra: Identitetsnummer, til: Identitetsnummer, skjermetTil: Boolean) = leggTilLøsning(
         behov = HentPersonopplysninger,
         løsning = mapOf(
             "personopplysninger" to mapOf(
@@ -53,7 +53,7 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
                     "aktørId" to "33",
                     "adressebeskyttelse" to "UGRADERT",
                     "gjeldendeIdentitetsnummer" to fra,
-                    "enhetsnummer" to "1234",
+                    "enhetsnummer" to "4487",
                     "enhetstype" to "VANLIG"
                 ),
                 til to mapOf(
@@ -64,10 +64,19 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
                     ),
                     "fødselsdato" to "1992-09-01",
                     "aktørId" to "44",
-                    "adressebeskyttelse" to "UGRADERT",
+                    "adressebeskyttelse" to when (skjermetTil) {
+                        true -> "STRENGT_FORTROLIG"
+                        false -> "UGRADERT"
+                   },
                     "gjeldendeIdentitetsnummer" to til,
-                    "enhetsnummer" to "1234",
-                    "enhetstype" to "VANLIG"
+                    "enhetsnummer" to when (skjermetTil) {
+                        true -> "2103"
+                        false -> "4487"
+                    },
+                    "enhetstype" to when (skjermetTil) {
+                        true -> "SKJERMET"
+                        false -> "VANLIG"
+                    }
                 )
             )
         )

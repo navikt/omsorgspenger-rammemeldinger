@@ -30,7 +30,7 @@ internal class StatistikkMeldingTest {
     }
 
     @Test
-    internal fun `melding kan parses`() {
+    fun `melding kan parses`() {
         val res = StatistikkMelding.fromJson(melding.toJson())
         assertThat(res).isEqualTo(melding)
     }

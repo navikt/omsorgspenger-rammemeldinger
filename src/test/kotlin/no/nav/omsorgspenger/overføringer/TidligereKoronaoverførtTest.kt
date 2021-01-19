@@ -8,9 +8,11 @@ import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringer
 import no.nav.omsorgspenger.overføringer.apis.Motpart
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringer
+import no.nav.omsorgspenger.overføringer.statistikk.StatistikkFormat.assertForventetGjennomført
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
+import no.nav.omsorgspenger.testutils.RecordingStatistikkService
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -25,15 +27,18 @@ import javax.sql.DataSource
 @ExtendWith(DataSourceExtension::class)
 internal class TidligereKoronaoverførtTest(
     dataSource: DataSource) {
+
+    private val applicationContext = TestApplicationContextBuilder(
+        dataSource = dataSource.cleanAndMigrate(),
+        additionalEnv = mapOf("OVERFORING_BEHANDLING" to "enabled")
+    ).also { builder ->
+        builder.spleisetKoronaOverføringerService = spleisetKoronaOverføringerServiceMock
+    }.build()
+
+    private val statistikkService = applicationContext.statistikkService as RecordingStatistikkService
+
     private val rapid = TestRapid().apply {
-        this.registerApplicationContext(
-            TestApplicationContextBuilder(
-                dataSource = dataSource.cleanAndMigrate(),
-                additionalEnv = mapOf("OVERFORING_BEHANDLING" to "enabled")
-            ).also { builder ->
-                builder.spleisetKoronaOverføringerService = spleisetKoronaOverføringerServiceMock
-            }.build()
-        )
+        this.registerApplicationContext(applicationContext)
     }
 
     @BeforeEach
@@ -83,6 +88,8 @@ internal class TidligereKoronaoverførtTest(
                 Periode("2022-01-01/2030-12-31") to 9
             )
         )
+
+        statistikkService.finnStatistikkMeldingFor(behovssekvensId).assertForventetGjennomført(behovssekvensId)
     }
 
     private companion object {
