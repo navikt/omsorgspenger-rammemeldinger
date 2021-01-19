@@ -9,6 +9,8 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
+import no.nav.omsorgspenger.koronaoverføringer.statistikk.StatistikkFormat.assertForventetAvslag
+import no.nav.omsorgspenger.koronaoverføringer.statistikk.StatistikkFormat.assertForventetGjennomført
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringer
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
@@ -36,6 +38,8 @@ internal class BehandleKoronaOverføringerTest(
     ).also { builder ->
         builder.spleisetOverføringerService = overføringerMock
     }.build()
+
+    private val statistikkService = applicationContext.statistikkService as RecordingStatistikkService
 
     private val rapid = TestRapid().apply {
         this.registerOverføreKoronaOmsorgsdager(applicationContext)
@@ -123,6 +127,7 @@ internal class BehandleKoronaOverføringerTest(
                 regstrertIForbindelseMed = "KoronaOverføring"
             )))
         }
+        statistikkService.finnStatistikkMeldingFor(idStart).assertForventetGjennomført(idStart)
     }
 
     @Test
@@ -159,6 +164,8 @@ internal class BehandleKoronaOverføringerTest(
         val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
         assertTrue(løsning.erAvslått())
         assertEquals(idStart, idSlutt)
+
+        statistikkService.finnStatistikkMeldingFor(idStart).assertForventetAvslag(idStart)
     }
 
     private fun hentKoronaoverføringerFor(identitetsnummer: Identitetsnummer) =

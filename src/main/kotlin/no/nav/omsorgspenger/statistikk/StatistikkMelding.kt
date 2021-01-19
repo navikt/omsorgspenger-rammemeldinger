@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.statistikk
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -7,72 +8,111 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.omsorgspenger.AktørId
+import no.nav.omsorgspenger.Saksnummer
+import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
+import no.nav.omsorgspenger.personopplysninger.Enhet
 import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class StatistikkMelding(
-        @JsonProperty("saksnummer")
-        val saksnummer: String,
+data class StatistikkMelding @JsonCreator private constructor(
+    @JsonProperty("saksnummer")
+    val saksnummer: String,
 
-        @JsonProperty("behandlingId")
-        val behandlingId: String,
+    @JsonProperty("behandlingId")
+    val behandlingId: String,
 
-        @JsonProperty("mottattDato")
-        val mottattDato: LocalDate,
+    @JsonProperty("mottattDato")
+    val mottattDato: LocalDate,
 
-        @JsonProperty("registrertDato")
-        val registrertDato: LocalDate,
+    @JsonProperty("registrertDato")
+    val registrertDato: LocalDate,
 
-        @JsonProperty("behandlingType")
-        val behandlingType: String,
+    @JsonProperty("behandlingType")
+    val behandlingType: String,
 
-        @JsonProperty("behandlingStatus")
-        val behandlingStatus: String,
+    @JsonProperty("behandlingStatus")
+    val behandlingStatus: String,
 
-        @JsonProperty("funksjonellTid")
-        val funksjonellTid: OffsetDateTime,
+    @JsonProperty("funksjonellTid")
+    val funksjonellTid: OffsetDateTime,
 
-        @JsonProperty("aktorId")
-        val aktorId: String,
+    @JsonProperty("tekniskTid")
+    val tekniskTid: OffsetDateTime,
 
-        @JsonProperty("tekniskTid")
-        val tekniskTid: OffsetDateTime,
+    @JsonProperty("aktorId")
+    val aktorId: String,
 
-        @JsonProperty("sakId")
-        val sakId: String = saksnummer,
+    @JsonProperty("ansvarligEnhetKode")
+    val ansvarligEnhetKode: String,
 
-        @JsonProperty("ytelseType")
-        val ytelseType: String = "omsorgspenger",
+    @JsonProperty("ansvarligEnhetType")
+    val ansvarligEnhetType: String,
 
-        @JsonProperty("ansvarligEnhetKode")
-        val ansvarligEnhetKode: String = "SRV",
+    @JsonProperty("behandlendeEnhetKode")
+    val behandlendeEnhetKode: String?,
 
-        @JsonProperty("ansvarligEnhetType")
-        val ansvarligEnhetType: String = "NORG",
+    @JsonProperty("behandlendeEnhetType")
+    val behandlendeEnhetType: String?,
 
-        @JsonProperty("behandlendeEnhetKode")
-        val behandlendeEnhetKode: String = "SRV",
+    @JsonProperty("versjon")
+    val versjon: Long,
 
-        @JsonProperty("behandlendeEnhetType")
-        val behandlendeEnhetType: String = "NORG",
+    @JsonProperty("avsender")
+    val avsender: String,
 
-        @JsonProperty("totrinnsbehandling")
-        val totrinnsbehandling: Boolean = false,
+    @JsonProperty("totrinnsbehandling")
+    val totrinnsbehandling: Boolean,
 
-        @JsonProperty("avsender")
-        val avsender: String = "omsorgspenger-rammemeldinger",
+    @JsonProperty("ytelseType")
+    val ytelseType: String,
 
-        @JsonProperty("versjon")
-        val versjon: Long = 1L
+    @JsonProperty("underType")
+    val underType: String) {
 
-) {
-    fun toJson(): String {
-        return objectMapper.writeValueAsString(this)
-    }
+    internal fun toJson() = objectMapper.writeValueAsString(this)
 
-    companion object {
-        fun fromJson(json: String): StatistikkMelding {
+    internal companion object {
+        internal fun instance(
+            saksnummer: Saksnummer,
+            behovssekvensId: BehovssekvensId,
+            aktørId: AktørId,
+            registreringsdato: LocalDate,
+            mottaksdato: LocalDate,
+            mottatt: ZonedDateTime,
+            behandlingType: String,
+            behandlingStatus: String,
+            undertype: String,
+            enhet: Enhet) = StatistikkMelding(
+            saksnummer = saksnummer,
+            behandlingId = behovssekvensId,
+            registrertDato = registreringsdato,
+            mottattDato = mottaksdato,
+            funksjonellTid = mottatt.toOffsetDateTime(),
+            aktorId = when (enhet.skjermet) {
+                true -> SkjermetVerdi
+                false -> aktørId
+            },
+            ansvarligEnhetKode = enhet.enhetsnummer,
+            behandlingStatus = behandlingStatus,
+            behandlingType = behandlingType,
+            underType = undertype,
+            tekniskTid = OffsetDateTime.now(),
+            // Statiske verdier
+            versjon = 2L,
+            ytelseType = "omsorgspenger",
+            avsender = "omsorgspenger-rammemeldinger",
+            ansvarligEnhetType = "NORG",
+            behandlendeEnhetType = null,
+            behandlendeEnhetKode = null,
+            totrinnsbehandling = false
+        )
+
+        private const val SkjermetVerdi = "-5"
+
+        internal fun fromJson(json: String): StatistikkMelding {
             return objectMapper.readValue(json)
         }
 

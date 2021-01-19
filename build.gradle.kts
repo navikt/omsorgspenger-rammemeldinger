@@ -9,7 +9,7 @@ val ulidVersion = "8.2.0"
 val ktorVersion = "1.5.0"
 val assertjVersion = "3.18.1"
 val dusseldorfVersion = "1.5.0.0d3bd1e"
-val schemaValidatorVersion = "1.0.46"
+val schemaValidatorVersion = "1.0.47"
 
 // Database
 val flywayVersion = "7.5.0"

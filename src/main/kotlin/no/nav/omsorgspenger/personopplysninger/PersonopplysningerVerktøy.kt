@@ -20,8 +20,7 @@ internal object PersonopplysningerVerktøy {
                 false -> null
             },
             etternavn = it["etternavn"].asText()
-        )
-        }
+        )}
     }
     internal fun ObjectNode.fødselsdato() : LocalDate {
         require(hasNonNull("fødselsdato"))
@@ -34,5 +33,14 @@ internal object PersonopplysningerVerktøy {
     internal fun ObjectNode.aktørId() : AktørId {
         require(hasNonNull("aktørId"))
         return get("aktørId").asText()
+    }
+
+    internal fun ObjectNode.enhet() : Enhet {
+        require(hasNonNull("enhetsnummer"))
+        require(hasNonNull("enhetstype"))
+        return Enhet(
+            enhetsnummer = get("enhetsnummer").asText(),
+            enhetstype = Enhetstype.fromDTO(get("enhetstype").asText())
+        )
     }
 }

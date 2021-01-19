@@ -5,11 +5,14 @@ import no.nav.omsorgspenger.formidling.Meldingsbestilling
 import no.nav.omsorgspenger.koronaoverføringer.rivers.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner
 import no.nav.omsorgspenger.overføringer.formidling.GittDager
 import no.nav.omsorgspenger.overføringer.formidling.Grunn
+import no.nav.omsorgspenger.overføringer.statistikk.StatistikkFormat.assertForventetAvslagSkjermet
+import no.nav.omsorgspenger.overføringer.statistikk.StatistikkFormat.assertForventetAvslag
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
 import no.nav.omsorgspenger.testutils.RecordingFormidlingService
+import no.nav.omsorgspenger.testutils.RecordingStatistikkService
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import no.nav.omsorgspenger.testutils.ventPå
@@ -32,6 +35,7 @@ internal class VurderOmsorgenForTest(
     ).build()
 
     private val formidlingService = applicationContext.formidlingService as RecordingFormidlingService
+    private val statistikkService = applicationContext.statistikkService as RecordingStatistikkService
 
     private val rapid = TestRapid().apply {
         this.registerApplicationContext(applicationContext)
@@ -82,7 +86,7 @@ internal class VurderOmsorgenForTest(
         assertTrue(løsning.erAvslått())
 
         formidlingService.finnMeldingsbestillingerFor(behovssekvensId).assertAvslagsmelding(Grunn.IKKE_OMSORGEN_FOR_NOEN_BARN)
-
+        statistikkService.finnStatistikkMeldingFor(behovssekvensId).assertForventetAvslag(behovssekvensId)
     }
 
     @Test
@@ -125,6 +129,8 @@ internal class VurderOmsorgenForTest(
         assertTrue(løsning.erAvslått())
 
         formidlingService.finnMeldingsbestillingerFor(behovssekvensId).assertAvslagsmelding(Grunn.IKKE_SAMME_ADRESSE_SOM_MOTTAKER)
+        statistikkService.finnStatistikkMeldingFor(behovssekvensId).assertForventetAvslag(behovssekvensId)
+
     }
 
     @Test
@@ -158,7 +164,7 @@ internal class VurderOmsorgenForTest(
 
         rapid.ventPå(2)
 
-        rapid.mockLøsningPåHentePersonopplysninger(fra=fra, til=til)
+        rapid.mockLøsningPåHentePersonopplysninger(fra=fra, til=til, skjermetTil = true)
 
         rapid.ventPå(3)
 
@@ -166,7 +172,8 @@ internal class VurderOmsorgenForTest(
 
         assertTrue(løsning.erAvslått())
 
-        formidlingService.finnMeldingsbestillingerFor(behovssekvensId).assertAvslagsmelding(Grunn.IKKE_SAMME_ADRESSE_SOM_MOTTAKER)
+        assertEquals(0, formidlingService.finnMeldingsbestillingerFor(behovssekvensId).size) // Ettersom en part er skjemet blir det ikke brev
+        statistikkService.finnStatistikkMeldingFor(behovssekvensId).assertForventetAvslagSkjermet(behovssekvensId)
     }
 
     private fun List<Meldingsbestilling>.assertAvslagsmelding(avslagsGrunn: Grunn) {

@@ -3,20 +3,22 @@ package no.nav.omsorgspenger.statistikk
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.omsorgspenger.personopplysninger.Enhet
+import no.nav.omsorgspenger.personopplysninger.Enhetstype
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 import java.util.concurrent.CompletableFuture
 
 internal class StatistikkServiceTest {
     private val kafkaProducer = mockk<KafkaProducer<String, String>>()
     private val topic = "topic"
 
-    private val statistikkService = StatistikkService(
+    private val statistikkService = KafkaStatistikkService(
             kafkaProducer = kafkaProducer,
             topic = topic,
             enabled = true
@@ -33,16 +35,17 @@ internal class StatistikkServiceTest {
 
         every { kafkaProducer.send(capture(meldinger)) }.returns(CompletableFuture.completedFuture(null))
 
-        val melding = StatistikkMelding(
-                saksnummer = "",
-                behandlingId = "",
-                mottattDato = LocalDate.parse("2020-01-01"),
-                registrertDato = LocalDate.parse("2020-01-01"),
-                behandlingType = "",
-                behandlingStatus = "",
-                funksjonellTid = OffsetDateTime.now(),
-                aktorId = "12345678",
-                tekniskTid = OffsetDateTime.now(),
+        val melding = StatistikkMelding.instance(
+            saksnummer = "1",
+            behovssekvensId = "2",
+            mottaksdato = LocalDate.parse("2020-01-01"),
+            registreringsdato = LocalDate.parse("2020-01-01"),
+            behandlingType = "type",
+            behandlingStatus = "status",
+            undertype = "under",
+            mottatt = ZonedDateTime.now(),
+                aktørId = "12345678",
+                enhet = Enhet(enhetstype = Enhetstype.VANLIG, enhetsnummer = "1234")
         )
         statistikkService.publiser(melding)
 

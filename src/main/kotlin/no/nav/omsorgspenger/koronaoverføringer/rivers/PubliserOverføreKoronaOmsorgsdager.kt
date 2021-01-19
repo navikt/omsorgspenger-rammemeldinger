@@ -13,15 +13,20 @@ import no.nav.omsorgspenger.koronaoverføringer.formidling.Formidling
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
+import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding.fellesEnhet
 import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
+import no.nav.omsorgspenger.statistikk.StatistikkMelding
+import no.nav.omsorgspenger.statistikk.StatistikkService
 import org.slf4j.LoggerFactory
+import java.time.ZonedDateTime
 
 internal class PubliserOverføreKoronaOmsorgsdager(
     rapidsConnection: RapidsConnection,
     behovssekvensRepository: BehovssekvensRepository,
-    private val formidlingService: FormidlingService
+    private val formidlingService: FormidlingService,
+    private val statistikkService: StatistikkService
 ) : PersistentBehovssekvensPacketListener(
     steg = "PubliserOverføreKoronaOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
@@ -48,13 +53,14 @@ internal class PubliserOverføreKoronaOmsorgsdager(
         val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
         val behandling = OverføreKoronaOmsorgsdagerBehandlingMelding.hentLøsning(packet)
         val personopplysninger = OverføreKoronaOmsorgsdagerPersonopplysningerMelding.hentLøsning(packet).personopplysninger
+        val utfall = when (behandling.gjennomførtOverføringer) {
+            true -> Utfall.Gjennomført
+            false -> Utfall.Avslått
+        }
 
         packet.leggTilLøsningPar(OverføreKoronaOmsorgsdagerMelding.løsning(
             OverføreKoronaOmsorgsdagerMelding.Løsningen(
-                utfall = when (behandling.gjennomførtOverføringer) {
-                    true -> Utfall.Gjennomført
-                    false -> Utfall.Avslått
-                },
+                utfall = utfall,
                 gjeldendeOverføringer = behandling.gjeldendeOverføringer,
                 alleSaksnummerMapping = behandling.alleSaksnummerMapping,
                 personopplysninger = personopplysninger
@@ -84,6 +90,26 @@ internal class PubliserOverføreKoronaOmsorgsdager(
             )
         )
 
+        val fellesEnhet = personopplysninger
+            .filterKeys { it == behovet.fra || it == behovet.til }
+            .fellesEnhet(behovet.fra)
+
+        statistikkService.publiser(StatistikkMelding.instance(
+            enhet = fellesEnhet,
+            aktørId = personopplysninger.getValue(behovet.fra).aktørId,
+            saksnummer = behandling.alleSaksnummerMapping.getValue(behovet.fra),
+            behovssekvensId = id,
+            mottatt = behovet.mottatt,
+            mottaksdato = behovet.mottaksdato,
+            registreringsdato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
+            undertype = "koronaoverføring",
+            behandlingType = "søknad",
+            behandlingStatus = when (utfall) {
+                Utfall.Avslått -> "avslått"
+                Utfall.Gjennomført -> "gjennomført"
+                Utfall.GosysJournalføringsoppgaver -> throw IllegalStateException("Uventet utfall: $utfall")
+            }
+        ))
         secureLogger.info("SuccessPacket=${packet.toJson()}")
 
         return true

@@ -6,6 +6,8 @@ import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
+import no.nav.omsorgspenger.personopplysninger.Enhet
+import no.nav.omsorgspenger.personopplysninger.Enhetstype
 import no.nav.omsorgspenger.personopplysninger.Navn
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
@@ -278,7 +280,8 @@ internal class MeldingsbestillingTest {
                 ),
                 aktørId = "aktør1",
                 adressebeskyttet = false,
-                gjeldendeIdentitetsnummer = "id1"
+                gjeldendeIdentitetsnummer = "id1",
+                enhet = Enhet(enhetstype = Enhetstype.VANLIG, enhetsnummer = "1234")
             ),
             "id2" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(
                 fødselsdato = LocalDate.parse("1991-02-03"),
@@ -289,8 +292,8 @@ internal class MeldingsbestillingTest {
                 ),
                 aktørId = "aktør2",
                 adressebeskyttet = false,
-                gjeldendeIdentitetsnummer = "id2"
-
+                gjeldendeIdentitetsnummer = "id2",
+                enhet = Enhet(enhetstype = Enhetstype.VANLIG, enhetsnummer = "1234")
             ),
             "id3" to OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger(
                 fødselsdato = LocalDate.now(),
@@ -301,7 +304,8 @@ internal class MeldingsbestillingTest {
                 ),
                 aktørId = "aktør3",
                 adressebeskyttet = true,
-                gjeldendeIdentitetsnummer = "id3"
+                gjeldendeIdentitetsnummer = "id3",
+                enhet = Enhet(enhetstype = Enhetstype.VANLIG, enhetsnummer = "1234")
             )
         )
 

@@ -16,12 +16,12 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.HentPersonopplysninger
+import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.fellesEnhet
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.statistikk.StatistikkMelding
 import no.nav.omsorgspenger.statistikk.StatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
-import java.time.OffsetDateTime
 import java.time.ZonedDateTime
 
 internal class PubliserOverføringAvOmsorgsdager (
@@ -99,20 +99,25 @@ internal class PubliserOverføringAvOmsorgsdager (
             else -> formidlingService.sendMeldingsbestillinger(it)
         }}
 
-        statistikkService.publiser(StatistikkMelding(
-                saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
-                behandlingId = id,
-                mottattDato = overføreOmsorgsdager.mottaksdato,
-                registrertDato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
-                funksjonellTid = overføreOmsorgsdager.mottatt.toOffsetDateTime(),
-                behandlingType = "overføring",
-                behandlingStatus = when(utfall) {
-                    Utfall.Avslått -> "avslått"
-                    Utfall.Gjennomført -> "gjennomført"
-                    Utfall.GosysJournalføringsoppgaver -> throw IllegalStateException("Uventet utfall: $utfall")
-                },
-                aktorId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
-                tekniskTid = OffsetDateTime.now()
+        val berørteIdentitetsnummer = behandling.alleSaksnummerMapping.filterValues { it in behandling.berørteSaksnummer }.keys
+        val berørtePersonopplysninger = personopplysninger.filterKeys { it in berørteIdentitetsnummer }
+        val fellesEnhet = berørtePersonopplysninger.fellesEnhet(fra = overføreOmsorgsdager.overførerFra)
+
+        statistikkService.publiser(StatistikkMelding.instance(
+            enhet = fellesEnhet,
+            aktørId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
+            saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
+            behovssekvensId = id,
+            mottatt = overføreOmsorgsdager.mottatt,
+            mottaksdato = overføreOmsorgsdager.mottaksdato,
+            registreringsdato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
+            undertype = "overføring",
+            behandlingType = "søknad",
+            behandlingStatus = when (utfall) {
+                Utfall.Avslått -> "avslått"
+                Utfall.Gjennomført -> "gjennomført"
+                Utfall.GosysJournalføringsoppgaver -> throw IllegalStateException("Uventet utfall: $utfall")
+            }
         ))
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")

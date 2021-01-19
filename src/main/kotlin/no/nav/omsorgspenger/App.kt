@@ -31,6 +31,7 @@ import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOm
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
 import org.slf4j.event.Level
+import java.util.*
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -108,7 +109,8 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         PubliserOverføreKoronaOmsorgsdager(
             rapidsConnection = this,
             behovssekvensRepository = applicationContext.behovssekvensRepository,
-            formidlingService = applicationContext.formidlingService
+            formidlingService = applicationContext.formidlingService,
+            statistikkService = applicationContext.statistikkService
         )
     }
 }
@@ -132,7 +134,11 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     }
 
     install(CallId) {
-        retrieveFromHeader(HttpHeaders.XCorrelationId)
+        retrieve { when {
+            it.request.headers.contains(HttpHeaders.XCorrelationId) -> it.request.header(HttpHeaders.XCorrelationId)
+            it.request.headers.contains("Nav-Call-Id") -> it.request.header("Nav-Call-Id")
+            else -> "rammemeldinger-${UUID.randomUUID()}"
+        }}
     }
 
     install(CallLogging) {
