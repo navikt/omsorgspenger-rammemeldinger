@@ -36,6 +36,9 @@ data class StatistikkMelding @JsonCreator private constructor(
     @JsonProperty("behandlingStatus")
     val behandlingStatus: String,
 
+    @JsonProperty("behandlingResultat")
+    val behandlingResultat: String,
+
     @JsonProperty("funksjonellTid")
     val funksjonellTid: OffsetDateTime,
 
@@ -83,7 +86,7 @@ data class StatistikkMelding @JsonCreator private constructor(
             mottaksdato: LocalDate,
             mottatt: ZonedDateTime,
             behandlingType: String,
-            behandlingStatus: String,
+            behandlingResultat: String,
             undertype: String,
             enhet: Enhet) = StatistikkMelding(
             saksnummer = saksnummer,
@@ -95,13 +98,14 @@ data class StatistikkMelding @JsonCreator private constructor(
                 true -> SkjermetVerdi
                 false -> aktørId
             },
+            behandlingResultat = behandlingResultat,
             ansvarligEnhetKode = enhet.enhetsnummer,
-            behandlingStatus = behandlingStatus,
             behandlingType = behandlingType,
             underType = undertype,
             tekniskTid = OffsetDateTime.now(),
             // Statiske verdier
             versjon = 2L,
+            behandlingStatus = "avsluttet",
             ytelseType = "omsorgspenger",
             avsender = "omsorgspenger-rammemeldinger",
             ansvarligEnhetType = "NORG",

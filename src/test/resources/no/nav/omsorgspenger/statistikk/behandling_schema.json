@@ -13,6 +13,7 @@
     "behandlingId",
     "behandlingType",
     "behandlingStatus",
+    "behandlingResultat",
     "ansvarligEnhetKode",
     "ansvarligEnhetType",
     "totrinnsbehandling",
@@ -67,7 +68,11 @@
     },
     "behandlingStatus": {
       "type": "string",
-      "description": "Kode som angir den aktuelle behandlingens tilstand på gjeldende tidspunkt. Ha med alle mulige statuser som er naturlig for det enkelte system/ytelse. Som minimum, angi om saken har følgende status: Registrert, Klar for behandling, Venter på bruker, venter på ekstern (arbeidsgiver, lege etc.), venter på utland, Avsluttet.Her bør det også angis at saken er behandlet av beslutter, men sendt i retur for ny behandling."
+      "description": "Kode som angir status på behandlingen. avsluttet."
+    },
+    "behandlingResultat": {
+      "type": "string",
+      "description": "Kode som angir resultat av behandlingen. gjennomført/avslått."
     },
     "ansvarligEnhetKode": {
       "type": "string",

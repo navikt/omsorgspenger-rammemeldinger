@@ -41,7 +41,7 @@ internal class StatistikkServiceTest {
             mottaksdato = LocalDate.parse("2020-01-01"),
             registreringsdato = LocalDate.parse("2020-01-01"),
             behandlingType = "type",
-            behandlingStatus = "status",
+            behandlingResultat = "resulat",
             undertype = "under",
             mottatt = ZonedDateTime.now(),
                 aktørId = "12345678",

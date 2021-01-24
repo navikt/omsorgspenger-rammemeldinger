@@ -104,7 +104,7 @@ internal class PubliserOverføreKoronaOmsorgsdager(
             registreringsdato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
             undertype = "koronaoverføring",
             behandlingType = "søknad",
-            behandlingStatus = when (utfall) {
+            behandlingResultat = when (utfall) {
                 Utfall.Avslått -> "avslått"
                 Utfall.Gjennomført -> "gjennomført"
                 Utfall.GosysJournalføringsoppgaver -> throw IllegalStateException("Uventet utfall: $utfall")
