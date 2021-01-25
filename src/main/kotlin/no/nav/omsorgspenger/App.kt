@@ -98,21 +98,19 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         spleisetKoronaOverføringerService = applicationContext.spleisetKoronaOverføringerService,
         enableBehandling = enableBehandling
     )
-    if (enableBehandling) {
-        BehandleOverføreKoronaOmsorgsdager(
-            rapidsConnection = this,
-            behovssekvensRepository = applicationContext.behovssekvensRepository,
-            koronaoverføringRepository = applicationContext.koronaoverføringRepository,
-            saksnummerRepository = applicationContext.saksnummerRepository,
-            aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService
-        )
-        PubliserOverføreKoronaOmsorgsdager(
-            rapidsConnection = this,
-            behovssekvensRepository = applicationContext.behovssekvensRepository,
-            formidlingService = applicationContext.formidlingService,
-            statistikkService = applicationContext.statistikkService
-        )
-    }
+    BehandleOverføreKoronaOmsorgsdager(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        koronaoverføringRepository = applicationContext.koronaoverføringRepository,
+        saksnummerRepository = applicationContext.saksnummerRepository,
+        aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService
+    )
+    PubliserOverføreKoronaOmsorgsdager(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        formidlingService = applicationContext.formidlingService,
+        statistikkService = applicationContext.statistikkService
+    )
 }
 
 internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {
