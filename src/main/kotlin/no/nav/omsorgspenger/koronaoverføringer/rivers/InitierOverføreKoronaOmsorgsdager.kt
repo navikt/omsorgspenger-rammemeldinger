@@ -85,7 +85,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
             logger.info("Legger til behov $OpprettGosysJournalføringsoppgaver")
             secureLogger.info("SuccessPacket=${packet.toJson()}")
         } else {
-            require(enableBehandling) {
+            require(enableBehandling || (id in SlippGjennom)) {
                 "Behandling av koronaoverføringer er ikke skrudd på."
             }
 
