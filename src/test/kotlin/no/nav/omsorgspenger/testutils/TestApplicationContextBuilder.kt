@@ -44,7 +44,10 @@ internal fun TestApplicationContextBuilder(
             "AZURE_APP_CLIENT_ID" to "omsorgspenger-rammemeldinger",
             "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl()
         )
-    }.plus(additionalEnv)
+    }.plus(additionalEnv).plus(mapOf(
+        "OVERFORING_BEHANDLE_MOTTATT_ETTER" to "2000-01-01",
+        "KORONA_BEHANDLE_MOTTATT_ETTER" to "2000-01-01"
+    ))
 )
 
 internal fun DataSource.cleanAndMigrate() = this.also {

@@ -29,6 +29,7 @@ import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import no.nav.omsorgspenger.utvidetrett.meldinger.HentUtvidetRettVedtakMelding
 import no.nav.omsorgspenger.utvidetrett.meldinger.HentUtvidetRettVedtakMelding.HentUtvidetRettVedtak
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
 
 internal class InitierOverføreKoronaOmsorgsdager(
     rapidsConnection: RapidsConnection,
@@ -37,7 +38,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
     private val utvidetRettService: UtvidetRettService,
     private val spleisetOverføringerService: SpleisetOverføringerService,
     private val spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService,
-    private val enableBehandling: Boolean
+    private val behandleMottattEtter: LocalDate
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføreKoronaOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
@@ -47,7 +48,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
     private val aktueltBehov = OverføreKoronaOmsorgsdagerMelding.OverføreKoronaOmsorgsdager
 
     init {
-        logger.info("EnableBehandling=$enableBehandling")
+        logger.info("BehandleMottattEtter=$behandleMottattEtter")
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(aktueltBehov)
@@ -58,12 +59,12 @@ internal class InitierOverføreKoronaOmsorgsdager(
     }
 
     override fun doHandlePacket(id: String, packet: JsonMessage): Boolean {
-        val perioden = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet).periode
-        logger.info("Vurderer videre steg for søknad for perioden $perioden")
-        return when (perioden.erStøttetPeriode()) {
-            true -> when (enableBehandling || (id in SlippGjennom)) {
+        val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
+        logger.info("Vurderer videre steg for søknad for perioden ${behovet.periode}")
+        return when (behovet.periode.erStøttetPeriode()) {
+            true -> when (behovet.skalBehandles()) {
                 true -> super.doHandlePacket(id, packet)
-                false -> logger.warn("Behandling av koronaoverføringer er ikke skrudd på").let { false }
+                false -> logger.warn("Behandlet i Infotrygd").let { false }
             }
             false -> super.doHandlePacket(id, packet)
         }
@@ -85,9 +86,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
             logger.info("Legger til behov $OpprettGosysJournalføringsoppgaver")
             secureLogger.info("SuccessPacket=${packet.toJson()}")
         } else {
-            require(enableBehandling || (id in SlippGjennom)) {
-                "Behandling av koronaoverføringer er ikke skrudd på."
-            }
+            require(behovet.skalBehandles())
 
             val identitetsnummer = behovet.fra
             val correlationId = packet.correlationId()
@@ -158,9 +157,5 @@ internal class InitierOverføreKoronaOmsorgsdager(
         return true
     }
 
-    private companion object {
-        private val SlippGjennom = setOf(
-            "01EV1K28C61R2X1H05MFSXKS60"
-        )
-    }
+    private fun OverføreKoronaOmsorgsdagerMelding.Behovet.skalBehandles() = mottaksdato.isAfter(behandleMottattEtter)
 }

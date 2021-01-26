@@ -4,19 +4,19 @@ val junitJupiterVersion = "5.7.0"
 val jsonassertVersion = "1.5.0"
 val k9rapidVersion = "1.0e6a99e"
 val awaitilityVersion = "4.0.3"
-val mockkVersion = "1.10.4"
+val mockkVersion = "1.10.5"
 val ulidVersion = "8.2.0"
 val ktorVersion = "1.5.0"
-val assertjVersion = "3.18.1"
-val dusseldorfVersion = "1.5.0.0d3bd1e"
+val assertjVersion = "3.19.0"
+val dusseldorfVersion = "1.5.0.ae98b7c"
 val schemaValidatorVersion = "1.0.47"
 
 // Database
-val flywayVersion = "7.5.0"
-val hikariVersion = "3.4.5"
+val flywayVersion = "7.5.1"
+val hikariVersion = "4.0.1"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.18"
-val embeddedPostgres = "1.2.9"
+val embeddedPostgres = "1.2.10"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
@@ -103,7 +103,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "6.8"
+        gradleVersion = "6.8.1"
     }
 
 }

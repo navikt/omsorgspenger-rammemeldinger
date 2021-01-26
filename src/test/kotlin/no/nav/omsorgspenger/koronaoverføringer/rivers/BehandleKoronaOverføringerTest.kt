@@ -33,8 +33,7 @@ import kotlin.test.assertTrue
 internal class BehandleKoronaOverføringerTest(
     dataSource: DataSource) {
     private val applicationContext = TestApplicationContextBuilder(
-        dataSource = dataSource.cleanAndMigrate(),
-        additionalEnv = mapOf("KORONA_BEHANDLING" to "enabled")
+        dataSource = dataSource.cleanAndMigrate()
     ).also { builder ->
         builder.spleisetOverføringerService = overføringerMock
     }.build()
