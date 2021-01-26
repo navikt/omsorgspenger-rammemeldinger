@@ -29,8 +29,7 @@ internal class TidligereKoronaoverførtTest(
     dataSource: DataSource) {
 
     private val applicationContext = TestApplicationContextBuilder(
-        dataSource = dataSource.cleanAndMigrate(),
-        additionalEnv = mapOf("OVERFORING_BEHANDLING" to "enabled")
+        dataSource = dataSource.cleanAndMigrate()
     ).also { builder ->
         builder.spleisetKoronaOverføringerService = spleisetKoronaOverføringerServiceMock
     }.build()

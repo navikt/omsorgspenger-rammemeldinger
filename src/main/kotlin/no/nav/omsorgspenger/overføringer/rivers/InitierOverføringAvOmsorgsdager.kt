@@ -27,6 +27,7 @@ import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
 
 internal class InitierOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
@@ -34,15 +35,15 @@ internal class InitierOverføringAvOmsorgsdager(
     private val spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService,
     private val utvidetRettService: UtvidetRettService,
     private val midlertidigAleneService: MidlertidigAleneService,
-    behovssekvensRepository: BehovssekvensRepository,
-    private val enableBehandling: Boolean
+    private val behandleMottattEtter: LocalDate,
+    behovssekvensRepository: BehovssekvensRepository
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføringAvOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
     logger = LoggerFactory.getLogger(InitierOverføringAvOmsorgsdager::class.java)) {
 
     init {
-        logger.info("EnableBehandling=$enableBehandling")
+        logger.info("BehandleMottattEtter=$behandleMottattEtter")
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(OverføreOmsorgsdager)
@@ -62,19 +63,17 @@ internal class InitierOverføringAvOmsorgsdager(
     }
 
     override fun doHandlePacket(id: String, packet: JsonMessage): Boolean {
-        return if (enableBehandling || (id in SlippGjennom)) {
-            super.doHandlePacket(id, packet)
-        }
-        else when (OverføreOmsorgsdagerMelding.hentBehov(packet).erMottattFør2021()) {
+        val behovet = OverføreOmsorgsdagerMelding.hentBehov(packet)
+        return when (behovet.skalBehandles()) {
             true -> super.doHandlePacket(id, packet)
-            false -> logger.warn("Behandling av overføringer mottatt etter 2020 er ikke skrudd på").let { false }
+            false -> logger.warn("Behandlet i Infotrygd").let { false }
         }
     }
 
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("InitierOverføringAvOmsorgsdager for $id")
         val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet).also {
-            require(enableBehandling || (id in SlippGjennom) || it.erMottattFør2021()) { "Behandling av overføringer mottatt etter 2020 er ikke skrudd på" }
+            require(it.skalBehandles())
         }
         val periode = overføreOmsorgsdager.overordnetPeriode
         val correlationId = packet.correlationId()
@@ -146,11 +145,6 @@ internal class InitierOverføringAvOmsorgsdager(
         return true
     }
 
-    private companion object {
-        private fun OverføreOmsorgsdagerMelding.Behovet.erMottattFør2021() = mottaksdato.year <= 2020
+    private fun OverføreOmsorgsdagerMelding.Behovet.skalBehandles() = mottaksdato.isAfter(behandleMottattEtter)
 
-        private val SlippGjennom = setOf(
-            "01ETZ1139JXHN49Q4QGCW43QG4"
-        )
-    }
 }

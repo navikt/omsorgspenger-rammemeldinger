@@ -19,8 +19,7 @@ import javax.sql.DataSource
 internal class GosysKoronaOverføringerTest(
     dataSource: DataSource) {
     private val applicationContext = TestApplicationContextBuilder(
-        dataSource = dataSource.cleanAndMigrate(),
-        additionalEnv = mapOf("KORONA_BEHANDLING" to "enabled")
+        dataSource = dataSource.cleanAndMigrate()
     ).build()
 
     private val rapid = TestRapid().apply {

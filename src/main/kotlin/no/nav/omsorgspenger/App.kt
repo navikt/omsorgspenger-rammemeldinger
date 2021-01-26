@@ -31,6 +31,7 @@ import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOm
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
 import org.slf4j.event.Level
+import java.time.LocalDate
 import java.util.*
 
 fun main() {
@@ -50,7 +51,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         utvidetRettService = applicationContext.utvidetRettService,
         midlertidigAleneService = applicationContext.midlertidigAleneService,
         behovssekvensRepository = applicationContext.behovssekvensRepository,
-        enableBehandling = applicationContext.env.hentOptionalEnv("OVERFORING_BEHANDLING") == "enabled"
+        behandleMottattEtter = LocalDate.parse(applicationContext.env.hentOptionalEnv("OVERFORING_BEHANDLE_MOTTATT_ETTER")?: "2021-01-24")
     )
 
     BehandleOverføringAvOmsorgsdager(
@@ -88,7 +89,6 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
 }
 
 internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationContext: ApplicationContext) {
-    val enableBehandling = applicationContext.env.hentOptionalEnv("KORONA_BEHANDLING") == "enabled"
     InitierOverføreKoronaOmsorgsdager(
         rapidsConnection = this,
         behovssekvensRepository = applicationContext.behovssekvensRepository,
@@ -96,7 +96,7 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         fordelingService = applicationContext.fordelingService,
         spleisetOverføringerService = applicationContext.spleisetOverføringerService,
         spleisetKoronaOverføringerService = applicationContext.spleisetKoronaOverføringerService,
-        enableBehandling = enableBehandling
+        behandleMottattEtter = LocalDate.parse(applicationContext.env.hentOptionalEnv("KORONA_BEHANDLE_MOTTATT_ETTER")?: "2021-01-25")
     )
     BehandleOverføreKoronaOmsorgsdager(
         rapidsConnection = this,

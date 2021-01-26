@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import javax.sql.DataSource
-import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class)
 internal class KoronaOverføringPåVentTest(
@@ -21,8 +20,7 @@ internal class KoronaOverføringPåVentTest(
     private val rapid = TestRapid().apply {
         this.registerOverføreKoronaOmsorgsdager(
             TestApplicationContextBuilder(
-                dataSource = dataSource.cleanAndMigrate(),
-                additionalEnv = mapOf("KORONA_BEHANDLING" to "disabled")
+                dataSource = dataSource.cleanAndMigrate()
             ).build()
         )
     }
@@ -52,21 +50,5 @@ internal class KoronaOverføringPåVentTest(
             til = til,
             journalpostId = "12345"
         )
-    }
-
-    @Test
-    fun `Søknad for 2021 blir ikke behandlet`() {
-        val fra = IdentitetsnummerGenerator.identitetsnummer()
-        val til = IdentitetsnummerGenerator.identitetsnummer()
-
-        val (_, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
-            fra = fra,
-            til = til,
-            omsorgsdagerÅOverføre = 10,
-            periode = Periode("2021-01-01/2021-12-31"),
-            journalpostIder = listOf("12345")
-        )
-        rapid.sendTestMessage(behovssekvens)
-        assertEquals(0, rapid.inspektør.size)
     }
 }
