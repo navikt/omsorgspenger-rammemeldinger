@@ -7,12 +7,12 @@ import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.correlationId
+import no.nav.omsorgspenger.extensions.erFørEllerLik
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding.HentFordelingGirMeldinger
 import no.nav.omsorgspenger.koronaoverføringer.ManuellVurdering
 import no.nav.omsorgspenger.koronaoverføringer.Perioder
-import no.nav.omsorgspenger.koronaoverføringer.Perioder.erStøttetPeriode
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.HentKoronaOverføringGirMeldingerMelding.HentKoronaOverføringGirMeldinger
@@ -42,8 +42,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
 ) : PersistentBehovssekvensPacketListener(
     steg = "InitierOverføreKoronaOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
-    logger = LoggerFactory.getLogger(InitierOverføreKoronaOmsorgsdager::class.java)
-) {
+    logger = LoggerFactory.getLogger(InitierOverføreKoronaOmsorgsdager::class.java)) {
 
     private val aktueltBehov = OverføreKoronaOmsorgsdagerMelding.OverføreKoronaOmsorgsdager
 
@@ -58,104 +57,106 @@ internal class InitierOverføreKoronaOmsorgsdager(
         }.register(this)
     }
 
-    override fun doHandlePacket(id: String, packet: JsonMessage): Boolean {
-        val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
-        logger.info("Vurderer videre steg for søknad for perioden ${behovet.periode}")
-        return when (behovet.periode.erStøttetPeriode()) {
-            true -> when (behovet.skalBehandles()) {
-                true -> super.doHandlePacket(id, packet)
-                false -> logger.warn("Behandlet i Infotrygd").let { false }
-            }
-            false -> super.doHandlePacket(id, packet)
-        }
-    }
-
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val behovet = OverføreKoronaOmsorgsdagerMelding.hentBehov(packet)
+        logger.info("Vurderer videre steg for søknad for perioden ${behovet.periode}")
 
-        if (ManuellVurdering.måVurderesManuelt(behovet)) {
-            packet.leggTilLøsningPar(
-                OverføreKoronaOmsorgsdagerMelding.løsning(
-                    OverføreKoronaOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
+        when {
+            ManuellVurdering.måVurderesManuelt(behovet) -> {
+                packet.leggTilLøsningPar(
+                    OverføreKoronaOmsorgsdagerMelding.løsning(
+                        OverføreKoronaOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
+                    )
                 )
-            )
-            packet.leggTilBehovEtter(
-                aktueltBehov = aktueltBehov,
-                behov = arrayOf(behovet.somOpprettGosysJournalføringsoppgaverBehov())
-            )
-            logger.info("Legger til behov $OpprettGosysJournalføringsoppgaver")
-            secureLogger.info("SuccessPacket=${packet.toJson()}")
-        } else {
-            require(behovet.skalBehandles())
-
-            val identitetsnummer = behovet.fra
-            val correlationId = packet.correlationId()
-            val periode = Perioder.behandlingsPeriode(
-                mottaksdato = behovet.mottaksdato,
-                periode = behovet.periode
-            )
-
-            logger.info("Henter rammemeldinger & rammevedtak")
-            val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
-                identitetsnummer = identitetsnummer,
-                periode = periode,
-                correlationId = correlationId
-            )
-
-            val overføringGirMeldinger = spleisetOverføringerService.hentSpleisetOverføringer(
-                identitetsnummer = identitetsnummer,
-                periode = periode,
-                correlationId = correlationId
-            ).gitt
-
-            val koronaoverføringGirMeldinger = spleisetKoronaOverføringerService.hentSpleisetOverføringer(
-                identitetsnummer = identitetsnummer,
-                periode = periode,
-                correlationId = correlationId
-            ).gitt
-
-            val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
-                identitetsnummer = identitetsnummer,
-                periode = periode,
-                correlationId = correlationId
-            )
-
-            logger.info("legger til behov med løsninger [${HentFordelingGirMeldinger}, ${HentUtvidetRettVedtak}, ${HentOverføringGirMeldinger}, ${HentKoronaOverføringGirMeldinger}]")
-            logger.warn("Løsning på behov [${HentUtvidetRettVedtak}] bør flyttes til 'omsorgspenger-rammevedtak'")
-            val inputHentingAvRammer = mapOf(
-                "periode" to "$periode",
-                "identitetsnummer" to identitetsnummer
-            )
-            packet.leggTilBehovMedLøsninger(
-                aktueltBehov = aktueltBehov,
-                behovMedLøsninger = arrayOf(
-                    HentFordelingGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, fordelingGirMeldinger),
-                    HentOverføringGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, overføringGirMeldinger),
-                    HentKoronaOverføringGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, koronaoverføringGirMeldinger),
-                    HentUtvidetRettVedtakMelding.behovMedLøsning(inputHentingAvRammer, utvidetRettVedtak)
+                packet.leggTilBehovEtter(
+                    aktueltBehov = aktueltBehov,
+                    behov = arrayOf(behovet.somOpprettGosysJournalføringsoppgaverBehov())
                 )
-            )
+                logger.info("Legger til behov $OpprettGosysJournalføringsoppgaver")
+                secureLogger.info("SuccessPacket=${packet.toJson()}")
+            }
+            behovet.erBehandletIInfotrygd() -> {
+                logger.warn("Er behandlet i Infotrygd.")
+                packet.leggTilLøsning(
+                    behov = aktueltBehov,
+                    løsning = mapOf("melding" to "Er behandlet i Infotrygd.")
+                )
+            }
+            else -> {
+                require(behovet.skalBehandles())
 
-            logger.info("Legger til behov $HentOmsorgspengerSaksnummer & ${VurderRelasjonerMelding.VurderRelasjoner}")
-            packet.leggTilBehov(
-                aktueltBehov = aktueltBehov,
-                behov = arrayOf(
-                    HentOmsorgspengerSaksnummerMelding.behov(
-                        HentOmsorgspengerSaksnummerMelding.BehovInput(
-                            identitetsnummer = setOf(behovet.fra, behovet.til)
-                        )
-                    ),
-                    VurderRelasjonerMelding.behov(
-                        VurderRelasjonerMelding.BehovInput(
-                            identitetsnummer = behovet.fra,
-                            til = behovet.barn.map { it.identitetsnummer }.toSet()
+                val identitetsnummer = behovet.fra
+                val correlationId = packet.correlationId()
+                val periode = Perioder.behandlingsPeriode(
+                    mottaksdato = behovet.mottaksdato,
+                    periode = behovet.periode
+                )
+
+                logger.info("Henter rammemeldinger & rammevedtak")
+                val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
+                    identitetsnummer = identitetsnummer,
+                    periode = periode,
+                    correlationId = correlationId
+                )
+
+                val overføringGirMeldinger = spleisetOverføringerService.hentSpleisetOverføringer(
+                    identitetsnummer = identitetsnummer,
+                    periode = periode,
+                    correlationId = correlationId
+                ).gitt
+
+                val koronaoverføringGirMeldinger = spleisetKoronaOverføringerService.hentSpleisetOverføringer(
+                    identitetsnummer = identitetsnummer,
+                    periode = periode,
+                    correlationId = correlationId
+                ).gitt
+
+                val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
+                    identitetsnummer = identitetsnummer,
+                    periode = periode,
+                    correlationId = correlationId
+                )
+
+                logger.info("legger til behov med løsninger [${HentFordelingGirMeldinger}, ${HentUtvidetRettVedtak}, ${HentOverføringGirMeldinger}, ${HentKoronaOverføringGirMeldinger}]")
+                logger.warn("Løsning på behov [${HentUtvidetRettVedtak}] bør flyttes til 'omsorgspenger-rammevedtak'")
+                val inputHentingAvRammer = mapOf(
+                    "periode" to "$periode",
+                    "identitetsnummer" to identitetsnummer
+                )
+                packet.leggTilBehovMedLøsninger(
+                    aktueltBehov = aktueltBehov,
+                    behovMedLøsninger = arrayOf(
+                        HentFordelingGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, fordelingGirMeldinger),
+                        HentOverføringGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, overføringGirMeldinger),
+                        HentKoronaOverføringGirMeldingerMelding.behovMedLøsning(inputHentingAvRammer, koronaoverføringGirMeldinger),
+                        HentUtvidetRettVedtakMelding.behovMedLøsning(inputHentingAvRammer, utvidetRettVedtak)
+                    )
+                )
+
+                logger.info("Legger til behov $HentOmsorgspengerSaksnummer & ${VurderRelasjonerMelding.VurderRelasjoner}")
+                packet.leggTilBehov(
+                    aktueltBehov = aktueltBehov,
+                    behov = arrayOf(
+                        HentOmsorgspengerSaksnummerMelding.behov(
+                            HentOmsorgspengerSaksnummerMelding.BehovInput(
+                                identitetsnummer = setOf(behovet.fra, behovet.til)
+                            )
+                        ),
+                        VurderRelasjonerMelding.behov(
+                            VurderRelasjonerMelding.BehovInput(
+                                identitetsnummer = behovet.fra,
+                                til = behovet.barn.map { it.identitetsnummer }.toSet()
+                            )
                         )
                     )
                 )
-            )
+            }
         }
         return true
     }
 
-    private fun OverføreKoronaOmsorgsdagerMelding.Behovet.skalBehandles() = mottaksdato.isAfter(behandleMottattEtter)
+    private fun OverføreKoronaOmsorgsdagerMelding.Behovet.erBehandletIInfotrygd() =
+        mottaksdato.year == 2021 && mottaksdato.erFørEllerLik(behandleMottattEtter)
+    private fun OverføreKoronaOmsorgsdagerMelding.Behovet.skalBehandles() =
+        mottaksdato.isAfter(behandleMottattEtter)
 }
