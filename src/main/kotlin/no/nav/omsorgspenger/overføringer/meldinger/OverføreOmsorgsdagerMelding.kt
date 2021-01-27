@@ -158,6 +158,14 @@ internal object OverføreOmsorgsdagerMelding :
             personopplysninger.getValue(saksnummerTilIdentitetsnummer.getValue(sak))
         internal fun identitetsnummer(sak: Saksnummer) =
             personopplysninger(sak).gjeldendeIdentitetsnummer
+        internal companion object {
+            internal val GosysJournalføringsoppgaver = Løsningen(
+                utfall = Utfall.GosysJournalføringsoppgaver,
+                gjeldendeOverføringer = emptyMap(),
+                alleSaksnummerMapping = emptyMap(),
+                personopplysninger = emptyMap()
+            )
+        }
     }
 
     internal enum class Relasjon {

@@ -7,6 +7,7 @@ import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.correlationId
+import no.nav.omsorgspenger.extensions.erFørEllerLik
 import no.nav.omsorgspenger.fordelinger.FordelingService
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding
@@ -25,6 +26,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
+import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -62,19 +64,23 @@ internal class InitierOverføringAvOmsorgsdager(
         }.register(this)
     }
 
-    override fun doHandlePacket(id: String, packet: JsonMessage): Boolean {
-        val behovet = OverføreOmsorgsdagerMelding.hentBehov(packet)
-        return when (behovet.skalBehandles()) {
-            true -> super.doHandlePacket(id, packet)
-            false -> logger.warn("Behandlet i Infotrygd").let { false }
-        }
-    }
-
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         logger.info("InitierOverføringAvOmsorgsdager for $id")
-        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet).also {
-            require(it.skalBehandles())
+        val overføreOmsorgsdager = OverføreOmsorgsdagerMelding.hentBehov(packet)
+
+        if (overføreOmsorgsdager.erBehandletIInfotrygd()) {
+            logger.warn("Er behandlet i Infotrygd.")
+            packet.leggTilLøsningPar(
+                OverføreOmsorgsdagerMelding.løsning(
+                    OverføreOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
+                )
+            )
+            secureLogger.info("SuccessPacket=${packet.toJson()}")
+            return true
         }
+
+        require(overføreOmsorgsdager.skalBehandles())
+
         val periode = overføreOmsorgsdager.overordnetPeriode
         val correlationId = packet.correlationId()
 
@@ -145,6 +151,8 @@ internal class InitierOverføringAvOmsorgsdager(
         return true
     }
 
-    private fun OverføreOmsorgsdagerMelding.Behovet.skalBehandles() = mottaksdato.isAfter(behandleMottattEtter)
-
+    private fun OverføreOmsorgsdagerMelding.Behovet.erBehandletIInfotrygd() =
+        mottaksdato.year == 2021 && mottaksdato.erFørEllerLik(behandleMottattEtter)
+    private fun OverføreOmsorgsdagerMelding.Behovet.skalBehandles() =
+        mottaksdato.isAfter(behandleMottattEtter)
 }
