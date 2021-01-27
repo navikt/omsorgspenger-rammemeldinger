@@ -82,6 +82,7 @@ internal class InitierOverføreKoronaOmsorgsdager(
                         OverføreKoronaOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
                     )
                 )
+                secureLogger.info("SuccessPacket=${packet.toJson()}")
             }
             else -> {
                 require(behovet.skalBehandles())

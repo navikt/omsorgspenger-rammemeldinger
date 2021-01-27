@@ -75,6 +75,7 @@ internal class InitierOverføringAvOmsorgsdager(
                     OverføreOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
                 )
             )
+            secureLogger.info("SuccessPacket=${packet.toJson()}")
             return true
         }
 
