@@ -26,6 +26,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
+import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
@@ -69,9 +70,10 @@ internal class InitierOverføringAvOmsorgsdager(
 
         if (overføreOmsorgsdager.erBehandletIInfotrygd()) {
             logger.warn("Er behandlet i Infotrygd.")
-            packet.leggTilLøsning(
-                behov = OverføreOmsorgsdager,
-                løsning = mapOf("melding" to "Er behandlet i Infotrygd.")
+            packet.leggTilLøsningPar(
+                OverføreOmsorgsdagerMelding.løsning(
+                    OverføreOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
+                )
             )
             return true
         }

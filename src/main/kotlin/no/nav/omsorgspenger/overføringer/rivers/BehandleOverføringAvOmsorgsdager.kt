@@ -188,12 +188,9 @@ internal class BehandleOverføringAvOmsorgsdager(
         if (måBehandlesSomGosysJournalføringsoppgaver) {
             logger.info("Legger til løsning på $OverføreOmsorgsdager")
             packet.leggTilLøsningPar(
-                OverføreOmsorgsdagerMelding.løsning(OverføreOmsorgsdagerMelding.Løsningen(
-                    utfall = Utfall.GosysJournalføringsoppgaver,
-                    gjeldendeOverføringer = mapOf(),
-                    personopplysninger = mapOf(),
-                    alleSaksnummerMapping = mapOf()
-                ))
+                OverføreOmsorgsdagerMelding.løsning(
+                    OverføreOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
+                )
             )
             logger.info("legger til behov [$OpprettGosysJournalføringsoppgaver]")
             packet.leggTilBehovEtter(

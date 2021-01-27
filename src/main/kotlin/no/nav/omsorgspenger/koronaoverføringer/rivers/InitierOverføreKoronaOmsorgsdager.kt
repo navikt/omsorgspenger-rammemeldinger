@@ -77,9 +77,10 @@ internal class InitierOverføreKoronaOmsorgsdager(
             }
             behovet.erBehandletIInfotrygd() -> {
                 logger.warn("Er behandlet i Infotrygd.")
-                packet.leggTilLøsning(
-                    behov = aktueltBehov,
-                    løsning = mapOf("melding" to "Er behandlet i Infotrygd.")
+                packet.leggTilLøsningPar(
+                    OverføreKoronaOmsorgsdagerMelding.løsning(
+                        OverføreKoronaOmsorgsdagerMelding.Løsningen.GosysJournalføringsoppgaver
+                    )
                 )
             }
             else -> {
