@@ -42,19 +42,22 @@ internal class OverføringerApiTest(
 ) {
 
     private val tilgangsstyringMock = mockk<TilgangsstyringRestClient>().also {
-        coEvery { it.sjekkTilgang(setOf("22", "33"), any(), any()) }
+        coEvery { it.sjekkTilgang(setOf("22", "33", "44", "55"), any(), any()) }
                 .returns(true)
     }
 
     private val saksnummerServiceMock = mockk<SaksnummerService>().also {
         every { it.hentSaksnummerIdentitetsnummerMapping(any()) }.returns(mapOf(
-                "101112" to "22",
-                "131415" to "33"
+            "101112" to "22",
+            "131415" to "33",
+            SaksnummerHarOverføringer to "44",
+            SaksnummerHarIkkeOverføringer to "55"
         ))
     }
 
     private val overføringRepositoryMock = mockk<OverføringRepository>().also {
         every { it.hentAktiveOverføringer(setOf(SaksnummerHarIkkeOverføringer)) }.returns(emptyMap())
+        every { it.hentAktiveOverføringer(setOf(SaksnummerIkkeILøsningen)) }.returns(emptyMap())
         every { it.hentAktiveOverføringer(setOf(SaksnummerHarOverføringer)) }.returns(
                 mapOf(SaksnummerHarOverføringer to GjeldendeOverføringer(
                         gitt = listOf(GjeldendeOverføringGitt(
@@ -101,49 +104,50 @@ internal class OverføringerApiTest(
                 @Language("JSON")
                 val forventetResponse = """
                 {
-                 "gitt": [{
-                  "gjennomført": "2020-11-24T17:34:31.227Z",
-                  "til": {
-                   "saksnummer": "101112",
-                   "identitetsnummer": "22"
-                  },
-                  "gjelderFraOgMed": "2020-01-01",
-                  "begrunnelserForPeriode": [
-                   {
-                    "gjelderFraOgMed": "2019-01-01",
-                    "gjelderTilOgMed": "2019-03-05",
-                    "begrunnelser": [
-                     "En to tre § lov",
-                     "Samme periode."
-                    ]
-                   },
-                   {
-                    "gjelderFraOgMed": "2020-02-03",
-                    "gjelderTilOgMed": "2020-05-07",
-                    "begrunnelser": ["By design"]
-                   },
-                   {
-                    "gjelderFraOgMed": "2021-12-30",
-                    "gjelderTilOgMed": "2022-02-02",
-                    "begrunnelser": ["Det var som bare.."]
-                   }
-                  ],
-                  "gjelderTilOgMed": "2020-12-31",
-                  "dagerOverført": 5,
-                  "dagerØnsketOverført": 10,
-                  "status": "Aktiv"
-                 }],
-                 "fått": [{
-                  "gjennomført": "2018-11-24T17:34:31.000Z",
-                  "fra": {
-                   "saksnummer": "131415",
-                   "identitetsnummer": "33"
-                  },
-                  "gjelderFraOgMed": "2019-01-01",
-                  "gjelderTilOgMed": "2019-12-31",
-                  "dagerOverført": 3,
-                  "status": "Aktiv"
-                 }]
+                    "saksnummer": "$SaksnummerHarOverføringer",
+                    "identitetsnummer": "44",
+                    "gitt": [{
+                        "gjennomført": "2020-11-24T17:34:31.227Z",
+                        "til": {
+                            "saksnummer": "101112",
+                            "identitetsnummer": "22"
+                        },
+                        "gjelderFraOgMed": "2020-01-01",
+                        "begrunnelserForPeriode": [{
+                                "gjelderFraOgMed": "2019-01-01",
+                                "gjelderTilOgMed": "2019-03-05",
+                                "begrunnelser": [
+                                    "En to tre § lov",
+                                    "Samme periode."
+                                ]
+                            },
+                            {
+                                "gjelderFraOgMed": "2020-02-03",
+                                "gjelderTilOgMed": "2020-05-07",
+                                "begrunnelser": ["By design"]
+                            },
+                            {
+                                "gjelderFraOgMed": "2021-12-30",
+                                "gjelderTilOgMed": "2022-02-02",
+                                "begrunnelser": ["Det var som bare.."]
+                            }
+                        ],
+                        "gjelderTilOgMed": "2020-12-31",
+                        "dagerOverført": 5,
+                        "dagerØnsketOverført": 10,
+                        "status": "Aktiv"
+                    }],
+                    "fått": [{
+                        "gjennomført": "2018-11-24T17:34:31.000Z",
+                        "fra": {
+                            "saksnummer": "131415",
+                            "identitetsnummer": "33"
+                        },
+                        "gjelderFraOgMed": "2019-01-01",
+                        "gjelderTilOgMed": "2019-12-31",
+                        "dagerOverført": 3,
+                        "status": "Aktiv"
+                    }]
                 }
                 """.trimIndent()
 
@@ -164,12 +168,25 @@ internal class OverføringerApiTest(
                 @Language("JSON")
                 val forventetResponse = """
                 {
+                  "saksnummer": "$SaksnummerHarIkkeOverføringer",
+                  "identitetsnummer": "55",
                   "gitt": [],
                   "fått": []
                 }
                 """.trimIndent()
 
                 JSONAssert.assertEquals(forventetResponse, response.content, true)
+            }
+        }
+    }
+
+    @Test
+    fun `Hent overføringer for et saksnummer som ikke finnes i løsningen`() {
+        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
+            handleRequest(HttpMethod.Get, path(SaksnummerIkkeILøsningen)) {
+                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
+            }.apply {
+                assertEquals(HttpStatusCode.NotFound, response.status())
             }
         }
     }
@@ -200,6 +217,7 @@ internal class OverføringerApiTest(
         private const val Path = "/overforinger"
         private const val SaksnummerHarOverføringer = "123"
         private const val SaksnummerHarIkkeOverføringer = "456"
+        private const val SaksnummerIkkeILøsningen = "404"
 
         private fun path(saksnummer: Saksnummer, status: String = "Aktiv") =
                 "$Path?saksnummer=$saksnummer&status=$status"
