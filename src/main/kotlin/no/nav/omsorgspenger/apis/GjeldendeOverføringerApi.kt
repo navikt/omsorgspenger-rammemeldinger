@@ -25,6 +25,10 @@ internal fun Route.GjeldendeOverføringerApi(
     saksnummerService: SaksnummerService,
     tilgangsstyringRestClient: TilgangsstyringRestClient) {
 
+    fun Saksnummer.identitetsnummerOrNull() = saksnummerService.hentSaksnummerIdentitetsnummerMapping(
+        saksnummer = setOf(this)
+    )[this]
+
     get(path) {
         val saksnummer = try {
             call.støtterKunAktiv()
@@ -42,7 +46,11 @@ internal fun Route.GjeldendeOverføringerApi(
         )
 
         if (overføringer.isEmpty()) {
-            call.respondJson(json = """{"fått":[],"gitt":[]}""")
+            val identitetsnummer = saksnummer.identitetsnummerOrNull()
+            when (identitetsnummer) {
+                null -> call.respond(HttpStatusCode.NotFound)
+                else -> call.respondJson(json = """{"saksnummer":"$saksnummer", "identitetsnummer": "$identitetsnummer", "fått":[],"gitt":[]}""")
+            }
             return@get
         }
 
@@ -63,7 +71,10 @@ internal fun Route.GjeldendeOverføringerApi(
         }
 
         call.respondJson(
-            json = overføringer.getValue(saksnummer).somJson(saksnummerIdentitetsnummerMapping)
+            json = overføringer.getValue(saksnummer).somJson(
+                aktueltSaksnummer = saksnummer,
+                mapping = saksnummerIdentitetsnummerMapping
+            )
         )
     }
 }
@@ -77,7 +88,9 @@ private suspend fun ApplicationCall.respondJson(
     text = json
 )
 
-private fun GjeldendeOverføringer.somJson(mapping: Map<Saksnummer, Identitetsnummer>) = JSONObject().also { root ->
+private fun GjeldendeOverføringer.somJson(aktueltSaksnummer: Saksnummer, mapping: Map<Saksnummer, Identitetsnummer>) = JSONObject().also { root ->
+    root.put("saksnummer", aktueltSaksnummer)
+    root.put("identitetsnummer", mapping.getValue(aktueltSaksnummer))
     root.put("fått", fått.fåttSomJson(mapping))
     root.put("gitt", gitt.gittSomJson(mapping))
 }.toString()
