@@ -20,6 +20,8 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
+import no.nav.helse.dusseldorf.ktor.core.FullførAktiveRequester
+import no.nav.helse.dusseldorf.ktor.core.PreStopRoute
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
@@ -160,8 +162,15 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         multipleJwtIssuers(accessAsApplicationIssuers.plus(accessAsPersonIssuers))
     }
 
+    val fullførAktiveRequester = FullførAktiveRequester(
+        application = this
+    )
+
     routing {
         HealthRoute(healthService = applicationContext.healthService)
+        PreStopRoute(
+            preStopActions = listOf(fullførAktiveRequester)
+        )
 
         authenticate(*accessAsApplicationIssuers.allIssuers()) {
             SpleisetOverføringerApi(
