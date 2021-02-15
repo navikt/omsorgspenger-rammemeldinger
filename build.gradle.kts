@@ -8,7 +8,7 @@ val mockkVersion = "1.10.5"
 val ulidVersion = "8.2.0"
 val ktorVersion = "1.5.1"
 val assertjVersion = "3.19.0"
-val dusseldorfVersion = "1.5.1.fa7db77"
+val dusseldorfVersion = "1.5.1.870aa75"
 val schemaValidatorVersion = "1.0.48"
 
 // Database
@@ -34,6 +34,7 @@ dependencies {
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
