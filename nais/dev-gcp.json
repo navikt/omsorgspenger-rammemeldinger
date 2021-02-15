@@ -1,7 +1,7 @@
 {
   "cluster": "dev-gcp",
-  "minReplicas": "1",
-  "maxReplicas": "2",
+  "minReplicas": "2",
+  "maxReplicas": "4",
   "ingresses": [
     "https://omsorgspenger-rammemeldinger.dev.intern.nav.no"
   ],
