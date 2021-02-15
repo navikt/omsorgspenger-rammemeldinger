@@ -6,13 +6,13 @@ val k9rapidVersion = "1.0e6a99e"
 val awaitilityVersion = "4.0.3"
 val mockkVersion = "1.10.5"
 val ulidVersion = "8.2.0"
-val ktorVersion = "1.5.0"
+val ktorVersion = "1.5.1"
 val assertjVersion = "3.19.0"
-val dusseldorfVersion = "1.5.1.9b0fee0"
-val schemaValidatorVersion = "1.0.47"
+val dusseldorfVersion = "1.5.1.fa7db77"
+val schemaValidatorVersion = "1.0.48"
 
 // Database
-val flywayVersion = "7.5.2"
+val flywayVersion = "7.5.3"
 val hikariVersion = "4.0.1"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.18"
@@ -21,7 +21,7 @@ val embeddedPostgres = "1.2.10"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.4.30"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
@@ -77,7 +77,6 @@ repositories {
         }
     }
     mavenCentral()
-    jcenter()
     maven("https://dl.bintray.com/kotlin/ktor")
 }
 
@@ -103,7 +102,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "6.8.1"
+        gradleVersion = "6.8.2"
     }
 
 }
