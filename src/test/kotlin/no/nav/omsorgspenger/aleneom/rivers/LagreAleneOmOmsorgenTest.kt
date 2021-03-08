@@ -25,7 +25,7 @@ import java.util.*
 import javax.sql.DataSource
 
 @ExtendWith(DataSourceExtension::class)
-internal class GosysKoronaOverføringerTest(
+internal class LagreAleneOmOmsorgenTest(
     dataSource: DataSource) {
     private val applicationContext = TestApplicationContextBuilder(
         dataSource = dataSource.cleanAndMigrate()
