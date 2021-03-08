@@ -24,6 +24,8 @@ import no.nav.helse.dusseldorf.ktor.core.FullførAktiveRequester
 import no.nav.helse.dusseldorf.ktor.core.preStopOnApplicationStopPreparing
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
+import no.nav.omsorgspenger.aleneom.rivers.InitierAleneOmOmsorgen
+import no.nav.omsorgspenger.aleneom.rivers.LagreAleneOmOmsorgen
 import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.apis.KoronaOverføringerApi
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerApi
@@ -80,6 +82,18 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     registerOverføreKoronaOmsorgsdager(
         applicationContext = applicationContext
     )
+
+    InitierAleneOmOmsorgen(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository
+    )
+
+    LagreAleneOmOmsorgen(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService
+    )
+
     register(object : RapidsConnection.StatusListener {
         override fun onStartup(rapidsConnection: RapidsConnection) {
             applicationContext.start()

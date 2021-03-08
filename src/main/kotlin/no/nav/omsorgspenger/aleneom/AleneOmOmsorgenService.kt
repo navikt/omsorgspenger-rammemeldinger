@@ -33,6 +33,18 @@ internal class AleneOmOmsorgenService(
         registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.KoronaOverføring
     )
 
+    internal fun lagreIForbindelseMedAleneOmOmsorgen(
+        behovssekvensId: BehovssekvensId,
+        saksnummer: Saksnummer,
+        dato: LocalDate,
+        aleneOmOmsorgenFor: List<AleneOmOmsorgen.Barn>) = lagre(
+        behovssekvensId = behovssekvensId,
+        saksnummer = saksnummer,
+        dato = dato,
+        aleneOmOmsorgenFor = aleneOmOmsorgenFor,
+        registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.AleneOmOmsorgen
+    )
+
     private fun lagre(
         behovssekvensId: BehovssekvensId,
         saksnummer: Saksnummer,
