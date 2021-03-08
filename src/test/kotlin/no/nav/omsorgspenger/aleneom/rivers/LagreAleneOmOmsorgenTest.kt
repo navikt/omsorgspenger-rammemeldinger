@@ -3,7 +3,7 @@ package no.nav.omsorgspenger.aleneom.rivers
 import de.huxhorn.sulky.ulid.ULID
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import no.nav.k9.rapid.behov.Behov
+import no.nav.k9.rapid.behov.AleneOmOmsorgenBehov
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.*
@@ -50,17 +50,16 @@ internal class GosysKoronaOverføringerTest(
         val (id, behovssekvens) = Behovssekvens(
             id = ULID().nextULID(),
             correlationId = "${UUID.randomUUID()}",
-            behov = arrayOf(Behov(
-                navn = "AleneOmOmsorgen",
-                input = mapOf(
-                    "versjon" to "1.0.0",
-                    "identitetsnummer" to identitetsnummer,
-                    "mottaksdato" to "2020-12-15",
-                    "barn" to listOf<Map<String, Any?>>(
-                        mapOf("identitetsnummer" to barn1, "fødselsdato" to "2003-04-12"),
-                        mapOf("identitetsnummer" to barn2, "fødselsdato" to "2009-12-12")
-                    )
-                )
+            behov = arrayOf(AleneOmOmsorgenBehov(
+                identitetsnummer = identitetsnummer,
+                mottaksdato = LocalDate.parse("2020-12-15"),
+                barn = listOf(AleneOmOmsorgenBehov.Barn(
+                    identitetsnummer = barn2,
+                    fødselsdato = LocalDate.parse("2009-12-12")
+                ), AleneOmOmsorgenBehov.Barn(
+                    identitetsnummer = barn1,
+                    fødselsdato = LocalDate.parse("2003-04-12")
+                ))
             ))
         ).keyValue
 

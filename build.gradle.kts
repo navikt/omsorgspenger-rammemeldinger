@@ -51,6 +51,8 @@ dependencies {
     testImplementation("no.nav.k9.rapid:midlertidig-alene:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:overfore-korona-omsorgsdager:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:fordele-omsorgsdager:$k9rapidVersion")
+    testImplementation("no.nav.k9.rapid:alene-om-omsorgen:$k9rapidVersion")
+
 
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
