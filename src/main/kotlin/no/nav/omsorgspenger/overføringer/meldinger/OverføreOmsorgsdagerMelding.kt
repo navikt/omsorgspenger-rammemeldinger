@@ -15,6 +15,7 @@ import no.nav.omsorgspenger.overføringer.Barn.Companion.somBarn
 import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.rivers.HentBehov
 import no.nav.omsorgspenger.rivers.LeggTilLøsning
+import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
@@ -146,6 +147,15 @@ internal object OverføreOmsorgsdagerMelding :
                 }
             }
         }
+
+        internal fun somOpprettGosysJournalføringsoppgaverBehov() = OpprettGosysJournalføringsoppgaverMelding.behov(
+            behovInput = OpprettGosysJournalføringsoppgaverMelding.BehovInput(
+                identitetsnummer = overførerFra,
+                berørteIdentitetsnummer = setOf(overførerTil).plus(barn.map { it.identitetsnummer }),
+                journalpostIder = journalpostIder,
+                journalpostType = "OverføreOmsorgsdager"
+            )
+        )
     }
 
     internal data class Løsningen(

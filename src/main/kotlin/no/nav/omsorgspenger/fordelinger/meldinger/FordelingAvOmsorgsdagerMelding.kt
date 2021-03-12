@@ -7,6 +7,7 @@ import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.JournalpostId
 import no.nav.omsorgspenger.rivers.HentBehov
 import no.nav.omsorgspenger.rivers.LeggTilLøsning
+import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
 import java.time.ZonedDateTime
 
 internal object FordelingAvOmsorgsdagerMelding :
@@ -46,8 +47,16 @@ internal object FordelingAvOmsorgsdagerMelding :
         val fra:  Identitetsnummer,
         val til: Identitetsnummer,
         val barn: List<Identitetsnummer>,
-        val journalpostIder: Set<JournalpostId>
-    )
+        val journalpostIder: Set<JournalpostId>) {
+        internal fun somOpprettGosysJournalføringsoppgaverBehov() = OpprettGosysJournalføringsoppgaverMelding.behov(
+            behovInput = OpprettGosysJournalføringsoppgaverMelding.BehovInput(
+                identitetsnummer = fra,
+                berørteIdentitetsnummer = setOf(til).plus(barn),
+                journalpostIder = journalpostIder,
+                journalpostType = "FordeleOmsorgsdager"
+            )
+        )
+    }
 
     internal class Løsningen
 

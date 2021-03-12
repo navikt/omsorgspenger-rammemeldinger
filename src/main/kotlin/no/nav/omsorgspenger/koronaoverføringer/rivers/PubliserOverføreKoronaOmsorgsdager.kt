@@ -14,6 +14,7 @@ import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgs
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerPersonopplysningerMelding.fellesEnhet
+import no.nav.omsorgspenger.overføringer.OverføringLogg.gjennomførtOverføring
 import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
@@ -67,15 +68,22 @@ internal class PubliserOverføreKoronaOmsorgsdager(
             )
         ))
 
-        Formidling.opprettMeldingsbestillinger(
+        val meldingsbestillingerSendt = Formidling.opprettMeldingsbestillinger(
             behovssekvensId = id,
             personopplysninger = personopplysninger,
             behovet = behovet,
             behandling = behandling
-        ).also { when {
-            it.isEmpty() -> secureLogger.warn("Melding(er) må sendes manuelt.")
-            else -> formidlingService.sendMeldingsbestillinger(it)
+        ).let { when {
+            it.isEmpty() -> secureLogger.warn("Melding(er) må sendes manuelt.").let { false }
+            else -> formidlingService.sendMeldingsbestillinger(it).let { true }
         }}
+
+        secureLogger.gjennomførtOverføring(
+            fra = behovet.fra,
+            til = behovet.til,
+            type = "korona",
+            meldingsbestillingerSendt = meldingsbestillingerSendt
+        )
 
         packet.leggTilBehovEtter(
             aktueltBehov = aktueltBehov,

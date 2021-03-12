@@ -65,6 +65,7 @@ internal fun JSONObject.assertGosysJournalføringsoppgave(
     behovssekvensId: BehovssekvensId,
     fra: Identitetsnummer,
     til: Identitetsnummer,
+    barn: Identitetsnummer,
     journalpostId: JournalpostId,
     forventetLøsninger: List<String> = listOf("OverføreKoronaOmsorgsdager")
 ) {
@@ -76,7 +77,7 @@ internal fun JSONObject.assertGosysJournalføringsoppgave(
     val forventetBehovInput = """
             {
              "identitetsnummer": "$fra",
-             "berørteIdentitetsnummer": ["$til"],
+             "berørteIdentitetsnummer": ["$til", "$barn"],
              "journalpostType": "OverføreKoronaOmsorgsdager",
              "journalpostIder": ["$journalpostId"]
             }

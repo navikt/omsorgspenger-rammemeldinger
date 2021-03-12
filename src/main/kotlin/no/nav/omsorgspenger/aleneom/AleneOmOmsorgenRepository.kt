@@ -14,7 +14,8 @@ internal class AleneOmOmsorgenRepository(
 
     internal enum class RegistreresIForbindelseMed {
         Overføring,
-        KoronaOverføring
+        KoronaOverføring,
+        AleneOmOmsorgen
     }
 
     internal fun lagre(

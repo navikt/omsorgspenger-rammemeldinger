@@ -8,6 +8,7 @@ import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.formidling.FormidlingService
 import no.nav.omsorgspenger.overføringer.*
+import no.nav.omsorgspenger.overføringer.OverføringLogg.gjennomførtOverføring
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
 import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
@@ -89,15 +90,22 @@ internal class PubliserOverføringAvOmsorgsdager (
             )
         )
 
-        opprettMeldingsBestillinger(
+        val meldingsbestillingerSendt = opprettMeldingsBestillinger(
             behovssekvensId = id,
             personopplysninger = personopplysninger,
             overføreOmsorgsdager = overføreOmsorgsdager,
             behandling = behandling
-        ).also { when {
-            it.isEmpty() -> secureLogger.warn("Melding(er) må sendes manuelt. Packet=${packet.toJson()}")
-            else -> formidlingService.sendMeldingsbestillinger(it)
+        ).let { when {
+            it.isEmpty() -> secureLogger.warn("Melding(er) må sendes manuelt. Packet=${packet.toJson()}").let { false }
+            else -> formidlingService.sendMeldingsbestillinger(it).let { true }
         }}
+
+        secureLogger.gjennomførtOverføring(
+            fra = overføreOmsorgsdager.overførerFra,
+            til = overføreOmsorgsdager.overførerTil,
+            type = "ordinær",
+            meldingsbestillingerSendt = meldingsbestillingerSendt
+        )
 
         val berørteIdentitetsnummer = behandling.alleSaksnummerMapping.filterValues { it in behandling.berørteSaksnummer }.keys
         val berørtePersonopplysninger = personopplysninger.filterKeys { it in berørteIdentitetsnummer }

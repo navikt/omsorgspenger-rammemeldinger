@@ -34,13 +34,15 @@ internal class KoronaOverføringPåVentTest(
     fun `Søknad for 2020 blir sendt som Gosysoppgave`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
+        val barn = koronaBarn()
 
         val (id, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
             fra = fra,
             til = til,
             omsorgsdagerÅOverføre = 10,
             periode = Periode("2020-06-01/2020-12-31"),
-            journalpostIder = listOf("12345")
+            journalpostIder = listOf("12345"),
+            barn = listOf(barn)
         )
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
@@ -48,6 +50,7 @@ internal class KoronaOverføringPåVentTest(
             behovssekvensId = id,
             fra = fra,
             til = til,
+            barn = barn.identitetsnummer,
             journalpostId = "12345"
         )
     }

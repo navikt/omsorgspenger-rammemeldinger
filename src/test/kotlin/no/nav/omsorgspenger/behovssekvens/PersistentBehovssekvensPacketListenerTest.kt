@@ -4,8 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
-import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Test
@@ -20,8 +20,8 @@ internal class PersistentBehovssekvensPacketListenerTest(
     private val workMock = mockk<Work>().also {
         every { it.doWork() }.returns(Unit)
     }
-    private val messageContextMock = mockk<RapidsConnection.MessageContext>().also {
-        every { it.send(any(), any()) }.returns(Unit)
+    private val messageContextMock = mockk<MessageContext>().also {
+        every { it.publish(any(), any()) }.returns(Unit)
     }
     private val packetListener1 = WorkPacketListener(
         dataSource = dataSource.cleanAndMigrate(),
@@ -61,7 +61,7 @@ internal class PersistentBehovssekvensPacketListenerTest(
 
     private fun gjortNganger(n: Int) {
         verify(exactly = n) { workMock.doWork() }
-        verify(exactly = n) { messageContextMock.send(any(), any())}
+        verify(exactly = n) { messageContextMock.publish(any(), any())}
     }
 
     private companion object {
