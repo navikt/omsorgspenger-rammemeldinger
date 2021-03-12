@@ -37,7 +37,7 @@ internal object OverføreKoronaOmsorgsdagerMelding :
         internal fun somOpprettGosysJournalføringsoppgaverBehov() = OpprettGosysJournalføringsoppgaverMelding.behov(
             behovInput = OpprettGosysJournalføringsoppgaverMelding.BehovInput(
                 identitetsnummer = fra,
-                berørteIdentitetsnummer = setOf(til),
+                berørteIdentitetsnummer = setOf(til).plus(barn.map { it.identitetsnummer }),
                 journalpostIder = journalpostIder,
                 journalpostType = "OverføreKoronaOmsorgsdager"
             )

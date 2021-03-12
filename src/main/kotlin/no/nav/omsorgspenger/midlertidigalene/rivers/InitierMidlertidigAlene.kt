@@ -38,14 +38,7 @@ internal class InitierMidlertidigAlene(
 
         logger.info("Legger til behovet ${OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver}")
 
-        packet.leggTilBehovEtter(MidlertidigAleneMelding.MidlertidigAlene, OpprettGosysJournalføringsoppgaverMelding.behov(
-            OpprettGosysJournalføringsoppgaverMelding.BehovInput(
-                identitetsnummer = behovet.søker,
-                berørteIdentitetsnummer = setOf(behovet.annenForelder),
-                journalpostIder = behovet.journalpostIder,
-                journalpostType = "MidlertidigAlene"
-            )
-        ))
+        packet.leggTilBehovEtter(MidlertidigAleneMelding.MidlertidigAlene, behovet.somOpprettGosysJournalføringsoppgaverBehov())
 
         return true
     }

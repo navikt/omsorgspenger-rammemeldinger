@@ -38,14 +38,7 @@ internal class InitierFordelingAvOmsorgsdager(
 
         logger.info("Legger til behovet ${OpprettGosysJournalføringsoppgaverMelding.OpprettGosysJournalføringsoppgaver}")
 
-        packet.leggTilBehovEtter(FordelingAvOmsorgsdager, OpprettGosysJournalføringsoppgaverMelding.behov(
-            OpprettGosysJournalføringsoppgaverMelding.BehovInput(
-                identitetsnummer = behovet.fra,
-                berørteIdentitetsnummer = setOf(behovet.til).plus(behovet.barn),
-                journalpostIder = behovet.journalpostIder,
-                journalpostType = "FordeleOmsorgsdager"
-            )
-        ))
+        packet.leggTilBehovEtter(FordelingAvOmsorgsdager, behovet.somOpprettGosysJournalføringsoppgaverBehov())
 
         return true
     }

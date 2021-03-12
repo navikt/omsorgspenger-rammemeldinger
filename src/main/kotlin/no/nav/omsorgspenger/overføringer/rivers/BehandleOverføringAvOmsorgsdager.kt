@@ -195,16 +195,7 @@ internal class BehandleOverføringAvOmsorgsdager(
             logger.info("legger til behov [$OpprettGosysJournalføringsoppgaver]")
             packet.leggTilBehovEtter(
                 aktueltBehov = OverføreOmsorgsdager,
-                behov = arrayOf(
-                    OpprettGosysJournalføringsoppgaverMelding.behov(
-                        OpprettGosysJournalføringsoppgaverMelding.BehovInput(
-                            identitetsnummer = overføreOmsorgsdager.overførerFra,
-                            berørteIdentitetsnummer = setOf(overføreOmsorgsdager.overførerTil),
-                            journalpostIder = overføreOmsorgsdager.journalpostIder,
-                            journalpostType = "OverføreOmsorgsdager"
-                        )
-                    )
-                )
+                behov = arrayOf(overføreOmsorgsdager.somOpprettGosysJournalføringsoppgaverBehov())
             )
             secureLogger.info("SuccessPacket=${packet.toJson()}")
         } else {

@@ -36,13 +36,15 @@ internal class GosysKoronaOverføringerTest(
     fun `Annen periode enn støttet blir til Gosys journalføringsoppgaver`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
+        val barn = koronaBarn()
 
         val (id, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
             fra = fra,
             til = til,
             omsorgsdagerÅOverføre = 10,
             periode = Periode("2020-06-01/2020-12-31"),
-            journalpostIder = listOf("88124")
+            journalpostIder = listOf("88124"),
+            barn = listOf(barn)
         )
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
@@ -50,6 +52,7 @@ internal class GosysKoronaOverføringerTest(
             behovssekvensId = id,
             fra = fra,
             til = til,
+            barn = barn.identitetsnummer,
             journalpostId = "88124"
         )
     }
@@ -58,13 +61,15 @@ internal class GosysKoronaOverføringerTest(
     fun `Svart at man ikke jobber i Norge blir til Gosys journalføringsoppgaver`() {
         val fra = IdentitetsnummerGenerator.identitetsnummer()
         val til = IdentitetsnummerGenerator.identitetsnummer()
+        val barn = koronaBarn()
 
         val (id, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
             fra = fra,
             til = til,
             omsorgsdagerÅOverføre = 10,
             jobberINorge = false,
-            journalpostIder = listOf("88126")
+            journalpostIder = listOf("88126"),
+            barn = listOf(barn)
         )
         rapid.sendTestMessage(behovssekvens)
         rapid.ventPå(1)
@@ -72,6 +77,7 @@ internal class GosysKoronaOverføringerTest(
             behovssekvensId = id,
             fra = fra,
             til = til,
+            barn = barn.identitetsnummer,
             journalpostId = "88126"
         )
     }
@@ -108,6 +114,7 @@ internal class GosysKoronaOverføringerTest(
             behovssekvensId = id,
             fra = fra,
             til = til,
+            barn = barnet.identitetsnummer,
             journalpostId = "88127",
             forventetLøsninger = listOf(
                 "HentFordelingGirMeldinger",
