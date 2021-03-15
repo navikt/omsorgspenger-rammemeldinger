@@ -19,6 +19,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersono
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.fellesEnhet
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
+import no.nav.omsorgspenger.rivers.meldinger.SendMeldingerManueltMelding
 import no.nav.omsorgspenger.statistikk.StatistikkMelding
 import no.nav.omsorgspenger.statistikk.StatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
@@ -77,15 +78,12 @@ internal class PubliserOverføringAvOmsorgsdager (
             ))
         )
 
-        packet.leggTilBehovEtter(
-            aktueltBehov = OverføreOmsorgsdager,
-            behov = arrayOf(
-                FerdigstillJournalføringForOmsorgspengerMelding.behov(
-                    FerdigstillJournalføringForOmsorgspengerMelding.BehovInput(
-                        identitetsnummer = overføreOmsorgsdager.overførerFra,
-                        journalpostIder = overføreOmsorgsdager.journalpostIder,
-                        saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra)
-                    )
+        val behovEtter = mutableListOf(
+            FerdigstillJournalføringForOmsorgspengerMelding.behov(
+                FerdigstillJournalføringForOmsorgspengerMelding.BehovInput(
+                    identitetsnummer = overføreOmsorgsdager.overførerFra,
+                    journalpostIder = overføreOmsorgsdager.journalpostIder,
+                    saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra)
                 )
             )
         )
@@ -96,7 +94,10 @@ internal class PubliserOverføringAvOmsorgsdager (
             overføreOmsorgsdager = overføreOmsorgsdager,
             behandling = behandling
         ).let { when {
-            it.isEmpty() -> secureLogger.warn("Melding(er) må sendes manuelt. Packet=${packet.toJson()}").let { false }
+            it.isEmpty() -> {
+                secureLogger.warn("Melding(er) må sendes manuelt.").let { false }
+                behovEtter.add(SendMeldingerManueltMelding.behov(OverføreOmsorgsdager))
+            }
             else -> formidlingService.sendMeldingsbestillinger(it).let { true }
         }}
 
@@ -105,6 +106,11 @@ internal class PubliserOverføringAvOmsorgsdager (
             til = overføreOmsorgsdager.overførerTil,
             type = "ordinær",
             meldingsbestillingerSendt = meldingsbestillingerSendt
+        )
+
+        packet.leggTilBehovEtter(
+            aktueltBehov = OverføreOmsorgsdager,
+            behov = behovEtter.toTypedArray()
         )
 
         val berørteIdentitetsnummer = behandling.alleSaksnummerMapping.filterValues { it in behandling.berørteSaksnummer }.keys
