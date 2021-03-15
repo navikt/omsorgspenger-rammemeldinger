@@ -5,7 +5,6 @@ import com.zaxxer.hikari.HikariDataSource
 import no.nav.k9.rapid.river.Environment
 import no.nav.k9.rapid.river.hentRequiredEnv
 import org.flywaydb.core.Flyway
-import org.slf4j.LoggerFactory
 import javax.sql.DataSource
 
 internal class DataSourceBuilder(env: Environment) {
@@ -28,21 +27,7 @@ internal class DataSourceBuilder(env: Environment) {
         driverClassName = "org.postgresql.Driver"
     }
 
-    internal fun build(): DataSource = kotlin.runCatching {
-        HikariDataSource(hikariConfig)
-    }.fold(
-        onSuccess = { it },
-        onFailure = { cause ->
-            "Feil ved opprettelse av DataSource".let { error ->
-                secureLogger.error(error, cause)
-                throw IllegalStateException("$error. Se secure logs for detaljer")
-            }
-        }
-    )
-
-    private companion object {
-        private val secureLogger = LoggerFactory.getLogger("tjenestekall")
-    }
+    internal fun build() = HikariDataSource(hikariConfig)
 }
 
 internal fun DataSource.migrate() {
