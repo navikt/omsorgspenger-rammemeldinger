@@ -3,7 +3,6 @@ package no.nav.omsorgspenger.overføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.river.*
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
@@ -20,7 +19,7 @@ import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersono
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.HentPersonopplysninger
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.fellesEnhet
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
-import no.nav.omsorgspenger.rivers.meldinger.SendMeldingManueltMelding
+import no.nav.omsorgspenger.rivers.meldinger.SendMeldingerManueltMelding
 import no.nav.omsorgspenger.statistikk.StatistikkMelding
 import no.nav.omsorgspenger.statistikk.StatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
@@ -97,7 +96,7 @@ internal class PubliserOverføringAvOmsorgsdager (
         ).let { when {
             it.isEmpty() -> {
                 secureLogger.warn("Melding(er) må sendes manuelt.").let { false }
-                behovEtter.add(SendMeldingManueltMelding.behov(OverføreOmsorgsdager))
+                behovEtter.add(SendMeldingerManueltMelding.behov(OverføreOmsorgsdager))
             }
             else -> formidlingService.sendMeldingsbestillinger(it).let { true }
         }}

@@ -18,7 +18,7 @@ import no.nav.omsorgspenger.overføringer.OverføringLogg.gjennomførtOverførin
 import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
-import no.nav.omsorgspenger.rivers.meldinger.SendMeldingManueltMelding
+import no.nav.omsorgspenger.rivers.meldinger.SendMeldingerManueltMelding
 import no.nav.omsorgspenger.statistikk.StatistikkMelding
 import no.nav.omsorgspenger.statistikk.StatistikkService
 import org.slf4j.LoggerFactory
@@ -85,7 +85,7 @@ internal class PubliserOverføreKoronaOmsorgsdager(
         ).let { when {
             it.isEmpty() -> {
                 secureLogger.warn("Melding(er) må sendes manuelt.").let { false }
-                behovEtter.add(SendMeldingManueltMelding.behov(OverføreKoronaOmsorgsdagerMelding.OverføreKoronaOmsorgsdager))
+                behovEtter.add(SendMeldingerManueltMelding.behov(OverføreKoronaOmsorgsdagerMelding.OverføreKoronaOmsorgsdager))
             }
             else -> formidlingService.sendMeldingsbestillinger(it).let { true }
         }}
