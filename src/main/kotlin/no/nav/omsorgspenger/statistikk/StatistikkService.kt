@@ -9,13 +9,9 @@ internal interface StatistikkService {
 
 internal class KafkaStatistikkService(
         private val kafkaProducer: KafkaProducer<String, String>,
-        private val topic: String = "aapen-omsorgspengerRammemeldinger-statistikk-v1",
-        private val enabled: Boolean) : StatistikkService {
+        private val topic: String = "aapen-omsorgspengerRammemeldinger-statistikk-v1") : StatistikkService {
 
     override fun publiser(statistikkMelding: StatistikkMelding) {
-        if(!enabled) {
-            return
-        }
         kafkaProducer.send(ProducerRecord(topic, statistikkMelding.toJson()))
     }
 }

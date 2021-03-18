@@ -10,7 +10,6 @@ import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.k9.rapid.river.Environment
 import no.nav.k9.rapid.river.KafkaBuilder.kafkaProducer
 import no.nav.k9.rapid.river.csvTilSet
-import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
@@ -119,8 +118,7 @@ internal class ApplicationContext(
             )
 
             val benyttetStatistikkService = statistikkService ?: KafkaStatistikkService(
-                kafkaProducer = benyttetKafkaProducer,
-                enabled = benyttetEnv.hentOptionalEnv("SEND_STATISTIKK") == "enabled"
+                kafkaProducer = benyttetKafkaProducer
             )
 
             val benyttetAleneOmOmsorgenRepository = aleneOmOmsorgenRepository ?: AleneOmOmsorgenRepository(
