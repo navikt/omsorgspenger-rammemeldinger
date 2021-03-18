@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.koronaoverføringer.rivers.KoronaoverføringerRapidVerktøy.gjennomførKoronaOverføring
+import no.nav.omsorgspenger.koronaoverføringer.rivers.KoronaoverføringerRapidVerktøy.opphørKoronaoverføringer
 import no.nav.omsorgspenger.overføringer.apis.Motpart
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringFått
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
@@ -95,6 +96,26 @@ internal class OpphøreKoronaOverføringerTest(
                 forventetFått(fra = mor, periode = Ut2021, antallDager = 5)
 
             ))
+        }
+
+        rapid.opphørKoronaoverføringer(
+            fra = mor,
+            til = far,
+            fraOgMed = IDag
+        )
+
+        hent(mor).also {
+            assertThat(it.gitt).isEmpty()
+            assertThat(it.fått).hasSameElementsAs(setOf(
+                forventetFått(fra = far, periode = Ut2021, antallDager = 4)
+            ))
+        }
+
+        hent(far).also {
+            assertThat(it.gitt).hasSameElementsAs(setOf(
+                forventetGitt(til = mor, periode = Ut2021, antallDager = 4),
+            ))
+            assertThat(it.fått).isEmpty()
         }
 
     }

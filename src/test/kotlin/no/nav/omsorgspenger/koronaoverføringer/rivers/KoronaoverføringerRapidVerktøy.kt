@@ -1,13 +1,21 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
+import de.huxhorn.sulky.ulid.ULID
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import no.nav.k9.rapid.behov.Behov
+import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.OverføreKoronaOmsorgsdagerBehov
 import no.nav.k9.rapid.losning.OverføreKoronaOmsorgsdagerLøsning
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
+import no.nav.omsorgspenger.testutils.sisteMeldingSomJSONObject
 import no.nav.omsorgspenger.testutils.ventPå
+import org.junit.jupiter.api.Assertions.assertNotNull
+import java.time.LocalDate
+import java.time.ZonedDateTime
+import java.util.*
 
 internal object KoronaoverføringerRapidVerktøy {
 
@@ -54,7 +62,30 @@ internal object KoronaoverføringerRapidVerktøy {
     }
 
 
-    internal fun TestRapid.opphørKoronaoverføringer() {
+    internal fun TestRapid.opphørKoronaoverføringer(
+        fra: Saksnummer, til: Saksnummer, fraOgMed: LocalDate) {
+        val (_, behovssekvens) = Behovssekvens(
+            id = ULID().nextULID(),
+            correlationId = "${UUID.randomUUID()}",
+            behov = arrayOf(Behov(
+                navn = "OpphøreKoronaOverføringer",
+                input = mapOf(
+                    "fraOgMed" to "$fraOgMed",
+                    "fra" to mapOf(
+                        "saksnummer" to fra
+                    ),
+                    "til" to mapOf(
+                        "saksnummer" to til
+                    )
+                )
+            ))
+        ).keyValue
 
+        sendTestMessage(behovssekvens)
+        ventPå(1)
+        val løst = sisteMeldingSomJSONObject().getJSONObject("@løsninger").getJSONObject("OpphøreKoronaOverføringer").getString("løst").let {
+            ZonedDateTime.parse(it)
+        }
+        assertNotNull(løst)
     }
 }
