@@ -20,8 +20,7 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
-import no.nav.helse.dusseldorf.ktor.core.FullførAktiveRequester
-import no.nav.helse.dusseldorf.ktor.core.preStopOnApplicationStopPreparing
+import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.aleneom.rivers.InitierAleneOmOmsorgen
@@ -148,19 +147,15 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     }
 
     install(CallId) {
-        retrieve { when {
-            it.request.headers.contains(HttpHeaders.XCorrelationId) -> it.request.header(HttpHeaders.XCorrelationId)
-            it.request.headers.contains("Nav-Call-Id") -> it.request.header("Nav-Call-Id")
-            else -> "rammemeldinger-${UUID.randomUUID()}"
-        }}
+        fromFirstNonNullHeader(
+            headers = listOf(HttpHeaders.XCorrelationId, "Nav-Call-Id"),
+            generateOnNotSet = true
+        )
     }
 
     install(CallLogging) {
-        val ignorePaths = setOf("/isalive", "/isready", "/metrics")
-        level = Level.INFO
-        logger = log
-        filter { call -> !ignorePaths.contains(call.request.path().toLowerCase()) }
-        callIdMdc("correlation_id")
+        logRequests()
+        correlationIdAndRequestIdInMdc()
         callIdMdc("callId")
     }
 

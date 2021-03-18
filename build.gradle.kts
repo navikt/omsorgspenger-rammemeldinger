@@ -1,14 +1,15 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.7.1"
 val jsonassertVersion = "1.5.0"
 val k9rapidVersion = "1.db39724"
 val awaitilityVersion = "4.0.3"
-val mockkVersion = "1.10.6"
+val mockkVersion = "1.11.0"
 val ulidVersion = "8.2.0"
 val ktorVersion = "1.5.2"
 val assertjVersion = "3.19.0"
-val dusseldorfVersion = "1.5.2.7462190"
+val dusseldorfVersion = "1.5.2.fa18872"
 val schemaValidatorVersion = "1.0.49"
 
 // Database
@@ -84,6 +85,13 @@ repositories {
 }
 
 tasks {
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "12"
+    }
+
+    named<KotlinCompile>("compileTestKotlin") {
+        kotlinOptions.jvmTarget = "12"
+    }
 
     withType<Test> {
         useJUnitPlatform()
