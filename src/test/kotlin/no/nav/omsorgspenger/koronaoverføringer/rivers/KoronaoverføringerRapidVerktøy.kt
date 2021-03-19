@@ -10,6 +10,7 @@ import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
+import no.nav.omsorgspenger.testutils.printSisteMelding
 import no.nav.omsorgspenger.testutils.sisteMeldingSomJSONObject
 import no.nav.omsorgspenger.testutils.ventPå
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -70,6 +71,7 @@ internal object KoronaoverføringerRapidVerktøy {
             behov = arrayOf(Behov(
                 navn = "OpphøreKoronaOverføringer",
                 input = mapOf(
+                    "versjon" to "1.0.0",
                     "fraOgMed" to "$fraOgMed",
                     "fra" to mapOf(
                         "saksnummer" to fra
@@ -82,6 +84,7 @@ internal object KoronaoverføringerRapidVerktøy {
         ).keyValue
 
         sendTestMessage(behovssekvens)
+        printSisteMelding()
         ventPå(1)
         val løst = sisteMeldingSomJSONObject().getJSONObject("@løsninger").getJSONObject("OpphøreKoronaOverføringer").getString("løst").let {
             ZonedDateTime.parse(it)

@@ -98,18 +98,13 @@ internal class OpphøreKoronaOverføringerTest(
             ))
         }
 
-        /*
-        rapid.opphørKoronaoverføringer(
-            fra = mor,
-            til = far,
-            fraOgMed = IDag
-        )*/
 
-        applicationContext.koronaoverføringRepository.opphørOverføringer(
+        rapid.opphørKoronaoverføringer(
             fra = morSaksnummer,
             til = farSaksnummer,
             fraOgMed = IDag
         )
+        rapid.reset()
 
         hent(mor).also {
             assertThat(it.gitt).isEmpty()
@@ -125,11 +120,12 @@ internal class OpphøreKoronaOverføringerTest(
             assertThat(it.fått).isEmpty()
         }
 
-        applicationContext.koronaoverføringRepository.opphørOverføringer(
+        rapid.opphørKoronaoverføringer(
             fra = farSaksnummer,
             til = morSaksnummer,
             fraOgMed = OmEnUke
         )
+        rapid.reset()
 
         val forventetPeriode = Periode(fom = IDag, tom = OmEnUke.minusDays(1))
         hent(mor).also {

@@ -28,6 +28,7 @@ import no.nav.omsorgspenger.aleneom.rivers.LagreAleneOmOmsorgen
 import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.apis.KoronaOverføringerApi
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerApi
+import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOpphøreKoronaOverføringer
 import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
@@ -125,6 +126,11 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         behovssekvensRepository = applicationContext.behovssekvensRepository,
         formidlingService = applicationContext.formidlingService,
         statistikkService = applicationContext.statistikkService
+    )
+    BehandleOpphøreKoronaOverføringer(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        koronaoverføringRepository = applicationContext.koronaoverføringRepository
     )
 }
 
