@@ -53,17 +53,8 @@ internal class OpphøreKoronaOverføringerTest(
             fraSaksnummer = morSaksnummer,
             tilSaksnummer = farSaksnummer,
             barn = listOf(barn),
-            omsorgsdagerÅOverføre = 10
-        )
-
-        rapid.reset()
-        rapid.gjennomførKoronaOverføring(
-            fra = mor,
-            til = far,
-            fraSaksnummer = morSaksnummer,
-            tilSaksnummer = farSaksnummer,
-            barn = listOf(barn),
-            omsorgsdagerÅOverføre = 5
+            omsorgsdagerÅOverføre = 20,
+            omsorgsdagerTattUtIÅr = 7
         )
 
         rapid.reset()
@@ -73,47 +64,84 @@ internal class OpphøreKoronaOverføringerTest(
             fraSaksnummer = farSaksnummer,
             tilSaksnummer = morSaksnummer,
             barn = listOf(barn),
-            omsorgsdagerÅOverføre = 4
+            omsorgsdagerÅOverføre = 33,
+            omsorgsdagerTattUtIÅr = 0
+        )
+
+        rapid.reset()
+        rapid.gjennomførKoronaOverføring(
+            fra = far,
+            til = mor,
+            fraSaksnummer = farSaksnummer,
+            tilSaksnummer = morSaksnummer,
+            barn = listOf(barn),
+            omsorgsdagerÅOverføre = 13,
+            omsorgsdagerTattUtIÅr = 0
         )
         rapid.reset()
 
         hent(mor).also {
             assertThat(it.gitt).hasSameElementsAs(setOf(
-                forventetGitt(til = far, periode = Ut2021, antallDager = 10),
-                forventetGitt(til = far, periode = Ut2021, antallDager = 5)
+                forventetGitt(til = far, periode = Ut2021, antallDager = 13),
             ))
             assertThat(it.fått).hasSameElementsAs(setOf(
-                forventetFått(fra = far, periode = Ut2021, antallDager = 4)
+                forventetFått(fra = far, periode = Ut2021, antallDager = 20)
             ))
         }
 
         hent(far).also {
             assertThat(it.gitt).hasSameElementsAs(setOf(
-                forventetGitt(til = mor, periode = Ut2021, antallDager = 4),
+                forventetGitt(til = mor, periode = Ut2021, antallDager = 20),
             ))
             assertThat(it.fått).hasSameElementsAs(setOf(
-                forventetFått(fra = mor, periode = Ut2021, antallDager = 10),
-                forventetFått(fra = mor, periode = Ut2021, antallDager = 5)
-
+                forventetFått(fra = mor, periode = Ut2021, antallDager = 13),
             ))
         }
 
+        /*
         rapid.opphørKoronaoverføringer(
             fra = mor,
             til = far,
+            fraOgMed = IDag
+        )*/
+
+        applicationContext.koronaoverføringRepository.opphørOverføringer(
+            fra = morSaksnummer,
+            til = farSaksnummer,
             fraOgMed = IDag
         )
 
         hent(mor).also {
             assertThat(it.gitt).isEmpty()
             assertThat(it.fått).hasSameElementsAs(setOf(
-                forventetFått(fra = far, periode = Ut2021, antallDager = 4)
+                forventetFått(fra = far, periode = Ut2021, antallDager = 20)
             ))
         }
 
         hent(far).also {
             assertThat(it.gitt).hasSameElementsAs(setOf(
-                forventetGitt(til = mor, periode = Ut2021, antallDager = 4),
+                forventetGitt(til = mor, periode = Ut2021, antallDager = 20),
+            ))
+            assertThat(it.fått).isEmpty()
+        }
+
+        applicationContext.koronaoverføringRepository.opphørOverføringer(
+            fra = farSaksnummer,
+            til = morSaksnummer,
+            fraOgMed = OmEnUke
+        )
+
+        val forventetPeriode = Periode(fom = IDag, tom = OmEnUke.minusDays(1))
+        hent(mor).also {
+            assertThat(it.gitt).isEmpty()
+            assertThat(it.fått).hasSameElementsAs(setOf(
+                forventetFått(fra = far, periode = forventetPeriode, antallDager = 20)
+            ))
+        }
+
+        hent(far).also {
+            assertThat(it.gitt).hasSameElementsAs(setOf(
+                forventetGitt(til = mor, periode = forventetPeriode, antallDager = 20),
             ))
             assertThat(it.fått).isEmpty()
         }
@@ -127,7 +155,8 @@ internal class OpphøreKoronaOverføringerTest(
     ).sammenlignbar()
 
     private companion object {
-        private val IDag = LocalDate.now()
+        private val IDag = LocalDate.parse("2021-03-19")
+        private val OmEnUke = IDag.plusDays(1)
         private val Ut2021 = Periode(fom = IDag, tom = LocalDate.parse("2021-12-31"))
 
         private fun SpleisetOverføringer.sammenlignbar() = SpleisetOverføringer(
