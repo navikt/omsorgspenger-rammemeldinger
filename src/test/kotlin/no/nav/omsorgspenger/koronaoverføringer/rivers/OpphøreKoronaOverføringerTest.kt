@@ -40,7 +40,7 @@ internal class OpphøreKoronaOverføringerTest(
     }
 
     @Test
-    fun `Opphøre overføringer`() {
+    fun `Opphøre koronaoverføringer`() {
         val mor = IdentitetsnummerGenerator.identitetsnummer()
         val far = IdentitetsnummerGenerator.identitetsnummer()
         val morSaksnummer = "OP$mor"
