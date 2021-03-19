@@ -3,13 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.7.1"
 val jsonassertVersion = "1.5.0"
-val k9rapidVersion = "1.db39724"
+val k9rapidVersion = "1.afab3a1"
 val awaitilityVersion = "4.0.3"
 val mockkVersion = "1.11.0"
 val ulidVersion = "8.2.0"
 val ktorVersion = "1.5.2"
 val assertjVersion = "3.19.0"
-val dusseldorfVersion = "1.5.2.fa18872"
+val dusseldorfVersion = "1.5.2.1303b90"
 val schemaValidatorVersion = "1.0.49"
 
 // Database
@@ -27,8 +27,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_12
-    targetCompatibility = JavaVersion.VERSION_12
+    sourceCompatibility = JavaVersion.VERSION_15
+    targetCompatibility = JavaVersion.VERSION_15
 }
 
 dependencies {
@@ -86,11 +86,11 @@ repositories {
 
 tasks {
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "12"
+        kotlinOptions.jvmTarget = "15"
     }
 
     named<KotlinCompile>("compileTestKotlin") {
-        kotlinOptions.jvmTarget = "12"
+        kotlinOptions.jvmTarget = "15"
     }
 
     withType<Test> {
