@@ -110,14 +110,14 @@ internal class OverføringRepository(
                         transactionalSession.overføringerEndret(
                             behovssekvensId = behovssekvensId,
                             overføringIder = overføringIder,
-                            endring = "Endret status til deaktivert"
+                            endring = "Endret status til Deaktivert ifbm. gjennomføring av overføringer."
                         )
                     },
                     onNyTilOgMed = { overføringIder, nyTilOgMed ->
                         transactionalSession.overføringerEndret(
                             behovssekvensId = behovssekvensId,
                             overføringIder = overføringIder,
-                            endring = "Endret til og med til $nyTilOgMed"
+                            endring = "Endret til og med til $nyTilOgMed ifbm. gjennomføring av overføringer."
                         )
                     }
                 )
@@ -149,6 +149,38 @@ internal class OverføringRepository(
                 GjennomførtOverføringer(
                     gjeldendeOverføringer = aktiveGjeldendeOverføringer.plus(ikkeAktiveGjeldendeOverføringer),
                     berørteSaksnummer = berørteSaksnummer
+                )
+            }
+        }
+    }
+
+    internal fun opphørOverføringer(
+        behovssekvensId: BehovssekvensId,
+        fra: Saksnummer,
+        til: Saksnummer,
+        fraOgMed: LocalDate
+    ) : OpphørOverføringer.OpphørteOverføringer{
+        return using(sessionOf(dataSource)) { session ->
+            session.transaction { tx ->
+                tx.opphørOverføringer(
+                    tabell = "overforing",
+                    fra = fra,
+                    til = til,
+                    fraOgMed = fraOgMed,
+                    onDeaktivert = { overføringIder ->
+                        tx.overføringerEndret(
+                            behovssekvensId = behovssekvensId,
+                            overføringIder = overføringIder,
+                            endring = "Endret status til Deaktivert ifbm. opphøring av overføringer."
+                        )
+                    },
+                    onNyTilOgMed = { overføringIder, nyTilOgMed ->
+                        tx.overføringerEndret(
+                            behovssekvensId = behovssekvensId,
+                            overføringIder = overføringIder,
+                            endring = "Endret til og med til $nyTilOgMed ifbm. opphøring av overføringer."
+                        )
+                    }
                 )
             }
         }

@@ -17,7 +17,6 @@ import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdage
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.auth.*
 import io.ktor.http.*
-import io.ktor.request.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
@@ -34,9 +33,8 @@ import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOms
 import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
-import org.slf4j.event.Level
+import no.nav.omsorgspenger.overføringer.rivers.BehandleOpphøreOverføringer
 import java.time.LocalDate
-import java.util.*
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -70,6 +68,11 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         formidlingService = applicationContext.formidlingService,
         behovssekvensRepository = applicationContext.behovssekvensRepository,
         statistikkService = applicationContext.statistikkService
+    )
+    BehandleOpphøreOverføringer(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        overføringerRepository = applicationContext.overføringRepository
     )
     InitierMidlertidigAlene(
         rapidsConnection = this,
