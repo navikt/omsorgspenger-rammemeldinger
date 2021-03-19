@@ -13,31 +13,24 @@ import java.time.LocalDate
 internal object OverføringSessionExt {
     internal fun TransactionalSession.opphørOverføringer(
         tabell: String,
-        fra: Saksnummer,
-        til: Saksnummer,
+        aktiveOverføringer: List<DbOverføring>,
         fraOgMed: LocalDate,
-        onDeaktivert: (tx: TransactionalSession, overføringIder: List<Long>) -> Unit = {_,_ ->},
-        onNyTilOgMed: (tx: TransactionalSession, overføringIder: List<Long>) -> Unit = {_,_ ->}) : OpphørteOverføringer {
-
+        onDeaktivert: (overføringIder: List<Long>) -> Unit = {},
+        onNyTilOgMed: (overføringIder: List<Long>, nyTilOgMed: LocalDate) -> Unit = {_,_ ->}) : OpphørteOverføringer {
         require(tabell == "koronaoverforing" || tabell == "overforing"){
             "Støtter ikke opphøring av overføringer for Tabell=[$tabell]"
         }
 
-        val nyTilOgMed = fraOgMed.minusDays(1)
+        val nyTilOgMed = fraOgMed.fraOgMedTilNyTilOgMed()
 
-        val aktiveOverføringer = hentAktiveOverføringer(
-            tabell = tabell,
-            fra = fra,
-            til = til,
-            tilOgMedEtter = nyTilOgMed
-        )
+        require(aktiveOverføringer.all { it.periode.tom.isAfter(nyTilOgMed) })
 
         val skalFåNyTilOgMed = aktiveOverføringer.filter { it.periode.fom.erFørEllerLik(nyTilOgMed) }
         val skalFåNyTilOgMedIds = skalFåNyTilOgMed.map { it.id }
         if (skalFåNyTilOgMed.isNotEmpty()) {
             logger.info("Oppdaterer tilOgMed på overføringer, Tabell=[$tabell], NyTilOgMed=[$nyTilOgMed], AntallOverføringer=[${skalFåNyTilOgMed.size}]")
             oppdaterTilOgMed(tabell = tabell, overføringer = skalFåNyTilOgMed, nyTilOgMed = nyTilOgMed)
-            onNyTilOgMed(this, skalFåNyTilOgMedIds)
+            onNyTilOgMed(skalFåNyTilOgMedIds, nyTilOgMed)
         }
 
 
@@ -46,14 +39,40 @@ internal object OverføringSessionExt {
         if (skalDeaktiveres.isNotEmpty()) {
             logger.info("Deaktiverer overføringer, Tabell=[$tabell], AntallOverføringer=[${skalDeaktiveres.size}]")
             deaktivertOverføringer(tabell = tabell, overføringer = skalDeaktiveres)
-            onDeaktivert(this, skalDeaktiveresIds)
+            onDeaktivert(skalDeaktiveresIds)
         }
 
         return OpphørteOverføringer(
-           deaktiverte = skalDeaktiveresIds,
-           nyTilOgMed = skalFåNyTilOgMedIds
+            deaktiverte = skalDeaktiveresIds,
+            nyTilOgMed = skalFåNyTilOgMedIds
         )
     }
+
+    internal fun TransactionalSession.opphørOverføringer(
+        tabell: String,
+        fra: Saksnummer,
+        til: Saksnummer,
+        fraOgMed: LocalDate,
+        onDeaktivert: (overføringIder: List<Long>) -> Unit = {},
+        onNyTilOgMed: (overføringIder: List<Long>, nyTilOgMed: LocalDate) -> Unit = {_,_ ->}) : OpphørteOverføringer {
+
+        val aktiveOverføringer = hentAktiveOverføringer(
+            tabell = tabell,
+            fra = fra,
+            til = til,
+            tilOgMedEtter = fraOgMed.fraOgMedTilNyTilOgMed()
+        )
+
+        return opphørOverføringer(
+            tabell = tabell,
+            fraOgMed = fraOgMed,
+            aktiveOverføringer = aktiveOverføringer,
+            onDeaktivert = onDeaktivert,
+            onNyTilOgMed = onNyTilOgMed
+        )
+    }
+
+    private fun LocalDate.fraOgMedTilNyTilOgMed() = minusDays(1)
 
     private fun TransactionalSession.hentAktiveOverføringer(
         tabell: String, fra: Saksnummer, til: Saksnummer, tilOgMedEtter: LocalDate) : List<DbOverføring> {
@@ -99,7 +118,7 @@ internal object OverføringSessionExt {
         internal val nyTilOgMed: List<Long>
     )
 
-    private data class DbOverføring(
+    internal data class DbOverføring(
         val id: Long,
         val periode: Periode
     )
