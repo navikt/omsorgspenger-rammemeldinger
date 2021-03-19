@@ -12,8 +12,11 @@ import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.GjennomførtOverføringer
+import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer
+import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer.opphørOverføringer
 import org.intellij.lang.annotations.Language
 import java.sql.Array
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import javax.sql.DataSource
 
@@ -58,6 +61,24 @@ internal class KoronaoverføringRepository(
             gjeldendeOverføringer = overføringerDb.somGjeldendeOverføringer(),
             berørteSaksnummer = berørteSaksnummer
         )
+    }
+
+
+    internal fun opphørOverføringer(
+        fra: Saksnummer,
+        til: Saksnummer,
+        fraOgMed: LocalDate
+    ) : OpphørOverføringer.OpphørteOverføringer{
+        return using(sessionOf(dataSource)) { session ->
+            session.transaction { tx ->
+                tx.opphørOverføringer(
+                    tabell = "koronaoverforing",
+                    fra = fra,
+                    til = til,
+                    fraOgMed = fraOgMed
+                )
+            }
+        }
     }
 
     private fun Session.saksnummerArray(saksnummer: Set<Saksnummer>) = createArrayOf("varchar", saksnummer)

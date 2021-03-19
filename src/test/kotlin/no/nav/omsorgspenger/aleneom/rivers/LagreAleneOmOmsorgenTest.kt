@@ -8,6 +8,7 @@ import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.*
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
+import no.nav.omsorgspenger.aleneom.meldinger.AleneOmOmsorgenPersonopplysningerMelding
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgspenger.testutils.*
 import no.nav.omsorgspenger.testutils.DataSourceExtension
@@ -54,17 +55,20 @@ internal class LagreAleneOmOmsorgenTest(
                 identitetsnummer = identitetsnummer,
                 mottaksdato = LocalDate.parse("2020-12-15"),
                 barn = listOf(AleneOmOmsorgenBehov.Barn(
-                    identitetsnummer = barn2,
-                    fødselsdato = LocalDate.parse("2009-12-12")
+                    identitetsnummer = barn2
                 ), AleneOmOmsorgenBehov.Barn(
-                    identitetsnummer = barn1,
-                    fødselsdato = LocalDate.parse("2003-04-12")
+                    identitetsnummer = barn1
                 ))
             ))
         ).keyValue
 
+        val fødselsdatoer = mapOf(
+            barn1 to LocalDate.parse("2003-04-12"),
+            barn2 to LocalDate.parse("2009-12-12")
+        )
+
         rapid.sendTestMessage(behovssekvens)
-        rapid.mockHentOmsorgspengerSaksnummer(identitetsnummer, saksnummer)
+        rapid.mockHentOmsorgspengerSaksnummer(identitetsnummer, saksnummer, fødselsdatoer)
         val jsonMessage = rapid.sisteMeldingSomJsonMessage().also { it.interestedIn("@løsninger.AleneOmOmsorgen.løst") }
         assertNotNull(jsonMessage["@løsninger.AleneOmOmsorgen.løst"].asText().let {ZonedDateTime.parse(it)})
 
@@ -79,8 +83,15 @@ internal class LagreAleneOmOmsorgenTest(
 
     private companion object {
 
-        private fun TestRapid.mockHentOmsorgspengerSaksnummer(identitetsnummer: Identitetsnummer, saksnummer: Saksnummer) =
-            sendTestMessage(sisteMeldingSomJsonMessage().leggTilLøsningPåHentOmsorgspengerSaksnummer(identitetsnummer, saksnummer).toJson())
+        private fun TestRapid.mockHentOmsorgspengerSaksnummer(
+            identitetsnummer: Identitetsnummer,
+            saksnummer: Saksnummer,
+            fødselsdatoer: Map<Identitetsnummer, LocalDate>) =
+            sendTestMessage(sisteMeldingSomJsonMessage()
+                .leggTilLøsningPåHentOmsorgspengerSaksnummer(identitetsnummer, saksnummer)
+                .leggTilLøsningPåHentPersonopplysninger(fødselsdatoer)
+                .toJson()
+            )
 
         private fun JsonMessage.leggTilLøsningPåHentOmsorgspengerSaksnummer(
             identitetsnummer: Identitetsnummer, saksnummer: Saksnummer) = leggTilLøsning(
@@ -89,6 +100,14 @@ internal class LagreAleneOmOmsorgenTest(
                 "saksnummer" to mapOf(
                     identitetsnummer to saksnummer
                 )
+            )
+        )
+
+        private fun JsonMessage.leggTilLøsningPåHentPersonopplysninger(
+            fødselsdatoer: Map<Identitetsnummer, LocalDate>) = leggTilLøsning(
+            behov = AleneOmOmsorgenPersonopplysningerMelding.HentPersonopplysninger,
+            løsning = mapOf(
+                "personopplysninger" to fødselsdatoer.mapValues { mapOf("fødselsdato" to it.value) }
             )
         )
     }

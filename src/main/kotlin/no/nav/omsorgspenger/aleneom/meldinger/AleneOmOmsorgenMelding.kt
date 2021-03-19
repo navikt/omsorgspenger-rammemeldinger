@@ -11,7 +11,7 @@ internal object AleneOmOmsorgenMelding : HentBehov<AleneOmOmsorgenMelding.Behove
     internal const val AleneOmOmsorgen = "AleneOmOmsorgen"
 
     override fun validateBehov(packet: JsonMessage) {
-        packet.requireValue(BehovKeys.Versjon, "1.0.0")
+        packet.requireValue(BehovKeys.Versjon, "1.1.0")
         packet.interestedIn(
             BehovKeys.Mottaksdato,
             BehovKeys.Identitetsnumer,
@@ -24,15 +24,13 @@ internal object AleneOmOmsorgenMelding : HentBehov<AleneOmOmsorgenMelding.Behove
             identitetsnummer = packet[BehovKeys.Identitetsnumer].asText(),
             mottaksdato = packet[BehovKeys.Mottaksdato].asLocalDate(),
             barn = (packet[BehovKeys.Barn] as ArrayNode).map { barn -> Barn(
-                identitetsnummer = barn["identitetsnummer"].asText(),
-                fødselsdato = barn["fødselsdato"].asLocalDate()
+                identitetsnummer = barn["identitetsnummer"].asText()
             )}
         )
     }
 
     internal data class Barn(
         internal val identitetsnummer: Identitetsnummer,
-        internal val fødselsdato: LocalDate
     )
 
     internal data class Behovet(

@@ -7,8 +7,10 @@ import no.nav.k9.rapid.river.leggTilBehov
 import no.nav.k9.rapid.river.skalLøseBehov
 import no.nav.k9.rapid.river.utenLøsningPåBehov
 import no.nav.omsorgspenger.aleneom.meldinger.AleneOmOmsorgenMelding
+import no.nav.omsorgspenger.aleneom.meldinger.AleneOmOmsorgenPersonopplysningerMelding
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
+import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerInput
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import org.slf4j.LoggerFactory
 
@@ -24,7 +26,10 @@ internal class InitierAleneOmOmsorgen(
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(AleneOmOmsorgenMelding.AleneOmOmsorgen)
-                it.utenLøsningPåBehov(HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer)
+                it.utenLøsningPåBehov(
+                    HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer,
+                    AleneOmOmsorgenPersonopplysningerMelding.HentPersonopplysninger
+                )
                 AleneOmOmsorgenMelding.validateBehov(it)
             }
         }.register(this)
@@ -33,11 +38,14 @@ internal class InitierAleneOmOmsorgen(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val behovet = AleneOmOmsorgenMelding.hentBehov(packet)
 
-        packet.leggTilBehov(AleneOmOmsorgenMelding.AleneOmOmsorgen, HentOmsorgspengerSaksnummerMelding.behov(
-            behovInput = HentOmsorgspengerSaksnummerMelding.BehovInput(
+        packet.leggTilBehov(AleneOmOmsorgenMelding.AleneOmOmsorgen,
+            HentOmsorgspengerSaksnummerMelding.behov(behovInput = HentOmsorgspengerSaksnummerMelding.BehovInput(
                 identitetsnummer = setOf(behovet.identitetsnummer)
-            )
-        ))
+            )),
+            AleneOmOmsorgenPersonopplysningerMelding.behov(behovInput = HentPersonopplysningerInput(
+                identitetsnummer = behovet.barn.map { it.identitetsnummer }.toSet()
+            ))
+        )
 
         return true
     }

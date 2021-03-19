@@ -20,8 +20,7 @@ internal class StatistikkServiceTest {
 
     private val statistikkService = KafkaStatistikkService(
             kafkaProducer = kafkaProducer,
-            topic = topic,
-            enabled = true
+            topic = topic
     )
 
     @BeforeEach

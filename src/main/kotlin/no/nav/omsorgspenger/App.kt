@@ -17,11 +17,9 @@ import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdage
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.auth.*
 import io.ktor.http.*
-import io.ktor.request.*
 import io.ktor.response.*
 import no.nav.helse.dusseldorf.ktor.auth.*
-import no.nav.helse.dusseldorf.ktor.core.FullførAktiveRequester
-import no.nav.helse.dusseldorf.ktor.core.preStopOnApplicationStopPreparing
+import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.aleneom.rivers.InitierAleneOmOmsorgen
@@ -29,14 +27,14 @@ import no.nav.omsorgspenger.aleneom.rivers.LagreAleneOmOmsorgen
 import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.apis.KoronaOverføringerApi
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerApi
+import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOpphøreKoronaOverføringer
 import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
-import org.slf4j.event.Level
+import no.nav.omsorgspenger.overføringer.rivers.BehandleOpphøreOverføringer
 import java.time.LocalDate
-import java.util.*
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -70,6 +68,11 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         formidlingService = applicationContext.formidlingService,
         behovssekvensRepository = applicationContext.behovssekvensRepository,
         statistikkService = applicationContext.statistikkService
+    )
+    BehandleOpphøreOverføringer(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        overføringerRepository = applicationContext.overføringRepository
     )
     InitierMidlertidigAlene(
         rapidsConnection = this,
@@ -127,6 +130,11 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         formidlingService = applicationContext.formidlingService,
         statistikkService = applicationContext.statistikkService
     )
+    BehandleOpphøreKoronaOverføringer(
+        rapidsConnection = this,
+        behovssekvensRepository = applicationContext.behovssekvensRepository,
+        koronaoverføringRepository = applicationContext.koronaoverføringRepository
+    )
 }
 
 internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {
@@ -148,19 +156,15 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     }
 
     install(CallId) {
-        retrieve { when {
-            it.request.headers.contains(HttpHeaders.XCorrelationId) -> it.request.header(HttpHeaders.XCorrelationId)
-            it.request.headers.contains("Nav-Call-Id") -> it.request.header("Nav-Call-Id")
-            else -> "rammemeldinger-${UUID.randomUUID()}"
-        }}
+        fromFirstNonNullHeader(
+            headers = listOf(HttpHeaders.XCorrelationId, "Nav-Call-Id"),
+            generateOnNotSet = true
+        )
     }
 
     install(CallLogging) {
-        val ignorePaths = setOf("/isalive", "/isready", "/metrics")
-        level = Level.INFO
-        logger = log
-        filter { call -> !ignorePaths.contains(call.request.path().toLowerCase()) }
-        callIdMdc("correlation_id")
+        logRequests()
+        correlationIdAndRequestIdInMdc()
         callIdMdc("callId")
     }
 

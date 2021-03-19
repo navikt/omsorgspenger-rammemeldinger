@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgspenger.Identitetsnummer
+import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.personopplysninger.HentPersonopplysningerMelding
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
@@ -22,11 +23,12 @@ internal fun TestRapid.mockHentPersonopplysninger(
 
 internal fun TestRapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
     fra: Identitetsnummer, til: Identitetsnummer,
+    fraSaksnummer: Saksnummer = "foo", tilSaksnummer: Saksnummer = "bar",
     relasjoner: Set<VurderRelasjonerMelding.Relasjon> = emptySet()
 ) {
     sendTestMessage(
         sisteMeldingSomJsonMessage()
-            .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til)
+            .leggTilLøsningPåHenteOmsorgspengerSaksnummer(fra = fra, til = til, fraSaksnummer = fraSaksnummer, tilSaksnummer = tilSaksnummer)
             .leggTilLøsningPåVurderRelasjonerTilBarn(relasjoner = relasjoner)
             .toJson()
     )
@@ -68,13 +70,13 @@ private fun JsonMessage.leggTilLøsningPåHentePersonopplysninger(
 )
 
 private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
-    fra: Identitetsnummer, til: Identitetsnummer
-) = leggTilLøsning(
+    fra: Identitetsnummer, til: Identitetsnummer,
+    fraSaksnummer: Saksnummer, tilSaksnummer: Saksnummer) = leggTilLøsning(
     behov = HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer,
     løsning = mapOf(
         "saksnummer" to mapOf(
-            fra to "foo",
-            til to "bar"
+            fra to fraSaksnummer,
+            til to tilSaksnummer
         )
     )
 )

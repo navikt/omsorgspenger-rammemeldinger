@@ -9,7 +9,8 @@ import no.nav.omsorgspenger.rivers.HentLøsning
 import no.nav.omsorgspenger.rivers.LeggTilBehov
 
 internal abstract class HentPersonopplysningerMelding<Personopplysninger, Fellesopplysninger>(
-    private val defaultAttributter: Set<String>) :
+    private val defaultAttributter: Set<String>,
+    private val måFinneAllePersoner: Boolean = false) :
     LeggTilBehov<HentPersonopplysningerInput>,
     HentLøsning<HentPersonopplysningerMelding.HentetPersonopplysninger<Personopplysninger, Fellesopplysninger>> {
 
@@ -22,6 +23,7 @@ internal abstract class HentPersonopplysningerMelding<Personopplysninger, Felles
     override fun behov(behovInput: HentPersonopplysningerInput) = Behov(
         navn = HentPersonopplysninger,
         input = mapOf(
+            "måFinneAllePersoner" to måFinneAllePersoner,
             "identitetsnummer" to behovInput.identitetsnummer,
             "attributter" to when (behovInput.attributter.isEmpty()) {
                 true -> defaultAttributter

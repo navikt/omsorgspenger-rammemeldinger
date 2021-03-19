@@ -78,3 +78,9 @@ spec:
   {{/each}}
     - name: TILGANGSSTYRING_URL
       value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local
+    - name: KAFKA_PROPERTIES_SECURITY_PROTOCOL
+      value: SASL_SSL
+    - name: KAFKA_RAPID_TOPIC
+      value: k9-rapid-v2
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: omsorgspenger-rammemelding

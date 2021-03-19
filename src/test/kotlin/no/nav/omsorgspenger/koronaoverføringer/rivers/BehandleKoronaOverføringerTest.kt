@@ -9,6 +9,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
+import no.nav.omsorgspenger.koronaoverføringer.rivers.KoronaoverføringerRapidVerktøy.gjennomførKoronaOverføring
 import no.nav.omsorgspenger.koronaoverføringer.statistikk.StatistikkFormat.assertForventetAvslag
 import no.nav.omsorgspenger.koronaoverføringer.statistikk.StatistikkFormat.assertForventetGjennomført
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringer
@@ -57,32 +58,12 @@ internal class BehandleKoronaOverføringerTest(
         val barnetsFødselsdato = LocalDate.parse("2020-10-05")
         val barnet = koronaBarn(fødselsdato = barnetsFødselsdato, aleneOmOmsorgen = true)
 
-        val (idStart, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
+        val (id, løsning) = rapid.gjennomførKoronaOverføring(
             fra = fra,
             til = til,
-            omsorgsdagerTattUtIÅr = 0,
-            omsorgsdagerÅOverføre = 10,
             barn = listOf(barnet)
         )
 
-        rapid.sendTestMessage(behovssekvens)
-        rapid.ventPå(1)
-        rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
-            fra = fra,
-            til = til,
-            relasjoner = setOf(
-                VurderRelasjonerMelding.Relasjon(identitetsnummer = barnet.identitetsnummer, relasjon = "barn", borSammen = true),
-                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = true)
-            )
-        )
-        rapid.ventPå(2)
-
-        rapid.mockHentPersonopplysninger(
-            fra = fra,
-            til = til
-        )
-        rapid.ventPå(3)
-        val (idSlutt, løsning) = rapid.løsningOverføreKoronaOmsorgsdager()
         assertTrue(løsning.erGjennomført())
 
         assertThat(løsning.overføringer.keys).hasSameElementsAs(setOf(fra, til))
@@ -107,8 +88,6 @@ internal class BehandleKoronaOverføringerTest(
             gjelderTilOgMed = LocalDate.parse("2021-12-31")
         )))
 
-        assertEquals(idStart, idSlutt)
-
         hentKoronaoverføringerFor(fra).also {
             assertThat(it.fått).isEmpty()
             assertThat(it.gitt).hasSize(1)
@@ -121,12 +100,12 @@ internal class BehandleKoronaOverføringerTest(
             assertThat(it).hasSameElementsAs(setOf(AleneOmOmsorgen(
                 registrert = registrert,
                 periode = Periode(fom = LocalDate.now(), tom = LocalDate.parse("2038-12-31")), // Ut året barnet fyller 18
-                behovssekvensId = idStart,
+                behovssekvensId = id,
                 barn = AleneOmOmsorgen.Barn(identitetsnummer = barnet.identitetsnummer, fødselsdato = barnet.fødselsdato),
                 regstrertIForbindelseMed = "KoronaOverføring"
             )))
         }
-        statistikkService.finnStatistikkMeldingFor(idStart).assertForventetGjennomført(idStart)
+        statistikkService.finnStatistikkMeldingFor(id).assertForventetGjennomført(id)
     }
 
     @Test
