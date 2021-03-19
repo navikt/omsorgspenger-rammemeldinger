@@ -3,14 +3,14 @@ package no.nav.omsorgspenger.koronaoverføringer.meldinger
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.overføringer.db.OverføringSessionExt
+import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer
 import no.nav.omsorgspenger.rivers.HentBehov
 import no.nav.omsorgspenger.rivers.LeggTilLøsning
 import java.time.LocalDate
 
 internal object OpphøreKoronaOverføringerMelding :
     HentBehov<OpphøreKoronaOverføringerMelding.Behovet>,
-    LeggTilLøsning<OverføringSessionExt.OpphørteOverføringer> {
+    LeggTilLøsning<OpphørOverføringer.OpphørteOverføringer> {
     internal const val OpphøreKoronaOverføringer = "OpphøreKoronaOverføringer"
 
     internal data class Behovet(
@@ -41,7 +41,7 @@ internal object OpphøreKoronaOverføringerMelding :
         val FraOgMed = "@behov.${OpphøreKoronaOverføringer}.fraOgMed"
     }
 
-    override fun løsning(løsning: OverføringSessionExt.OpphørteOverføringer): Pair<String, Map<String, *>> {
+    override fun løsning(løsning: OpphørOverføringer.OpphørteOverføringer): Pair<String, Map<String, *>> {
         return OpphøreKoronaOverføringer to mapOf(
             "deaktiverte" to løsning.deaktiverte,
             "nyTilOgMed" to løsning.nyTilOgMed

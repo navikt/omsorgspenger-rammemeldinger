@@ -16,7 +16,7 @@ import no.nav.omsorgspenger.overføringer.NyOverføring
 import no.nav.omsorgspenger.overføringer.db.OverføringLogg.hentOverføringLogger
 import no.nav.omsorgspenger.overføringer.db.OverføringLogg.overføringerEndret
 import no.nav.omsorgspenger.overføringer.db.OverføringLogg.overføringerOpprettet
-import no.nav.omsorgspenger.overføringer.db.OverføringSessionExt.opphørOverføringer
+import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer.opphørOverføringer
 import org.slf4j.LoggerFactory
 import java.sql.Array
 import java.time.LocalDate
@@ -99,11 +99,10 @@ internal class OverføringRepository(
                     til = fra
                 )
 
-
                 transactionalSession.opphørOverføringer(
                     tabell = "overforing",
                     fraOgMed = fraOgMed,
-                    aktiveOverføringer = berørteOverføringer.map { OverføringSessionExt.DbOverføring(
+                    aktiveOverføringer = berørteOverføringer.map { OpphørOverføringer.AktivOverføring(
                         id = it.id,
                         periode = it.periode
                     )},

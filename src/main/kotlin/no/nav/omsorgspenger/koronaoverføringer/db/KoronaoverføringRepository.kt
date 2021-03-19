@@ -12,8 +12,8 @@ import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
 import no.nav.omsorgspenger.overføringer.GjennomførtOverføringer
-import no.nav.omsorgspenger.overføringer.db.OverføringSessionExt
-import no.nav.omsorgspenger.overføringer.db.OverføringSessionExt.opphørOverføringer
+import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer
+import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer.opphørOverføringer
 import org.intellij.lang.annotations.Language
 import java.sql.Array
 import java.time.LocalDate
@@ -68,7 +68,7 @@ internal class KoronaoverføringRepository(
         fra: Saksnummer,
         til: Saksnummer,
         fraOgMed: LocalDate
-    ) : OverføringSessionExt.OpphørteOverføringer{
+    ) : OpphørOverføringer.OpphørteOverføringer{
         return using(sessionOf(dataSource)) { session ->
             session.transaction { tx ->
                 tx.opphørOverføringer(

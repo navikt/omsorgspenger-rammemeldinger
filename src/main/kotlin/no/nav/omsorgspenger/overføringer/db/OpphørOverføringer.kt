@@ -10,10 +10,20 @@ import org.slf4j.LoggerFactory
 import java.sql.Array
 import java.time.LocalDate
 
-internal object OverføringSessionExt {
+internal object OpphørOverføringer {
+    internal data class OpphørteOverføringer(
+        internal val deaktiverte: List<Long>,
+        internal val nyTilOgMed: List<Long>
+    )
+
+    internal data class AktivOverføring(
+        val id: Long,
+        val periode: Periode
+    )
+
     internal fun TransactionalSession.opphørOverføringer(
         tabell: String,
-        aktiveOverføringer: List<DbOverføring>,
+        aktiveOverføringer: List<AktivOverføring>,
         fraOgMed: LocalDate,
         onDeaktivert: (overføringIder: List<Long>) -> Unit = {},
         onNyTilOgMed: (overføringIder: List<Long>, nyTilOgMed: LocalDate) -> Unit = {_,_ ->}) : OpphørteOverføringer {
@@ -75,9 +85,9 @@ internal object OverføringSessionExt {
     private fun LocalDate.fraOgMedTilNyTilOgMed() = minusDays(1)
 
     private fun TransactionalSession.hentAktiveOverføringer(
-        tabell: String, fra: Saksnummer, til: Saksnummer, tilOgMedEtter: LocalDate) : List<DbOverføring> {
+        tabell: String, fra: Saksnummer, til: Saksnummer, tilOgMedEtter: LocalDate) : List<AktivOverføring> {
         val query = hentAktiveOverføringerQuery(tabell = tabell, fra = fra, til = til, tilOgMedEtter = tilOgMedEtter)
-        return run(query.map { row -> DbOverføring(
+        return run(query.map { row -> AktivOverføring(
             id = row.long("id"),
             periode = Periode(
                 fom = row.localDate("fom"),
@@ -87,7 +97,7 @@ internal object OverføringSessionExt {
     }
 
     private fun TransactionalSession.deaktivertOverføringer(
-        tabell: String, overføringer: List<DbOverføring>) {
+        tabell: String, overføringer: List<AktivOverføring>) {
         val query = deaktivertOverføringQuery(
             tabell = tabell,
             overføringIder = overføringIderArray(overføringer)
@@ -100,7 +110,7 @@ internal object OverføringSessionExt {
     }
 
     private fun TransactionalSession.oppdaterTilOgMed(
-        tabell: String, overføringer: List<DbOverføring>, nyTilOgMed: LocalDate) {
+        tabell: String, overføringer: List<AktivOverføring>, nyTilOgMed: LocalDate) {
         val query = endreTilOgMedQuery(
             tabell = tabell,
             overføringIder = overføringIderArray(overføringer),
@@ -113,17 +123,7 @@ internal object OverføringSessionExt {
         }}
     }
 
-    internal data class OpphørteOverføringer(
-        internal val deaktiverte: List<Long>,
-        internal val nyTilOgMed: List<Long>
-    )
-
-    internal data class DbOverføring(
-        val id: Long,
-        val periode: Periode
-    )
-
-    private fun Session.overføringIderArray(overføringer: Collection<DbOverføring>) = createArrayOf("bigint", overføringer.map { it.id })
+    private fun Session.overføringIderArray(overføringer: Collection<AktivOverføring>) = createArrayOf("bigint", overføringer.map { it.id })
 
     private fun hentAktiveOveføringerStatement(tabell: String) =
         "SELECT id, fom, tom from $tabell WHERE fra = :fra AND til = :til AND tom > :tilOgMedEtter"
@@ -147,5 +147,5 @@ internal object OverføringSessionExt {
             "overforingIder" to overføringIder
         ))
 
-    private val logger = LoggerFactory.getLogger(OverføringSessionExt::class.java)
+    private val logger = LoggerFactory.getLogger(OpphørOverføringer::class.java)
 }
