@@ -9,6 +9,7 @@ import no.nav.k9.rapid.river.skalLøseBehov
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
 import no.nav.omsorgspenger.aleneom.meldinger.AleneOmOmsorgenMelding
+import no.nav.omsorgspenger.aleneom.meldinger.AleneOmOmsorgenPersonopplysningerMelding
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
@@ -27,9 +28,13 @@ internal class LagreAleneOmOmsorgen(
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(AleneOmOmsorgenMelding.AleneOmOmsorgen)
-                it.harLøsningPåBehov(HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer)
+                it.harLøsningPåBehov(
+                    HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer,
+                    AleneOmOmsorgenPersonopplysningerMelding.HentPersonopplysninger
+                )
                 AleneOmOmsorgenMelding.validateBehov(it)
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
+                AleneOmOmsorgenPersonopplysningerMelding.validateLøsning(it)
             }
         }.register(this)
     }
@@ -37,6 +42,7 @@ internal class LagreAleneOmOmsorgen(
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val behovet = AleneOmOmsorgenMelding.hentBehov(packet)
         val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet).getValue(behovet.identitetsnummer)
+        val personopplysninger = AleneOmOmsorgenPersonopplysningerMelding.hentLøsning(packet).personopplysninger
 
         aleneOmOmsorgenService.lagreIForbindelseMedAleneOmOmsorgen(
             behovssekvensId = id,
@@ -44,7 +50,7 @@ internal class LagreAleneOmOmsorgen(
             dato = behovet.mottaksdato,
             aleneOmOmsorgenFor = behovet.barn.map { AleneOmOmsorgen.Barn(
                 identitetsnummer = it.identitetsnummer,
-                fødselsdato = it.fødselsdato
+                fødselsdato = personopplysninger.getValue(it.identitetsnummer)
             )}
         )
 
