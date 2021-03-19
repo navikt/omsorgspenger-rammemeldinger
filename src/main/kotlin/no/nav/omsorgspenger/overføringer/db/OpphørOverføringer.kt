@@ -126,7 +126,7 @@ internal object OpphørOverføringer {
     private fun Session.overføringIderArray(overføringer: Collection<AktivOverføring>) = createArrayOf("bigint", overføringer.map { it.id })
 
     private fun hentAktiveOveføringerStatement(tabell: String) =
-        "SELECT id, fom, tom from $tabell WHERE fra = :fra AND til = :til AND tom > :tilOgMedEtter"
+        "SELECT id, fom, tom from $tabell WHERE fra = :fra AND til = :til AND tom > :tilOgMedEtter AND status = 'Aktiv'"
     private fun hentAktiveOverføringerQuery(tabell: String, fra: Saksnummer, til: Saksnummer, tilOgMedEtter: LocalDate) =
         queryOf(hentAktiveOveføringerStatement(tabell), mapOf(
             "fra" to fra, "til" to til, "tilOgMedEtter" to tilOgMedEtter
