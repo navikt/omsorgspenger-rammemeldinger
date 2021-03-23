@@ -27,6 +27,19 @@ internal class GittDager(
     }()
 }
 
+internal class GittDagerOpphørt(
+    val til: OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger,
+    val fraOgMed: LocalDate
+) : Melding {
+    override val mal = "KORONA_OVERFORE_GITT_DAGER_OPPHORT"
+    override val data = {
+        JSONObject().also { root ->
+            root.put("fraOgMed", "$fraOgMed")
+            root.put("til", til.somJSONObject())
+        }.toString()
+    }()
+}
+
 internal class MottattDager(
     val fra: OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger,
     val mottaksdato: LocalDate,
@@ -40,6 +53,19 @@ internal class MottattDager(
                 "gjelderTilOgMed" to "${overføring.periode.tom}",
                 "antallDager" to overføring.antallDager
             ).let { JSONArray().put(it)})
+            root.put("fra", fra.somJSONObject())
+        }.toString()
+    }()
+}
+
+internal class MottattDagerOpphørt(
+    val fra: OverføreKoronaOmsorgsdagerPersonopplysningerMelding.Personopplysninger,
+    val fraOgMed: LocalDate
+) : Melding {
+    override val mal = "KORONA_OVERFORE_MOTTATT_DAGER_OPPHORT"
+    override val data = {
+        JSONObject().also { root ->
+            root.put("fraOgMed", "$fraOgMed")
             root.put("fra", fra.somJSONObject())
         }.toString()
     }()

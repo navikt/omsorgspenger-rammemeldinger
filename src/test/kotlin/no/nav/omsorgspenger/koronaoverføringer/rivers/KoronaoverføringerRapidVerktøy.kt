@@ -27,14 +27,16 @@ internal object KoronaoverføringerRapidVerktøy {
         fraSaksnummer: Saksnummer = "foo",
         tilSaksnummer: Saksnummer = "bar",
         omsorgsdagerTattUtIÅr: Int = 0,
-        omsorgsdagerÅOverføre: Int = 10) : Pair<String, OverføreKoronaOmsorgsdagerLøsning> {
+        omsorgsdagerÅOverføre: Int = 10,
+        mottatt: ZonedDateTime = ZonedDateTime.now()) : Pair<String, OverføreKoronaOmsorgsdagerLøsning> {
 
         val (idStart, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
             fra = fra,
             til = til,
             omsorgsdagerTattUtIÅr = omsorgsdagerTattUtIÅr,
             omsorgsdagerÅOverføre = omsorgsdagerÅOverføre,
-            barn = barn
+            barn = barn,
+            mottatt = mottatt
         )
 
         sendTestMessage(behovssekvens)
