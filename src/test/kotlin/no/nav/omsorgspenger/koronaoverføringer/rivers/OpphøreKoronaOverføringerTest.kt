@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Duration
 import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.*
 import javax.sql.DataSource
 
@@ -54,7 +55,8 @@ internal class OpphøreKoronaOverføringerTest(
             tilSaksnummer = farSaksnummer,
             barn = listOf(barn),
             omsorgsdagerÅOverføre = 20,
-            omsorgsdagerTattUtIÅr = 7
+            omsorgsdagerTattUtIÅr = 7,
+            mottatt = Mottatt
         )
 
         rapid.reset()
@@ -65,7 +67,8 @@ internal class OpphøreKoronaOverføringerTest(
             tilSaksnummer = morSaksnummer,
             barn = listOf(barn),
             omsorgsdagerÅOverføre = 33,
-            omsorgsdagerTattUtIÅr = 0
+            omsorgsdagerTattUtIÅr = 0,
+            mottatt = Mottatt
         )
 
         rapid.reset()
@@ -76,7 +79,8 @@ internal class OpphøreKoronaOverføringerTest(
             tilSaksnummer = morSaksnummer,
             barn = listOf(barn),
             omsorgsdagerÅOverføre = 13,
-            omsorgsdagerTattUtIÅr = 0
+            omsorgsdagerTattUtIÅr = 0,
+            mottatt = Mottatt
         )
         rapid.reset()
 
@@ -152,6 +156,7 @@ internal class OpphøreKoronaOverføringerTest(
 
     private companion object {
         private val IDag = LocalDate.parse("2021-03-19")
+        private val Mottatt =  ZonedDateTime.parse("2021-03-19T16:00:00.000Z")
         private val OmEnUke = IDag.plusDays(1)
         private val Ut2021 = Periode(fom = IDag, tom = LocalDate.parse("2021-12-31"))
 

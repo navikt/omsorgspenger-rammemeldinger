@@ -32,6 +32,19 @@ internal class GittDager(
     }()
 }
 
+internal class GittDagerOpphørt(
+    val til: Personopplysninger,
+    val fraOgMed: LocalDate
+) : Melding {
+    override val mal = "OVERFORE_GITT_DAGER_OPPHORT"
+    override val data = {
+        JSONObject().also { root ->
+            root.put("fraOgMed", "$fraOgMed")
+            root.put("til", til.somJSONObject())
+        }.toString()
+    }()
+}
+
 internal class MottattDager private constructor(
     val fra: Personopplysninger,
     val mottaksdato: LocalDate,
@@ -61,6 +74,19 @@ internal class MottattDager private constructor(
             )
         }
     }
+}
+
+internal class MottattDagerOpphørt(
+    val fra: Personopplysninger,
+    val fraOgMed: LocalDate
+) : Melding {
+    override val mal = "OVERFORE_MOTTATT_DAGER_OPPHORT"
+    override val data = {
+        JSONObject().also { root ->
+            root.put("fraOgMed", "$fraOgMed")
+            root.put("fra", fra.somJSONObject())
+        }.toString()
+    }()
 }
 
 internal class TidligerePartner private constructor(
