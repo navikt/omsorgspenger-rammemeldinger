@@ -3,13 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.7.1"
 val jsonassertVersion = "1.5.0"
-val k9rapidVersion = "1.afab3a1"
+val k9rapidVersion = "1.04849d5"
 val awaitilityVersion = "4.0.3"
 val mockkVersion = "1.11.0"
 val ulidVersion = "8.2.0"
-val ktorVersion = "1.5.2"
+val ktorVersion = "1.5.3"
 val assertjVersion = "3.19.0"
-val dusseldorfVersion = "1.5.2.1303b90"
+val dusseldorfVersion = "1.5.3.9b6aed3"
 val schemaValidatorVersion = "1.0.49"
 
 // Database
@@ -22,7 +22,7 @@ val embeddedPostgres = "1.2.10"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.4.32"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
@@ -81,7 +81,6 @@ repositories {
         }
     }
     mavenCentral()
-    maven("https://dl.bintray.com/kotlin/ktor")
 }
 
 tasks {
@@ -113,7 +112,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "6.8.3"
+        gradleVersion = "7.0"
     }
 
 }
