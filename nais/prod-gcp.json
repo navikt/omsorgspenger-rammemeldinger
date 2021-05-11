@@ -6,7 +6,7 @@
     "https://omsorgspenger-rammemeldinger.intern.nav.no"
   ],
   "externalHosts": [
-    "omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
+    "omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io"
   ],
   "azureTenant": "nav.no",
   "kafkaPool": "nav-prod",
