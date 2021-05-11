@@ -56,7 +56,9 @@ dependencies {
 
 
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
-    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
+    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion") {
+        exclude(group = "com.github.jknack")
+    }
     testImplementation("com.networknt:json-schema-validator:$schemaValidatorVersion")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
