@@ -35,8 +35,8 @@ internal fun TestApplicationContextBuilder(
                 "TILGANGSSTYRING_URL" to "test"
         )
         else -> mapOf(
-            "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
-            "AZURE_V2_JWKS_URI" to wireMockServer.getAzureV2JwksUrl(),
+            "AZURE_OPENID_CONFIG_ISSUER" to Azure.V2_0.getIssuer(),
+            "AZURE_OPENID_CONFIG_JWKS_URI" to wireMockServer.getAzureV2JwksUrl(),
             "AZURE_APP_CLIENT_ID" to "omsorgspenger-rammemeldinger",
             "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl()
         )
