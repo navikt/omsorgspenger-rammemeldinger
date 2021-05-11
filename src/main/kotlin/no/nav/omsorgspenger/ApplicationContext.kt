@@ -8,7 +8,7 @@ import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.k9.rapid.river.Environment
-import no.nav.k9.rapid.river.KafkaBuilder.kafkaProducer
+import no.nav.k9.rapid.river.KafkaBuilder.kafkaProducerOnPrem
 import no.nav.k9.rapid.river.csvTilSet
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
@@ -52,7 +52,7 @@ internal class ApplicationContext(
     internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
     internal val aleneOmOmsorgenService: AleneOmOmsorgenService,
     internal val spleisetAleneOmOmsorgenService: SpleisetAleneOmOmsorgenService,
-    internal val kafkaProducer: KafkaProducer<String, String>,
+    internal val kafkaProducerOnPrem: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
     internal val saksnummerRepository: SaksnummerRepository,
     internal val saksnummerService: SaksnummerService,
@@ -66,7 +66,7 @@ internal class ApplicationContext(
         dataSource.migrate()
     }
     internal fun stop() {
-        kafkaProducer.close()
+        kafkaProducerOnPrem.close()
     }
 
     internal class Builder(
@@ -86,7 +86,7 @@ internal class ApplicationContext(
         internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
         internal var aleneOmOmsorgenService: AleneOmOmsorgenService? = null,
         internal var spleisetAleneOmOmsorgenService: SpleisetAleneOmOmsorgenService? = null,
-        internal var kafkaProducer: KafkaProducer<String, String>? = null,
+        internal var kafkaProducerOnPrem: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
         internal var saksnummerRepository: SaksnummerRepository? = null,
         internal var saksnummerService: SaksnummerService? = null,
@@ -109,7 +109,7 @@ internal class ApplicationContext(
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
             )
 
-            val benyttetKafkaProducer =  kafkaProducer ?: benyttetEnv.kafkaProducer()
+            val benyttetKafkaProducerOnPrem = kafkaProducerOnPrem ?: benyttetEnv.kafkaProducerOnPrem("omsorgspenger-rammemeldinger-onprem")
 
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
 
@@ -118,7 +118,7 @@ internal class ApplicationContext(
             )
 
             val benyttetStatistikkService = statistikkService ?: KafkaStatistikkService(
-                kafkaProducer = benyttetKafkaProducer
+                kafkaProducer = benyttetKafkaProducerOnPrem
             )
 
             val benyttetAleneOmOmsorgenRepository = aleneOmOmsorgenRepository ?: AleneOmOmsorgenRepository(
@@ -175,9 +175,9 @@ internal class ApplicationContext(
                 healthService = HealthService(healthChecks = setOf(
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway
                 )),
-                kafkaProducer = benyttetKafkaProducer,
+                kafkaProducerOnPrem = benyttetKafkaProducerOnPrem,
                 formidlingService = formidlingService ?: KafkaFormidlingService(
-                    kafkaProducer = benyttetKafkaProducer
+                    kafkaProducer = benyttetKafkaProducerOnPrem
                 ),
                 dataSource = benyttetDataSource,
                 overføringRepository = benyttetOverføringRepository,
