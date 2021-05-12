@@ -3,27 +3,27 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.7.1"
 val jsonassertVersion = "1.5.0"
-val k9rapidVersion = "1.04849d5"
-val awaitilityVersion = "4.0.3"
+val k9rapidVersion = "1.592c7c1"
+val awaitilityVersion = "4.1.0"
 val mockkVersion = "1.11.0"
 val ulidVersion = "8.2.0"
-val ktorVersion = "1.5.3"
+val ktorVersion = "1.5.4"
 val assertjVersion = "3.19.0"
-val dusseldorfVersion = "1.5.3.9b6aed3"
-val schemaValidatorVersion = "1.0.49"
+val dusseldorfVersion = "1.5.4.f9a29f3"
+val schemaValidatorVersion = "1.0.52"
 
 // Database
-val flywayVersion = "7.7.0"
+val flywayVersion = "7.8.2"
 val hikariVersion = "4.0.3"
 val kotliqueryVersion = "1.3.1"
-val postgresVersion = "42.2.19"
+val postgresVersion = "42.2.20"
 val embeddedPostgres = "1.2.10"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.4.32"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    kotlin("jvm") version "1.5.0"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 java {
@@ -56,7 +56,9 @@ dependencies {
 
 
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
-    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
+    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion") {
+        exclude(group = "com.github.jknack")
+    }
     testImplementation("com.networknt:json-schema-validator:$schemaValidatorVersion")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
@@ -80,6 +82,7 @@ repositories {
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
+    maven { url = uri("https://jitpack.io") }
     mavenCentral()
 }
 
@@ -112,7 +115,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.0"
+        gradleVersion = "7.0.1"
     }
 
 }

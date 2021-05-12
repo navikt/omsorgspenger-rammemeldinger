@@ -79,7 +79,7 @@ internal object Beregninger {
         }
 
 
-        val fordeltBort = fordelingGirMeldinger.sumBy { it.lengde.antallDager() }.also {
+        val fordeltBort = fordelingGirMeldinger.sumOf { it.lengde.antallDager() }.also {
             if (it > 0) {
                 behandling.lovanvendelser.leggTil(
                     periode = periode,
@@ -89,7 +89,7 @@ internal object Beregninger {
             }
         }
 
-        val koronaOverførtTrekkesFra = koronaOverføringer.sumBy { it.lengde.antallDager() }.let { totaltAntallDagerKoronaOverført ->
+        val koronaOverførtTrekkesFra = koronaOverføringer.sumOf { it.lengde.antallDager() }.let { totaltAntallDagerKoronaOverført ->
             if (totaltAntallDagerKoronaOverført <= 0) 0
             else {
                 val anvendelser = mutableSetOf(

@@ -42,7 +42,7 @@ internal object Issuers {
         requiredGroups = setOf(),
         requiredRoles = requiredRoles
     )
-    private fun Environment.azureV2Issuer() = hentRequiredEnv("AZURE_V2_ISSUER")
-    private fun Environment.azureV2JwksUri() = URI(hentRequiredEnv("AZURE_V2_JWKS_URI"))
+    private fun Environment.azureV2Issuer() = hentRequiredEnv("AZURE_OPENID_CONFIG_ISSUER")
+    private fun Environment.azureV2JwksUri() = URI(hentRequiredEnv("AZURE_OPENID_CONFIG_JWKS_URI"))
     private fun Environment.azureV2Audience() = hentRequiredEnv("AZURE_APP_CLIENT_ID")
 }

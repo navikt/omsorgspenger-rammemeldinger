@@ -113,7 +113,7 @@ internal object Beregninger {
 
     private fun Grunnlag.antallDagerKoronaOverført(periode: Periode) = koronaoverføringer
         .filter { overføringer -> overføringer.periode().overlapperMedMinstEnDag(periode) }
-        .sumBy { overføring -> overføring.lengde.antallDager() }
+        .sumOf { overføring -> overføring.lengde.antallDager() }
 }
 
 private object DoblingAvAntallDagerKorona : Lovhenvisning {

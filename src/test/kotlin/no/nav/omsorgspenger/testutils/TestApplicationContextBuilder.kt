@@ -11,11 +11,7 @@ import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
 import no.nav.omsorgspenger.ApplicationContext
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.RecordMetadata
-import org.apache.kafka.common.TopicPartition
 import org.flywaydb.core.Flyway
-import java.util.concurrent.CompletableFuture
 import javax.sql.DataSource
 
 internal fun TestApplicationContextBuilder(
@@ -28,7 +24,7 @@ internal fun TestApplicationContextBuilder(
     accessTokenClient = mockk<AccessTokenClient>().also {
         every { it.getAccessToken(any()) }.returns(AccessTokenResponse(accessToken = "foo", expiresIn = 1000, tokenType = "Bearer"))
     },
-    kafkaProducer = mockk(),
+    kafkaProducerOnPrem = mockk(),
     omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
         every { it.hent(any(), any(), any())}.returns(listOf())
         coEvery { it.check() }.returns(Healthy("OmsorgspengerInfotrygdRammevedtakGateway", "Mock helsesjekk OK!"))
@@ -39,8 +35,8 @@ internal fun TestApplicationContextBuilder(
                 "TILGANGSSTYRING_URL" to "test"
         )
         else -> mapOf(
-            "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
-            "AZURE_V2_JWKS_URI" to wireMockServer.getAzureV2JwksUrl(),
+            "AZURE_OPENID_CONFIG_ISSUER" to Azure.V2_0.getIssuer(),
+            "AZURE_OPENID_CONFIG_JWKS_URI" to wireMockServer.getAzureV2JwksUrl(),
             "AZURE_APP_CLIENT_ID" to "omsorgspenger-rammemeldinger",
             "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl()
         )
