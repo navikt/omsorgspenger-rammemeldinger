@@ -42,7 +42,7 @@ internal class OverføringerApiTest(
 ) {
 
     private val tilgangsstyringMock = mockk<TilgangsstyringRestClient>().also {
-        coEvery { it.sjekkTilgang(setOf("22", "33", "44", "55"), any(), any()) }
+        coEvery { it.sjekkTilgang(setOf("22", "33", "44", "55"), any(), any(), any()) }
                 .returns(true)
     }
 

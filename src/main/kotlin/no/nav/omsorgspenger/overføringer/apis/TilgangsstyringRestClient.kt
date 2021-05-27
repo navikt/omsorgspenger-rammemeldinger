@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.overføringer.apis
 
+import com.nimbusds.jwt.SignedJWT
 import io.ktor.client.HttpClient
 import io.ktor.client.features.ResponseException
 import io.ktor.client.request.get
@@ -11,28 +12,38 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.util.toByteArray
-import java.util.*
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
+import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
+import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
 import no.nav.k9.rapid.river.Environment
+import no.nav.k9.rapid.river.csvTilSet
 import no.nav.k9.rapid.river.hentRequiredEnv
+import no.nav.omsorgspenger.CorrelationId
 import org.slf4j.LoggerFactory
 
 internal class TilgangsstyringRestClient(
         private val httpClient: HttpClient,
+        private val accessTokenClient: AccessTokenClient,
         env: Environment
 ): HealthCheck {
 
     private val logger = LoggerFactory.getLogger(TilgangsstyringRestClient::class.java)
     private val tilgangUrl = env.hentRequiredEnv("TILGANGSSTYRING_URL")
+    private val scopes = env.hentRequiredEnv("TILGANGSSTYRING_SCOPES").csvTilSet()
 
-    internal suspend fun sjekkTilgang(identer: Set<String>, authHeader: String, beskrivelse: String): Boolean {
+    private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
+
+    internal suspend fun sjekkTilgang(identer: Set<String>, authHeader: String, beskrivelse: String, correlationId: CorrelationId): Boolean {
         return kotlin.runCatching {
             httpClient.post<HttpStatement>("$tilgangUrl/api/tilgang/personer") {
-                header(HttpHeaders.Authorization, authHeader)
+                header(HttpHeaders.Authorization, cachedAccessTokenClient.getAccessToken(
+                    scopes = scopes,
+                    onBehalfOf = authHeader.removePrefix("Bearer ")
+                ).asAuthoriationHeader())
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
-                header(HttpHeaders.XCorrelationId, UUID.randomUUID().toString())
+                header(HttpHeaders.XCorrelationId, correlationId)
                 body = PersonerRequestBody(identer, Operasjon.Visning, beskrivelse)
             }.execute()
         }.håndterResponse()
@@ -61,20 +72,42 @@ internal class TilgangsstyringRestClient(
             logger.error("HTTP ${status.value} fra omsorgspenger-tilgangsstyring, response: ${String(content.toByteArray())}")
 
     override suspend fun check(): no.nav.helse.dusseldorf.ktor.health.Result {
+        return no.nav.helse.dusseldorf.ktor.health.Result.merge(
+            name = "TilgangsstyringRestClient",
+            pingCheck(),
+            accessTokenCheck()
+        )
+    }
+
+    private suspend fun pingCheck(): no.nav.helse.dusseldorf.ktor.health.Result {
         return kotlin.runCatching {
             httpClient.get<HttpStatement>("$tilgangUrl/isalive").execute()
         }.fold(
                 onSuccess = { response ->
                     when (HttpStatusCode.OK == response.status) {
-                        true -> Healthy("TilgangsstyringRestClient", "OK")
-                        false -> UnHealthy("TilgangsstyringRestClient", "Feil: Mottok Http Status Code ${response.status.value}")
+                        true -> Healthy("PingCheck", "OK")
+                        false -> UnHealthy("PingCheck", "Feil: Mottok Http Status Code ${response.status.value}")
                     }
                 },
                 onFailure = {
-                    UnHealthy("TilgangsstyringRestClient", "Feil: ${it.message}")
+                    UnHealthy("PingCheck", "Feil: ${it.message}")
                 }
         )
     }
+
+    private fun accessTokenCheck() = kotlin.runCatching {
+        val accessTokenResponse = accessTokenClient.getAccessToken(scopes)
+        (SignedJWT.parse(accessTokenResponse.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()
+            ?: emptyList()).contains("access_as_application")
+    }.fold(
+        onSuccess = {
+            when (it) {
+                true -> Healthy("AccessTokenCheck", "OK")
+                false -> UnHealthy("AccessTokenCheck", "Feil: Mangler rettigheter")
+            }
+        },
+        onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
+    )
 }
 
 enum class Operasjon {

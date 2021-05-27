@@ -7,23 +7,34 @@ import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import kotlin.test.assertFalse
 import kotlinx.coroutines.runBlocking
+import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
+import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.omsorgspenger.testutils.AuthorizationHeaders.authorizedUser
 import no.nav.omsorgspenger.testutils.WireMockExtension
 import no.nav.omsorgspenger.testutils.personident403
 import no.nav.omsorgspenger.testutils.tilgangApiBaseUrl
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.net.URI
 
 @ExtendWith(WireMockExtension::class)
 internal class TilgangsstyringRestClientTest(
-        private val wireMockServer: WireMockServer
-) {
+        wireMockServer: WireMockServer) {
 
     private val tilgangsstyringRestClient = TilgangsstyringRestClient(
-            env = mapOf("TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl()),
-            httpClient = HttpClient {
-                install(JsonFeature) { serializer = JacksonSerializer(jacksonObjectMapper()) }
-            }
+        env = mapOf(
+            "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl(),
+            "TILGANGSSTYRING_SCOPES" to "tilgangsstyring/.default"
+        ),
+        httpClient = HttpClient {
+            install(JsonFeature) { serializer = JacksonSerializer(jacksonObjectMapper()) }
+        },
+        accessTokenClient = ClientSecretAccessTokenClient(
+            clientId = "foo",
+            clientSecret = "bar",
+            tokenEndpoint = URI(wireMockServer.getAzureV2TokenUrl()),
+            authenticationMode = ClientSecretAccessTokenClient.AuthenticationMode.POST
+        )
     )
 
     @Test
@@ -32,7 +43,9 @@ internal class TilgangsstyringRestClientTest(
             tilgangsstyringRestClient.sjekkTilgang(
                 identer = setOf(personident403),
                 authHeader = authorizedUser(),
-                beskrivelse = "test")
+                beskrivelse = "test",
+                correlationId = "foo-bar"
+            )
         }
 
         assertFalse(harTilgang)
@@ -42,9 +55,11 @@ internal class TilgangsstyringRestClientTest(
     fun `Boolean true for de som skall ha tilgang`() {
         val harTilgang = runBlocking {
             tilgangsstyringRestClient.sjekkTilgang(
-                    identer = setOf("123123"),
-                    authHeader = authorizedUser(),
-                    beskrivelse = "test")
+                identer = setOf("123123"),
+                authHeader = authorizedUser(),
+                beskrivelse = "test",
+                correlationId = "foo-bar"
+            )
         }
 
         assert(harTilgang)

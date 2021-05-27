@@ -41,6 +41,7 @@ internal fun TestApplicationContextBuilder(
             "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl()
         )
     }.plus(additionalEnv).plus(mapOf(
+        "TILGANGSSTYRING_SCOPES" to "tilgangsstyring./default",
         "OVERFORING_BEHANDLE_MOTTATT_ETTER" to "2000-01-01",
         "KORONA_BEHANDLE_MOTTATT_ETTER" to "2000-01-01"
     ))
