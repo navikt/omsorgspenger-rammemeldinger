@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger.apis
 
 import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -17,6 +18,7 @@ import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.*
 
 internal fun Route.GjeldendeOverføringerApi(
     path: String,
@@ -64,7 +66,12 @@ internal fun Route.GjeldendeOverføringerApi(
 
         val authHeader = requireNotNull(call.request.headers[HttpHeaders.Authorization])
         val identer = saksnummerIdentitetsnummerMapping.values.toSet()
-        val harTilgang = tilgangsstyringRestClient.sjekkTilgang(identer, authHeader, oppslagBeskrivelse)
+        val harTilgang = tilgangsstyringRestClient.sjekkTilgang(
+            identer = identer,
+            authHeader = authHeader,
+            beskrivelse = oppslagBeskrivelse,
+            correlationId = call.callId?:"${UUID.randomUUID()}"
+        )
 
         if (!harTilgang) {
             return@get call.respond(HttpStatusCode.Forbidden)

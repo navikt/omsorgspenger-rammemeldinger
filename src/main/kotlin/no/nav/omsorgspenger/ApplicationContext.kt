@@ -95,10 +95,11 @@ internal class ApplicationContext(
         internal var spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService? = null) {
         internal fun build() : ApplicationContext {
             val benyttetEnv = env?:System.getenv()
-            val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
+            val benyttetAccessTokenClient = accessTokenClient ?: ClientSecretAccessTokenClient(
                 clientId = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
                 clientSecret = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_SECRET"),
-                tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"))
+                tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")),
+                authenticationMode = ClientSecretAccessTokenClient.AuthenticationMode.POST
             )
             val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway?: OmsorgspengerInfotrygdRammevedtakGateway(
                 accessTokenClient = benyttetAccessTokenClient,
@@ -141,7 +142,8 @@ internal class ApplicationContext(
                 httpClient = HttpClient {
                     install(JsonFeature) { serializer = JacksonSerializer(jacksonObjectMapper()) }
                 },
-                env = benyttetEnv
+                env = benyttetEnv,
+                accessTokenClient = benyttetAccessTokenClient
             )
 
             val benyttetKoronaoverføringRepository = koronaoverføringRepository ?: KoronaoverføringRepository(
