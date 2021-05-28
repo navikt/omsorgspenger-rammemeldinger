@@ -15,7 +15,7 @@ jobs:
         with:
           java-version: '15'
           distribution: 'adopt'
-      - uses: actions/cache@v2.1.5
+      - uses: actions/cache@v2.1.6
         with:
           path: |
             ~/.gradle/caches
