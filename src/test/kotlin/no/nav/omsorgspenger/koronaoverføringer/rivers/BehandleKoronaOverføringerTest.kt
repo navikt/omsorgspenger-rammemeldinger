@@ -7,7 +7,6 @@ import no.nav.k9.rapid.losning.OverføreKoronaOmsorgsdagerLøsning
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
 import no.nav.omsorgspenger.koronaoverføringer.rivers.KoronaoverføringerRapidVerktøy.gjennomførKoronaOverføring
 import no.nav.omsorgspenger.koronaoverføringer.statistikk.StatistikkFormat.assertForventetAvslag
@@ -97,13 +96,7 @@ internal class BehandleKoronaOverføringerTest(
             assertThat(it.gitt).isEmpty()
         }
         hentAleneOmOmsorgen("foo").also {
-            assertThat(it).hasSameElementsAs(setOf(AleneOmOmsorgen(
-                registrert = registrert,
-                periode = Periode(fom = LocalDate.now(), tom = LocalDate.parse("2038-12-31")), // Ut året barnet fyller 18
-                behovssekvensId = id,
-                barn = AleneOmOmsorgen.Barn(identitetsnummer = barnet.identitetsnummer, fødselsdato = barnet.fødselsdato),
-                regstrertIForbindelseMed = "KoronaOverføring"
-            )))
+            assertThat(it).isEmpty()
         }
         statistikkService.finnStatistikkMeldingFor(id).assertForventetGjennomført(id)
     }

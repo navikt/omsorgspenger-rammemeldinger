@@ -9,30 +9,6 @@ import java.time.LocalDate
 internal class AleneOmOmsorgenService(
     private val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository) {
 
-    internal fun lagreIForbindelseMedOverføring(
-        behovssekvensId: BehovssekvensId,
-        saksnummer: Saksnummer,
-        dato: LocalDate,
-        aleneOmOmsorgenFor: List<AleneOmOmsorgen.Barn>) = lagre(
-        behovssekvensId = behovssekvensId,
-        saksnummer = saksnummer,
-        dato = dato,
-        aleneOmOmsorgenFor = aleneOmOmsorgenFor,
-        registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.Overføring
-    )
-
-    internal fun lagreIForbindelseMedKoronaOverføring(
-        behovssekvensId: BehovssekvensId,
-        saksnummer: Saksnummer,
-        dato: LocalDate,
-        aleneOmOmsorgenFor: List<AleneOmOmsorgen.Barn>) = lagre(
-        behovssekvensId = behovssekvensId,
-        saksnummer = saksnummer,
-        dato = dato,
-        aleneOmOmsorgenFor = aleneOmOmsorgenFor,
-        registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.KoronaOverføring
-    )
-
     internal fun lagreIForbindelseMedAleneOmOmsorgen(
         behovssekvensId: BehovssekvensId,
         saksnummer: Saksnummer,

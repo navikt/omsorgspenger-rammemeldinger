@@ -4,8 +4,6 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding
@@ -36,7 +34,6 @@ internal class BehandleOverføreKoronaOmsorgsdager(
     rapidsConnection: RapidsConnection,
     behovssekvensRepository: BehovssekvensRepository,
     private val koronaoverføringRepository: KoronaoverføringRepository,
-    private val aleneOmOmsorgenService: AleneOmOmsorgenService,
     private val saksnummerRepository: SaksnummerRepository
 ) : PersistentBehovssekvensPacketListener(
     steg = "BehandleOverføreKoronaOmsorgsdager",
@@ -91,16 +88,6 @@ internal class BehandleOverføreKoronaOmsorgsdager(
             relasjoner = relasjoner,
             koronaoverføringer = koronaOverføringGirMeldinger
         ).vurdert(behandling)
-
-        aleneOmOmsorgenService.lagreIForbindelseMedKoronaOverføring(
-            behovssekvensId = id,
-            saksnummer = fraSaksnummer,
-            dato = grunnlag.behovet.mottaksdato,
-            aleneOmOmsorgenFor = grunnlag.behovet.barn.filter { it.aleneOmOmsorgen }.map { AleneOmOmsorgen.Barn(
-                identitetsnummer = it.identitetsnummer,
-                fødselsdato = it.fødselsdato
-            )}
-        )
 
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(
             behandling = behandling,

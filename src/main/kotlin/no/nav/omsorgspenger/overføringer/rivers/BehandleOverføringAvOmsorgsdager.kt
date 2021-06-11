@@ -4,8 +4,6 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
-import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenService
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.fordelinger.meldinger.HentFordelingGirMeldingerMelding
@@ -33,7 +31,6 @@ import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding.VurderRelasjoner
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
 import no.nav.omsorgspenger.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
-import no.nav.omsorgspenger.rivers.meldinger.OpprettGosysJournalføringsoppgaverMelding
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 
@@ -43,7 +40,6 @@ internal class BehandleOverføringAvOmsorgsdager(
     rapidsConnection: RapidsConnection,
     private val gjennomførOverføringService: GjennomførOverføringService,
     private val saksnummerRepository: SaksnummerRepository,
-    private val aleneOmOmsorgenService: AleneOmOmsorgenService,
     behovssekvensRepository: BehovssekvensRepository
 ) : PersistentBehovssekvensPacketListener(
     steg = "BehandleOverføringAvOmsorgsdager",
@@ -114,16 +110,6 @@ internal class BehandleOverføringAvOmsorgsdager(
         vurderInngangsvilkår(
             grunnlag = grunnlag,
             behandling = behandling
-        )
-
-        aleneOmOmsorgenService.lagreIForbindelseMedOverføring(
-            behovssekvensId = id,
-            saksnummer = fraTilSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
-            dato = grunnlag.overføreOmsorgsdager.mottaksdato,
-            aleneOmOmsorgenFor = grunnlag.overføreOmsorgsdager.barn.filter { it.aleneOmOmsorgen }.map { AleneOmOmsorgen.Barn(
-                identitetsnummer = it.identitetsnummer,
-                fødselsdato = it.fødselsdato,
-            )}
         )
 
         val omsorgsdagerTilgjengeligForOverføring = beregnOmsorgsdagerTilgjengeligForOverføring(
