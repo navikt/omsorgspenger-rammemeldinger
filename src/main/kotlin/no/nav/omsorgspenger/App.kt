@@ -22,8 +22,6 @@ import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
-import no.nav.omsorgspenger.aleneom.rivers.InitierAleneOmOmsorgen
-import no.nav.omsorgspenger.aleneom.rivers.LagreAleneOmOmsorgen
 import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.apis.KoronaOverføringerApi
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerApi
@@ -31,7 +29,6 @@ import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOpphøreKoronaOve
 import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
-import no.nav.omsorgspenger.midlertidigalene.rivers.InitierMidlertidigAlene
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOpphøreOverføringer
 import java.time.LocalDate
@@ -73,27 +70,12 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         behovssekvensRepository = applicationContext.behovssekvensRepository,
         overføringerRepository = applicationContext.overføringRepository
     )
-    InitierMidlertidigAlene(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
-    )
     InitierFordelingAvOmsorgsdager(
         rapidsConnection = this,
         behovssekvensRepository = applicationContext.behovssekvensRepository
     )
     registerOverføreKoronaOmsorgsdager(
         applicationContext = applicationContext
-    )
-
-    InitierAleneOmOmsorgen(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
-    )
-
-    LagreAleneOmOmsorgen(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository,
-        aleneOmOmsorgenService = applicationContext.aleneOmOmsorgenService
     )
 
     register(object : RapidsConnection.StatusListener {
