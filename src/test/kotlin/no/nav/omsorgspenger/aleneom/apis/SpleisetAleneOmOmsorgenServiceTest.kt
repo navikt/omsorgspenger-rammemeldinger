@@ -1,8 +1,10 @@
 package no.nav.omsorgspenger.aleneom.apis
 
 import io.mockk.clearMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgen
@@ -166,7 +168,7 @@ internal class SpleisetAleneOmOmsorgenServiceTest {
 
     private fun mockInfotrygd(
         aleneOmOmsorgen: List<InfotrygdAleneOmOmsorgenMelding> = listOf()) {
-        every { infotrygdRammeServiceMock.hentAleneOmOmsorgen(any(), any(), any()) }.returns(aleneOmOmsorgen)
+        coEvery { infotrygdRammeServiceMock.hentAleneOmOmsorgen(any(), any(), any()) }.returns(aleneOmOmsorgen)
     }
 
     private fun mockNyLøsning(
@@ -175,11 +177,11 @@ internal class SpleisetAleneOmOmsorgenServiceTest {
         every { aleneOmOmsorgenRepository.hent(Saksnummer) }.returns(aleneOmOmsorgen)
     }
 
-    private fun hentSpleiset() = spleisetAleneOmOmsorgenService.hentSpleisetAleneOmOmsorgen(
+    private fun hentSpleiset() = runBlocking { spleisetAleneOmOmsorgenService.hentSpleisetAleneOmOmsorgen(
         identitetsnummer = Identitsnummer,
         periode = periode,
         correlationId = CorrelationId
-    )
+    )}
 
     private companion object {
         private const val Identitsnummer = "Id-1"

@@ -3,7 +3,7 @@ package no.nav.omsorgspenger.koronaoverføringer.apis
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.omsorgspengerRammemeldinger
@@ -28,7 +28,7 @@ internal class SpleisetKoronaOverføringerApiTest(
     wireMockServer: WireMockServer) {
 
     private val spleisetoverføringerServiceMock = mockk<SpleisetKoronaOverføringerService>().also {
-        every { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
+        coEvery { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
             gitt = listOf(SpleisetOverføringGitt(
                 gjennomført = LocalDate.parse("2018-01-01"),
                 gyldigFraOgMed = LocalDate.parse("2019-01-01"),

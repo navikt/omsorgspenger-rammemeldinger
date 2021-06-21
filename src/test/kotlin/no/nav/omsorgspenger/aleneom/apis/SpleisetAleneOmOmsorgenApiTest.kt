@@ -3,7 +3,7 @@ package no.nav.omsorgspenger.aleneom.apis
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.omsorgspengerRammemeldinger
@@ -26,7 +26,7 @@ internal class SpleisetAleneOmOmsorgenApiTest(
     wireMockServer: WireMockServer) {
 
     private val spleisetAleneOmOmsorgenServiceMock = mockk<SpleisetAleneOmOmsorgenService>().also {
-        every { it.hentSpleisetAleneOmOmsorgen(any(), any(), any()) }.returns(
+        coEvery { it.hentSpleisetAleneOmOmsorgen(any(), any(), any()) }.returns(
             listOf(
                 SpleisetAleneOmOmsorgen(
                     registrert = LocalDate.parse("2020-01-01"),

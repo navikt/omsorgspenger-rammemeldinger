@@ -7,7 +7,7 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 
 internal class UtvidetRettService(
     private val infotrygdRammeService: InfotrygdRammeService) {
-    internal fun hentUtvidetRettVedtak(
+    internal suspend fun hentUtvidetRettVedtak(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
         correlationId: CorrelationId) : List<UtvidetRettVedtak> =

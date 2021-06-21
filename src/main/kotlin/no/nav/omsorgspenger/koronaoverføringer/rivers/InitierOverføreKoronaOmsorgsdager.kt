@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
+import kotlinx.coroutines.runBlocking
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
@@ -95,29 +96,29 @@ internal class InitierOverføreKoronaOmsorgsdager(
                 )
 
                 logger.info("Henter rammemeldinger & rammevedtak")
-                val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
+                val fordelingGirMeldinger = runBlocking { fordelingService.hentFordelingGirMeldinger(
                     identitetsnummer = identitetsnummer,
                     periode = periode,
                     correlationId = correlationId
-                )
+                )}
 
-                val overføringGirMeldinger = spleisetOverføringerService.hentSpleisetOverføringer(
+                val overføringGirMeldinger = runBlocking { spleisetOverføringerService.hentSpleisetOverføringer(
                     identitetsnummer = identitetsnummer,
                     periode = periode,
                     correlationId = correlationId
-                ).gitt
+                ).gitt}
 
-                val koronaoverføringGirMeldinger = spleisetKoronaOverføringerService.hentSpleisetOverføringer(
+                val koronaoverføringGirMeldinger = runBlocking { spleisetKoronaOverføringerService.hentSpleisetOverføringer(
                     identitetsnummer = identitetsnummer,
                     periode = periode,
                     correlationId = correlationId
-                ).gitt
+                ).gitt}
 
-                val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
+                val utvidetRettVedtak = runBlocking { utvidetRettService.hentUtvidetRettVedtak(
                     identitetsnummer = identitetsnummer,
                     periode = periode,
                     correlationId = correlationId
-                )
+                )}
 
                 logger.info("legger til behov med løsninger [${HentFordelingGirMeldinger}, ${HentUtvidetRettVedtak}, ${HentOverføringGirMeldinger}, ${HentKoronaOverføringGirMeldinger}]")
                 logger.warn("Løsning på behov [${HentUtvidetRettVedtak}] bør flyttes til 'omsorgspenger-rammevedtak'")

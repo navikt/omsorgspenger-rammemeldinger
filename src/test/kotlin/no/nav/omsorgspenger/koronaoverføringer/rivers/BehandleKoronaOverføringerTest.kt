@@ -1,7 +1,8 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.losning.OverføreKoronaOmsorgsdagerLøsning
 import no.nav.omsorgspenger.Identitetsnummer
@@ -140,11 +141,11 @@ internal class BehandleKoronaOverføringerTest(
     }
 
     private fun hentKoronaoverføringerFor(identitetsnummer: Identitetsnummer) =
-        applicationContext.spleisetKoronaOverføringerService.hentSpleisetOverføringer(
+        runBlocking { applicationContext.spleisetKoronaOverføringerService.hentSpleisetOverføringer(
             identitetsnummer = identitetsnummer,
             periode = Periode("2021-01-01/2021-12-31"),
             correlationId = "test"
-        )
+        )}
 
     private fun hentAleneOmOmsorgen(saksnummer: Saksnummer) = applicationContext.aleneOmOmsorgenRepository.hent(saksnummer).map {
         it.copy(registrert = registrert)
@@ -153,7 +154,7 @@ internal class BehandleKoronaOverføringerTest(
     private companion object {
         val registrert = ZonedDateTime.parse("2021-01-10T12:15:00.000+01:00")
         private val overføringerMock = mockk<SpleisetOverføringerService>().also {
-            every { it.hentSpleisetOverføringer(any(), any(), any()) }
+            coEvery { it.hentSpleisetOverføringer(any(), any(), any()) }
                 .returns(SpleisetOverføringer(
                     gitt = listOf(overføring(
                         periode = Periode("2021-01-01/2021-12-31"),

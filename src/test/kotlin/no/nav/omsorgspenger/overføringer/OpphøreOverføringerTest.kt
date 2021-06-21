@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.overføringer
 
+import kotlinx.coroutines.runBlocking
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
@@ -105,11 +106,11 @@ internal class OpphøreOverføringerTest(
         }
     }
 
-    private fun hent(identitetsnummer: Identitetsnummer) = applicationContext.spleisetOverføringerService.hentSpleisetOverføringer(
+    private fun hent(identitetsnummer: Identitetsnummer) = runBlocking { applicationContext.spleisetOverføringerService.hentSpleisetOverføringer(
         identitetsnummer = identitetsnummer,
         periode = periode,
         correlationId = correlationId
-    )
+    )}
 
     private companion object {
         private val iDag = LocalDate.now()

@@ -18,7 +18,7 @@ internal class SpleisetAleneOmOmsorgenService(
     private val saksnummerService: SaksnummerService,
     private val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository) {
 
-    internal fun hentSpleisetAleneOmOmsorgen(
+    internal suspend fun hentSpleisetAleneOmOmsorgen(
             identitetsnummer: Identitetsnummer,
             periode: Periode,
             correlationId: CorrelationId): List<SpleisetAleneOmOmsorgen> {

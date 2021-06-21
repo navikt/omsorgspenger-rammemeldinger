@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.overføringer
 
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -93,7 +94,7 @@ internal class TidligereKoronaoverførtTest(
 
     private companion object {
         val spleisetKoronaOverføringerServiceMock = mockk<SpleisetKoronaOverføringerService>().also {
-            every { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
+            coEvery { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
                 fått = emptyList(),
                 gitt = listOf(SpleisetOverføringGitt(
                     gjennomført = LocalDate.now(),

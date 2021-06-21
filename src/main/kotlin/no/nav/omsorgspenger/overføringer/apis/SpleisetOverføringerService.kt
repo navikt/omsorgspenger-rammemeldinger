@@ -19,7 +19,7 @@ internal class SpleisetOverføringerService(
     private val saksnummerService: SaksnummerService,
     private val overføringRepository: OverføringRepository) {
 
-    internal fun hentSpleisetOverføringer(
+    internal suspend fun hentSpleisetOverføringer(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
         correlationId: CorrelationId) : SpleisetOverføringer {

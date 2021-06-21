@@ -7,7 +7,7 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 
 internal class FordelingService(
     private val infotrygdRammeService: InfotrygdRammeService) {
-    internal fun hentFordelingGirMeldinger(
+    internal suspend fun hentFordelingGirMeldinger(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
         correlationId: CorrelationId) : List<FordelingGirMelding> =

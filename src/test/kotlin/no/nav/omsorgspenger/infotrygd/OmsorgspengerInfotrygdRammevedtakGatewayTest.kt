@@ -146,11 +146,11 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
             periode = periode
         )
 
-        val infotrygdRammer = gateway.hent(
+        val infotrygdRammer = runBlocking { gateway.hent(
             identitetsnummer = identitetsnummer,
             periode = periode,
             correlationId = UUID.randomUUID().toString()
-        )
+        )}
 
         assertThat(infotrygdRammer).hasSameElementsAs(forventedeInfotrygdRammer)
     }
