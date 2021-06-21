@@ -1,8 +1,10 @@
 package no.nav.omsorgspenger.overføringer.apis
 
 import io.mockk.clearMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
@@ -194,8 +196,8 @@ internal class SpleisetOverføringerServiceTest {
     private fun mockInfotrygd(
         gitt: List<InfotrygdOverføringGirMelding> = listOf(),
         fått: List<InfotrygdOverføringFårMelding> = listOf()) {
-        every { infotrygdRammeServiceMock.hentOverføringGir(any(), any(), any()) }.returns(gitt)
-        every { infotrygdRammeServiceMock.hentOverføringFår(any(), any(), any()) }.returns(fått)
+        coEvery { infotrygdRammeServiceMock.hentOverføringGir(any(), any(), any()) }.returns(gitt)
+        coEvery { infotrygdRammeServiceMock.hentOverføringFår(any(), any(), any()) }.returns(fått)
     }
 
     private fun mockNyLøsning(
@@ -209,11 +211,11 @@ internal class SpleisetOverføringerServiceTest {
         every { saksnummerServiceMock.hentSaksnummerIdentitetsnummerMapping(saksnummer) }.returns(saksnummerIdentitetsnummerMapping)
     }
 
-    private fun hentSpleisetOverføringer() = spleisetOverføringerService.hentSpleisetOverføringer(
+    private fun hentSpleisetOverføringer() = runBlocking { spleisetOverføringerService.hentSpleisetOverføringer(
         identitetsnummer = identitetsnummer,
         periode = periode,
         correlationId = correlationId
-    )
+    )}
 
     private companion object {
         private val kilderNyLøsning = setOf(

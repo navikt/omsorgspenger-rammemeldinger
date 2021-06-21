@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
+import kotlinx.coroutines.runBlocking
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
@@ -148,11 +149,11 @@ internal class OpphøreKoronaOverføringerTest(
 
     }
 
-    private fun hent(identitetsnummer: Identitetsnummer) = applicationContext.spleisetKoronaOverføringerService.hentSpleisetOverføringer(
+    private fun hent(identitetsnummer: Identitetsnummer) = runBlocking { applicationContext.spleisetKoronaOverføringerService.hentSpleisetOverføringer(
         identitetsnummer = identitetsnummer,
         periode = Ut2021,
         correlationId = "${UUID.randomUUID()}"
-    ).sammenlignbar()
+    ).sammenlignbar()}
 
     private companion object {
         private val IDag = LocalDate.parse("2021-03-19")

@@ -14,7 +14,7 @@ internal class InfotrygdRammeService(
         .maximumSize(200)
         .build()
 
-    private fun hentAlle(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) : List<InfotrygdRamme> {
+    private suspend fun hentAlle(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) : List<InfotrygdRamme> {
         val cacheKey = CacheKey(identitetsnummer, periode)
         val infotrygdRammer = cache.getIfPresent(cacheKey)?:omsorgspengerInfotrygdRammevedtakGateway.hent(
             identitetsnummer = identitetsnummer,
@@ -24,28 +24,28 @@ internal class InfotrygdRammeService(
         return cache.put(cacheKey, infotrygdRammer).let { infotrygdRammer }
     }
 
-    internal fun hentUtvidetRett(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+    internal suspend fun hentUtvidetRett(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
         hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdUtvidetRettVedtak>()
 
-    internal fun hentFordelingGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+    internal suspend fun hentFordelingGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
         hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdFordelingGirMelding>()
 
-    internal fun hentMidlertidigAlene(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+    internal suspend fun hentMidlertidigAlene(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
         hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdMidlertidigAleneVedtak>()
 
-    internal fun hentOverføringGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+    internal suspend fun hentOverføringGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
             hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdOverføringGirMelding>()
 
-    internal fun hentOverføringFår(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+    internal suspend fun hentOverføringFår(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
             hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdOverføringFårMelding>()
 
-    internal fun hentAleneOmOmsorgen(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+    internal suspend fun hentAleneOmOmsorgen(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
             hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdAleneOmOmsorgenMelding>()
 
-    internal fun hentKoronaOverføringGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+    internal suspend fun hentKoronaOverføringGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
         hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdKoronaOverføringGirMelding>()
 
-    internal fun hentKoronaOverføringFår(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
+    internal suspend fun hentKoronaOverføringFår(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
         hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdKoronaOverføringFårMelding>()
 
     private companion object {

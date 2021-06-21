@@ -1,9 +1,7 @@
 package no.nav.omsorgspenger.koronaoverføringer.apis
 
-import io.mockk.clearMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
@@ -52,8 +50,8 @@ internal class SpleisetKoronaOverføringerServiceTest {
         val spleisetOverføringer = hentSpleisetOverføringer(periode = I2021)
         verify(exactly = 1) { saksnummerServiceMock.hentSaksnummer(any()) }
         verify(exactly = 1) { koronaoverføringRepositoryMock.hentAlleOverføringer(any()) }
-        verify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }
-        verify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }
+        coVerify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }
+        coVerify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }
         assertThat(spleisetOverføringer.gitt).isEmpty()
         assertThat(spleisetOverføringer.fått).isEmpty()
     }
@@ -159,8 +157,8 @@ internal class SpleisetKoronaOverføringerServiceTest {
 
         verify(exactly = 0) { saksnummerServiceMock.hentSaksnummer(any()) }
         verify(exactly = 0) { koronaoverføringRepositoryMock.hentAlleOverføringer(any()) }
-        verify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }
-        verify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }
+        coVerify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }
+        coVerify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }
 
         assertThat(spleisetOverføringer.gitt).isEmpty()
         assertThat(spleisetOverføringer.fått).hasSameElementsAs(setOf(
@@ -192,8 +190,8 @@ internal class SpleisetKoronaOverføringerServiceTest {
 
         verify(exactly = 0) { saksnummerServiceMock.hentSaksnummer(any()) }
         verify(exactly = 0) { koronaoverføringRepositoryMock.hentAlleOverføringer(any()) }
-        verify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }
-        verify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }
+        coVerify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }
+        coVerify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }
 
         assertThat(spleisetOverføringer.gitt).isEmpty()
         assertThat(spleisetOverføringer.fått).hasSameElementsAs(setOf(
@@ -220,8 +218,8 @@ internal class SpleisetKoronaOverføringerServiceTest {
     private fun mockInfotrygd(
         gitt: List<InfotrygdKoronaOverføringGirMelding> = listOf(),
         fått: List<InfotrygdKoronaOverføringFårMelding> = listOf()) {
-        every { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }.returns(gitt)
-        every { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }.returns(fått)
+        coEvery { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }.returns(gitt)
+        coEvery { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }.returns(fått)
     }
 
     private fun mockNyLøsning(
@@ -241,11 +239,11 @@ internal class SpleisetKoronaOverføringerServiceTest {
 
     private fun hentSpleisetOverføringer(
         periode: Periode
-    ) = spleisetOverføringerService.hentSpleisetOverføringer(
+    ) = runBlocking { spleisetOverføringerService.hentSpleisetOverføringer(
         identitetsnummer = identitetsnummer,
         periode = periode,
         correlationId = correlationId
-    )
+    )}
 
     private companion object {
         private val kilderNyLøsning = setOf(

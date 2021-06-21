@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.overføringer
 
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -53,7 +54,7 @@ internal class ToParterFlerePerioderTest(
         val fødselsdatoBarnUtvidetRett= mottaksdato.minusYears(17)
         val fødsesldatoYngsteBarn = mottaksdato.minusYears(5)
 
-        every { fordelingService.hentFordelingGirMeldinger(any(), any(), any()) }
+        coEvery { fordelingService.hentFordelingGirMeldinger(any(), any(), any()) }
             .returns(listOf(FordelingGirMelding(
                 periode = Periode(
                     fom = fødsesldatoYngsteBarn.plusMonths(6),
@@ -64,7 +65,7 @@ internal class ToParterFlerePerioderTest(
             )))
 
 
-        every { utvidetRettService.hentUtvidetRettVedtak(any(), any(), any()) }
+        coEvery { utvidetRettService.hentUtvidetRettVedtak(any(), any(), any()) }
             .returns(listOf(UtvidetRettVedtak(
                 periode = Periode(
                     fom = fødselsdatoBarnUtvidetRett.plusWeeks(3),

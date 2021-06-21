@@ -7,7 +7,7 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 
 internal class MidlertidigAleneService(
     private val infotrygdRammeService: InfotrygdRammeService) {
-    internal fun hentMidlertidigAleneVedtak(
+    internal suspend fun hentMidlertidigAleneVedtak(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
         correlationId: CorrelationId) =

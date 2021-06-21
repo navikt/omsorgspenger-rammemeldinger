@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.overføringer.apis
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.omsorgspenger.Kilde
@@ -27,7 +28,7 @@ internal class SpleisetOverføringerApiTest(
     wireMockServer: WireMockServer) {
 
     private val spleisetoverføringerServiceMock = mockk<SpleisetOverføringerService>().also {
-        every { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
+        coEvery { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
             gitt = listOf(SpleisetOverføringGitt(
                 gjennomført = LocalDate.parse("2018-01-01"),
                 gyldigFraOgMed = LocalDate.parse("2019-01-01"),

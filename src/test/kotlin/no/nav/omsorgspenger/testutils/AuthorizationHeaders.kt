@@ -10,6 +10,13 @@ internal object AuthorizationHeaders {
         accessAsApplication = true
     ).let { "Bearer $it" }
 
+    internal fun omsorgsdagerAuthorized() = Azure.V2_0.generateJwt(
+        clientId = "omsorgsdager",
+        audience = "omsorgspenger-rammemeldinger",
+        clientAuthenticationMode = Azure.ClientAuthenticationMode.CLIENT_SECRET,
+        accessAsApplication = true
+    ).let { "Bearer $it" }
+
     internal fun k9AarskvantumUnauthorized() = Azure.V2_0.generateJwt(
         clientId = "k9-aarskvantum",
         audience = "omsorgspenger-infotrygd-rammemeldinger",

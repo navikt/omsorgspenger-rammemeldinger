@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.overføringer.rivers
 
+import kotlinx.coroutines.runBlocking
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
@@ -85,29 +86,29 @@ internal class InitierOverføringAvOmsorgsdager(
         val correlationId = packet.correlationId()
 
         logger.info("Henter rammemeldinger & rammevedtak")
-        val fordelingGirMeldinger = fordelingService.hentFordelingGirMeldinger(
+        val fordelingGirMeldinger = runBlocking { fordelingService.hentFordelingGirMeldinger(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
             periode = periode,
             correlationId = correlationId
-        )
+        )}
 
-        val koronaoverføringGirMeldinger = spleisetKoronaOverføringerService.hentSpleisetOverføringer(
+        val koronaoverføringGirMeldinger = runBlocking { spleisetKoronaOverføringerService.hentSpleisetOverføringer(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
             periode = periode,
             correlationId = correlationId
-        ).gitt
+        ).gitt}
 
-        val utvidetRettVedtak = utvidetRettService.hentUtvidetRettVedtak(
+        val utvidetRettVedtak = runBlocking { utvidetRettService.hentUtvidetRettVedtak(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
             periode = periode,
             correlationId = correlationId
-        )
+        )}
 
-        val midlertidigAleneVedtak = midlertidigAleneService.hentMidlertidigAleneVedtak(
+        val midlertidigAleneVedtak = runBlocking { midlertidigAleneService.hentMidlertidigAleneVedtak(
             identitetsnummer = overføreOmsorgsdager.overførerFra,
             periode = periode,
             correlationId = correlationId
-        )
+        )}
 
         logger.info("legger til behov med løsninger [$HentFordelingGirMeldinger, $HentKoronaOverføringGirMeldinger, $HentUtvidetRettVedtak, $HentMidlertidigAleneVedtak]")
         logger.warn("Løsning på behov [$HentUtvidetRettVedtak,$HentMidlertidigAleneVedtak] bør flyttes til 'omsorgspenger-rammevedtak'")

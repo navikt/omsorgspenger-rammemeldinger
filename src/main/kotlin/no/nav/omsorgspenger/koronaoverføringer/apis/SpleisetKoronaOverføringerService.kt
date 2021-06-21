@@ -17,7 +17,7 @@ internal class SpleisetKoronaOverføringerService(
     private val saksnummerService: SaksnummerService,
     private val infotrygdRammeService: InfotrygdRammeService) {
 
-    internal fun hentSpleisetOverføringer(
+    internal suspend fun hentSpleisetOverføringer(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
         correlationId: CorrelationId) : SpleisetOverføringer {
@@ -56,7 +56,7 @@ internal class SpleisetKoronaOverføringerService(
         )
     }
 
-    private fun fraInfotrygd(
+    private suspend fun fraInfotrygd(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
         correlationId: CorrelationId) : SpleisetOverføringer {

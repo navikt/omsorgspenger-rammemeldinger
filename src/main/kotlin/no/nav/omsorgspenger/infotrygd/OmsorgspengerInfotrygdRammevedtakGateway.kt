@@ -1,11 +1,12 @@
 package no.nav.omsorgspenger.infotrygd
 
-import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
-import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.httpPost
 import com.nimbusds.jwt.SignedJWT
+import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.utils.io.charsets.Charsets
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.httpGet
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.httpPost
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.jsonBody
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.readTextOrThrow
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.Result
@@ -33,28 +34,22 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
     private val pingUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/isready"
     private val rammevedtakUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/rammevedtak"
 
-    internal fun hent(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) : List<InfotrygdRamme> {
-        val (_, response, result) = rammevedtakUrl
-            .httpPost()
-            .header(HttpHeaders.Authorization, authorizationHeader())
-            .header(HttpHeaders.Accept, "application/json")
-            .header(HttpHeaders.ContentType, "application/json")
-            .header(HttpHeaders.XCorrelationId, correlationId)
-            .body(
-                body = JSONObject().also { root ->
-                    root.put("fom", periode.fom.toString())
-                    root.put("tom", periode.tom.toString())
-                    root.put("personIdent", identitetsnummer)
-                }.toString(),
-                charset = Charsets.UTF_8
-            ).responseString(charset = Charsets.UTF_8)
+    internal suspend fun hent(
+        identitetsnummer: Identitetsnummer,
+        periode: Periode,
+        correlationId: CorrelationId) : List<InfotrygdRamme> {
+        val (httpStatusCode, response) = rammevedtakUrl.httpPost { builder ->
+            builder.header(HttpHeaders.Authorization, authorizationHeader())
+            builder.header(HttpHeaders.Accept, "application/json")
+            builder.header(HttpHeaders.XCorrelationId, correlationId)
+            builder.jsonBody("""{"fom":"${periode.fom}", "tom":"${periode.tom}", personIdent:"$identitetsnummer"}""")
+        }.readTextOrThrow()
 
-        val json = result.fold(
-            success = { JSONObject(it) },
-            failure = {
-                throw IllegalStateException("HTTP ${response.statusCode} - ${it.message}")
-            }
-        )
+        require(httpStatusCode.isSuccess()) {
+            throw IllegalStateException("HTTP ${httpStatusCode.value} fra $rammevedtakUrl")
+        }
+
+        val json = JSONObject(response)
 
         val rammevedtak = json.getJSONObject("rammevedtak")
 
@@ -152,11 +147,10 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
 
 
     private suspend fun pingOmsorgspengerInfotrygdRammevetakCheck() =
-        pingUrl.httpGet().awaitStringResponseResult().third.fold(
-            success = { Healthy("PingOmsorgspengerInfotrygdRammevetak", "OK: $it") },
-            failure = { UnHealthy("PingOmsorgspengerInfotrygdRammevetak", "Feil: ${it.message}") }
+        pingUrl.httpGet().second.fold(
+            onSuccess = { Healthy("PingOmsorgspengerInfotrygdRammevetak", "OK: $it") },
+            onFailure = { UnHealthy("PingOmsorgspengerInfotrygdRammevetak", "Feil: ${it.message}") }
         )
-
 
     private companion object {
         private val logger = LoggerFactory.getLogger(OmsorgspengerInfotrygdRammevedtakGateway::class.java)
