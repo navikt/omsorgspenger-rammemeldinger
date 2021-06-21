@@ -37,7 +37,7 @@ internal fun Route.GjeldendeOverføringerApi(
             call.saksnummer()
         } catch (cause: IllegalArgumentException) {
             call.respondJson(
-                json = """{"melding":"Ugylidg request ${cause.message}"}""",
+                json = """{"melding":"Ugyldig request ${cause.message}"}""",
                 status = HttpStatusCode.BadRequest
             )
             return@get
