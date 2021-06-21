@@ -23,6 +23,10 @@ internal fun Route.AleneOmOmsorgenApi(
                 barnJson.put("identitetsnummer", aleneOmOmsorgen.barn.identitetsnummer)
                 barnJson.put("fødselsdato", "${aleneOmOmsorgen.barn.fødselsdato}")
             })
+            json.put("kilde", JSONObject().also { kildeJson ->
+                kildeJson.put("id", aleneOmOmsorgen.kilde.id)
+                kildeJson.put("type", aleneOmOmsorgen.kilde.type)
+            })
         }}
 
         call.respondText(

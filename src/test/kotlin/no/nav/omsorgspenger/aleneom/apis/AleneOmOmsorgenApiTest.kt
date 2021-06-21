@@ -41,7 +41,7 @@ internal class AleneOmOmsorgenApiTest(
         )
         every { it.hent("SAK1") }.returns(setOf(
             aleneOmOmsorgen,
-            aleneOmOmsorgen.copy(periode = Periode("2025-03-03/2030-12-31"))
+            aleneOmOmsorgen.copy(periode = Periode("2025-03-03/2030-12-31"), behovssekvensId = "foo2", regstrertIForbindelseMed = "bar2"),
         ))
         every { it.hent("SAK2") }.returns(emptySet())
     }
@@ -70,6 +70,10 @@ internal class AleneOmOmsorgenApiTest(
                         "barn": {
                           "identitetsnummer": "12345678991",
                           "fødselsdato": "2006-05-01"
+                        },
+                        "kilde": {
+                          "id":"foo",
+                          "type":"OmsorgspengerRammemeldinger[bar]"
                         }
                       },{
                         "registrert": "$registrert",
@@ -78,6 +82,10 @@ internal class AleneOmOmsorgenApiTest(
                         "barn": {
                           "identitetsnummer": "12345678991",
                           "fødselsdato": "2006-05-01"
+                        },
+                        "kilde": {
+                          "id":"foo2",
+                          "type":"OmsorgspengerRammemeldinger[bar2]"
                         }
                       }]
                     }
