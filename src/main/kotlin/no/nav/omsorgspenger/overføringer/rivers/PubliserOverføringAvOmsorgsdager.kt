@@ -95,8 +95,8 @@ internal class PubliserOverføringAvOmsorgsdager (
             behandling = behandling
         ).let { when {
             it.isEmpty() -> {
-                secureLogger.warn("Melding(er) må sendes manuelt.").let { false }
                 behovEtter.add(SendMeldingerManueltMelding.behov(OverføreOmsorgsdager))
+                secureLogger.warn("Melding(er) må sendes manuelt.").let { false }
             }
             else -> formidlingService.sendMeldingsbestillinger(it).let { true }
         }}
