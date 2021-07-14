@@ -4,8 +4,8 @@ import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBarn
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerBeregning
 import no.nav.omsorgspenger.omsorgsdager.OmsorgsdagerResultat
 import no.nav.omsorgspenger.overføringer.Beregninger.antallKoronaoverførteDagerSomSkalTrekkesFraTilgjengelig
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 internal class AntallKoronaoverførteDagerSomSkalTrekkesFraTilgjengeligTest {
 

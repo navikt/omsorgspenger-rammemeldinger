@@ -14,13 +14,13 @@ import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.WireMockExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert
 import java.time.Duration
 import java.time.LocalDate
 import javax.sql.DataSource
-import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
 internal class SpleisetKoronaOverføringerApiTest(
