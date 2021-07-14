@@ -6,10 +6,10 @@ import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.barn
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.behovet
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.grunnlag
 import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.overføring
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
-import kotlin.test.assertEquals
 
 internal class BeregningerTest {
 

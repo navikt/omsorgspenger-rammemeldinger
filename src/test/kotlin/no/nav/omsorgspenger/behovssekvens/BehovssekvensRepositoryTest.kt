@@ -3,13 +3,13 @@ package no.nav.omsorgspenger.behovssekvens
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert
 import javax.sql.DataSource
-import kotlin.test.assertEquals
 
 
 @ExtendWith(DataSourceExtension::class)

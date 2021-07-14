@@ -4,7 +4,6 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.omsorgspengerRammemeldinger
@@ -14,13 +13,13 @@ import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.WireMockExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert
 import java.time.Duration
 import java.time.LocalDate
 import javax.sql.DataSource
-import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
 internal class SpleisetOverføringerApiTest(

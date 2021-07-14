@@ -3,10 +3,10 @@ package no.nav.omsorgspenger.overføringer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.testutils.IdentitetsnummerGenerator
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import kotlin.test.assertEquals
 
 internal class OverordnetPeriodeTest {
 

@@ -3,13 +3,13 @@ package no.nav.omsorgspenger.fordelinger
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
-import kotlin.test.assertEquals
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.FordeleOmsorgsdagerBehov
 import no.nav.omsorgspenger.fordelinger.meldinger.FordelingAvOmsorgsdagerMelding
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class FordelingAvOmsorgsdagerMeldingTest {

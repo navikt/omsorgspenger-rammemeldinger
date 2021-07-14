@@ -9,10 +9,10 @@ import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.WireMockExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import javax.sql.DataSource
-import kotlin.test.assertEquals
 
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
 internal class HealthApiTest(

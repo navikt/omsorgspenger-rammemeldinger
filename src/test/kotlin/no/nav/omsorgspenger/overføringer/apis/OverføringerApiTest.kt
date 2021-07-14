@@ -14,7 +14,6 @@ import io.mockk.every
 import io.mockk.mockk
 import java.time.ZonedDateTime
 import javax.sql.DataSource
-import kotlin.test.assertEquals
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.lovverk.LovanvendelserTest
@@ -31,6 +30,7 @@ import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.WireMockExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert

@@ -21,14 +21,14 @@ import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.TestApplicationContextBuilder
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import javax.sql.DataSource
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @ExtendWith(DataSourceExtension::class)
 internal class BehandleKoronaOverføringerTest(

@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
-import kotlin.test.assertFalse
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
@@ -13,6 +12,8 @@ import no.nav.omsorgspenger.testutils.AuthorizationHeaders.authorizedUser
 import no.nav.omsorgspenger.testutils.WireMockExtension
 import no.nav.omsorgspenger.testutils.personident403
 import no.nav.omsorgspenger.testutils.tilgangApiBaseUrl
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.net.URI
@@ -62,6 +63,6 @@ internal class TilgangsstyringRestClientTest(
             )
         }
 
-        assert(harTilgang)
+        assertTrue(harTilgang)
     }
 }

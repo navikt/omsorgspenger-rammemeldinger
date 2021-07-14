@@ -16,11 +16,11 @@ import no.nav.omsorgspenger.testutils.sisteMelding
 import org.assertj.core.api.Assertions.assertThat
 import org.intellij.lang.annotations.Language
 import org.json.JSONObject
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.skyscreamer.jsonassert.JSONAssert
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
-import kotlin.test.assertEquals
 
 internal fun behovssekvensOverføreKoronaOmsorgsdager(
     id: String = ULID().nextValue().toString(),

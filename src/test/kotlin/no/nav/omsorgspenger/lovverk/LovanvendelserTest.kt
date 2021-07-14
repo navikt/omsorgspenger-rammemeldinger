@@ -2,10 +2,10 @@ package no.nav.omsorgspenger.lovverk
 
 import no.nav.omsorgspenger.Periode
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.skyscreamer.jsonassert.JSONAssert
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 internal class LovanvendelserTest {
 
