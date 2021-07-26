@@ -7,10 +7,13 @@ import no.nav.omsorgspenger.personopplysninger.Enhet
 import no.nav.omsorgspenger.personopplysninger.Enhetstype
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.clients.producer.RecordMetadata
+import org.apache.kafka.common.TopicPartition
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.util.concurrent.CompletableFuture
 
@@ -32,7 +35,15 @@ internal class StatistikkServiceTest {
     fun `Sending av statistikkmeldinger`() {
         val meldinger = mutableListOf<ProducerRecord<String, String>>()
 
-        every { kafkaProducer.send(capture(meldinger)) }.returns(CompletableFuture.completedFuture(null))
+        every { kafkaProducer.send(capture(meldinger)) }.returns(CompletableFuture.completedFuture(RecordMetadata(
+            TopicPartition("topic", 1),
+            1L,
+            2L,
+            System.currentTimeMillis(),
+            System.currentTimeMillis(),
+            1,
+            2
+        )))
 
         val melding = StatistikkMelding.instance(
             saksnummer = "1",
