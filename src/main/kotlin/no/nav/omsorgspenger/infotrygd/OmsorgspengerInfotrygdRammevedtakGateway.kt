@@ -73,13 +73,6 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             vedtatt = it.vedtatt()
         )}
 
-        val aleneOmOmsorgen = rammevedtak.getArray("AleneOmOmsorgen").mapJSONObject().map { InfotrygdAleneOmOmsorgenMelding(
-            periode = it.periode(),
-            kilder = it.kilder(),
-            vedtatt = it.vedtatt(),
-            barn = it.barn().somInfotrygdAnnenPart()
-        )}
-
         val overføringGir = rammevedtak.getArray("OverføringGir").mapJSONObject().map { InfotrygdOverføringGirMelding(
             vedtatt = it.vedtatt(),
             kilder = it.kilder(),
@@ -120,7 +113,6 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             .asSequence()
             .plus(fordelingGir)
             .plus(midlertidigAlene)
-            .plus(aleneOmOmsorgen)
             .plus(overføringGir)
             .plus(overføringFår)
             .plus(koronaOverføringGir)

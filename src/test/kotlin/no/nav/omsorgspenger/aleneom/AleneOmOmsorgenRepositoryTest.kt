@@ -15,8 +15,14 @@ import javax.sql.DataSource
 internal class AleneOmOmsorgenRepositoryTest(
     dataSource: DataSource) {
 
+    private val migratedDataSource = dataSource.cleanAndMigrate()
+
     private val aleneOmOmsorgenRepository = AleneOmOmsorgenRepository(
-        dataSource = dataSource.cleanAndMigrate()
+        dataSource = migratedDataSource
+    )
+
+    private val aleneOmOmsorgenTestRepository = AleneOmOmsorgenTestRepository(
+        dataSource = migratedDataSource
     )
 
     @Test
@@ -34,10 +40,10 @@ internal class AleneOmOmsorgenRepositoryTest(
             aleneOmOmsorgenI = Periode("2020-01-01/2020-05-05")
         ))
 
-        aleneOmOmsorgenRepository.lagre(
+        aleneOmOmsorgenTestRepository.lagre(
             saksnummer = saksnummer1,
             behovssekvensId = "Behovssekvens-1",
-            registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.Overføring,
+            registreresIForbindelseMed = AleneOmOmsorgenTestRepository.RegistreresIForbindelseMed.Overføring,
             aleneOmOmsorgenFor = saksnummer1AleneOmOmsorgenFor
         )
 
@@ -58,10 +64,10 @@ internal class AleneOmOmsorgenRepositoryTest(
         assertThat(saksnummer1.hent()).hasSameElementsAs(forventetAleneOmOmsorgenSaksnummer1)
         assertThat(saksnummer2.hent()).isEmpty()
 
-        aleneOmOmsorgenRepository.lagre(
+        aleneOmOmsorgenTestRepository.lagre(
             saksnummer = saksnummer1,
             behovssekvensId = "Behovssekvens-2",
-            registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.Overføring,
+            registreresIForbindelseMed = AleneOmOmsorgenTestRepository.RegistreresIForbindelseMed.Overføring,
             aleneOmOmsorgenFor = saksnummer1AleneOmOmsorgenFor
         )
 
@@ -79,10 +85,10 @@ internal class AleneOmOmsorgenRepositoryTest(
             aleneOmOmsorgenI = Periode("2021-02-01/2022-08-05")
         ))
 
-        aleneOmOmsorgenRepository.lagre(
+        aleneOmOmsorgenTestRepository.lagre(
             saksnummer = saksnummer2,
             behovssekvensId = "Behovssekvens-3",
-            registreresIForbindelseMed = AleneOmOmsorgenRepository.RegistreresIForbindelseMed.Overføring,
+            registreresIForbindelseMed = AleneOmOmsorgenTestRepository.RegistreresIForbindelseMed.Overføring,
             aleneOmOmsorgenFor = saksnummer2AleneOmOmsorgenFor
         )
 

@@ -29,16 +29,6 @@ internal data class InfotrygdUtvidetRettVedtak(
 }
 
 /**
- * Rammemelding i Infotrygd for alene om omsorgen.
- */
-
-internal data class InfotrygdAleneOmOmsorgenMelding(
-    override val periode: Periode,
-    override val vedtatt: LocalDate,
-    override val kilder: Set<Kilde>,
-    val barn: InfotrygdAnnenPart) : InfotrygdRamme
-
-/**
  * Rammevedtak i Infotrygd for midlertidig alene om omsorgen.
  *  TODO: Bør hentes fra `omsorgspenger-rammevedtak`
  */
