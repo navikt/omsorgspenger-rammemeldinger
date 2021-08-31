@@ -7,22 +7,22 @@ val k9rapidVersion = "1.20210625095239-653e3a9"
 val awaitilityVersion = "4.1.0"
 val mockkVersion = "1.12.0"
 val ulidVersion = "8.2.0"
-val ktorVersion = "1.6.1"
+val ktorVersion = "1.6.3"
 val assertjVersion = "3.20.2"
-val dusseldorfVersion = "2.1.6.0-1516d10"
-val schemaValidatorVersion = "1.0.53"
+val dusseldorfVersion = "2.1.6.3-3127cf5"
+val schemaValidatorVersion = "1.0.58"
 
 // Database
-val flywayVersion = "7.11.2"
-val hikariVersion = "4.0.3"
+val flywayVersion = "7.14.0"
+val hikariVersion = "5.0.0"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.23"
-val embeddedPostgres = "1.3.0"
+val embeddedPostgres = "1.3.1"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.5.30"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
@@ -112,7 +112,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.1.1"
+        gradleVersion = "7.2"
     }
 
 }
