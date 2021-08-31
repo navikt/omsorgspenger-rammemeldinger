@@ -7,10 +7,10 @@ import no.nav.omsorgspenger.koronaoverføringer.TestVerktøy.grunnlag
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettVedtak
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
 
 internal class GrunnlagVurderingTest {
 

@@ -15,13 +15,13 @@ import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringFått
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 internal class SpleisetKoronaOverføringerServiceTest {
 

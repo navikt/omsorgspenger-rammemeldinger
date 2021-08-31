@@ -4,7 +4,6 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 import javax.sql.DataSource
-import kotlin.test.assertEquals
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.FordeleOmsorgsdagerBehov
@@ -16,6 +15,7 @@ import no.nav.omsorgspenger.testutils.sisteMelding
 import no.nav.omsorgspenger.testutils.ventPå
 import org.intellij.lang.annotations.Language
 import org.json.JSONObject
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

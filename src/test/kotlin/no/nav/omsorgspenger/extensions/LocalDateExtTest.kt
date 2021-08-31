@@ -1,9 +1,9 @@
 package no.nav.omsorgspenger.extensions
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import kotlin.test.assertEquals
 
 internal class LocalDateExtTest {
 
