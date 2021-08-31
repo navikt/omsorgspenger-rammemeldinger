@@ -9,14 +9,16 @@ import no.nav.omsorgspenger.rivers.LeggTilBehov
 internal object FerdigstillJournalføringForOmsorgspengerMelding :
     LeggTilBehov<FerdigstillJournalføringForOmsorgspengerMelding.BehovInput> {
 
-    internal const val FerdigstillJournalføringForOmsorgspenger = "FerdigstillJournalføringForOmsorgspenger"
+    internal const val FerdigstillJournalføringForOmsorgspenger = "FerdigstillJournalføring"
 
     override fun behov(behovInput: BehovInput) = Behov(
         navn = FerdigstillJournalføringForOmsorgspenger,
         input = mapOf(
+            "versjon" to "1.0.0",
             "identitetsnummer" to behovInput.identitetsnummer,
             "journalpostIder" to behovInput.journalpostIder,
-            "saksnummer" to behovInput.saksnummer
+            "saksnummer" to behovInput.saksnummer,
+            "fagsystem" to "OMSORGSPENGER"
         )
     )
 

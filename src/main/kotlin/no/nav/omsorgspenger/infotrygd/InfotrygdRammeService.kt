@@ -39,9 +39,6 @@ internal class InfotrygdRammeService(
     internal suspend fun hentOverføringFår(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
             hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdOverføringFårMelding>()
 
-    internal suspend fun hentAleneOmOmsorgen(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
-            hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdAleneOmOmsorgenMelding>()
-
     internal suspend fun hentKoronaOverføringGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
         hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdKoronaOverføringGirMelding>()
 

@@ -22,7 +22,6 @@ import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.AleneOmOmsorgenApi
-import no.nav.omsorgspenger.aleneom.apis.SpleisetAleneOmOmsorgenApi
 import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.apis.KoronaOverføringerApi
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerApi
@@ -171,9 +170,6 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         authenticate(*accessAsApplicationIssuers.allIssuers()) {
             SpleisetOverføringerApi(
                 spleisetOverføringerService = applicationContext.spleisetOverføringerService
-            )
-            SpleisetAleneOmOmsorgenApi(
-                spleisetAleneOmOmsorgenService = applicationContext.spleisetAleneOmOmsorgenService
             )
             AleneOmOmsorgenApi(
                 aleneOmOmsorgenRepository = applicationContext.aleneOmOmsorgenRepository

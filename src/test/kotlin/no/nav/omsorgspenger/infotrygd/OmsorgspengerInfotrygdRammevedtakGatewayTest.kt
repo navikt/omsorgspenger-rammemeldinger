@@ -75,26 +75,6 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest {
                     type = "Personkort"
                 ))
             ),
-            InfotrygdAleneOmOmsorgenMelding(
-                periode = Periode("2017-06-20/2018-06-25"),
-                vedtatt = LocalDate.parse("2016-06-18"),
-                kilder = setOf(),
-                barn = InfotrygdAnnenPart(
-                    id = "1991-09-29",
-                    fødselsdato = LocalDate.parse("1991-09-29"),
-                    type = "Fødselsdato"
-                )
-            ),
-            InfotrygdAleneOmOmsorgenMelding(
-                periode = Periode("2017-06-17/2018-06-20"),
-                vedtatt = LocalDate.parse("2016-06-17"),
-                kilder = setOf(),
-                barn = InfotrygdAnnenPart(
-                    id = "29099011112",
-                    fødselsdato = LocalDate.parse("1990-09-29"),
-                    type = "Identitetsnummer"
-                )
-            ),
             InfotrygdOverføringGirMelding(
                 vedtatt = LocalDate.parse("2018-06-17"),
                 periode = Periode("2017-06-17/2018-06-20"),
