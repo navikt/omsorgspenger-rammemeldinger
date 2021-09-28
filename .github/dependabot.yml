@@ -1,7 +1,20 @@
 version: 2
+registries:
+  k9-rapid:
+    type: maven-repository
+    url: https://maven.pkg.github.com/navikt/k9-rapid
+    username: x-access-token
+    password: ${{secrets.DEPENDABOT_ACCESS_TOKEN}}
 updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
       interval: daily
     open-pull-requests-limit: 10
+  - package-ecosystem: gradle
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+    registries:
+      - k9-rapid

@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.testutils
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.containing
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
 
@@ -35,7 +36,7 @@ private fun WireMockServer.stubTilgangsstyringIkkeTilgang(): WireMockServer {
             WireMock
                 .urlPathMatching(".*$apiPath.*")
         ).atPriority(highPriority)
-            .withRequestBody(matchingJsonPath("$.identitetsnummer", equalTo("[ \"$personident403\" ]")))
+            .withRequestBody(matchingJsonPath("$.identitetsnummer", containing("$personident403")))
             .willReturn(
                 aResponse()
                     .withStatus(403)

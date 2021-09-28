@@ -1,20 +1,30 @@
 name: Build Pull Request
 
-on: [pull_request]
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.MD'
+      - '.gitignore'
+      - 'LICENSE'
+      - 'CODEOWNERS'
 
 env:
   GITHUB_USERNAME: x-access-token
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  build:
+  run-tests:
+
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2.3.4
-      - uses: actions/setup-java@v2
+      - uses: actions/setup-java@v2.3.0
         with:
           java-version: 16
           distribution: adopt
+          cache: gradle
       - uses: actions/cache@v2.1.6
         with:
           path: |
@@ -23,6 +33,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Bygge JAR
+      - name: Kjør tester & bygg JAR
         run: |
           ./gradlew test shadowjar
