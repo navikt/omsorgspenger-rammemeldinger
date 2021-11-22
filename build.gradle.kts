@@ -9,7 +9,7 @@ val mockkVersion = "1.12.0"
 val ulidVersion = "8.2.0"
 val ktorVersion = "1.6.5"
 val assertjVersion = "3.21.0"
-val dusseldorfVersion = "3.1.6.4-e07c5ec"
+val dusseldorfVersion = "3.1.6.5-0911cdd"
 val schemaValidatorVersion = "1.0.64"
 
 // Database
@@ -23,13 +23,13 @@ val embeddedPostgresBinaries = "13.4.0"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.0"
     id("com.github.johnrengelman.shadow") version "7.1.0"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 dependencies {
@@ -88,11 +88,11 @@ repositories {
 
 tasks {
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "16"
+        kotlinOptions.jvmTarget = "17"
     }
 
     named<KotlinCompile>("compileTestKotlin") {
-        kotlinOptions.jvmTarget = "16"
+        kotlinOptions.jvmTarget = "17"
     }
 
     withType<Test> {
@@ -115,7 +115,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.2"
+        gradleVersion = "7.3"
     }
 
 }
