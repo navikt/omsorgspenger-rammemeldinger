@@ -49,7 +49,6 @@ dependencies {
     testImplementation("io.zonky.test:embedded-postgres:$embeddedPostgres")
     testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:$embeddedPostgresBinaries"))
 
-
     // Test
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:overfore-korona-omsorgsdager:$k9rapidVersion")

@@ -399,7 +399,7 @@ internal class MeldingsbestillingTest {
     }
 
     private fun testFordeling(
-        mottatt: ZonedDateTime = ZonedDateTime.parse("2020-11-10T15:00:00.00Z"),
+        mottatt: ZonedDateTime = ZonedDateTime.parse("2020-12-10T15:00:00.00Z"),
         tattUtIÅr: Int,
         girDager: Int,
         fordelingsperiode: Periode,
