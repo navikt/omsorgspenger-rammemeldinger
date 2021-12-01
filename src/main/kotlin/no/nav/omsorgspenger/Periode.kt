@@ -8,7 +8,7 @@ internal data class Periode(
     constructor(iso: String) : this(LocalDate.parse(iso.split("/")[0]), LocalDate.parse(iso.split("/")[1]))
 
     init {
-        require(tom.isAfter(fom) || fom.isEqual(tom)) {"Ugylidg periode. fom=$fom, tom=$tom"}
+        require(tom.isAfter(fom) || fom.isEqual(tom)) {"Ugyldig periode. fom=$fom, tom=$tom"}
     }
 
     private fun erFør(periode: Periode) = tom.isBefore(periode.fom)
