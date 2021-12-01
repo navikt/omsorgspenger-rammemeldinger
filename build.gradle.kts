@@ -1,19 +1,19 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.8.1"
+val junitJupiterVersion = "5.8.2"
 val jsonassertVersion = "1.5.0"
 val k9rapidVersion = "1.20210920084849-2ac86f1"
 val awaitilityVersion = "4.1.1"
 val mockkVersion = "1.12.1"
 val ulidVersion = "8.2.0"
-val ktorVersion = "1.6.5"
+val ktorVersion = "1.6.6"
 val assertjVersion = "3.21.0"
 val dusseldorfVersion = "3.1.6.5-50b2e34"
 val schemaValidatorVersion = "1.0.64"
 
 // Database
-val flywayVersion = "8.1.0"
+val flywayVersion = "8.2.0"
 val hikariVersion = "5.0.0"
 val kotliqueryVersion = "1.6.1"
 val postgresVersion = "42.3.1"

@@ -399,7 +399,7 @@ internal class MeldingsbestillingTest {
     }
 
     private fun testFordeling(
-        mottatt: ZonedDateTime = ZonedDateTime.now().minusMonths(11).withHour(15),
+        mottatt: ZonedDateTime = ZonedDateTime.now().minusYears(1).plusDays(1),
         tattUtIÅr: Int,
         girDager: Int,
         fordelingsperiode: Periode,
