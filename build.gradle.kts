@@ -18,7 +18,7 @@ val hikariVersion = "5.0.0"
 val kotliqueryVersion = "1.6.1"
 val postgresVersion = "42.3.1"
 val embeddedPostgres = "1.3.1"
-val embeddedPostgresBinaries = "13.4.0"
+val embeddedPostgresBinaries = "14.1.0"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
