@@ -8,7 +8,7 @@ val awaitilityVersion = "4.1.1"
 val mockkVersion = "1.12.1"
 val ulidVersion = "8.3.0"
 val ktorVersion = "1.6.7"
-val assertjVersion = "3.21.0"
+val assertjVersion = "3.22.0"
 val dusseldorfVersion = "3.1.6.7-7d29e37"
 val schemaValidatorVersion = "1.0.64"
 
