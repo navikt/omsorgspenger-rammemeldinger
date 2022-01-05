@@ -34,7 +34,7 @@ internal class SpleisetKoronaOverføringerService(
     private fun fraNyLøsning(
         identitetsnummer: Identitetsnummer,
         periode: Periode) : SpleisetOverføringer {
-        if (!periode.inneholderDagerI2021()) return SpleisetOverføringer.ingenOverføringer()
+        if (!periode.inneholderDagerI2021() && !periode.inneholderDagerI2022()) return SpleisetOverføringer.ingenOverføringer()
 
         val saksnummer = saksnummerService.hentSaksnummer(
             identitetsnummer = identitetsnummer
@@ -92,6 +92,8 @@ internal class SpleisetKoronaOverføringerService(
 
     internal companion object {
         private val År2021 = Periode("2021-01-01/2021-12-31")
+        private val År2022 = Periode("2022-01-01/2022-12-31")
         internal fun Periode.inneholderDagerI2021() = overlapperMedMinstEnDag(År2021)
+        internal fun Periode.inneholderDagerI2022() = overlapperMedMinstEnDag(År2022)
     }
 }

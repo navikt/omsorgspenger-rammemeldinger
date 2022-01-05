@@ -87,19 +87,19 @@ internal class OpphøreKoronaOverføringerTest(
 
         hent(mor).also {
             assertThat(it.gitt).hasSameElementsAs(setOf(
-                forventetGitt(til = far, periode = Ut2021, antallDager = 13),
+                forventetGitt(til = far, periode = UtÅret, antallDager = 13),
             ))
             assertThat(it.fått).hasSameElementsAs(setOf(
-                forventetFått(fra = far, periode = Ut2021, antallDager = 20)
+                forventetFått(fra = far, periode = UtÅret, antallDager = 20)
             ))
         }
 
         hent(far).also {
             assertThat(it.gitt).hasSameElementsAs(setOf(
-                forventetGitt(til = mor, periode = Ut2021, antallDager = 20),
+                forventetGitt(til = mor, periode = UtÅret, antallDager = 20),
             ))
             assertThat(it.fått).hasSameElementsAs(setOf(
-                forventetFått(fra = mor, periode = Ut2021, antallDager = 13),
+                forventetFått(fra = mor, periode = UtÅret, antallDager = 13),
             ))
         }
 
@@ -114,13 +114,13 @@ internal class OpphøreKoronaOverføringerTest(
         hent(mor).also {
             assertThat(it.gitt).isEmpty()
             assertThat(it.fått).hasSameElementsAs(setOf(
-                forventetFått(fra = far, periode = Ut2021, antallDager = 20)
+                forventetFått(fra = far, periode = UtÅret, antallDager = 20)
             ))
         }
 
         hent(far).also {
             assertThat(it.gitt).hasSameElementsAs(setOf(
-                forventetGitt(til = mor, periode = Ut2021, antallDager = 20),
+                forventetGitt(til = mor, periode = UtÅret, antallDager = 20),
             ))
             assertThat(it.fått).isEmpty()
         }
@@ -151,15 +151,16 @@ internal class OpphøreKoronaOverføringerTest(
 
     private fun hent(identitetsnummer: Identitetsnummer) = runBlocking { applicationContext.spleisetKoronaOverføringerService.hentSpleisetOverføringer(
         identitetsnummer = identitetsnummer,
-        periode = Ut2021,
+        periode = UtÅret,
         correlationId = "${UUID.randomUUID()}"
     ).sammenlignbar()}
 
     private companion object {
-        private val IDag = LocalDate.parse("2021-03-19")
-        private val Mottatt =  ZonedDateTime.parse("2021-03-19T16:00:00.000Z")
+        private val iÅr = LocalDate.now().year
+        private val IDag = LocalDate.now()
+        private val Mottatt =  ZonedDateTime.now().minusHours(5)
         private val OmEnUke = IDag.plusDays(1)
-        private val Ut2021 = Periode(fom = IDag, tom = LocalDate.parse("2021-12-31"))
+        private val UtÅret = Periode(fom = IDag, tom = LocalDate.parse("$iÅr-12-31"))
 
         private fun SpleisetOverføringer.sammenlignbar() = SpleisetOverføringer(
             gitt = gitt.map { it.copy(kilder = emptySet(), gjennomført = IDag) },

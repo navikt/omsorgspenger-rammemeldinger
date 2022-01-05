@@ -36,7 +36,7 @@ internal object TestVerktøy {
         fra = IdentitetsnummerGenerator.identitetsnummer(),
         til = IdentitetsnummerGenerator.identitetsnummer(),
         jobberINorge = true,
-        periode = Periode("2021-01-01/2021-12-31"),
+        periode = Periode("2022-01-01/2022-12-31"),
         mottatt = ZonedDateTime.now(),
         mottaksdato = LocalDate.now(),
         journalpostIder = setOf("123"),

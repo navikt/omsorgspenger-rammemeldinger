@@ -8,6 +8,7 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.infotrygd.*
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService.Companion.inneholderDagerI2021
+import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService.Companion.inneholderDagerI2022
 import no.nav.omsorgspenger.koronaoverføringer.db.KoronaoverføringRepository
 import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.apis.Motpart
@@ -63,93 +64,111 @@ internal class SpleisetKoronaOverføringerServiceTest {
         val periode = I2021
 
         mockInfotrygd(
-            fått = listOf(InfotrygdKoronaOverføringFårMelding(
-                periode = periode,
-                vedtatt = vedtatt,
-                kilder = setOf(Kilde(type = "foo", id = "bar")),
-                lengde = Duration.ofDays(2),
-                fra = InfotrygdAnnenPart(id = "foo", type ="bar", fødselsdato = vedtatt.minusDays(10))
-            )),
-            gitt = listOf(InfotrygdKoronaOverføringGirMelding(
-                periode = periode,
-                vedtatt = vedtatt,
-                kilder = setOf(Kilde(type = "foo2", id = "bar2")),
-                lengde = Duration.ofDays(5),
-                til = InfotrygdAnnenPart(id = "foo2", type ="bar2", fødselsdato = vedtatt.minusDays(5))
-            ))
+            fått = listOf(
+                InfotrygdKoronaOverføringFårMelding(
+                    periode = periode,
+                    vedtatt = vedtatt,
+                    kilder = setOf(Kilde(type = "foo", id = "bar")),
+                    lengde = Duration.ofDays(2),
+                    fra = InfotrygdAnnenPart(id = "foo", type = "bar", fødselsdato = vedtatt.minusDays(10))
+                )
+            ),
+            gitt = listOf(
+                InfotrygdKoronaOverføringGirMelding(
+                    periode = periode,
+                    vedtatt = vedtatt,
+                    kilder = setOf(Kilde(type = "foo2", id = "bar2")),
+                    lengde = Duration.ofDays(5),
+                    til = InfotrygdAnnenPart(id = "foo2", type = "bar2", fødselsdato = vedtatt.minusDays(5))
+                )
+            )
         )
 
-        mockNyLøsning(gjeldendeOverføringer = mapOf(
-            saksnummer to GjeldendeOverføringer(
-                fått = listOf(GjeldendeOverføringFått(
-                    gjennomført = gjennomført,
-                    antallDager = 5,
-                    periode = periode,
-                    status = GjeldendeOverføring.Status.Aktiv,
-                    fra = "678",
-                    kilder = kilderNyLøsning
-                )),
-                gitt = listOf(GjeldendeOverføringGitt(
-                    gjennomført = gjennomført,
-                    antallDager = 3,
-                    periode = periode,
-                    status = GjeldendeOverføring.Status.Aktiv,
-                    til = "456",
-                    kilder = kilderNyLøsning,
-                    antallDagerØnsketOverført = 5
-                ))
+        mockNyLøsning(
+            gjeldendeOverføringer = mapOf(
+                saksnummer to GjeldendeOverføringer(
+                    fått = listOf(
+                        GjeldendeOverføringFått(
+                            gjennomført = gjennomført,
+                            antallDager = 5,
+                            periode = periode,
+                            status = GjeldendeOverføring.Status.Aktiv,
+                            fra = "678",
+                            kilder = kilderNyLøsning
+                        )
+                    ),
+                    gitt = listOf(
+                        GjeldendeOverføringGitt(
+                            gjennomført = gjennomført,
+                            antallDager = 3,
+                            periode = periode,
+                            status = GjeldendeOverføring.Status.Aktiv,
+                            til = "456",
+                            kilder = kilderNyLøsning,
+                            antallDagerØnsketOverført = 5
+                        )
+                    )
+                )
             )
-        ))
+        )
 
         val spleisetOverføringer = hentSpleisetOverføringer(periode = periode)
-        assertThat(spleisetOverføringer.fått).hasSameElementsAs(setOf(
-            SpleisetOverføringFått(
-                gjennomført = vedtatt,
-                gyldigFraOgMed = periode.fom,
-                gyldigTilOgMed = periode.tom,
-                fra = Motpart(id = "foo", type = "bar"),
-                lengde = Duration.ofDays(2),
-                kilder = setOf(Kilde(type = "foo", id = "bar"))
-            ),
-            SpleisetOverføringFått(
-                gjennomført = vedtatt,
-                gyldigFraOgMed = periode.fom,
-                gyldigTilOgMed = periode.tom,
-                fra = Motpart(id = "ID-678", type = "Identitetsnummer"),
-                lengde = Duration.ofDays(5),
-                kilder = kilderNyLøsning
+        assertThat(spleisetOverføringer.fått).hasSameElementsAs(
+            setOf(
+                SpleisetOverføringFått(
+                    gjennomført = vedtatt,
+                    gyldigFraOgMed = periode.fom,
+                    gyldigTilOgMed = periode.tom,
+                    fra = Motpart(id = "foo", type = "bar"),
+                    lengde = Duration.ofDays(2),
+                    kilder = setOf(Kilde(type = "foo", id = "bar"))
+                ),
+                SpleisetOverføringFått(
+                    gjennomført = vedtatt,
+                    gyldigFraOgMed = periode.fom,
+                    gyldigTilOgMed = periode.tom,
+                    fra = Motpart(id = "ID-678", type = "Identitetsnummer"),
+                    lengde = Duration.ofDays(5),
+                    kilder = kilderNyLøsning
+                )
             )
-        ))
-        assertThat(spleisetOverføringer.gitt).hasSameElementsAs(setOf(
-            SpleisetOverføringGitt(
-                gjennomført = vedtatt,
-                gyldigFraOgMed = periode.fom,
-                gyldigTilOgMed = periode.tom,
-                til = Motpart(id = "foo2", type = "bar2"),
-                lengde = Duration.ofDays(5),
-                kilder = setOf(Kilde(type = "foo2", id = "bar2"))
-            ),
-            SpleisetOverføringGitt(
-                gjennomført = vedtatt,
-                gyldigFraOgMed = periode.fom,
-                gyldigTilOgMed = periode.tom,
-                til = Motpart(id = "ID-456", type = "Identitetsnummer"),
-                lengde = Duration.ofDays(3),
-                kilder = kilderNyLøsning
+        )
+        assertThat(spleisetOverføringer.gitt).hasSameElementsAs(
+            setOf(
+                SpleisetOverføringGitt(
+                    gjennomført = vedtatt,
+                    gyldigFraOgMed = periode.fom,
+                    gyldigTilOgMed = periode.tom,
+                    til = Motpart(id = "foo2", type = "bar2"),
+                    lengde = Duration.ofDays(5),
+                    kilder = setOf(Kilde(type = "foo2", id = "bar2"))
+                ),
+                SpleisetOverføringGitt(
+                    gjennomført = vedtatt,
+                    gyldigFraOgMed = periode.fom,
+                    gyldigTilOgMed = periode.tom,
+                    til = Motpart(id = "ID-456", type = "Identitetsnummer"),
+                    lengde = Duration.ofDays(3),
+                    kilder = kilderNyLøsning
+                )
             )
-        ))
+        )
     }
 
     @Test
     fun `Før 2021`() {
         val vedtatt = LocalDate.now()
-        mockInfotrygd(fått = listOf(InfotrygdKoronaOverføringFårMelding(
-            periode = I2020,
-            vedtatt = vedtatt,
-            kilder = setOf(Kilde(type = "foo", id = "bar")),
-            lengde = Duration.ofDays(2),
-            fra = InfotrygdAnnenPart(id = "foo", type ="bar", fødselsdato = vedtatt.minusDays(10)),
-        )), gitt = listOf())
+        mockInfotrygd(
+            fått = listOf(
+                InfotrygdKoronaOverføringFårMelding(
+                    periode = I2020,
+                    vedtatt = vedtatt,
+                    kilder = setOf(Kilde(type = "foo", id = "bar")),
+                    lengde = Duration.ofDays(2),
+                    fra = InfotrygdAnnenPart(id = "foo", type = "bar", fødselsdato = vedtatt.minusDays(10)),
+                )
+            ), gitt = listOf()
+        )
 
         val spleisetOverføringer = hentSpleisetOverføringer(
             periode = I2020
@@ -161,31 +180,37 @@ internal class SpleisetKoronaOverføringerServiceTest {
         coVerify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }
 
         assertThat(spleisetOverføringer.gitt).isEmpty()
-        assertThat(spleisetOverføringer.fått).hasSameElementsAs(setOf(
-            SpleisetOverføringFått(
-                gjennomført = vedtatt,
-                gyldigFraOgMed = I2020.fom,
-                gyldigTilOgMed = I2020.tom,
-                fra = Motpart(id = "foo", type = "bar"),
-                lengde = Duration.ofDays(2),
-                kilder = setOf(Kilde(type = "foo", id = "bar"))
+        assertThat(spleisetOverføringer.fått).hasSameElementsAs(
+            setOf(
+                SpleisetOverføringFått(
+                    gjennomført = vedtatt,
+                    gyldigFraOgMed = I2020.fom,
+                    gyldigTilOgMed = I2020.tom,
+                    fra = Motpart(id = "foo", type = "bar"),
+                    lengde = Duration.ofDays(2),
+                    kilder = setOf(Kilde(type = "foo", id = "bar"))
+                )
             )
-        ))
+        )
     }
 
     @Test
     fun `Etter 2021`() {
         val vedtatt = LocalDate.now()
-        mockInfotrygd(fått = listOf(InfotrygdKoronaOverføringFårMelding(
-            periode = Etter2021,
-            vedtatt = vedtatt,
-            kilder = setOf(Kilde(type = "foo", id = "bar")),
-            lengde = Duration.ofDays(2),
-            fra = InfotrygdAnnenPart(id = "foo", type ="bar", fødselsdato = vedtatt.minusDays(10)),
-        )), gitt = listOf())
+        mockInfotrygd(
+            fått = listOf(
+                InfotrygdKoronaOverføringFårMelding(
+                    periode = Etter2022,
+                    vedtatt = vedtatt,
+                    kilder = setOf(Kilde(type = "foo", id = "bar")),
+                    lengde = Duration.ofDays(2),
+                    fra = InfotrygdAnnenPart(id = "foo", type = "bar", fødselsdato = vedtatt.minusDays(10)),
+                )
+            ), gitt = listOf()
+        )
 
         val spleisetOverføringer = hentSpleisetOverføringer(
-            periode = Etter2021
+            periode = Etter2022
         )
 
         verify(exactly = 0) { saksnummerServiceMock.hentSaksnummer(any()) }
@@ -194,16 +219,18 @@ internal class SpleisetKoronaOverføringerServiceTest {
         coVerify(exactly = 1) { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }
 
         assertThat(spleisetOverføringer.gitt).isEmpty()
-        assertThat(spleisetOverføringer.fått).hasSameElementsAs(setOf(
-            SpleisetOverføringFått(
-                gjennomført = vedtatt,
-                gyldigFraOgMed = Etter2021.fom,
-                gyldigTilOgMed = Etter2021.tom,
-                fra = Motpart(id = "foo", type = "bar"),
-                lengde = Duration.ofDays(2),
-                kilder = setOf(Kilde(type = "foo", id = "bar"))
+        assertThat(spleisetOverføringer.fått).hasSameElementsAs(
+            setOf(
+                SpleisetOverføringFått(
+                    gjennomført = vedtatt,
+                    gyldigFraOgMed = Etter2022.fom,
+                    gyldigTilOgMed = Etter2022.tom,
+                    fra = Motpart(id = "foo", type = "bar"),
+                    lengde = Duration.ofDays(2),
+                    kilder = setOf(Kilde(type = "foo", id = "bar"))
+                )
             )
-        ))
+        )
     }
 
     @Test
@@ -215,22 +242,36 @@ internal class SpleisetKoronaOverføringerServiceTest {
         assertTrue(Periode("2021-01-01/2021-12-31").inneholderDagerI2021())
     }
 
+    @Test
+    fun `Perioden inneholder en dag i 2022`() {
+        assertFalse(Periode("1998-01-01/2020-12-31").inneholderDagerI2022())
+        assertTrue(Periode("1998-01-01/2022-01-01").inneholderDagerI2022())
+        assertFalse(Periode("1998-01-01/2021-01-01").inneholderDagerI2022())
+        assertFalse(Periode("2023-01-01/2023-05-01").inneholderDagerI2022())
+        assertTrue(Periode("2022-01-01/2022-12-31").inneholderDagerI2022())
+    }
+
+
     private fun mockInfotrygd(
         gitt: List<InfotrygdKoronaOverføringGirMelding> = listOf(),
-        fått: List<InfotrygdKoronaOverføringFårMelding> = listOf()) {
+        fått: List<InfotrygdKoronaOverføringFårMelding> = listOf()
+    ) {
         coEvery { infotrygdRammeServiceMock.hentKoronaOverføringGir(any(), any(), any()) }.returns(gitt)
         coEvery { infotrygdRammeServiceMock.hentKoronaOverføringFår(any(), any(), any()) }.returns(fått)
     }
 
     private fun mockNyLøsning(
-        gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer> = mapOf()) {
+        gjeldendeOverføringer: Map<Saksnummer, GjeldendeOverføringer> = mapOf()
+    ) {
         val saksnummer = gjeldendeOverføringer.saksnummer()
         every { koronaoverføringRepositoryMock.hentAlleOverføringer(any()) }.returns(gjeldendeOverføringer)
         every { saksnummerServiceMock.hentSaksnummer(identitetsnummer) }.returns(gjeldendeOverføringer.keys.firstOrNull())
         val saksnummerIdentitetsnummerMapping = mutableMapOf<Saksnummer, Identitetsnummer>().also {
             saksnummer.forEach { sak -> it[sak] = "ID-$sak" }
         }
-        every { saksnummerServiceMock.hentSaksnummerIdentitetsnummerMapping(saksnummer) }.returns(saksnummerIdentitetsnummerMapping)
+        every { saksnummerServiceMock.hentSaksnummerIdentitetsnummerMapping(saksnummer) }.returns(
+            saksnummerIdentitetsnummerMapping
+        )
     }
 
     private fun mockSaksnummer() {
@@ -239,11 +280,13 @@ internal class SpleisetKoronaOverføringerServiceTest {
 
     private fun hentSpleisetOverføringer(
         periode: Periode
-    ) = runBlocking { spleisetOverføringerService.hentSpleisetOverføringer(
-        identitetsnummer = identitetsnummer,
-        periode = periode,
-        correlationId = correlationId
-    )}
+    ) = runBlocking {
+        spleisetOverføringerService.hentSpleisetOverføringer(
+            identitetsnummer = identitetsnummer,
+            periode = periode,
+            correlationId = correlationId
+        )
+    }
 
     private companion object {
         private val kilderNyLøsning = setOf(
@@ -254,7 +297,7 @@ internal class SpleisetKoronaOverføringerServiceTest {
 
         private val I2020 = Periode("2020-01-01/2020-12-31")
         private val I2021 = Periode("2021-01-05/2021-06-15")
-        private val Etter2021 = Periode("2022-01-01/2022-02-10")
+        private val Etter2022 = Periode("2023-01-01/2023-02-10")
 
         private val correlationId = "test"
     }

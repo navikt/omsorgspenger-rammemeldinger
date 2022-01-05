@@ -16,7 +16,7 @@ import org.skyscreamer.jsonassert.JSONAssert
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
-internal class MeldingsbestillingTest {
+internal class KoronaMeldingsbestillingTest {
 
     @Test
     fun `Innvilget overføring`() {
