@@ -5,11 +5,14 @@ import no.nav.omsorgspenger.extensions.erFørEllerLik
 import java.time.LocalDate
 
 internal object Perioder {
-    private val fraOgMed = LocalDate.parse("2021-01-01")
-    private val tilOgMed = LocalDate.parse("2021-12-31")
-    private val støttetPeriode = Periode(fom = fraOgMed, tom = tilOgMed)
+    private val fraOgMed = LocalDate.now().withDayOfMonth(1).withMonth(1)
+    private val tilOgMed = LocalDate.now().withDayOfMonth(31).withMonth(12)
+    private val støttetPeriode = setOf(
+        Periode(fom = fraOgMed, tom = tilOgMed),
+        Periode(fom = fraOgMed.minusYears(1), tom = tilOgMed.minusYears(1))
+    )
 
-    internal fun Periode.erStøttetPeriode() = støttetPeriode == this
+    internal fun Periode.erStøttetPeriode() = støttetPeriode.contains(this)
 
     internal fun behandlingsPeriode(periode: Periode, mottaksdato: LocalDate) : Periode {
         require(periode.erStøttetPeriode()) {

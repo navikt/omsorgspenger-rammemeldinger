@@ -29,7 +29,7 @@ internal fun behovssekvensOverføreKoronaOmsorgsdager(
     jobberINorge: Boolean = true,
     omsorgsdagerTattUtIÅr: Int = 0,
     omsorgsdagerÅOverføre: Int,
-    periode: Periode = Periode("2021-01-01/2021-12-31"),
+    periode: Periode = Periode("2022-01-01/2022-12-31"),
     mottatt: ZonedDateTime = ZonedDateTime.now(),
     barn: List<OverføreKoronaOmsorgsdagerBehov.Barn> = listOf(koronaBarn()),
     journalpostIder: List<String> = listOf("1234")

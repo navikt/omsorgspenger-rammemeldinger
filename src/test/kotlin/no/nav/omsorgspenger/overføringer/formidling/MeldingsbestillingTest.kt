@@ -235,7 +235,7 @@ internal class MeldingsbestillingTest {
     fun `Ikke brukt dager i år, men fordeler dager hele perioden - delvis`() = testFordeling(
         tattUtIÅr = 0,
         girDager = 6,
-        fordelingsperiode = Periode("1999-01-01/2050-12-31"),
+        fordelingsperiode = Periode("2010-01-01/2050-12-31"),
         fordelerDager = 5,
         forventetDelvisInnvilgedeOverføringer = 1,
         forventetInnvilgedeOverføringer = 0,
@@ -246,7 +246,7 @@ internal class MeldingsbestillingTest {
     fun `Ikke brukt dager i år, men fordeler alle dager ut året - delvis`() = testFordeling(
         tattUtIÅr = 0,
         girDager = 10,
-        fordelingsperiode = Periode("1999-01-01/2020-12-31"),
+        fordelingsperiode = Periode("2010-01-01/$iÅr-12-31"),
         fordelerDager = 10,
         forventetDelvisInnvilgedeOverføringer = 0,
         forventetInnvilgedeOverføringer = 1,
@@ -257,7 +257,7 @@ internal class MeldingsbestillingTest {
     fun `Ikke brukt dager i år, men fordeler noen dager ut året - delvis`() = testFordeling(
         tattUtIÅr = 0,
         girDager = 10,
-        fordelingsperiode = Periode("1999-01-01/2020-12-31"),
+        fordelingsperiode = Periode("1999-01-01/$iÅr-12-31"),
         fordelerDager = 3,
         forventetDelvisInnvilgedeOverføringer = 1,
         forventetInnvilgedeOverføringer = 1,
@@ -434,6 +434,7 @@ internal class MeldingsbestillingTest {
     }
 
     internal companion object {
+        private val iÅr = LocalDate.now().year.toString()
         private val enhet = Enhet(enhetsnummer = "1234", enhetstype = Enhetstype.VANLIG)
         private const val fra = "11111111111"
         internal const val til = "22222222222"

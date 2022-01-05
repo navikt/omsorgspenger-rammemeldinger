@@ -75,7 +75,7 @@ internal class BehandleKoronaOverføringerTest(
             ),
             antallDager = 10,
             gjelderFraOgMed = LocalDate.now(),
-            gjelderTilOgMed = LocalDate.parse("2021-12-31")
+            gjelderTilOgMed = LocalDate.parse("$iÅr-12-31")
         )))
         assertThat(løsning.overføringer.getValue(til).gitt).isEmpty()
         assertThat(løsning.overføringer.getValue(til).fått).hasSameElementsAs(setOf(OverføreKoronaOmsorgsdagerLøsning.OverføringFått(
@@ -85,7 +85,7 @@ internal class BehandleKoronaOverføringerTest(
             ),
             antallDager = 10,
             gjelderFraOgMed = LocalDate.now(),
-            gjelderTilOgMed = LocalDate.parse("2021-12-31")
+            gjelderTilOgMed = LocalDate.parse("$iÅr-12-31")
         )))
 
         hentKoronaoverføringerFor(fra).also {
@@ -99,6 +99,7 @@ internal class BehandleKoronaOverføringerTest(
         hentAleneOmOmsorgen("foo").also {
             assertThat(it).isEmpty()
         }
+
         statistikkService.finnStatistikkMeldingFor(id).assertForventetGjennomført(id)
     }
 
@@ -143,7 +144,7 @@ internal class BehandleKoronaOverføringerTest(
     private fun hentKoronaoverføringerFor(identitetsnummer: Identitetsnummer) =
         runBlocking { applicationContext.spleisetKoronaOverføringerService.hentSpleisetOverføringer(
             identitetsnummer = identitetsnummer,
-            periode = Periode("2021-01-01/2021-12-31"),
+            periode = Periode("$iÅr-01-01/$iÅr-12-31"),
             correlationId = "test"
         )}
 
@@ -152,12 +153,14 @@ internal class BehandleKoronaOverføringerTest(
     }
 
     private companion object {
+        val iÅr = LocalDate.now().year.toString()
         val registrert = ZonedDateTime.parse("2021-01-10T12:15:00.000+01:00")
+
         private val overføringerMock = mockk<SpleisetOverføringerService>().also {
             coEvery { it.hentSpleisetOverføringer(any(), any(), any()) }
                 .returns(SpleisetOverføringer(
                     gitt = listOf(overføring(
-                        periode = Periode("2021-01-01/2021-12-31"),
+                        periode = Periode("$iÅr-01-01/$iÅr-12-31"),
                         antallDager = 7
                     )),
                     fått = emptyList()
