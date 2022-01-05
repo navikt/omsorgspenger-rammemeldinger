@@ -5,15 +5,15 @@ val junitJupiterVersion = "5.8.2"
 val jsonassertVersion = "1.5.0"
 val k9rapidVersion = "1.20210920084849-2ac86f1"
 val awaitilityVersion = "4.1.1"
-val mockkVersion = "1.12.1"
+val mockkVersion = "1.12.2"
 val ulidVersion = "8.3.0"
 val ktorVersion = "1.6.7"
-val assertjVersion = "3.21.0"
-val dusseldorfVersion = "3.1.6.7-7d29e37"
+val assertjVersion = "3.22.0"
+val dusseldorfVersion = "3.1.6.7-1288df6"
 val schemaValidatorVersion = "1.0.64"
 
 // Database
-val flywayVersion = "8.2.3"
+val flywayVersion = "8.3.0"
 val hikariVersion = "5.0.0"
 val kotliqueryVersion = "1.6.1"
 val postgresVersion = "42.3.1"
@@ -24,7 +24,7 @@ val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
     kotlin("jvm") version "1.6.10"
-    id("com.github.johnrengelman.shadow") version "7.1.1"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 java {
