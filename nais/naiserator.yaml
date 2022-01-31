@@ -63,8 +63,8 @@ spec:
      - {{url}}
   {{/each}}
   replicas:
-    min: {{minReplicas}}
-    max: {{maxReplicas}}
+    min: 2
+    max: 4
     cpuThresholdPercentage: 90
   prometheus:
     enabled: true
