@@ -6,7 +6,7 @@ import java.time.LocalDate
 
 internal object Perioder {
     private val fraOgMed = LocalDate.now().withDayOfMonth(1).withMonth(1)
-    private val tilOgMed = LocalDate.now().withDayOfMonth(31).withMonth(12)
+    private val tilOgMed = LocalDate.now().withMonth(12).withDayOfMonth(31)
     private val støttetPeriode = setOf(
         Periode(fom = fraOgMed, tom = tilOgMed),
         Periode(fom = fraOgMed.minusYears(1), tom = tilOgMed.minusYears(1))
