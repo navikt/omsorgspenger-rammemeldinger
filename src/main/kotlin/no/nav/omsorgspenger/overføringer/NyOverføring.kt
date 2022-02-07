@@ -20,7 +20,6 @@ internal fun Map<KnektPeriode, Int>.somNyeOverføringer(
             ønsketOmsorgsdagerÅOverføre).also { require(it >= 0) }
         
         val overføring = overføringer.firstOrNull { it.antallDager == antallDager && it.periode.erKantIKant(knektPeriode.periode) }
-
         when (overføring) {
             null -> {
                 overføringer.add(NyOverføring(
