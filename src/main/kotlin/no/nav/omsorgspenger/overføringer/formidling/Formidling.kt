@@ -121,6 +121,6 @@ internal class Formidlingsoverføringer(
     private companion object {
         private val logger = LoggerFactory.getLogger(Formidlingsoverføringer::class.java)
         private fun meldingMåSendesManuelt(karakteristikk: String) =
-            logger.warn("Melding(er) må sendes manuelt. Støtter ikke melding(er) for $karakteristikk. Se sikker logg for informasjon til melding(ene)").let { false }
+            logger.error("Melding(er) må sendes manuelt. Støtter ikke melding(er) for $karakteristikk. Se sikker logg for informasjon til melding(ene)").let { false }
     }
 }

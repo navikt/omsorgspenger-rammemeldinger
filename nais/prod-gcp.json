@@ -1,7 +1,5 @@
 {
   "cluster": "prod-gcp",
-  "minReplicas": "2",
-  "maxReplicas": "4",
   "ingresses": [
     "https://omsorgspenger-rammemeldinger.intern.nav.no"
   ],
@@ -13,7 +11,7 @@
   "clusterFss": "prod-fss",
   "database": {
     "tier": "db-custom-4-15360",
-    "diskSize": "40",
+    "diskSize": "20",
     "highAvailability": "true"
   },
   "env": {
