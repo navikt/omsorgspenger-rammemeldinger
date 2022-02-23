@@ -13,7 +13,7 @@ val dusseldorfVersion = "3.1.6.7-1288df6"
 val schemaValidatorVersion = "1.0.66"
 
 // Database
-val flywayVersion = "8.4.4"
+val flywayVersion = "8.5.1"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.6.1"
 val postgresVersion = "42.3.2"
