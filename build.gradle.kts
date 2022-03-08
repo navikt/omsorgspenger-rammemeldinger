@@ -3,20 +3,20 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.8.2"
 val jsonassertVersion = "1.5.0"
-val k9rapidVersion = "1.20220113090933-70694df"
-val awaitilityVersion = "4.1.1"
-val mockkVersion = "1.12.2"
+val k9rapidVersion = "1.20220215091703-a5f112c"
+val awaitilityVersion = "4.2.0"
+val mockkVersion = "1.12.3"
 val ulidVersion = "8.3.0"
 val ktorVersion = "1.6.7"
 val assertjVersion = "3.22.0"
-val dusseldorfVersion = "3.1.6.7-1288df6"
-val schemaValidatorVersion = "1.0.66"
+val dusseldorfVersion = "3.1.6.7-f2a96e8"
+val schemaValidatorVersion = "1.0.67"
 
 // Database
-val flywayVersion = "8.4.4"
+val flywayVersion = "8.5.2"
 val hikariVersion = "5.0.1"
-val kotliqueryVersion = "1.6.1"
-val postgresVersion = "42.3.2"
+val kotliqueryVersion = "1.6.3"
+val postgresVersion = "42.3.3"
 val embeddedPostgres = "1.3.1"
 val embeddedPostgresBinaries = "12.9.0"
 
@@ -114,7 +114,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.3.3"
+        gradleVersion = "7.4"
     }
 
 }
