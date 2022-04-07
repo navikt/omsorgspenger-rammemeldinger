@@ -17,4 +17,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           command: monitor
-          args: --org=omsorgspenger --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
+          args: --org=omsorgspenger --configuration-matching=^runtimeClasspath$ --project-name=${{ github.repository }} --remote-repo-url=https://github.com/${{ github.repository }}.git
