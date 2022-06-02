@@ -69,7 +69,7 @@ internal fun JSONObject.assertGosysJournalføringsoppgave(
     journalpostId: JournalpostId,
     forventetLøsninger: List<String> = listOf("OverføreKoronaOmsorgsdager")
 ) {
-    assertEquals(getString(Behovsformat.Id), behovssekvensId)
+    assertEquals(getString(Behovsformat.BehovssekvensId), behovssekvensId)
     assertThat(forventetLøsninger.plus("OpprettGosysJournalføringsoppgaver")).hasSameElementsAs(
         getJSONArray(Behovsformat.Behovsrekkefølge).map { it.toString() }
     )

@@ -1,5 +1,6 @@
 package no.nav.omsorgspenger.behovssekvens
 
+import de.huxhorn.sulky.ulid.ULID
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -38,7 +39,7 @@ internal class PersistentBehovssekvensPacketListenerTest(
     @Test
     fun `Test at vi kun håndterer en gang`() {
 
-        val jsonMessage1 = "1".somJsonMessage()
+        val jsonMessage1 = ULID().nextULID().somJsonMessage()
 
         for (i in 0..10) {
             packetListener1.onPacket(jsonMessage1, messageContextMock)
@@ -52,7 +53,7 @@ internal class PersistentBehovssekvensPacketListenerTest(
 
         gjortNganger(2)
 
-        val jsonMessage2 = "2".somJsonMessage()
+        val jsonMessage2 = ULID().nextULID().somJsonMessage()
         packetListener1.onPacket(jsonMessage2, messageContextMock)
         gjortNganger(3)
         packetListener2.onPacket(jsonMessage2, messageContextMock)
@@ -67,14 +68,14 @@ internal class PersistentBehovssekvensPacketListenerTest(
     private companion object {
         private fun String.somJsonMessage() = """
             {
-                "@id": "$this",
+                "@behovssekvensId": "$this",
                 "@correlationId": "2"
             }
         """.trimIndent().let { JsonMessage(
             originalMessage = it,
             problems = MessageProblems(originalMessage = it)
         ).also { jsonMessage ->
-            jsonMessage.interestedIn("@id","@correlationId")
+            jsonMessage.interestedIn("@correlationId","@behovssekvensId")
         }}
 
         private class WorkPacketListener(
