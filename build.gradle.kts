@@ -15,7 +15,7 @@ val schemaValidatorVersion = "1.0.69"
 // Database
 val flywayVersion = "8.5.10"
 val hikariVersion = "5.0.1"
-val kotliqueryVersion = "1.7.0"
+val kotliqueryVersion = "1.8.0"
 val postgresVersion = "42.3.5"
 val embeddedPostgres = "1.3.1"
 val embeddedPostgresBinaries = "12.9.0"
