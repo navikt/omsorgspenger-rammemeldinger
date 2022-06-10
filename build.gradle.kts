@@ -9,7 +9,7 @@ val mockkVersion = "1.12.3"
 val ulidVersion = "8.3.0"
 val ktorVersion = "1.6.8"
 val assertjVersion = "3.22.0"
-val dusseldorfVersion = "3.1.6.8-248832c"
+val dusseldorfVersion = "3.2.0.2-db0f814"
 val schemaValidatorVersion = "1.0.69"
 
 // Database
