@@ -3,6 +3,7 @@ package no.nav.omsorgspenger.koronaoverføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.isMissingOrNull
 import no.nav.k9.rapid.river.harLøsningPåBehov
 import no.nav.k9.rapid.river.leggTilBehovEtter
 import no.nav.k9.rapid.river.skalLøseBehov
@@ -106,6 +107,8 @@ internal class PubliserOverføreKoronaOmsorgsdager(
             .filterKeys { it == behovet.fra || it == behovet.til }
             .fellesEnhet(behovet.fra)
 
+        val opprettet = packet["@behovOpprettet"].takeIf { !it.isMissingOrNull() }?.asText() ?: packet["@opprettet"].asText()
+
         statistikkService.publiser(StatistikkMelding.instance(
             enhet = fellesEnhet,
             aktørId = personopplysninger.getValue(behovet.fra).aktørId,
@@ -113,7 +116,7 @@ internal class PubliserOverføreKoronaOmsorgsdager(
             behovssekvensId = id,
             mottatt = behovet.mottatt,
             mottaksdato = behovet.mottaksdato,
-            registreringsdato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
+            registreringsdato = opprettet.let { ZonedDateTime.parse(it).toLocalDate() },
             undertype = "koronaoverføring",
             behandlingType = "søknad",
             behandlingResultat = when (utfall) {
