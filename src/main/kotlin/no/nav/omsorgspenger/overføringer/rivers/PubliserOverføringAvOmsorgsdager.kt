@@ -124,7 +124,7 @@ internal class PubliserOverføringAvOmsorgsdager (
             behovssekvensId = id,
             mottatt = overføreOmsorgsdager.mottatt,
             mottaksdato = overføreOmsorgsdager.mottaksdato,
-            registreringsdato = packet["@opprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
+            registreringsdato = packet["@behovOpprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
             undertype = "overføring",
             behandlingType = "søknad",
             behandlingResultat = when (utfall) {
