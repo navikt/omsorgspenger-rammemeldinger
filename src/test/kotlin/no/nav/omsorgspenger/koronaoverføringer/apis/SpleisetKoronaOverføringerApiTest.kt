@@ -25,28 +25,35 @@ import javax.sql.DataSource
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
 internal class SpleisetKoronaOverføringerApiTest(
     dataSource: DataSource,
-    wireMockServer: WireMockServer) {
+    wireMockServer: WireMockServer
+) {
 
     private val spleisetoverføringerServiceMock = mockk<SpleisetKoronaOverføringerService>().also {
-        coEvery { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(SpleisetOverføringer(
-            gitt = listOf(SpleisetOverføringGitt(
-                gjennomført = LocalDate.parse("2018-01-01"),
-                gyldigFraOgMed = LocalDate.parse("2019-01-01"),
-                gyldigTilOgMed = LocalDate.parse("2020-01-01"),
-                til = Motpart(id = "29098811111", type = "Identitetsnummer"),
-                lengde = Duration.ofDays(5),
-                kilder = setOf(Kilde(id = "1", type = "OmsorgspengerRammemeldinger"))
-            )),
-            fått = listOf(SpleisetOverføringFått(
-                gjennomført = LocalDate.parse("2019-01-01"),
-                gyldigFraOgMed = LocalDate.parse("2020-01-01"),
-                gyldigTilOgMed = LocalDate.parse("2021-01-01"),
-                fra = Motpart(id = "29098811111", type = "Identitetsnummer"),
-                lengde = Duration.ofDays(3),
-                kilder = setOf(Kilde(id = "2", type = "OmsorgspengerRammemeldinger"))
+        coEvery { it.hentSpleisetOverføringer(any(), any(), any()) }.returns(
+            SpleisetOverføringer(
+                gitt = listOf(
+                    SpleisetOverføringGitt(
+                        gjennomført = LocalDate.parse("2018-01-01"),
+                        gyldigFraOgMed = LocalDate.parse("2019-01-01"),
+                        gyldigTilOgMed = LocalDate.parse("2020-01-01"),
+                        til = Motpart(id = "29098811111", type = "Identitetsnummer"),
+                        lengde = Duration.ofDays(5),
+                        kilder = setOf(Kilde(id = "1", type = "OmsorgspengerRammemeldinger"))
+                    )
+                ),
+                fått = listOf(
+                    SpleisetOverføringFått(
+                        gjennomført = LocalDate.parse("2019-01-01"),
+                        gyldigFraOgMed = LocalDate.parse("2020-01-01"),
+                        gyldigTilOgMed = LocalDate.parse("2021-01-01"),
+                        fra = Motpart(id = "29098811111", type = "Identitetsnummer"),
+                        lengde = Duration.ofDays(3),
+                        kilder = setOf(Kilde(id = "2", type = "OmsorgspengerRammemeldinger"))
 
-            ))
-        ))
+                    )
+                )
+            )
+        )
     }
 
     private val applicationContext = TestApplicationContextBuilder(
@@ -65,7 +72,7 @@ internal class SpleisetKoronaOverføringerApiTest(
                 setBody(Body)
             }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
+                assertEquals(ContentType.Application.Json, response.contentType())
 
                 @Language("JSON")
                 val forventetResponse = """
@@ -127,6 +134,7 @@ internal class SpleisetKoronaOverføringerApiTest(
 
     private companion object {
         private const val Path = "/hent-korona-overforinger"
+
         @Language("JSON")
         private val Body = """
             {

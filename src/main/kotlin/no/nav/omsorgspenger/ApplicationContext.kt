@@ -2,8 +2,8 @@ package no.nav.omsorgspenger
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.jackson.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
@@ -56,11 +56,13 @@ internal class ApplicationContext(
     internal val dataSource: DataSource,
     internal val healthService: HealthService,
     internal val koronaoverføringRepository: KoronaoverføringRepository,
-    internal val spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService) {
+    internal val spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService
+) {
 
     internal fun start() {
         dataSource.migrate()
     }
+
     internal fun stop() {
         kafkaProducerOnPrem.close()
     }
@@ -86,25 +88,29 @@ internal class ApplicationContext(
         internal var saksnummerService: SaksnummerService? = null,
         internal var dataSource: DataSource? = null,
         internal var koronaoverføringRepository: KoronaoverføringRepository? = null,
-        internal var spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService? = null) {
-        internal fun build() : ApplicationContext {
-            val benyttetEnv = env?:System.getenv()
+        internal var spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService? = null
+    ) {
+        internal fun build(): ApplicationContext {
+            val benyttetEnv = env ?: System.getenv()
             val benyttetAccessTokenClient = accessTokenClient ?: ClientSecretAccessTokenClient(
                 clientId = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
                 clientSecret = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_SECRET"),
                 tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")),
                 authenticationMode = ClientSecretAccessTokenClient.AuthenticationMode.POST
             )
-            val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway?: OmsorgspengerInfotrygdRammevedtakGateway(
-                accessTokenClient = benyttetAccessTokenClient,
-                hentRammevedtakFraInfotrygdScopes = benyttetEnv.hentRequiredEnv("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES").csvTilSet(),
-                omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
-            )
-            val benyttetInfotrygdRammeService = infotrygdRammeService?: InfotrygdRammeService(
+            val benyttetOmsorgspengerInfotrygdRammevedtakGateway =
+                omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway(
+                    accessTokenClient = benyttetAccessTokenClient,
+                    hentRammevedtakFraInfotrygdScopes = benyttetEnv.hentRequiredEnv("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES")
+                        .csvTilSet(),
+                    omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
+                )
+            val benyttetInfotrygdRammeService = infotrygdRammeService ?: InfotrygdRammeService(
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
             )
 
-            val benyttetKafkaProducerOnPrem = kafkaProducerOnPrem ?: benyttetEnv.kafkaProducerOnPrem("omsorgspenger-rammemeldinger-onprem")
+            val benyttetKafkaProducerOnPrem =
+                kafkaProducerOnPrem ?: benyttetEnv.kafkaProducerOnPrem("omsorgspenger-rammemeldinger-onprem")
 
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
 
@@ -130,7 +136,9 @@ internal class ApplicationContext(
 
             val benyttetTilgangsstyringRestClient = tilgangsstyringRestClient ?: TilgangsstyringRestClient(
                 httpClient = HttpClient {
-                    install(JsonFeature) { serializer = JacksonSerializer(jacksonObjectMapper()) }
+                    install(ContentNegotiation) {
+                        jackson()
+                    }
                 },
                 env = benyttetEnv,
                 accessTokenClient = benyttetAccessTokenClient
@@ -158,9 +166,11 @@ internal class ApplicationContext(
                     overføringRepository = benyttetOverføringRepository
                 ),
                 aleneOmOmsorgenRepository = benyttetAleneOmOmsorgenRepository,
-                healthService = HealthService(healthChecks = setOf(
-                    benyttetOmsorgspengerInfotrygdRammevedtakGateway
-                )),
+                healthService = HealthService(
+                    healthChecks = setOf(
+                        benyttetOmsorgspengerInfotrygdRammevedtakGateway
+                    )
+                ),
                 kafkaProducerOnPrem = benyttetKafkaProducerOnPrem,
                 formidlingService = formidlingService ?: KafkaFormidlingService(
                     kafkaProducer = benyttetKafkaProducerOnPrem
@@ -180,11 +190,12 @@ internal class ApplicationContext(
                 ),
                 tilgangsstyringRestClient = benyttetTilgangsstyringRestClient,
                 koronaoverføringRepository = benyttetKoronaoverføringRepository,
-                spleisetKoronaOverføringerService = spleisetKoronaOverføringerService ?: SpleisetKoronaOverføringerService(
-                    koronaoverføringRepository = benyttetKoronaoverføringRepository,
-                    saksnummerService = benyttetSaksnummerService,
-                    infotrygdRammeService = benyttetInfotrygdRammeService
-                )
+                spleisetKoronaOverføringerService = spleisetKoronaOverføringerService
+                    ?: SpleisetKoronaOverføringerService(
+                        koronaoverføringRepository = benyttetKoronaoverføringRepository,
+                        saksnummerService = benyttetSaksnummerService,
+                        infotrygdRammeService = benyttetInfotrygdRammeService
+                    )
             )
         }
     }

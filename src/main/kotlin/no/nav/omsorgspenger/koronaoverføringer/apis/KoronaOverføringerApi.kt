@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger.koronaoverføringer.apis
 
-import io.ktor.routing.*
+import io.ktor.server.routing.*
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.apis.GjeldendeOverføringerAdapter
 import no.nav.omsorgspenger.apis.GjeldendeOverføringerApi
@@ -11,7 +11,8 @@ import no.nav.omsorgspenger.saksnummer.SaksnummerService
 internal fun Route.KoronaOverføringerApi(
     koronaoverføringRepository: KoronaoverføringRepository,
     saksnummerService: SaksnummerService,
-    tilgangsstyringRestClient: TilgangsstyringRestClient) = GjeldendeOverføringerApi(
+    tilgangsstyringRestClient: TilgangsstyringRestClient
+) = GjeldendeOverføringerApi(
     path = "/korona-overforinger",
     oppslagBeskrivelse = "hente koronaoverføringer",
     saksnummerService = saksnummerService,

@@ -3,10 +3,9 @@ package no.nav.omsorgspenger
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.jackson.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.routing.*
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -15,9 +14,13 @@ import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdag
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.ktor.auth.*
+import io.ktor.server.auth.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.plugins.callid.*
+import io.ktor.server.response.*
+import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.statuspages.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.k9.rapid.river.hentOptionalEnv
@@ -50,7 +53,9 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         utvidetRettService = applicationContext.utvidetRettService,
         midlertidigAleneService = applicationContext.midlertidigAleneService,
         behovssekvensRepository = applicationContext.behovssekvensRepository,
-        behandleMottattEtter = LocalDate.parse(applicationContext.env.hentOptionalEnv("OVERFORING_BEHANDLE_MOTTATT_ETTER")?: "2021-01-24")
+        behandleMottattEtter = LocalDate.parse(
+            applicationContext.env.hentOptionalEnv("OVERFORING_BEHANDLE_MOTTATT_ETTER") ?: "2021-01-24"
+        )
     )
 
     BehandleOverføringAvOmsorgsdager(
@@ -82,6 +87,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
         override fun onStartup(rapidsConnection: RapidsConnection) {
             applicationContext.start()
         }
+
         override fun onShutdown(rapidsConnection: RapidsConnection) {
             applicationContext.stop()
         }
@@ -96,7 +102,9 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
         fordelingService = applicationContext.fordelingService,
         spleisetOverføringerService = applicationContext.spleisetOverføringerService,
         spleisetKoronaOverføringerService = applicationContext.spleisetKoronaOverføringerService,
-        behandleMottattEtter = LocalDate.parse(applicationContext.env.hentOptionalEnv("KORONA_BEHANDLE_MOTTATT_ETTER")?: "2021-01-25")
+        behandleMottattEtter = LocalDate.parse(
+            applicationContext.env.hentOptionalEnv("KORONA_BEHANDLE_MOTTATT_ETTER") ?: "2021-01-25"
+        )
     )
     BehandleOverføreKoronaOmsorgsdager(
         rapidsConnection = this,
@@ -129,8 +137,8 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     }
 
     install(StatusPages) {
-        exception<ClaimEnforcementFailed> { cause ->
-            log.error("Request uten tilstrekkelig tilganger stoppet. Håndheving av regler resulterte i '${cause.outcomes}'")
+        exception<ClaimEnforcementFailed> { call, cause ->
+            call.application.environment.log.error("Request uten tilstrekkelig tilganger stoppet. Håndheving av regler resulterte i '${cause.outcomes}'")
             call.respond(HttpStatusCode.Forbidden)
         }
     }
@@ -160,9 +168,11 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
         multipleJwtIssuers(accessAsApplicationIssuers.plus(accessAsPersonIssuers))
     }
 
-    preStopOnApplicationStopPreparing(preStopActions = listOf(
-        FullførAktiveRequester(this)
-    ))
+    preStopOnApplicationStopPreparing(
+        preStopActions = listOf(
+            FullførAktiveRequester(this)
+        )
+    )
 
     routing {
         HealthRoute(healthService = applicationContext.healthService)

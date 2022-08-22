@@ -1,10 +1,9 @@
 package no.nav.omsorgspenger.overføringer.apis
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.client.HttpClient
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.jackson.*
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
@@ -20,7 +19,8 @@ import java.net.URI
 
 @ExtendWith(WireMockExtension::class)
 internal class TilgangsstyringRestClientTest(
-        wireMockServer: WireMockServer) {
+    wireMockServer: WireMockServer
+) {
 
     private val tilgangsstyringRestClient = TilgangsstyringRestClient(
         env = mapOf(
@@ -28,7 +28,9 @@ internal class TilgangsstyringRestClientTest(
             "TILGANGSSTYRING_SCOPES" to "tilgangsstyring/.default"
         ),
         httpClient = HttpClient {
-            install(JsonFeature) { serializer = JacksonSerializer(jacksonObjectMapper()) }
+            install(ContentNegotiation) {
+                jackson()
+            }
         },
         accessTokenClient = ClientSecretAccessTokenClient(
             clientId = "foo",

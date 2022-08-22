@@ -3,10 +3,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.8.2"
 val jsonassertVersion = "1.5.1"
-val k9rapidVersion = "1.20220708075341-87c2b3c"
+val k9rapidVersion = "1.20220711113850-0593e9e"
 val ulidVersion = "8.3.0"
-val ktorVersion = "1.6.8"
-val dusseldorfVersion = "3.1.6.8-248832c"
+val ktorVersion = "2.0.3"
+val dusseldorfVersion = "3.2.0.3-d4fdef9"
 
 // Database
 val flywayVersion = "8.5.13"
@@ -36,10 +36,9 @@ java {
 
 dependencies {
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
     implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-jackson:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
 
@@ -47,6 +46,8 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
+    implementation("io.ktor:ktor-client-jackson-jvm:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
     testImplementation("io.zonky.test:embedded-postgres:$embeddedPostgres")
     testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:$embeddedPostgresBinaries"))
@@ -57,12 +58,9 @@ dependencies {
     testImplementation("no.nav.k9.rapid:fordele-omsorgsdager:$k9rapidVersion")
     
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
-    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion") {
-        exclude(group = "com.github.jknack")
-    }
+    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
     testImplementation("com.networknt:json-schema-validator:$schemaValidatorVersion")
-
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
+    testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
     testImplementation("org.awaitility:awaitility:$awaitilityVersion")
@@ -116,7 +114,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.4.2"
+        gradleVersion = "7.5.1"
     }
 
 }
