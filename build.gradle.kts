@@ -18,7 +18,7 @@ val postgresVersion = "42.4.1"
 val embeddedPostgres = "2.0.0"
 val embeddedPostgresBinaries = "12.9.0"
 val mockkVersion = "1.12.4"
-val schemaValidatorVersion = "1.0.71"
+val schemaValidatorVersion = "1.0.72"
 val awaitilityVersion = "4.2.0"
 val assertjVersion = "3.23.1"
 
