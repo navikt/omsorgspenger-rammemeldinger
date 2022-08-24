@@ -28,7 +28,8 @@ import java.time.LocalDate
 internal class OmsorgspengerInfotrygdRammevedtakGateway(
     private val accessTokenClient: AccessTokenClient,
     private val hentRammevedtakFraInfotrygdScopes: Set<String>,
-    omsorgspengerInfotrygdRammevedtakBaseUrl: URI) : HealthCheck {
+    omsorgspengerInfotrygdRammevedtakBaseUrl: URI
+) : HealthCheck {
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
     private val pingUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/isready"
@@ -37,7 +38,8 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
     internal suspend fun hent(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
-        correlationId: CorrelationId) : List<InfotrygdRamme> {
+        correlationId: CorrelationId
+    ): List<InfotrygdRamme> {
         val (httpStatusCode, response) = rammevedtakUrl.httpPost { builder ->
             builder.header(HttpHeaders.Authorization, authorizationHeader())
             builder.header(HttpHeaders.Accept, "application/json")
@@ -53,61 +55,77 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
 
         val rammevedtak = json.getJSONObject("rammevedtak")
 
-        val utvidetRett = rammevedtak.getArray("UtvidetRett").mapJSONObject().map { InfotrygdUtvidetRettVedtak(
-            periode = it.periode(),
-            kilder = it.kilder(),
-            barn = it.barn().somInfotrygdAnnenPart(),
-            vedtatt = it.vedtatt()
-        )}
+        val utvidetRett = rammevedtak.getArray("UtvidetRett").mapJSONObject().map {
+            InfotrygdUtvidetRettVedtak(
+                periode = it.periode(),
+                kilder = it.kilder(),
+                barn = it.barn().somInfotrygdAnnenPart(),
+                vedtatt = it.vedtatt()
+            )
+        }
 
-        val fordelingGir = rammevedtak.getArray("FordelingGir").mapJSONObject().map { InfotrygdFordelingGirMelding(
-            periode = it.periode(),
-            kilder = it.kilder(),
-            lengde = it.lengde(),
-            vedtatt = it.vedtatt()
-        )}
+        val fordelingGir = rammevedtak.getArray("FordelingGir").mapJSONObject().map {
+            InfotrygdFordelingGirMelding(
+                periode = it.periode(),
+                kilder = it.kilder(),
+                lengde = it.lengde(),
+                vedtatt = it.vedtatt()
+            )
+        }
 
-        val midlertidigAlene = rammevedtak.getArray("MidlertidigAleneOmOmsorgen").mapJSONObject().map { InfotrygdMidlertidigAleneVedtak(
-            periode = it.periode(),
-            kilder = it.kilder(),
-            vedtatt = it.vedtatt()
-        )}
+        val midlertidigAlene = rammevedtak.getArray("MidlertidigAleneOmOmsorgen").mapJSONObject().map {
+            InfotrygdMidlertidigAleneVedtak(
+                periode = it.periode(),
+                kilder = it.kilder(),
+                vedtatt = it.vedtatt()
+            )
+        }
 
-        val overføringGir = rammevedtak.getArray("OverføringGir").mapJSONObject().map { InfotrygdOverføringGirMelding(
-            vedtatt = it.vedtatt(),
-            kilder = it.kilder(),
-            til = it.getJSONObject("mottaker").somInfotrygdAnnenPart(),
-            lengde = it.lengde(),
-            periode = it.periode()
-        )}
+        val overføringGir = rammevedtak.getArray("OverføringGir").mapJSONObject().map {
+            InfotrygdOverføringGirMelding(
+                vedtatt = it.vedtatt(),
+                kilder = it.kilder(),
+                til = it.getJSONObject("mottaker").somInfotrygdAnnenPart(),
+                lengde = it.lengde(),
+                periode = it.periode()
+            )
+        }
 
-        val overføringFår = rammevedtak.getArray("OverføringFår").mapJSONObject().map { InfotrygdOverføringFårMelding(
-            vedtatt = it.vedtatt(),
-            kilder = it.kilder(),
-            fra = it.getJSONObject("avsender").somInfotrygdAnnenPart(),
-            lengde = it.lengde(),
-            periode = it.periode()
-        )}
+        val overføringFår = rammevedtak.getArray("OverføringFår").mapJSONObject().map {
+            InfotrygdOverføringFårMelding(
+                vedtatt = it.vedtatt(),
+                kilder = it.kilder(),
+                fra = it.getJSONObject("avsender").somInfotrygdAnnenPart(),
+                lengde = it.lengde(),
+                periode = it.periode()
+            )
+        }
 
-        val koronaOverføringGir = rammevedtak.getArray("KoronaOverføringGir").mapJSONObject().map { InfotrygdKoronaOverføringGirMelding(
-            vedtatt = it.vedtatt(),
-            kilder = it.kilder(),
-            til = it.getJSONObject("mottaker").somInfotrygdAnnenPart(),
-            lengde = it.lengde(),
-            periode = it.periode()
-        )}
+        val koronaOverføringGir = rammevedtak.getArray("KoronaOverføringGir").mapJSONObject().map {
+            InfotrygdKoronaOverføringGirMelding(
+                vedtatt = it.vedtatt(),
+                kilder = it.kilder(),
+                til = it.getJSONObject("mottaker").somInfotrygdAnnenPart(),
+                lengde = it.lengde(),
+                periode = it.periode()
+            )
+        }
 
-        val koronaOverføringFår = rammevedtak.getArray("KoronaOverføringFår").mapJSONObject().map { InfotrygdKoronaOverføringFårMelding(
-            vedtatt = it.vedtatt(),
-            kilder = it.kilder(),
-            fra = it.getJSONObject("avsender").somInfotrygdAnnenPart(),
-            lengde = it.lengde(),
-            periode = it.periode()
-        )}
+        val koronaOverføringFår = rammevedtak.getArray("KoronaOverføringFår").mapJSONObject().map {
+            InfotrygdKoronaOverføringFårMelding(
+                vedtatt = it.vedtatt(),
+                kilder = it.kilder(),
+                fra = it.getJSONObject("avsender").somInfotrygdAnnenPart(),
+                lengde = it.lengde(),
+                periode = it.periode()
+            )
+        }
 
-        rammevedtak.getArray("Uidentifisert").also { if (!it.isEmpty) {
-            logger.info("Antall Uidentifiserte rammevedtak fra Infotrygd = ${it.length()}")
-        }}
+        rammevedtak.getArray("Uidentifisert").also {
+            if (!it.isEmpty) {
+                logger.info("Antall Uidentifiserte rammevedtak fra Infotrygd = ${it.length()}")
+            }
+        }
 
         return utvidetRett
             .asSequence()
@@ -124,18 +142,26 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         cachedAccessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).asAuthoriationHeader()
 
     override suspend fun check() =
-        Result.merge("OmsorgspengerInfotrygdRammevedtakGateway", accessTokenCheck(), pingOmsorgspengerInfotrygdRammevetakCheck())
+        Result.merge(
+            "OmsorgspengerInfotrygdRammevedtakGateway",
+            accessTokenCheck(),
+            pingOmsorgspengerInfotrygdRammevetakCheck()
+        )
 
     private fun accessTokenCheck() = kotlin.runCatching {
         accessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).let {
-            (SignedJWT.parse(it.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()?: emptyList()).contains("access_as_application")
-        }}.fold(
-            onSuccess = { when (it) {
+            (SignedJWT.parse(it.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()
+                ?: emptyList()).contains("access_as_application")
+        }
+    }.fold(
+        onSuccess = {
+            when (it) {
                 true -> Healthy("AccessTokenCheck", "OK")
                 false -> UnHealthy("AccessTokenCheck", "Feil: Mangler rettigheter")
-            }},
-            onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
-        )
+            }
+        },
+        onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
+    )
 
 
     private suspend fun pingOmsorgspengerInfotrygdRammevetakCheck() =
@@ -150,17 +176,22 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             true -> getJSONArray(key)
             false -> JSONArray()
         }
+
         private fun JSONObject.periode() = Periode(
             fom = LocalDate.parse(getString("gyldigFraOgMed")),
             tom = LocalDate.parse(getString("gyldigTilOgMed"))
         )
+
         private fun JSONObject.lengde() = Duration.parse(getString("lengde"))
         private fun JSONObject.kilder() = getJSONArray("kilder")
             .map { it as JSONObject }
-            .map { Kilde(
-                id = it.getString("id"),
-                type = it.getString("type"))
+            .map {
+                Kilde(
+                    id = it.getString("id"),
+                    type = it.getString("type")
+                )
             }.toSet()
+
         private fun JSONObject.barn() = getJSONObject("barn")
         private fun JSONObject.vedtatt(): LocalDate = LocalDate.parse(getString("vedtatt"))
         private fun JSONArray.mapJSONObject() = map { it as JSONObject }

@@ -26,7 +26,8 @@ import javax.sql.DataSource
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
 internal class AleneOmOmsorgenApiTest(
     dataSource: DataSource,
-    wireMockServer: WireMockServer) {
+    wireMockServer: WireMockServer
+) {
 
     private val aleneOmOmsorgenRepositoryMock = mockk<AleneOmOmsorgenRepository>().also {
         val aleneOmOmsorgen = AleneOmOmsorgen(
@@ -39,10 +40,16 @@ internal class AleneOmOmsorgenApiTest(
             behovssekvensId = "foo",
             regstrertIForbindelseMed = "bar"
         )
-        every { it.hent("SAK1") }.returns(setOf(
-            aleneOmOmsorgen,
-            aleneOmOmsorgen.copy(periode = Periode("2025-03-03/2030-12-31"), behovssekvensId = "foo2", regstrertIForbindelseMed = "bar2"),
-        ))
+        every { it.hent("SAK1") }.returns(
+            setOf(
+                aleneOmOmsorgen,
+                aleneOmOmsorgen.copy(
+                    periode = Periode("2025-03-03/2030-12-31"),
+                    behovssekvensId = "foo2",
+                    regstrertIForbindelseMed = "bar2"
+                ),
+            )
+        )
         every { it.hent("SAK2") }.returns(emptySet())
     }
 

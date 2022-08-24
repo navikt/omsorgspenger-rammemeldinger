@@ -1,8 +1,8 @@
 package no.nav.omsorgspenger.apis
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.server.testing.*
 import no.nav.omsorgspenger.omsorgspengerRammemeldinger
 import no.nav.omsorgspenger.testutils.DataSourceExtension
@@ -17,20 +17,23 @@ import javax.sql.DataSource
 @ExtendWith(DataSourceExtension::class, WireMockExtension::class)
 internal class HealthApiTest(
     private val dataSource: DataSource,
-    private val wireMockServer: WireMockServer) {
+    private val wireMockServer: WireMockServer
+) {
 
     @Test
-    fun `Test health end point`() {
-        withTestApplication({
-            omsorgspengerRammemeldinger(TestApplicationContextBuilder(
-                dataSource = dataSource.cleanAndMigrate(),
-                wireMockServer = wireMockServer
-            ).build())
-        }) {
-            handleRequest(Get, "/health").apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
-            }
+    fun `Test health end point`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(
+                TestApplicationContextBuilder(
+                    dataSource = dataSource.cleanAndMigrate(),
+                    wireMockServer = wireMockServer
+                ).build()
+            )
+        }
+
+        client.get("/health").apply {
+            assertEquals(HttpStatusCode.OK, this.status)
+            assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), this.contentType())
         }
     }
 }

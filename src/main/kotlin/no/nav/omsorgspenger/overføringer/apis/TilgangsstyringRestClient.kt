@@ -2,16 +2,14 @@ package no.nav.omsorgspenger.overføringer.apis
 
 import com.nimbusds.jwt.SignedJWT
 import io.ktor.client.HttpClient
-import io.ktor.client.features.ResponseException
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.HttpStatement
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.util.toByteArray
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.jsonBody
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
@@ -24,10 +22,10 @@ import no.nav.omsorgspenger.CorrelationId
 import org.slf4j.LoggerFactory
 
 internal class TilgangsstyringRestClient(
-        private val httpClient: HttpClient,
-        private val accessTokenClient: AccessTokenClient,
-        env: Environment
-): HealthCheck {
+    private val httpClient: HttpClient,
+    private val accessTokenClient: AccessTokenClient,
+    env: Environment
+) : HealthCheck {
 
     private val logger = LoggerFactory.getLogger(TilgangsstyringRestClient::class.java)
     private val tilgangUrl = env.hentRequiredEnv("TILGANGSSTYRING_URL")
@@ -35,28 +33,36 @@ internal class TilgangsstyringRestClient(
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
 
-    internal suspend fun sjekkTilgang(identer: Set<String>, authHeader: String, beskrivelse: String, correlationId: CorrelationId): Boolean {
+    internal suspend fun sjekkTilgang(
+        identer: Set<String>,
+        authHeader: String,
+        beskrivelse: String,
+        correlationId: CorrelationId
+    ): Boolean {
+        val personRequestBodyJson = PersonerRequestBody(identer, Operasjon.Visning, beskrivelse).somJsonBody()
         return kotlin.runCatching {
-            httpClient.post<HttpStatement>("$tilgangUrl/api/tilgang/personer") {
-                header(HttpHeaders.Authorization, cachedAccessTokenClient.getAccessToken(
-                    scopes = scopes,
-                    onBehalfOf = authHeader.removePrefix("Bearer ")
-                ).asAuthoriationHeader())
+            httpClient.post("$tilgangUrl/api/tilgang/personer") {
+                header(
+                    HttpHeaders.Authorization, cachedAccessTokenClient.getAccessToken(
+                        scopes = scopes,
+                        onBehalfOf = authHeader.removePrefix("Bearer ")
+                    ).asAuthoriationHeader()
+                )
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
                 header(HttpHeaders.XCorrelationId, correlationId)
-                body = PersonerRequestBody(identer, Operasjon.Visning, beskrivelse)
-            }.execute()
+                jsonBody(personRequestBodyJson)
+            }
         }.håndterResponse()
     }
 
     private suspend fun Result<HttpResponse>.håndterResponse(): Boolean = fold(
-            onSuccess = { response -> response.boolify() },
-            onFailure = { cause ->
-                when (cause is ResponseException) {
-                    true -> cause.response.boolify()
-                    else -> throw cause
-                }
+        onSuccess = { response -> response.boolify() },
+        onFailure = { cause ->
+            when (cause is ResponseException) {
+                true -> cause.response.boolify()
+                else -> throw cause
             }
+        }
     )
 
     private suspend fun HttpResponse.boolify() = when (status) {
@@ -69,7 +75,13 @@ internal class TilgangsstyringRestClient(
     }
 
     private suspend fun HttpResponse.logError() =
-            logger.error("HTTP ${status.value} fra omsorgspenger-tilgangsstyring, response: ${String(content.toByteArray())}")
+        logger.error(
+            "HTTP ${status.value} fra omsorgspenger-tilgangsstyring, response: ${
+                String(
+                    this.bodyAsText().toByteArray()
+                )
+            }"
+        )
 
     override suspend fun check(): no.nav.helse.dusseldorf.ktor.health.Result {
         return no.nav.helse.dusseldorf.ktor.health.Result.merge(
@@ -81,17 +93,17 @@ internal class TilgangsstyringRestClient(
 
     private suspend fun pingCheck(): no.nav.helse.dusseldorf.ktor.health.Result {
         return kotlin.runCatching {
-            httpClient.get<HttpStatement>("$tilgangUrl/isalive").execute()
+            httpClient.get("$tilgangUrl/isalive").body<HttpStatement>().execute()
         }.fold(
-                onSuccess = { response ->
-                    when (HttpStatusCode.OK == response.status) {
-                        true -> Healthy("PingCheck", "OK")
-                        false -> UnHealthy("PingCheck", "Feil: Mottok Http Status Code ${response.status.value}")
-                    }
-                },
-                onFailure = {
-                    UnHealthy("PingCheck", "Feil: ${it.message}")
+            onSuccess = { response ->
+                when (HttpStatusCode.OK == response.status) {
+                    true -> Healthy("PingCheck", "OK")
+                    false -> UnHealthy("PingCheck", "Feil: Mottok Http Status Code ${response.status.value}")
                 }
+            },
+            onFailure = {
+                UnHealthy("PingCheck", "Feil: ${it.message}")
+            }
         )
     }
 
@@ -108,14 +120,26 @@ internal class TilgangsstyringRestClient(
         },
         onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
     )
+
+    private companion object {
+        enum class Operasjon {
+            Visning
+        }
+
+        data class PersonerRequestBody(
+            val identitetsnummer: Set<String>,
+            val operasjon: Operasjon,
+            val beskrivelse: String
+        )
+
+        private fun PersonerRequestBody.somJsonBody() = """
+            {
+                "identitetsnummer": ${identitetsnummer.map { """"$it"""" }},
+                "beskrivelse": "$beskrivelse",
+                "operasjon": "${operasjon.name}"
+            }
+            """.trimIndent()
+    }
 }
 
-enum class Operasjon {
-    Visning
-}
 
-data class PersonerRequestBody(
-        val identitetsnummer: Set<String>,
-        val operasjon: Operasjon,
-        val beskrivelse: String
-)

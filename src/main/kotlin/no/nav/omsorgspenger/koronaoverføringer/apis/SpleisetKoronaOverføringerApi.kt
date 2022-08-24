@@ -1,15 +1,16 @@
 package no.nav.omsorgspenger.koronaoverføringer.apis
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.omsorgspenger.apis.HentRammemeldingerRequest
 import no.nav.omsorgspenger.extensions.correlationId
 
 internal fun Route.SpleisetKoronaOverføringerApi(
-    spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService) {
+    spleisetKoronaOverføringerService: SpleisetKoronaOverføringerService
+) {
 
     post("/hent-korona-overforinger") {
         val request = call.receive<HentRammemeldingerRequest>()
