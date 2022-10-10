@@ -59,6 +59,7 @@ internal fun TestApplicationContextBuilder(
 internal fun DataSource.cleanAndMigrate() = this.also {
     Flyway
         .configure()
+        .cleanDisabled(false)
         .dataSource(this)
         .load()
         .also {
