@@ -1,31 +1,31 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.8.2"
+val junitJupiterVersion = "5.9.1"
 val jsonassertVersion = "1.5.1"
-val k9rapidVersion = "1.20220711113850-0593e9e"
+val k9rapidVersion = "1.20221007103720-75312fe"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.0.3"
-val dusseldorfVersion = "3.2.0.3-d4fdef9"
+val ktorVersion = "2.1.2"
+val dusseldorfVersion = "3.2.1.2-ce40a5b"
 
 // Database
-val flywayVersion = "8.5.13"
+val flywayVersion = "9.4.0"
 val hikariVersion = "5.0.1"
-val kotliqueryVersion = "1.8.0"
-val postgresVersion = "42.4.1"
+val kotliqueryVersion = "1.9.0"
+val postgresVersion = "42.5.0"
 
 // Test
-val embeddedPostgres = "2.0.0"
+val embeddedPostgres = "2.0.1"
 val embeddedPostgresBinaries = "12.9.0"
-val mockkVersion = "1.12.4"
-val schemaValidatorVersion = "1.0.71"
+val mockkVersion = "1.13.2"
+val schemaValidatorVersion = "1.0.73"
 val awaitilityVersion = "4.2.0"
 val assertjVersion = "3.23.1"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version "1.7.20"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
