@@ -1,0 +1,24 @@
+---
+apiVersion: kafka.nais.io/v1
+kind: Topic
+metadata:
+  name: omsorgspengerRammemeldinger-statistikk-v1
+  namespace: omsorgspenger
+  labels:
+    team: omsorgspenger
+spec:
+  pool: nav-prod
+  config:
+    cleanupPolicy: delete
+    minimumInSyncReplicas: 2
+    partitions: 1
+    replication: 3
+    retentionBytes: -1  # -1 means unlimited
+    retentionHours: 1440  # 60d
+  acl:
+    - team: omsorgspenger
+      application: omsorgspenger-rammemeldinger
+      access: write
+    - team: ptsak
+      application: pt-sak-sykdom-familie
+      access: read
