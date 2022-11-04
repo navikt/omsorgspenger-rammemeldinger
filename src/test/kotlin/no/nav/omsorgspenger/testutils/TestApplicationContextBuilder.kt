@@ -30,6 +30,7 @@ internal fun TestApplicationContextBuilder(
             )
         )
     },
+    kafkaProducerOnPrem = mockk(),
     kafkaProducerStatistikk = mockk(),
     omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
         coEvery { it.hent(any(), any(), any()) }.returns(listOf())

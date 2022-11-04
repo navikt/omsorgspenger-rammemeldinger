@@ -8,6 +8,7 @@ import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.k9.rapid.river.Environment
 import no.nav.k9.rapid.river.KafkaBuilder.kafkaProducer
+import no.nav.k9.rapid.river.KafkaBuilder.kafkaProducerOnPrem
 import no.nav.k9.rapid.river.csvTilSet
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
@@ -48,6 +49,7 @@ internal class ApplicationContext(
     internal val statistikkService: StatistikkService,
     internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
     internal val kafkaProducerStatistikk: KafkaProducer<String, String>,
+    internal val kafkaProducerOnPrem: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
     internal val saksnummerRepository: SaksnummerRepository,
     internal val saksnummerService: SaksnummerService,
@@ -64,6 +66,7 @@ internal class ApplicationContext(
 
     internal fun stop() {
         kafkaProducerStatistikk.close()
+        kafkaProducerOnPrem.close()
     }
 
     internal class Builder(
@@ -82,6 +85,7 @@ internal class ApplicationContext(
         internal var statistikkService: StatistikkService? = null,
         internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
         internal var kafkaProducerStatistikk: KafkaProducer<String, String>? = null,
+        internal val kafkaProducerOnPrem: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
         internal var saksnummerRepository: SaksnummerRepository? = null,
         internal var saksnummerService: SaksnummerService? = null,
@@ -110,6 +114,9 @@ internal class ApplicationContext(
 
             val benyttetKafkaProducer =
                 kafkaProducerStatistikk ?: benyttetEnv.kafkaProducer("omsorgspenger-rammemeldinger")
+
+            val benyttetKafkaProducerOnPrem =
+                kafkaProducerOnPrem ?: benyttetEnv.kafkaProducerOnPrem("omsorgspenger-rammemeldinger-onprem")
 
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
 
@@ -171,8 +178,9 @@ internal class ApplicationContext(
                     )
                 ),
                 kafkaProducerStatistikk = benyttetKafkaProducer,
+                kafkaProducerOnPrem = benyttetKafkaProducerOnPrem,
                 formidlingService = formidlingService ?: KafkaFormidlingService(
-                    kafkaProducer = benyttetKafkaProducer
+                    kafkaProducer = benyttetKafkaProducerOnPrem
                 ),
                 dataSource = benyttetDataSource,
                 overføringRepository = benyttetOverføringRepository,
