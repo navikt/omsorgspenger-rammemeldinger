@@ -1,0 +1,34 @@
+name: Deploy kafka
+
+on:
+  push:
+    paths:
+      - 'nais/dev-statistikk-topic.yaml'
+      - 'nais/prod-statistikk-topic.yaml'
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    name: Deploy to dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: nais/dev-statistikk-topic.yaml
+
+  deploy-prod:
+    name: Deploy to prod
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: nais/prod-statistikk-topic.yaml
