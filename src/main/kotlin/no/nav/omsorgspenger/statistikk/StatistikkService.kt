@@ -9,8 +9,9 @@ internal interface StatistikkService {
 }
 
 internal class KafkaStatistikkService(
-        private val kafkaProducer: KafkaProducer<String, String>,
-        private val topic: String = "aapen-omsorgspengerRammemeldinger-statistikk-v1") : StatistikkService {
+    private val kafkaProducer: KafkaProducer<String, String>,
+    private val topic: String = "omsorgspenger.omsorgspenger-rammemeldinger-statistikk-v1"
+) : StatistikkService {
 
     override fun publiser(statistikkMelding: StatistikkMelding) {
         val metadata = kafkaProducer.send(ProducerRecord(topic, statistikkMelding.toJson())).get()
