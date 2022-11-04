@@ -2,7 +2,7 @@
 apiVersion: kafka.nais.io/v1
 kind: Topic
 metadata:
-  name: omsorgspengerRammemeldinger-statistikk-v1
+  name: omsorgspenger-rammemeldinger-statistikk-v1
   namespace: omsorgspenger
   labels:
     team: omsorgspenger
