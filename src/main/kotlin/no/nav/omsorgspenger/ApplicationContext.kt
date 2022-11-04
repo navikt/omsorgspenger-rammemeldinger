@@ -1,6 +1,5 @@
 package no.nav.omsorgspenger
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.jackson.*
@@ -8,7 +7,7 @@ import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.k9.rapid.river.Environment
-import no.nav.k9.rapid.river.KafkaBuilder.kafkaProducerOnPrem
+import no.nav.k9.rapid.river.KafkaBuilder.kafkaProducer
 import no.nav.k9.rapid.river.csvTilSet
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgspenger.aleneom.AleneOmOmsorgenRepository
@@ -48,7 +47,7 @@ internal class ApplicationContext(
     internal val spleisetOverføringerService: SpleisetOverføringerService,
     internal val statistikkService: StatistikkService,
     internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
-    internal val kafkaProducerOnPrem: KafkaProducer<String, String>,
+    internal val kafkaProducerStatistikk: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
     internal val saksnummerRepository: SaksnummerRepository,
     internal val saksnummerService: SaksnummerService,
@@ -64,7 +63,7 @@ internal class ApplicationContext(
     }
 
     internal fun stop() {
-        kafkaProducerOnPrem.close()
+        kafkaProducerStatistikk.close()
     }
 
     internal class Builder(
@@ -82,7 +81,7 @@ internal class ApplicationContext(
         internal var tilgangsstyringRestClient: TilgangsstyringRestClient? = null,
         internal var statistikkService: StatistikkService? = null,
         internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
-        internal var kafkaProducerOnPrem: KafkaProducer<String, String>? = null,
+        internal var kafkaProducerStatistikk: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
         internal var saksnummerRepository: SaksnummerRepository? = null,
         internal var saksnummerService: SaksnummerService? = null,
@@ -109,8 +108,8 @@ internal class ApplicationContext(
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
             )
 
-            val benyttetKafkaProducerOnPrem =
-                kafkaProducerOnPrem ?: benyttetEnv.kafkaProducerOnPrem("omsorgspenger-rammemeldinger-onprem")
+            val benyttetKafkaProducer =
+                kafkaProducerStatistikk ?: benyttetEnv.kafkaProducer("omsorgspenger-rammemeldinger")
 
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
 
@@ -119,7 +118,7 @@ internal class ApplicationContext(
             )
 
             val benyttetStatistikkService = statistikkService ?: KafkaStatistikkService(
-                kafkaProducer = benyttetKafkaProducerOnPrem
+                kafkaProducer = benyttetKafkaProducer
             )
 
             val benyttetAleneOmOmsorgenRepository = aleneOmOmsorgenRepository ?: AleneOmOmsorgenRepository(
@@ -171,9 +170,9 @@ internal class ApplicationContext(
                         benyttetOmsorgspengerInfotrygdRammevedtakGateway
                     )
                 ),
-                kafkaProducerOnPrem = benyttetKafkaProducerOnPrem,
+                kafkaProducerStatistikk = benyttetKafkaProducer,
                 formidlingService = formidlingService ?: KafkaFormidlingService(
-                    kafkaProducer = benyttetKafkaProducerOnPrem
+                    kafkaProducer = benyttetKafkaProducer
                 ),
                 dataSource = benyttetDataSource,
                 overføringRepository = benyttetOverføringRepository,
