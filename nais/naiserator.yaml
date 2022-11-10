@@ -27,7 +27,7 @@ spec:
         - application: omsorgspenger-oidc-auth-proxy
         - application: omsorgsdager
         - application: k9-aarskvantum
-          namespace: default
+          namespace: k9saksbehandling
           cluster: {{clusterFss}}
   strategy:
     type: RollingUpdate
