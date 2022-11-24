@@ -10,7 +10,7 @@ internal interface FormidlingService {
 
 internal class KafkaFormidlingService(
     private val kafkaProducer: KafkaProducer<String, String>,
-    private val topic: String = "privat-k9-dokumenthendelse") : FormidlingService {
+    private val topic: String = "k9saksbehandling.k9-dokumenthendelse-v1") : FormidlingService {
 
     override fun sendMeldingsbestillinger(meldingsbestillinger: List<Meldingsbestilling>) {
         meldingsbestillinger.forEach { meldingsbestilling ->
