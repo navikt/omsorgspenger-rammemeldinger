@@ -5,7 +5,7 @@ val junitJupiterVersion = "5.9.1"
 val jsonassertVersion = "1.5.1"
 val k9rapidVersion = "1.20221007103720-75312fe"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.1.2"
+val ktorVersion = "2.2.1"
 val dusseldorfVersion = "3.2.1.2-ce40a5b"
 
 // Database
