@@ -12,7 +12,7 @@ val dusseldorfVersion = "3.2.1.2-ce40a5b"
 val flywayVersion = "9.7.0"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
-val postgresVersion = "42.5.0"
+val postgresVersion = "42.5.1"
 
 // Test
 val embeddedPostgres = "2.0.1"
