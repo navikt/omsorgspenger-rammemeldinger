@@ -15,5 +15,6 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    open-pull-requests-limit: 20
     registries:
       - k9-rapid
