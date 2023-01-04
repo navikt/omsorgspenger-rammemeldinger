@@ -74,8 +74,8 @@ internal class BehandleKoronaOverføringerTest(
                 fødselsdato = LocalDate.parse("1992-09-01")
             ),
             antallDager = 10,
-            gjelderFraOgMed = LocalDate.now(),
-            gjelderTilOgMed = LocalDate.parse("$iÅr-12-31")
+            gjelderFraOgMed = LocalDate.now().minusYears(1),
+            gjelderTilOgMed = LocalDate.parse("2022-12-31")
         )))
         assertThat(løsning.overføringer.getValue(til).gitt).isEmpty()
         assertThat(løsning.overføringer.getValue(til).fått).hasSameElementsAs(setOf(OverføreKoronaOmsorgsdagerLøsning.OverføringFått(
@@ -84,8 +84,8 @@ internal class BehandleKoronaOverføringerTest(
                 fødselsdato = LocalDate.parse("1990-09-01")
             ),
             antallDager = 10,
-            gjelderFraOgMed = LocalDate.now(),
-            gjelderTilOgMed = LocalDate.parse("$iÅr-12-31")
+            gjelderFraOgMed = LocalDate.now().minusYears(1),
+            gjelderTilOgMed = LocalDate.parse("2022-12-31")
         )))
 
         hentKoronaoverføringerFor(fra).also {
@@ -144,7 +144,7 @@ internal class BehandleKoronaOverføringerTest(
     private fun hentKoronaoverføringerFor(identitetsnummer: Identitetsnummer) =
         runBlocking { applicationContext.spleisetKoronaOverføringerService.hentSpleisetOverføringer(
             identitetsnummer = identitetsnummer,
-            periode = Periode("$iÅr-01-01/$iÅr-12-31"),
+            periode = Periode("2022-01-01/2022-12-31"),
             correlationId = "test"
         )}
 
@@ -160,7 +160,7 @@ internal class BehandleKoronaOverføringerTest(
             coEvery { it.hentSpleisetOverføringer(any(), any(), any()) }
                 .returns(SpleisetOverføringer(
                     gitt = listOf(overføring(
-                        periode = Periode("$iÅr-01-01/$iÅr-12-31"),
+                        periode = Periode("2022-01-01/2022-12-31"),
                         antallDager = 7
                     )),
                     fått = emptyList()
