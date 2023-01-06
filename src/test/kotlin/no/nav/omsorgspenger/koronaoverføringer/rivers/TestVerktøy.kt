@@ -30,7 +30,7 @@ internal fun behovssekvensOverføreKoronaOmsorgsdager(
     omsorgsdagerTattUtIÅr: Int = 0,
     omsorgsdagerÅOverføre: Int,
     periode: Periode = Periode("2022-01-01/2022-12-31"),
-    mottatt: ZonedDateTime = ZonedDateTime.now(),
+    mottatt: ZonedDateTime = ZonedDateTime.now().withYear(2022),
     barn: List<OverføreKoronaOmsorgsdagerBehov.Barn> = listOf(koronaBarn()),
     journalpostIder: List<String> = listOf("1234")
 ) = Behovssekvens(
@@ -54,7 +54,7 @@ internal fun behovssekvensOverføreKoronaOmsorgsdager(
 internal fun koronaBarn(
     utvidetRett: Boolean = false,
     aleneOmOmsorgen: Boolean = false,
-    fødselsdato: LocalDate = LocalDate.now().minusYears(1)) = OverføreKoronaOmsorgsdagerBehov.Barn(
+    fødselsdato: LocalDate = LocalDate.parse("2020-12-15")) = OverføreKoronaOmsorgsdagerBehov.Barn(
     identitetsnummer = IdentitetsnummerGenerator.identitetsnummer(),
     fødselsdato = fødselsdato,
     aleneOmOmsorgen = aleneOmOmsorgen,

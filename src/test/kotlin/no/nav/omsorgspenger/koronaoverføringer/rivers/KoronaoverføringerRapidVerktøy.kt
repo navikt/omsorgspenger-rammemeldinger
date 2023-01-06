@@ -28,7 +28,7 @@ internal object KoronaoverføringerRapidVerktøy {
         tilSaksnummer: Saksnummer = "bar",
         omsorgsdagerTattUtIÅr: Int = 0,
         omsorgsdagerÅOverføre: Int = 10,
-        mottatt: ZonedDateTime = ZonedDateTime.now()) : Pair<String, OverføreKoronaOmsorgsdagerLøsning> {
+        mottatt: ZonedDateTime = ZonedDateTime.now().withDayOfMonth(1).withMonth(1).withYear(2022)) : Pair<String, OverføreKoronaOmsorgsdagerLøsning> {
 
         val (idStart, behovssekvens) = behovssekvensOverføreKoronaOmsorgsdager(
             fra = fra,

@@ -49,44 +49,6 @@ internal class PeriodiseringTest {
     }
 
     @Test
-    @Disabled("TODO: https://github.com/navikt/omsorgspenger-rammemeldinger/issues/11")
-    fun `Forskjellige perioder om tom i overordnet periode også er et knekkpunkt`() {
-        val overordnetPeriode = Periode("2019-12-31/2020-01-02")
-
-        val datoerUten = listOf(
-            LocalDate.parse("2019-12-31"),
-            LocalDate.parse("2020-01-01")
-        )
-
-        val forventedePerioderUten = listOf(
-            Periode("2019-12-31/2019-12-31"),
-            Periode("2020-01-01/2020-01-02")
-        )
-
-        assertPerioder(
-            datoer = datoerUten,
-            overordnetPeriode = overordnetPeriode,
-            forventedePerioder = forventedePerioderUten
-        )
-
-        val datoerMed = datoerUten.plus(
-            LocalDate.parse("2020-01-02")
-        )
-
-        val forventedePerioderMed = listOf(
-            Periode("2019-12-31/2019-12-31"),
-            Periode("2020-01-01/2020-01-01"),
-            Periode("2020-01-02/2020-01-02")
-        )
-
-        assertPerioder(
-            datoer = datoerMed,
-            overordnetPeriode = overordnetPeriode,
-            forventedePerioder = forventedePerioderMed
-        )
-    }
-
-    @Test
     fun `Datoer med mellomrom mellom`() {
         val datoer = listOf(
             LocalDate.parse("2019-12-30"),
