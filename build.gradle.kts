@@ -20,7 +20,7 @@ val embeddedPostgresBinaries = "12.9.0"
 val mockkVersion = "1.13.2"
 val schemaValidatorVersion = "1.0.76"
 val awaitilityVersion = "4.2.0"
-val assertjVersion = "3.23.1"
+val assertjVersion = "3.24.1"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
