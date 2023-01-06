@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
@@ -72,53 +71,6 @@ internal class VurderOmsorgenForTest(
             til = til,
             relasjoner = setOf(
                 VurderRelasjonerMelding.Relasjon(identitetsnummer = barn.identitetsnummer, relasjon = "BARN", borSammen = false),
-                VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = true)
-            )
-        )
-
-        rapid.ventPå(2)
-
-        rapid.mockLøsningPåHentePersonopplysninger(fra=fra, til=til)
-
-        rapid.ventPå(3)
-
-        val (_, løsning) = rapid.løsningOverføreOmsorgsdager()
-
-        assertTrue(løsning.erAvslått())
-
-        formidlingService.finnMeldingsbestillingerFor(behovssekvensId).assertAvslagsmelding(Grunn.IKKE_OMSORGEN_FOR_NOEN_BARN)
-        statistikkService.finnStatistikkMeldingFor(behovssekvensId).assertForventetAvslag(behovssekvensId)
-    }
-
-    @Test
-    @Disabled("TODO: Må rettes opp så fremt vi kan ende IKKE_OMSORGEN_FOR_NOEN_BARN-brevet i dette scenarioet")
-    fun `Bor ikke sammen med barn med aleneomsorg, men har omsorgen for et annet barn på samme adresse`() {
-        val fra = IdentitetsnummerGenerator.identitetsnummer()
-        val til = IdentitetsnummerGenerator.identitetsnummer()
-        val barn = overføreOmsorgsdagerBarn(
-            aleneOmOmsorgen = true
-        )
-        val barn2 = overføreOmsorgsdagerBarn(
-            aleneOmOmsorgen = false
-        )
-
-        val (behovssekvensId, behovssekvens) = behovssekvensOverføreOmsorgsdager(
-            overføringFra = fra,
-            overføringTil = til,
-            mottaksdato = LocalDate.parse("2020-12-01"),
-            barn = listOf(barn, barn2)
-        )
-
-        rapid.sendTestMessage(behovssekvens)
-
-        rapid.ventPå(1)
-
-        rapid.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner(
-            fra = fra,
-            til = til,
-            relasjoner = setOf(
-                VurderRelasjonerMelding.Relasjon(identitetsnummer = barn.identitetsnummer, relasjon = "BARN", borSammen = false),
-                VurderRelasjonerMelding.Relasjon(identitetsnummer = barn2.identitetsnummer, relasjon = "BARN", borSammen = true),
                 VurderRelasjonerMelding.Relasjon(identitetsnummer = til, relasjon = "INGEN", borSammen = true)
             )
         )

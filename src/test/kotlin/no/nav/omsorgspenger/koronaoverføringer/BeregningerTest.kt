@@ -85,8 +85,8 @@ internal class BeregningerTest {
         val behovet = behovet(
             omsorgsdagerTattUtIÅr = 0,
             barn = listOf(
-                barn(fødselsdato = LocalDate.now().minusYears(13)),
-                barn(fødselsdato = LocalDate.now().minusYears(19), utvidetRett = true)
+                barn(fødselsdato = LocalDate.now().withYear(2022).minusYears(13)),
+                barn(fødselsdato = LocalDate.now().withYear(2022).minusYears(19), utvidetRett = true)
             )
         )
         val dagerTilgjengeligForOverføring = Beregninger.beregnDagerTilgjengeligForOverføring(

@@ -156,11 +156,10 @@ internal class OpphøreKoronaOverføringerTest(
     ).sammenlignbar()}
 
     private companion object {
-        private val iÅr = LocalDate.now().year
-        private val IDag = LocalDate.now()
-        private val Mottatt =  ZonedDateTime.now().minusHours(5)
+        private val IDag = LocalDate.now().withYear(2021)
+        private val Mottatt =  ZonedDateTime.now().withYear(2021).minusHours(5)
         private val OmEnUke = IDag.plusDays(1)
-        private val UtÅret = Periode(fom = IDag, tom = LocalDate.parse("$iÅr-12-31"))
+        private val UtÅret = Periode(fom = IDag, tom = LocalDate.parse("2022-12-31"))
 
         private fun SpleisetOverføringer.sammenlignbar() = SpleisetOverføringer(
             gitt = gitt.map { it.copy(kilder = emptySet(), gjennomført = IDag) },
