@@ -21,7 +21,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.LocalDate
@@ -313,7 +312,6 @@ internal class MeldingsbestillingTest {
     }
 
     @Test
-    @Disabled
     fun `Koronaoverført i 2021 - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
             mottatt = ZonedDateTime.parse("2021-01-15T14:15:00.000Z"),
@@ -343,14 +341,13 @@ internal class MeldingsbestillingTest {
     }
 
     @Test
-    @Disabled
     fun `Koronaoverført i 2021 og brukt i år - delvis`() {
         val meldingsbestillinger = meldingsbestillinger(
             mottatt = ZonedDateTime.parse("2021-01-15T14:15:00.000Z"),
             tattUtIÅr = 2,
             girDager = 10,
             koronaOverføringer = listOf(SpleisetOverføringGitt(
-                gjennomført = LocalDate.now(),
+                gjennomført = LocalDate.parse("2021-12-15"),
                 gyldigFraOgMed = LocalDate.parse("2021-01-01"),
                 gyldigTilOgMed = LocalDate.parse("2021-12-31"),
                 lengde = Duration.ofDays(32),
@@ -444,7 +441,7 @@ internal class MeldingsbestillingTest {
         private const val tidligerePartner = "44444444444"
 
         internal fun barn(
-            fødselsdato: LocalDate = LocalDate.now().minusYears(1),
+            fødselsdato: LocalDate = LocalDate.parse("2020-12-15"),
             utvidetRett: Boolean = false,
             aleneOmOmsorgen: Boolean = true) = Barn(
             fødselsdato = fødselsdato,

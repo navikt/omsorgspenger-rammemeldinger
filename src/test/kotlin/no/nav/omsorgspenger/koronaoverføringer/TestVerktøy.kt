@@ -3,7 +3,6 @@ package no.nav.omsorgspenger.koronaoverføringer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.koronaoverføringer.meldinger.OverføreKoronaOmsorgsdagerMelding
-import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.apis.Motpart
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
@@ -37,8 +36,8 @@ internal object TestVerktøy {
         til = IdentitetsnummerGenerator.identitetsnummer(),
         jobberINorge = true,
         periode = Periode("2022-01-01/2022-12-31"),
-        mottatt = ZonedDateTime.now(),
-        mottaksdato = LocalDate.now(),
+        mottatt = ZonedDateTime.now().withYear(2022),
+        mottaksdato = LocalDate.now().withYear(2022),
         journalpostIder = setOf("123"),
         omsorgsdagerTattUtIÅr = omsorgsdagerTattUtIÅr,
         omsorgsdagerÅOverføre = 10,
@@ -46,7 +45,7 @@ internal object TestVerktøy {
     )
 
     internal fun barn(
-        fødselsdato: LocalDate = LocalDate.now().minusYears(5),
+        fødselsdato: LocalDate = LocalDate.parse("2021-01-01").minusYears(5),
         aleneOmOmsorgen: Boolean = false,
         utvidetRett: Boolean = false
     ) = OverføreKoronaOmsorgsdagerMelding.Barn(
@@ -57,7 +56,7 @@ internal object TestVerktøy {
     )
 
     internal fun overføring(periode: Periode, antallDager: Int) = SpleisetOverføringGitt(
-        gjennomført = LocalDate.now(),
+        gjennomført = LocalDate.parse("2021-01-01"),
         gyldigFraOgMed = periode.fom,
         gyldigTilOgMed = periode.tom,
         lengde = Duration.ofDays(antallDager.toLong()),
