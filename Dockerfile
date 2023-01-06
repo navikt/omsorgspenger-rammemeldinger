@@ -15,7 +15,7 @@ RUN $JAVA_HOME/bin/jlink \
          --output /customjre
 
 # main app image
-FROM alpine:3.16
+FROM alpine:3.17
 ENV JAVA_HOME=/jre
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 

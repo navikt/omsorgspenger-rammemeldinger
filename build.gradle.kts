@@ -3,29 +3,29 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.9.1"
 val jsonassertVersion = "1.5.1"
-val k9rapidVersion = "1.20221007103720-75312fe"
+val k9rapidVersion = "1.20221124140732-e07f6f7"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.1.2"
-val dusseldorfVersion = "3.2.1.2-ce40a5b"
+val ktorVersion = "2.2.2"
+val dusseldorfVersion = "3.2.2.2-d9c7672"
 
 // Database
-val flywayVersion = "9.7.0"
+val flywayVersion = "9.11.0"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
-val postgresVersion = "42.5.0"
+val postgresVersion = "42.5.1"
 
 // Test
 val embeddedPostgres = "2.0.1"
 val embeddedPostgresBinaries = "12.9.0"
 val mockkVersion = "1.13.2"
-val schemaValidatorVersion = "1.0.73"
+val schemaValidatorVersion = "1.0.76"
 val awaitilityVersion = "4.2.0"
 val assertjVersion = "3.23.1"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.7.20"
+    kotlin("jvm") version "1.8.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -114,7 +114,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.5.1"
+        gradleVersion = "7.6"
     }
 
 }

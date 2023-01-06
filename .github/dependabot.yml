@@ -18,3 +18,7 @@ updates:
     open-pull-requests-limit: 20
     registries:
       - k9-rapid
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: daily
