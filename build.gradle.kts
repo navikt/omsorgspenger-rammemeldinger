@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.9.1"
+val junitJupiterVersion = "5.9.2"
 val jsonassertVersion = "1.5.1"
 val k9rapidVersion = "1.20221124140732-e07f6f7"
 val ulidVersion = "8.3.0"
