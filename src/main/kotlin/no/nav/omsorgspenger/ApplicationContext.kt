@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger
 
-import io.ktor.client.HttpClient
+import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.jackson.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
@@ -21,17 +21,15 @@ import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringer
 import no.nav.omsorgspenger.koronaoverføringer.db.KoronaoverføringRepository
 import no.nav.omsorgspenger.midlertidigalene.MidlertidigAleneService
 import no.nav.omsorgspenger.overføringer.GjennomførOverføringService
-import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
-import no.nav.omsorgspenger.statistikk.StatistikkService
+import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
+import no.nav.omsorgspenger.overføringer.db.OverføringRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerRepository
 import no.nav.omsorgspenger.saksnummer.SaksnummerService
 import no.nav.omsorgspenger.utvidetrett.UtvidetRettService
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
-import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
-import no.nav.omsorgspenger.statistikk.KafkaStatistikkService
 
 internal class ApplicationContext(
     internal val env: Environment,
@@ -45,7 +43,6 @@ internal class ApplicationContext(
     internal val gjennomførOverføringService: GjennomførOverføringService,
     internal val overføringRepository: OverføringRepository,
     internal val spleisetOverføringerService: SpleisetOverføringerService,
-    internal val statistikkService: StatistikkService,
     internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val formidlingService: FormidlingService,
@@ -79,7 +76,6 @@ internal class ApplicationContext(
         internal var overføringRepository: OverføringRepository? = null,
         internal var spleisetOverføringerService: SpleisetOverføringerService? = null,
         internal var tilgangsstyringRestClient: TilgangsstyringRestClient? = null,
-        internal var statistikkService: StatistikkService? = null,
         internal var aleneOmOmsorgenRepository: AleneOmOmsorgenRepository? = null,
         internal var kafkaProducer: KafkaProducer<String, String>? = null,
         internal var formidlingService: FormidlingService? = null,
@@ -115,10 +111,6 @@ internal class ApplicationContext(
 
             val benyttetOverføringRepository = overføringRepository ?: OverføringRepository(
                 dataSource = benyttetDataSource
-            )
-
-            val benyttetStatistikkService = statistikkService ?: KafkaStatistikkService(
-                kafkaProducer = benyttetKafkaProducer
             )
 
             val benyttetAleneOmOmsorgenRepository = aleneOmOmsorgenRepository ?: AleneOmOmsorgenRepository(
@@ -181,7 +173,6 @@ internal class ApplicationContext(
                     saksnummerService = benyttetSaksnummerService,
                     overføringRepository = benyttetOverføringRepository
                 ),
-                statistikkService = benyttetStatistikkService,
                 saksnummerRepository = benyttetSaksnummerRepository,
                 saksnummerService = benyttetSaksnummerService,
                 behovssekvensRepository = behovssekvensRepository ?: BehovssekvensRepository(
