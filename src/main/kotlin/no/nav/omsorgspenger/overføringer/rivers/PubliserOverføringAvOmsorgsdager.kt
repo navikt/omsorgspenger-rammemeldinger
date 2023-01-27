@@ -3,34 +3,31 @@ package no.nav.omsorgspenger.overføringer.rivers
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.river.*
+import no.nav.k9.rapid.river.harLøsningPåBehov
+import no.nav.k9.rapid.river.leggTilBehovEtter
+import no.nav.k9.rapid.river.skalLøseBehov
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensRepository
 import no.nav.omsorgspenger.behovssekvens.PersistentBehovssekvensPacketListener
 import no.nav.omsorgspenger.formidling.FormidlingService
-import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.OverføringLogg.gjennomførtOverføring
+import no.nav.omsorgspenger.overføringer.Utfall
 import no.nav.omsorgspenger.overføringer.formidling.Formidling.opprettMeldingsBestillinger
-import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerBehandlingMelding.OverføreOmsorgsdagerBehandling
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerMelding.OverføreOmsorgsdager
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding
 import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.HentPersonopplysninger
-import no.nav.omsorgspenger.overføringer.meldinger.OverføreOmsorgsdagerPersonopplysningerMelding.fellesEnhet
 import no.nav.omsorgspenger.rivers.leggTilLøsningPar
+import no.nav.omsorgspenger.rivers.meldinger.FerdigstillJournalføringForOmsorgspengerMelding
 import no.nav.omsorgspenger.rivers.meldinger.SendMeldingerManueltMelding
-import no.nav.omsorgspenger.statistikk.StatistikkMelding
-import no.nav.omsorgspenger.statistikk.StatistikkService
 import no.nav.omsorgspenger.saksnummer.identitetsnummer
 import org.slf4j.LoggerFactory
-import java.time.ZonedDateTime
 
 internal class PubliserOverføringAvOmsorgsdager (
     rapidsConnection: RapidsConnection,
     private val formidlingService: FormidlingService,
     behovssekvensRepository: BehovssekvensRepository,
-    private val statistikkService: StatistikkService
 ) : PersistentBehovssekvensPacketListener(
     steg = "PubliserOverføringAvOmsorgsdager",
     behovssekvensRepository = behovssekvensRepository,
@@ -112,27 +109,6 @@ internal class PubliserOverføringAvOmsorgsdager (
             aktueltBehov = OverføreOmsorgsdager,
             behov = behovEtter.toTypedArray()
         )
-
-        val berørteIdentitetsnummer = behandling.alleSaksnummerMapping.filterValues { it in behandling.berørteSaksnummer }.keys
-        val berørtePersonopplysninger = personopplysninger.filterKeys { it in berørteIdentitetsnummer }
-        val fellesEnhet = berørtePersonopplysninger.fellesEnhet(fra = overføreOmsorgsdager.overførerFra)
-
-        statistikkService.publiser(StatistikkMelding.instance(
-            enhet = fellesEnhet,
-            aktørId = personopplysninger.getValue(overføreOmsorgsdager.overførerFra).aktørId,
-            saksnummer = behandling.alleSaksnummerMapping.getValue(overføreOmsorgsdager.overførerFra),
-            behovssekvensId = id,
-            mottatt = overføreOmsorgsdager.mottatt,
-            mottaksdato = overføreOmsorgsdager.mottaksdato,
-            registreringsdato = packet["@behovOpprettet"].asText().let { ZonedDateTime.parse(it).toLocalDate() },
-            undertype = "overføring",
-            behandlingType = "søknad",
-            behandlingResultat = when (utfall) {
-                Utfall.Avslått -> "avslått"
-                Utfall.Gjennomført -> "gjennomført"
-                Utfall.GosysJournalføringsoppgaver -> throw IllegalStateException("Uventet utfall: $utfall")
-            }
-        ))
 
         secureLogger.info("SuccessPacket=${packet.toJson()}")
 

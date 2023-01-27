@@ -20,7 +20,6 @@ internal fun TestApplicationContextBuilder(
     additionalEnv: Map<String, String> = emptyMap()
 ) = ApplicationContext.Builder(
     formidlingService = RecordingFormidlingService(),
-    statistikkService = RecordingStatistikkService(),
     accessTokenClient = mockk<AccessTokenClient>().also {
         every { it.getAccessToken(any()) }.returns(
             AccessTokenResponse(

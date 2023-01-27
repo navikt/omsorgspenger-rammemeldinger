@@ -67,8 +67,7 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     PubliserOverføringAvOmsorgsdager(
         rapidsConnection = this,
         formidlingService = applicationContext.formidlingService,
-        behovssekvensRepository = applicationContext.behovssekvensRepository,
-        statistikkService = applicationContext.statistikkService
+        behovssekvensRepository = applicationContext.behovssekvensRepository
     )
     BehandleOpphøreOverføringer(
         rapidsConnection = this,
@@ -115,8 +114,7 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
     PubliserOverføreKoronaOmsorgsdager(
         rapidsConnection = this,
         behovssekvensRepository = applicationContext.behovssekvensRepository,
-        formidlingService = applicationContext.formidlingService,
-        statistikkService = applicationContext.statistikkService
+        formidlingService = applicationContext.formidlingService
     )
     BehandleOpphøreKoronaOverføringer(
         rapidsConnection = this,
