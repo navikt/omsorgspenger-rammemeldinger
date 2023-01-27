@@ -6,6 +6,8 @@ metadata:
   namespace: omsorgspenger
   labels:
     team: omsorgspenger
+  annotations:
+    kafka.nais.io/removeDataWhenResourceIsDeleted: "true"
 spec:
   pool: nav-dev
   config:
