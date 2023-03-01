@@ -1,26 +1,26 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.9.1"
+val junitJupiterVersion = "5.9.2"
 val jsonassertVersion = "1.5.1"
-val k9rapidVersion = "1.20221124140732-e07f6f7"
+val k9rapidVersion = "1.20230104071822-3d215b8"
 val ulidVersion = "8.3.0"
 val ktorVersion = "2.2.2"
-val dusseldorfVersion = "3.2.2.2-d9c7672"
+val dusseldorfVersion = "3.2.2.2-3189f02"
 
 // Database
-val flywayVersion = "9.11.0"
+val flywayVersion = "9.12.0"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.5.1"
 
 // Test
-val embeddedPostgres = "2.0.1"
+val embeddedPostgres = "2.0.2"
 val embeddedPostgresBinaries = "12.9.0"
-val mockkVersion = "1.13.2"
+val mockkVersion = "1.13.3"
 val schemaValidatorVersion = "1.0.76"
 val awaitilityVersion = "4.2.0"
-val assertjVersion = "3.23.1"
+val assertjVersion = "3.24.2"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
