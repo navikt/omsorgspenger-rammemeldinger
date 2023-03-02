@@ -129,6 +129,10 @@ tasks.jacocoTestReport {
     }
 }
 
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+}
+
 sonarqube {
     properties {
         property("sonar.projectKey", "navikt_omsorgspenger-rammemeldinger")
