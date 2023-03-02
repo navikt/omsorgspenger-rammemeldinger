@@ -28,8 +28,10 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+    - name: Bygg
+      run: ./gradlew shadowjar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
