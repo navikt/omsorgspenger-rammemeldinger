@@ -27,6 +27,8 @@ val mainClass = "no.nav.omsorgspenger.AppKt"
 plugins {
     kotlin("jvm") version "1.8.10"
     id("com.github.johnrengelman.shadow") version "8.1.0"
+    id("org.sonarqube") version "3.5.0.2730"
+    jacoco
 }
 
 java {
@@ -117,4 +119,22 @@ tasks {
         gradleVersion = "8.0.1"
     }
 
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "navikt_omsorgspenger-rammemeldinger")
+        property("sonar.organization", "navikt")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.login", System.getenv("SONAR_TOKEN"))
+        property("sonar.sourceEncoding", "UTF-8")
+    }
 }
