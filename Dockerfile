@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-alpine as corretto-jdk
+FROM amazoncorretto:18-alpine as corretto-jdk
 LABEL org.opencontainers.image.source=https://github.com/navikt/omsorgspenger-rammemeldinger
 
 RUN apk add --no-cache binutils
