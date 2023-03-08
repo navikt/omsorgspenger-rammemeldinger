@@ -11,9 +11,6 @@ on:
       - 'CODEOWNERS'
   workflow_dispatch:
 
-env:
-  BASE_IMAGE: ghcr.io/${{ github.repository }}
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -37,16 +34,44 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Sett tag for docker
-        run: echo "TAG=$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Sett image for nais deploy & latest for k9-verdikjede
+        run: echo "IMAGE=ghcr.io/${{ github.repository }}:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: Bygg & last opp Docker image
-        run: |
-          docker build --pull --tag ${BASE_IMAGE}:${TAG} --tag ${BASE_IMAGE}:latest .
-          docker push ${BASE_IMAGE} --all-tags
+      - uses: docker/build-push-action@v4
+        id: docker-build
+        with:
+          context: .
+          push: true
+          pull: true
+          tags: ${{ env.IMAGE }}
 
-      - name: Sett image for nais deploy
-        run: echo "IMAGE=${BASE_IMAGE}:${TAG}" >> $GITHUB_ENV
+      - name: Run Trivy vulnerability scanner on docker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE }}
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.SALSA_CREDENTIALS }}
+
+      - name: Provenance, upload and sign attestation
+        uses: nais/salsa@v0.8
+        with:
+          key: ${{ secrets.SALSA_KMS_KEY }}
+          registry: ${{ secrets.GITHUB_TOKEN }}
+          image_digest: ${{ steps.docker-build.outputs.digest }}
+          image: ${{ env.IMAGE }}
+
 
       - name: Deploy til dev-gcp
         uses: nais/deploy/actions/deploy@v1
