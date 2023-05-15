@@ -5,6 +5,8 @@ on:
     paths:
       - "build.gradle.kts"
   workflow_dispatch:
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   scan:
