@@ -3,7 +3,7 @@ on:
   push:
     branches: master
     paths:
-      - "**/build.gradle.kts"
+      - "build.gradle.kts"
   workflow_dispatch:
 
 jobs:
