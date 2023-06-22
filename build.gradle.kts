@@ -3,31 +3,31 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.9.3"
 val jsonassertVersion = "1.5.1"
-val k9rapidVersion = "1.20230426095941-a725ff7"
+val k9rapidVersion = "1.20230601082432-b338e04"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.3.0"
-val dusseldorfVersion = "3.2.3.0-7a92774"
+val ktorVersion = "2.3.1"
+val dusseldorfVersion = "3.2.3.1-b31dd02"
 
 // Database
-val flywayVersion = "9.17.0"
+val flywayVersion = "9.20.0"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.6.0"
 
 // Test
-val embeddedPostgres = "2.0.3"
+val embeddedPostgres = "2.0.4"
 val embeddedPostgresBinaries = "12.9.0"
 val mockkVersion = "1.13.5"
-val schemaValidatorVersion = "1.0.81"
+val schemaValidatorVersion = "1.0.84"
 val awaitilityVersion = "4.2.0"
 val assertjVersion = "3.24.2"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.8.22"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.sonarqube") version "4.0.0.2929"
+    id("org.sonarqube") version "4.2.1.3168"
     jacoco
 }
 
