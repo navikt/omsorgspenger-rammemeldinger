@@ -1,0 +1,17 @@
+name: CodeQL
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+      - '**.MD'
+      - '.gitignore'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    uses: navikt/sif-gha-workflows/.github/workflows/codeql-analysis.yml@main
+    secrets: inherit
