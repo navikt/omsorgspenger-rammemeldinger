@@ -6,7 +6,7 @@ val jsonassertVersion = "1.5.1"
 val k9rapidVersion = "1.20230601082432-b338e04"
 val ulidVersion = "8.3.0"
 val ktorVersion = "2.3.1"
-val dusseldorfVersion = "3.2.3.1-b31dd02"
+val dusseldorfVersion = "3.2.3.2-80dded7"
 
 // Database
 val flywayVersion = "9.20.0"
