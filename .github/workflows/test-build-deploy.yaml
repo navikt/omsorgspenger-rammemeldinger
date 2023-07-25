@@ -1,0 +1,78 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+      - '**.MD'
+      - '.gitignore'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+  workflow_dispatch:
+
+jobs:
+  sonar:
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-sonar.yml@main
+    permissions:
+      contents: read
+      pull-requests: read
+    secrets: inherit
+    with:
+      readertoken: false
+
+  codeql:
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-codeql.yml@main
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+      security-events: write
+    secrets: inherit
+    with:
+      readertoken: false
+      package-command: './gradlew clean build -x test'
+      branch: master
+
+  test:
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-test.yml@main
+    permissions:
+      contents: read
+    secrets: inherit
+    with:
+      readertoken: false
+
+  build:
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-build.yml@main
+    permissions:
+      contents: write
+      id-token: write
+    secrets: inherit
+    with:
+      team: omsorgspenger
+      dockercontext: .
+      readertoken: false
+
+  trivy:
+    needs: [ build ]
+    uses: navikt/sif-gha-workflows/.github/workflows/trivy.yml@main
+    permissions:
+      contents: write
+      security-events: write
+      id-token: write
+    secrets: inherit
+    with:
+      image: ${{ needs.build.outputs.image }}
+      team: omsorgspenger
+
+  deploy:
+    needs: [ test, build ]
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-deploy.yml@main
+    permissions:
+      contents: read
+    secrets: inherit
+    with:
+      image: ${{ needs.build.outputs.image }}
+      environment: gcp
+      deploy-prod: true
+      
