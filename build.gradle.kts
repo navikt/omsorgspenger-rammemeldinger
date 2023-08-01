@@ -5,11 +5,11 @@ val junitJupiterVersion = "5.10.0"
 val jsonassertVersion = "1.5.1"
 val k9rapidVersion = "1.20230721085317-ef25e22"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.3.2"
+val ktorVersion = "2.3.3"
 val dusseldorfVersion = "3.2.3.1-b31dd02"
 
 // Database
-val flywayVersion = "9.21.0"
+val flywayVersion = "9.21.1"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.6.0"
