@@ -23,8 +23,6 @@ updates:
       gradle:
         patterns:
           - "*"
-        exclude-patterns:
-          - "*dusseldorf*"
     registries:
       - k9-rapid
 
