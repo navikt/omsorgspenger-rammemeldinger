@@ -107,7 +107,7 @@ internal class OverføringerApiTest(
                 addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
             }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
+                assertEquals(ContentType.Application.Json, response.contentType())
 
                 @Language("JSON")
                 val forventetResponse = """
@@ -171,7 +171,7 @@ internal class OverføringerApiTest(
                 addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
             }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
+                assertEquals(ContentType.Application.Json, response.contentType())
 
                 @Language("JSON")
                 val forventetResponse = """
