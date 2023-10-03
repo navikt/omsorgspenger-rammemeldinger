@@ -24,7 +24,6 @@ spec:
       {{/each}}
     inbound:
       rules:
-        - application: omsorgspenger-oidc-auth-proxy
         - application: omsorgsdager
         - application: k9-aarskvantum
           namespace: k9saksbehandling
@@ -71,9 +70,6 @@ spec:
     path: /metrics
   secureLogs:
     enabled: true
-  filesFrom:
-    - secret: omsorgspenger-meldinger-srvusercredentials
-      mountPath: /var/run/secrets/nais.io/service_user
   env:
   {{#each env}}
     - name: {{@key}}

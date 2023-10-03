@@ -15,7 +15,6 @@
     "highAvailability": "false"
   },
   "env": {
-    "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
     "HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES": "6e6bc617-20d4-4a1a-bbca-bb0b46f59b0d/.default",
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL": "https://omsorgspenger-infotrygd-rammevedtak.dev-fss-pub.nais.io",
     "TILGANGSSTYRING_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-tilgangsstyring/.default"
