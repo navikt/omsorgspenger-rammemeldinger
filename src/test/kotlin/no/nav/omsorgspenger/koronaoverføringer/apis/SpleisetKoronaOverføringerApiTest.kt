@@ -1,6 +1,8 @@
 package no.nav.omsorgspenger.koronaoverføringer.apis
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
@@ -64,18 +66,20 @@ internal class SpleisetKoronaOverføringerApiTest(
     }.build()
 
     @Test
-    fun `hent overføringer`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Post, Path) {
-                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumAuthorized())
-                setBody(Body)
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals(ContentType.Application.Json, response.contentType())
+    fun `hent overføringer`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(applicationContext)
+        }
 
-                @Language("JSON")
-                val forventetResponse = """
+        client.post(Path) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            header(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumAuthorized())
+            setBody(Body)
+        }.apply {
+            assertEquals(HttpStatusCode.OK, this.status)
+
+            @Language("JSON")
+            val forventetResponse = """
                 {
                     "gitt": [{
                         "gjennomført": "2018-01-01",
@@ -108,27 +112,30 @@ internal class SpleisetKoronaOverføringerApiTest(
                 }
                 """.trimIndent()
 
-                JSONAssert.assertEquals(forventetResponse, response.content, true)
-            }
+            JSONAssert.assertEquals(forventetResponse, this.bodyAsText(), true)
         }
+
     }
 
     @Test
-    fun `hent overføringer uten tilgang`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Post, Path) {
-                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                setBody(Body)
-            }.apply {
-                assertEquals(HttpStatusCode.Unauthorized, response.status())
-            }
-            handleRequest(HttpMethod.Post, Path) {
-                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumUnauthorized())
-                setBody(Body)
-            }.apply {
-                assertEquals(HttpStatusCode.Forbidden, response.status())
-            }
+    fun `hent overføringer uten tilgang`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(applicationContext)
+        }
+
+        client.post(Path) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            setBody(Body)
+        }.apply {
+            assertEquals(HttpStatusCode.Unauthorized, this.status)
+        }
+
+        client.post(Path) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            header(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumUnauthorized())
+            setBody(Body)
+        }.apply {
+            assertEquals(HttpStatusCode.Forbidden, this.status)
         }
     }
 

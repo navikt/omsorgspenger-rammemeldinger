@@ -1,6 +1,8 @@
 package no.nav.omsorgspenger.aleneom.apis
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.every
@@ -61,14 +63,17 @@ internal class AleneOmOmsorgenApiTest(
     }.build()
 
     @Test
-    fun `hent alene om omsorgen har to meldinger`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Get, "/alene-om-omsorgen?saksnummer=SAK1") {
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.omsorgsdagerAuthorized())
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                @Language("JSON")
-                val forventet = """
+    fun `hent alene om omsorgen har to meldinger`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(applicationContext)
+        }
+
+        client.get("/alene-om-omsorgen?saksnummer=SAK1") {
+            header(HttpHeaders.Authorization, AuthorizationHeaders.omsorgsdagerAuthorized())
+        }.apply {
+            assertEquals(HttpStatusCode.OK, this.status)
+            @Language("JSON")
+            val forventet = """
                     {
                       "aleneOmOmsorgen": [{
                         "registrert": "$registrert",
@@ -98,30 +103,32 @@ internal class AleneOmOmsorgenApiTest(
                     }
                 """.trimIndent()
 
-                println(response.content!!)
-                JSONAssert.assertEquals(forventet, response.content!!, true)
-            }
+            println(this.bodyAsText())
+            JSONAssert.assertEquals(forventet, this.bodyAsText(), true)
         }
     }
 
     @Test
-    fun `hent alene om omsorgen har ingen meldinger`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Get, "/alene-om-omsorgen?saksnummer=SAK2") {
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.omsorgsdagerAuthorized())
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                @Language("JSON")
-                val forventet = """
+    fun `hent alene om omsorgen har ingen meldinger`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(applicationContext)
+        }
+
+        client.get("/alene-om-omsorgen?saksnummer=SAK2") {
+            header(HttpHeaders.Authorization, AuthorizationHeaders.omsorgsdagerAuthorized())
+        }.apply {
+            assertEquals(HttpStatusCode.OK, this.status)
+            @Language("JSON")
+            val forventet = """
                     {
                       "aleneOmOmsorgen": []
                     }
                 """.trimIndent()
 
-                println(response.content!!)
-                JSONAssert.assertEquals(forventet, response.content!!, true)
-            }
+            println(this.bodyAsText())
+            JSONAssert.assertEquals(forventet, this.bodyAsText(), true)
         }
+
     }
 
     private companion object {

@@ -1,14 +1,10 @@
 package no.nav.omsorgspenger.overføringer.apis
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.withCharset
-import io.ktor.server.testing.contentType
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.withTestApplication
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.server.testing.*
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -91,7 +87,7 @@ internal class OverføringerApiTest(
         )
     }
 
-    private val applicationContext = TestApplicationContextBuilder(
+    private val testApplicationContext = TestApplicationContextBuilder(
         dataSource = dataSource.cleanAndMigrate(),
         wireMockServer = wireMockServer
     ).also { builder ->
@@ -101,16 +97,19 @@ internal class OverføringerApiTest(
     }.build()
 
     @Test
-    fun `Hent overføringer for en person som har overføringer`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Get, path(SaksnummerHarOverføringer)) {
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals(ContentType.Application.Json, response.contentType())
+    fun `Hent overføringer for en person som har overføringer`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(testApplicationContext)
+        }
 
-                @Language("JSON")
-                val forventetResponse = """
+        client.get(path(SaksnummerHarOverføringer)) {
+            header(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
+        }.apply {
+            assertEquals(HttpStatusCode.OK, this.status)
+            assertEquals(ContentType.Application.Json, this.contentType())
+
+            @Language("JSON")
+            val forventetResponse = """
                 {
                     "saksnummer": "$SaksnummerHarOverføringer",
                     "identitetsnummer": "44",
@@ -159,22 +158,25 @@ internal class OverføringerApiTest(
                 }
                 """.trimIndent()
 
-                JSONAssert.assertEquals(forventetResponse, response.content, true)
-            }
+            JSONAssert.assertEquals(forventetResponse, this.bodyAsText(), true)
         }
+
     }
 
     @Test
-    fun `Hent overføringer for en person som ikke har overføringer`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Get, path(SaksnummerHarIkkeOverføringer)) {
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals(ContentType.Application.Json, response.contentType())
+    fun `Hent overføringer for en person som ikke har overføringer`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(testApplicationContext)
+        }
 
-                @Language("JSON")
-                val forventetResponse = """
+        client.get(path(SaksnummerHarIkkeOverføringer)) {
+            header(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
+        }.apply {
+            assertEquals(HttpStatusCode.OK, this.status)
+            assertEquals(ContentType.Application.Json, this.contentType())
+
+            @Language("JSON")
+            val forventetResponse = """
                 {
                   "saksnummer": "$SaksnummerHarIkkeOverføringer",
                   "identitetsnummer": "55",
@@ -183,41 +185,46 @@ internal class OverføringerApiTest(
                 }
                 """.trimIndent()
 
-                JSONAssert.assertEquals(forventetResponse, response.content, true)
-            }
+            JSONAssert.assertEquals(forventetResponse, this.bodyAsText(), true)
         }
     }
 
     @Test
-    fun `Hent overføringer for et saksnummer som ikke finnes i løsningen`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Get, path(SaksnummerIkkeILøsningen)) {
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
-            }.apply {
-                assertEquals(HttpStatusCode.NotFound, response.status())
-            }
+    fun `Hent overføringer for et saksnummer som ikke finnes i løsningen`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(testApplicationContext)
+        }
+
+        client.get(path(SaksnummerIkkeILøsningen)) {
+            header(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
+        }.apply {
+            assertEquals(HttpStatusCode.NotFound, this.status)
         }
     }
 
     @Test
-    fun `Hent annet enn aktive overføringer`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Get, path(SaksnummerHarOverføringer, "Deaktivert")) {
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
-            }.apply {
-                assertEquals(HttpStatusCode.BadRequest, response.status())
-            }
+    fun `Hent annet enn aktive overføringer`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(testApplicationContext)
+        }
+
+        client.get(path(SaksnummerHarOverføringer, "Deaktivert")) {
+            header(HttpHeaders.Authorization, AuthorizationHeaders.authorizedUser())
+        }.apply {
+            assertEquals(HttpStatusCode.BadRequest, this.status)
         }
     }
 
     @Test
-    fun `Hent overføringer uten tilgang ger http forbidden`() {
-        withTestApplication({ omsorgspengerRammemeldinger(applicationContext) }) {
-            handleRequest(HttpMethod.Get, path(SaksnummerHarOverføringer)) {
-                addHeader(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumUnauthorized())
-            }.apply {
-                assertEquals(HttpStatusCode.Forbidden, response.status())
-            }
+    fun `Hent overføringer uten tilgang ger http forbidden`() = testApplication {
+        application {
+            omsorgspengerRammemeldinger(testApplicationContext)
+        }
+
+        client.get(path(SaksnummerHarOverføringer)) {
+            header(HttpHeaders.Authorization, AuthorizationHeaders.k9AarskvantumUnauthorized())
+        }.apply {
+            assertEquals(HttpStatusCode.Forbidden, this.status)
         }
     }
 
