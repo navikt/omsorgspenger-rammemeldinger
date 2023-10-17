@@ -142,15 +142,11 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
     }
 
     install(CallId) {
-        fromFirstNonNullHeader(
-            headers = listOf(HttpHeaders.XCorrelationId, "Nav-Call-Id"),
-            generateOnNotSet = true
-        )
+        header("callId")
     }
 
     install(CallLogging) {
         logRequests()
-        correlationIdAndRequestIdInMdc()
         callIdMdc("callId")
     }
 
