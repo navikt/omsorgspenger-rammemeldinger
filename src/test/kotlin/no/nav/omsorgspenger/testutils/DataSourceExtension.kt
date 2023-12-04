@@ -15,9 +15,7 @@ internal class DataSourceExtension : ParameterResolver {
         .withPassword("postgresql")
 
     init {
-        if(!postgreSQLContainer.isRunning) {
-            postgreSQLContainer.start()
-        }
+        postgreSQLContainer.start()
     }
 
     private val dataSource = DataSourceBuilder(

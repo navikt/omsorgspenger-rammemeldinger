@@ -64,7 +64,6 @@ dependencies {
     }
 
     testImplementation("org.testcontainers:postgresql:$testcontainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
 
     testImplementation("org.awaitility:awaitility:$awaitilityVersion")
     testImplementation("org.skyscreamer:jsonassert:$jsonassertVersion")
