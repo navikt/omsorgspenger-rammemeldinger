@@ -71,6 +71,7 @@ jobs:
     uses: navikt/sif-gha-workflows/.github/workflows/gradle-deploy.yml@main
     permissions:
       contents: read
+      id-token: write
     secrets: inherit
     with:
       image: ${{ needs.build.outputs.image }}
