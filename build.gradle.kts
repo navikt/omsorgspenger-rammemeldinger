@@ -105,6 +105,8 @@ tasks {
                 )
             )
         }
+        // Fix for flyway bug https://github.com/flyway/flyway/issues/3482#issuecomment-1189357338
+        mergeServiceFiles()
     }
 
     withType<Wrapper> {
