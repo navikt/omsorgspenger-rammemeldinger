@@ -14,11 +14,11 @@ val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.7.1"
 
 // Test
-val testcontainersVersion = "1.19.3"
+val testcontainersVersion = "1.19.4"
 val mockkVersion = "1.13.9"
 val schemaValidatorVersion = "1.2.0"
 val awaitilityVersion = "4.2.0"
-val assertjVersion = "3.25.1"
+val assertjVersion = "3.25.2"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
