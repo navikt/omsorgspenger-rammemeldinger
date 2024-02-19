@@ -1,24 +1,24 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-val junitJupiterVersion = "5.10.1"
+val junitJupiterVersion = "5.10.2"
 val jsonassertVersion = "1.5.1"
 val k9rapidVersion = "1.20240115061003-339d641"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.3.7"
-val dusseldorfVersion = "4.1.5"
+val ktorVersion = "2.3.8"
+val dusseldorfVersion = "4.2.1"
 
 // Database
-val flywayVersion = "10.6.0"
+val flywayVersion = "10.8.1"
 val hikariVersion = "5.1.0"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.7.1"
 
 // Test
-val testcontainersVersion = "1.19.3"
+val testcontainersVersion = "1.19.5"
 val mockkVersion = "1.13.9"
-val schemaValidatorVersion = "1.2.0"
+val schemaValidatorVersion = "1.3.3"
 val awaitilityVersion = "4.2.0"
-val assertjVersion = "3.25.1"
+val assertjVersion = "3.25.3"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
