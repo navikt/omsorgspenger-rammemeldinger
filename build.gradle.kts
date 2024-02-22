@@ -14,7 +14,7 @@ val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.7.2"
 
 // Test
-val testcontainersVersion = "1.19.5"
+val testcontainersVersion = "1.19.6"
 val mockkVersion = "1.13.9"
 val schemaValidatorVersion = "1.3.3"
 val awaitilityVersion = "4.2.0"
