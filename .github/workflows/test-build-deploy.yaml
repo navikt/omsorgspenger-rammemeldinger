@@ -40,7 +40,7 @@ jobs:
       contents: read
     secrets: inherit
     with:
-      readertoken: false
+      javaversion: 21
 
   build:
     uses: navikt/sif-gha-workflows/.github/workflows/gradle-build.yml@main
@@ -50,8 +50,7 @@ jobs:
     secrets: inherit
     with:
       team: omsorgspenger
-      dockercontext: .
-      readertoken: false
+      javaversion: 21
 
   trivy:
     needs: [ build ]

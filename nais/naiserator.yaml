@@ -18,10 +18,7 @@ spec:
     outbound:
       rules:
         - application: omsorgspenger-tilgangsstyring
-      external:
-      {{#each externalHosts as |host|}}
-        - host: {{host}}
-      {{/each}}
+        - application: omsorgspenger-infotrygd-rammevedtak
     inbound:
       rules:
         - application: omsorgsdager
@@ -77,6 +74,8 @@ spec:
   {{/each}}
     - name: TILGANGSSTYRING_URL
       value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local
+    - name: OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL
+      value: http://omsorgspenger-infotrygd-rammevedtak.omsorgspenger.svc.cluster.local
     - name: KAFKA_RAPID_TOPIC
       value: omsorgspenger.k9-rapid-v2
     - name: KAFKA_CONSUMER_GROUP_ID
