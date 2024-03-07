@@ -3,9 +3,6 @@
   "ingresses": [
     "https://omsorgspenger-rammemeldinger.intern.dev.nav.no"
   ],
-  "externalHosts": [
-    "omsorgspenger-infotrygd-rammevedtak.dev-fss-pub.nais.io"
-  ],
   "azureTenant": "trygdeetaten.no",
   "kafkaPool": "nav-dev",
   "clusterFss": "dev-fss",
@@ -15,8 +12,7 @@
     "highAvailability": "false"
   },
   "env": {
-    "HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES": "6e6bc617-20d4-4a1a-bbca-bb0b46f59b0d/.default",
-    "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL": "https://omsorgspenger-infotrygd-rammevedtak.dev-fss-pub.nais.io",
+    "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-infotrygd-rammevedtak/.default",
     "TILGANGSSTYRING_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-tilgangsstyring/.default"
   }
 }
