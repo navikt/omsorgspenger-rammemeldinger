@@ -4,7 +4,7 @@ val junitJupiterVersion = "5.10.2"
 val jsonassertVersion = "1.5.1"
 val k9rapidVersion = "1.20240510084839-e7ae05b"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.3.10"
+val ktorVersion = "2.3.11"
 val dusseldorfVersion = "4.2.4"
 
 // Database
@@ -14,7 +14,7 @@ val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.7.3"
 
 // Test
-val testcontainersVersion = "1.19.7"
+val testcontainersVersion = "1.19.8"
 val mockkVersion = "1.13.10"
 val schemaValidatorVersion = "1.4.0"
 val awaitilityVersion = "4.2.1"
@@ -23,7 +23,7 @@ val assertjVersion = "3.25.3"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "1.9.24"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "5.0.0.4638"
     jacoco
