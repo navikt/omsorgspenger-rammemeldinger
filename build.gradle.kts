@@ -1,11 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-val junitJupiterVersion = "5.10.2"
-val jsonassertVersion = "1.5.1"
+val junitJupiterVersion = "5.10.3"
+val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20240510084839-e7ae05b"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.3.11"
-val dusseldorfVersion = "5.0.0"
+val ktorVersion = "2.3.12"
+val dusseldorfVersion = "5.0.1"
 
 // Database
 val flywayVersion = "10.15.0"
@@ -16,7 +16,7 @@ val postgresVersion = "42.7.3"
 // Test
 val testcontainersVersion = "1.19.8"
 val mockkVersion = "1.13.11"
-val schemaValidatorVersion = "1.4.0"
+val schemaValidatorVersion = "1.4.3"
 val awaitilityVersion = "4.2.1"
 val assertjVersion = "3.26.0"
 
