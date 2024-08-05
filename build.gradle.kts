@@ -5,18 +5,18 @@ val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20240510084839-e7ae05b"
 val ulidVersion = "8.3.0"
 val ktorVersion = "2.3.12"
-val dusseldorfVersion = "5.0.3"
+val dusseldorfVersion = "5.0.4"
 
 // Database
-val flywayVersion = "10.15.2"
+val flywayVersion = "10.17.0"
 val hikariVersion = "5.1.0"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.7.3"
 
 // Test
-val testcontainersVersion = "1.19.8"
-val mockkVersion = "1.13.11"
-val schemaValidatorVersion = "1.5.0"
+val testcontainersVersion = "1.20.1"
+val mockkVersion = "1.13.12"
+val schemaValidatorVersion = "1.5.1"
 val awaitilityVersion = "4.2.1"
 val assertjVersion = "3.26.3"
 
