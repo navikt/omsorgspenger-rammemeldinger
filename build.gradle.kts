@@ -23,7 +23,7 @@ val assertjVersion = "3.26.3"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "2.0.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "5.1.0.4882"
     jacoco
