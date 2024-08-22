@@ -8,10 +8,10 @@ val ktorVersion = "2.3.12"
 val dusseldorfVersion = "5.0.5"
 
 // Database
-val flywayVersion = "10.17.1"
+val flywayVersion = "10.17.2"
 val hikariVersion = "5.1.0"
 val kotliqueryVersion = "1.9.0"
-val postgresVersion = "42.7.3"
+val postgresVersion = "42.7.4"
 
 // Test
 val testcontainersVersion = "1.20.1"
@@ -23,7 +23,7 @@ val assertjVersion = "3.26.3"
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.0.10"
+    kotlin("jvm") version "2.0.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "5.1.0.4882"
     jacoco
