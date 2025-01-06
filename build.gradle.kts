@@ -5,7 +5,7 @@ val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20240510084839-e7ae05b"
 val ulidVersion = "8.3.0"
 val ktorVersion = "2.3.13"
-val dusseldorfVersion = "5.0.15"
+val dusseldorfVersion = "5.0.16"
 
 // Database
 val flywayVersion = "11.1.0"
@@ -18,7 +18,7 @@ val testcontainersVersion = "1.20.4"
 val mockkVersion = "1.13.14"
 val schemaValidatorVersion = "1.5.4"
 val awaitilityVersion = "4.2.2"
-val assertjVersion = "3.27.1"
+val assertjVersion = "3.27.2"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
