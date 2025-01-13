@@ -5,25 +5,25 @@ val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20240510084839-e7ae05b"
 val ulidVersion = "8.3.0"
 val ktorVersion = "2.3.13"
-val dusseldorfVersion = "5.0.15"
+val dusseldorfVersion = "5.0.16"
 
 // Database
-val flywayVersion = "11.1.0"
+val flywayVersion = "11.1.1"
 val hikariVersion = "6.2.1"
-val kotliqueryVersion = "1.9.0"
+val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.4"
 
 // Test
 val testcontainersVersion = "1.20.4"
-val mockkVersion = "1.13.14"
+val mockkVersion = "1.13.16"
 val schemaValidatorVersion = "1.5.4"
 val awaitilityVersion = "4.2.2"
-val assertjVersion = "3.27.1"
+val assertjVersion = "3.27.2"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.0.21" //kan ikke gå for 2.1+ pga ktor som har avhengighet til kotlin-stdlib-common, og den er tilsynelatende ikke tilgjengelig i 2.1+
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "6.0.1.5171"
     jacoco
