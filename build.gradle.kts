@@ -5,13 +5,13 @@ val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20240510084839-e7ae05b"
 val ulidVersion = "8.3.0"
 val ktorVersion = "2.3.13"
-val dusseldorfVersion = "5.0.16"
+val dusseldorfVersion = "5.0.17"
 
 // Database
 val flywayVersion = "11.1.1"
 val hikariVersion = "6.2.1"
 val kotliqueryVersion = "1.9.1"
-val postgresVersion = "42.7.4"
+val postgresVersion = "42.7.5"
 
 // Test
 val testcontainersVersion = "1.20.4"
