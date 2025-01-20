@@ -8,7 +8,7 @@ val ktorVersion = "2.3.13"
 val dusseldorfVersion = "5.0.17"
 
 // Database
-val flywayVersion = "11.1.1"
+val flywayVersion = "11.2.0"
 val hikariVersion = "6.2.1"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.5"
@@ -16,14 +16,14 @@ val postgresVersion = "42.7.5"
 // Test
 val testcontainersVersion = "1.20.4"
 val mockkVersion = "1.13.16"
-val schemaValidatorVersion = "1.5.4"
+val schemaValidatorVersion = "1.5.5"
 val awaitilityVersion = "4.2.2"
-val assertjVersion = "3.27.2"
+val assertjVersion = "3.27.3"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.0.21" //kan ikke gå for 2.1+ pga ktor som har avhengighet til kotlin-stdlib-common, og den er tilsynelatende ikke tilgjengelig i 2.1+
+    kotlin("jvm") version "2.1.0" //kan ikke gå for 2.1+ pga ktor som har avhengighet til kotlin-stdlib-common, og den er tilsynelatende ikke tilgjengelig i 2.1+
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "6.0.1.5171"
     jacoco
