@@ -1,10 +1,10 @@
 package no.nav.omsorgspenger.fordelinger
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
 import javax.sql.DataSource
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.FordeleOmsorgsdagerBehov
 import no.nav.omsorgspenger.registerApplicationContext
