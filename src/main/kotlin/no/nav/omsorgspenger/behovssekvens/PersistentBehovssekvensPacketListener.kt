@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger.behovssekvens
 
-import no.nav.helse.rapids_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import no.nav.k9.rapid.river.BehovssekvensPacketListener
 import org.slf4j.Logger
 

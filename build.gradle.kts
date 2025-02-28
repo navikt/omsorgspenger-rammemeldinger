@@ -1,10 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-val junitJupiterVersion = "5.12.0"
+val junitJupiterVersion = "5.11.4"
 val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20250225145424-cc27101"
 val ulidVersion = "8.3.0"
-val ktorVersion = "2.3.13"
+val ktorVersion = "3.1.0"
 val dusseldorfVersion = "6.1.1"
 
 // Database
@@ -55,7 +55,8 @@ dependencies {
     testImplementation("no.nav.k9.rapid:overfore-omsorgsdager:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:overfore-korona-omsorgsdager:$k9rapidVersion")
     testImplementation("no.nav.k9.rapid:fordele-omsorgsdager:$k9rapidVersion")
-    
+    testImplementation("no.nav.k9.rapid:river-test:$k9rapidVersion")
+
     testImplementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:$ulidVersion")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
     testImplementation("com.networknt:json-schema-validator:$schemaValidatorVersion")
