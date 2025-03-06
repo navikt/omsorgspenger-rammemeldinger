@@ -40,6 +40,8 @@ spec:
             value: "on"
           - name: "pgaudit.log"
             value: "write"
+          - name: "pgaudit.log_parameter"
+            value: "on"
         {{/if}}
         databases:
           - name: omsorgspenger-rammemeldinger
