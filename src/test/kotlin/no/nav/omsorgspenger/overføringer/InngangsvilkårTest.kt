@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger.overføringer
 
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import no.nav.k9.rapid.behov.OverføreOmsorgsdagerBehov
 import no.nav.omsorgspenger.registerApplicationContext
 import no.nav.omsorgspenger.testutils.*

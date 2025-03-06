@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.personopplysninger.VurderRelasjonerMelding
 import no.nav.omsorgspenger.registerOverføreKoronaOmsorgsdager

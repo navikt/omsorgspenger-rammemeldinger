@@ -1,10 +1,11 @@
 package no.nav.omsorgspenger.fordelinger
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.*
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.k9.rapid.behov.Behovssekvens
 import no.nav.k9.rapid.behov.FordeleOmsorgsdagerBehov
 import no.nav.omsorgspenger.fordelinger.meldinger.FordelingAvOmsorgsdagerMelding
@@ -40,5 +41,5 @@ internal class FordelingAvOmsorgsdagerMeldingTest {
             journalpostIder = listOf("4111111"),
             mottatt = mottatt
         ))
-    ).keyValue.second.let { JsonMessage(it, MessageProblems(it)) }
+    ).keyValue.second.let { JsonMessage(it, MessageProblems(it), SimpleMeterRegistry(), null) }
 }

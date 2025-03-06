@@ -8,17 +8,17 @@ import io.ktor.serialization.jackson.*
 import io.ktor.server.routing.*
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerApi
 import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
 import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.ktor.server.auth.*
 import io.ktor.http.*
 import io.ktor.server.plugins.callid.*
 import io.ktor.server.response.*
-import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.*
 import no.nav.helse.dusseldorf.ktor.auth.*
@@ -38,9 +38,10 @@ import java.time.LocalDate
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
-    RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(applicationContext.env))
-        .withKtorModule { omsorgspengerRammemeldinger(applicationContext) }
-        .build()
+    RapidApplication.create(
+        env = applicationContext.env,
+        builder = { withKtorModule { omsorgspengerRammemeldinger(applicationContext) } }
+    )
         .apply { registerApplicationContext(applicationContext) }
         .start()
 }
