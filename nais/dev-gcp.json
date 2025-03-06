@@ -9,7 +9,8 @@
   "database": {
     "tier": "db-custom-1-3840",
     "diskSize": "20",
-    "highAvailability": "false"
+    "highAvailability": "false",
+    "enableAudit": "true"
   },
   "env": {
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-infotrygd-rammevedtak/.default",
