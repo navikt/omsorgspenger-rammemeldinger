@@ -1,7 +1,7 @@
 package no.nav.omsorgspenger.overføringer.meldinger
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer
 import no.nav.omsorgspenger.rivers.HentBehov

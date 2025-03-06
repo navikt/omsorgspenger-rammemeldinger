@@ -2,7 +2,7 @@ package no.nav.omsorgspenger.overføringer.meldinger
 
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringGitt
 import no.nav.omsorgspenger.rivers.BehovMedLøsning

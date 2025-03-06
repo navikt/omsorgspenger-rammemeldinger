@@ -1,6 +1,6 @@
 package no.nav.omsorgspenger.overføringer
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.formidling.Meldingsbestilling
 import no.nav.omsorgspenger.koronaoverføringer.rivers.mockHentOmsorgspengerSaksnummerOchVurderRelasjoner
 import no.nav.omsorgspenger.overføringer.formidling.GittDager

@@ -1,9 +1,9 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.losning.OverføreKoronaOmsorgsdagerLøsning
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode

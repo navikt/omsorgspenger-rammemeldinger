@@ -2,7 +2,7 @@ package no.nav.omsorgspenger.fordelinger.meldinger
 
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.JournalpostId
 import no.nav.omsorgspenger.rivers.HentBehov

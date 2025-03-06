@@ -1,7 +1,7 @@
 package no.nav.omsorgspenger.koronaoverføringer.rivers
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import kotlinx.coroutines.runBlocking
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.koronaoverføringer.rivers.KoronaoverføringerRapidVerktøy.gjennomførKoronaOverføring

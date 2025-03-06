@@ -1,14 +1,12 @@
 package no.nav.omsorgspenger.behovssekvens
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import de.huxhorn.sulky.ulid.ULID
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.omsorgspenger.testutils.DataSourceExtension
 import no.nav.omsorgspenger.testutils.cleanAndMigrate
 import org.junit.jupiter.api.Test
@@ -44,21 +42,21 @@ internal class PersistentBehovssekvensPacketListenerTest(
         val jsonMessage1 = ULID().nextULID().somJsonMessage()
 
         for (i in 0..10) {
-            packetListener1.onPacket(jsonMessage1, messageContextMock, MessageMetadata("", -1, -1, null, emptyMap()), SimpleMeterRegistry())
+            packetListener1.onPacket(jsonMessage1, messageContextMock)
         }
 
         gjortNganger(1)
 
         for (i in 0..10) {
-            packetListener2.onPacket(jsonMessage1, messageContextMock, MessageMetadata("", -1, -1, null, emptyMap()), SimpleMeterRegistry())
+            packetListener2.onPacket(jsonMessage1, messageContextMock)
         }
 
         gjortNganger(2)
 
         val jsonMessage2 = ULID().nextULID().somJsonMessage()
-        packetListener1.onPacket(jsonMessage2, messageContextMock, MessageMetadata("", -1, -1, null, emptyMap()), SimpleMeterRegistry())
+        packetListener1.onPacket(jsonMessage2, messageContextMock)
         gjortNganger(3)
-        packetListener2.onPacket(jsonMessage2, messageContextMock, MessageMetadata("", -1, -1, null, emptyMap()), SimpleMeterRegistry())
+        packetListener2.onPacket(jsonMessage2, messageContextMock)
         gjortNganger(4)
     }
 
@@ -75,9 +73,7 @@ internal class PersistentBehovssekvensPacketListenerTest(
             }
         """.trimIndent().let { JsonMessage(
             originalMessage = it,
-            problems = MessageProblems(originalMessage = it),
-            metrics = SimpleMeterRegistry(),
-            randomIdGenerator = null
+            problems = MessageProblems(originalMessage = it)
         ).also { jsonMessage ->
             jsonMessage.interestedIn("@correlationId","@behovssekvensId")
         }}

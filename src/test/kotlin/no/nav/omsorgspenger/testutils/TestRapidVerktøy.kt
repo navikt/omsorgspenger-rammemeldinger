@@ -1,9 +1,8 @@
 package no.nav.omsorgspenger.testutils
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageProblems
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.awaitility.Awaitility
 import org.json.JSONObject
 import java.time.Duration
@@ -15,7 +14,7 @@ internal fun TestRapid.sisteMelding() =
     inspektør.message(inspektør.size - 1).toString()
 
 internal fun String.somJsonMessage() =
-    JsonMessage(toString(), MessageProblems(this), SimpleMeterRegistry()).also { it.interestedIn("@løsninger") }
+    JsonMessage(toString(), MessageProblems(this)).also { it.interestedIn("@løsninger") }
 
 internal fun TestRapid.sisteMeldingSomJsonMessage() =
     sisteMelding().somJsonMessage()

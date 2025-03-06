@@ -2,7 +2,7 @@ package no.nav.omsorgspenger.fordelinger.meldinger
 
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgspenger.fordelinger.FordelingGirMelding
 import no.nav.omsorgspenger.rivers.meldinger.SerDes.JacksonObjectMapper
