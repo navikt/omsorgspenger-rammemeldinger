@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.12.1"
+val junitPlatformVersion = "1.12.1"
 val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20250404105830-823f1fc"
 val ulidVersion = "8.3.0"
@@ -71,6 +72,7 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+    testImplementation("org.junit.platform:junit-platform-launcher:$junitPlatformVersion")
     testImplementation("org.assertj:assertj-core:$assertjVersion")
 }
 
