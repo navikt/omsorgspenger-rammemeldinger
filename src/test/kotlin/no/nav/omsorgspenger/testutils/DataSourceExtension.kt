@@ -9,7 +9,7 @@ import javax.sql.DataSource
 
 internal class DataSourceExtension : ParameterResolver {
 
-    private val postgreSQLContainer = PostgreSQLContainer("postgres:12.2")
+    private val postgreSQLContainer = PostgreSQLContainer("postgres:14.18")
         .withDatabaseName("postgresl")
         .withUsername("postgresl")
         .withPassword("postgresql")
