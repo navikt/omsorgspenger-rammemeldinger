@@ -3,13 +3,13 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 val junitJupiterVersion = "5.13.2"
 val junitPlatformVersion = "1.13.2"
 val jsonassertVersion = "1.5.3"
-val k9rapidVersion = "1.20250623153253-de9393d"
+val k9rapidVersion = "1.20250626074600-cb76847"
 val ulidVersion = "8.3.0"
 val ktorVersion = "3.1.0"
 val dusseldorfVersion = "7.0.0"
 
 // Database
-val flywayVersion = "11.9.2"
+val flywayVersion = "11.10.0"
 val hikariVersion = "6.3.0"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.7"
