@@ -15,7 +15,7 @@ internal fun TestRapid.sisteMelding() =
     inspektør.message(inspektør.size - 1).toString()
 
 internal fun String.somJsonMessage() =
-    JsonMessage(toString(), MessageProblems(this), SimpleMeterRegistry()).also { it.interestedIn("@løsninger") }
+    JsonMessage(toString(), MessageProblems(this)).also { it.interestedIn("@løsninger") }
 
 internal fun TestRapid.sisteMeldingSomJsonMessage() =
     sisteMelding().somJsonMessage()
