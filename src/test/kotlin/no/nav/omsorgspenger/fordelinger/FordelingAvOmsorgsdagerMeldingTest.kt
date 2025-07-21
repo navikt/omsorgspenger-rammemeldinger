@@ -41,5 +41,5 @@ internal class FordelingAvOmsorgsdagerMeldingTest {
             journalpostIder = listOf("4111111"),
             mottatt = mottatt
         ))
-    ).keyValue.second.let { JsonMessage(it, MessageProblems(it), SimpleMeterRegistry(), null) }
+    ).keyValue.second.let { JsonMessage(it, MessageProblems(it), null) }
 }

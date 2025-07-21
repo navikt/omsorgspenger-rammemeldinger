@@ -76,7 +76,6 @@ internal class PersistentBehovssekvensPacketListenerTest(
         """.trimIndent().let { JsonMessage(
             originalMessage = it,
             problems = MessageProblems(originalMessage = it),
-            metrics = SimpleMeterRegistry(),
             randomIdGenerator = null
         ).also { jsonMessage ->
             jsonMessage.interestedIn("@correlationId","@behovssekvensId")
