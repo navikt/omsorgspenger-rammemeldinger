@@ -19,7 +19,7 @@ val testcontainersVersion = "1.21.3"
 val mockkVersion = "1.14.5"
 val schemaValidatorVersion = "1.5.8"
 val awaitilityVersion = "4.3.0"
-val assertjVersion = "3.27.3"
+val assertjVersion = "3.27.4"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
