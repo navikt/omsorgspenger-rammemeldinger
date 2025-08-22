@@ -39,7 +39,7 @@ spec:
           - name: "cloudsql.enable_pgaudit"
             value: "on"
           - name: "pgaudit.log"
-            value: "write"
+            value: "all"
           - name: "pgaudit.log_parameter"
             value: "on"
         {{/if}}
