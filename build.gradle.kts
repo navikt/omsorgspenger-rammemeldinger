@@ -9,7 +9,7 @@ val ktorVersion = "3.2.3"
 val dusseldorfVersion = "7.0.4"
 
 // Database
-val flywayVersion = "11.11.2"
+val flywayVersion = "11.12.0"
 val hikariVersion = "7.0.2"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.7"
@@ -26,7 +26,7 @@ val mainClass = "no.nav.omsorgspenger.AppKt"
 plugins {
     kotlin("jvm") version "2.2.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.sonarqube") version "6.2.0.5505"
+    id("org.sonarqube") version "6.3.1.5724"
     jacoco
 }
 
