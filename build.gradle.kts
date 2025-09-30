@@ -9,17 +9,17 @@ val ktorVersion = "3.2.3"
 val dusseldorfVersion = "7.0.4"
 
 // Database
-val flywayVersion = "11.13.1"
+val flywayVersion = "11.13.2"
 val hikariVersion = "7.0.2"
 val kotliqueryVersion = "1.9.1"
-val postgresVersion = "42.7.7"
+val postgresVersion = "42.7.8"
 
 // Test
 val testcontainersVersion = "1.21.3"
 val mockkVersion = "1.14.5"
 val schemaValidatorVersion = "1.5.9"
 val awaitilityVersion = "4.3.0"
-val assertjVersion = "3.27.4"
+val assertjVersion = "3.27.6"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
