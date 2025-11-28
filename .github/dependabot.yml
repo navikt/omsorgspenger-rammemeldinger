@@ -10,6 +10,8 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    cooldown:
+      default-days: 7
     groups:
       github:
         patterns:
@@ -19,6 +21,10 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    cooldown:
+      default-days: 7
+      exclude:
+        - "no.nav.*"
     ignore:
       - dependency-name: "no.nav.helse:dusseldorf*"
         versions: ["6.0.0"]
@@ -35,3 +41,5 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    cooldown:
+      default-days: 7
