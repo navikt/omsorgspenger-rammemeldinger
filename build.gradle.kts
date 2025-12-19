@@ -16,7 +16,7 @@ val postgresVersion = "42.7.8"
 // Test
 val testcontainersVersion = "1.21.3"
 val mockkVersion = "1.14.7"
-val schemaValidatorVersion = "2.0.0"
+val schemaValidatorVersion = "2.0.1"
 val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.6"
 
