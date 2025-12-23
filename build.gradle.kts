@@ -14,16 +14,16 @@ val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.8"
 
 // Test
-val testcontainersVersion = "1.21.3"
+val testcontainersVersion = "1.21.4"
 val mockkVersion = "1.14.7"
-val schemaValidatorVersion = "2.0.0"
+val schemaValidatorVersion = "3.0.0"
 val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.6"
 
 val mainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "7.2.1.6560"
     jacoco
