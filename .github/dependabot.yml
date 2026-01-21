@@ -30,11 +30,6 @@ updates:
       default-days: 7
       exclude:
         - "no.nav.*"
-    ignore:
-      - dependency-name: "no.nav.helse:dusseldorf*"
-        versions: ["6.0.0"]
-      - dependency-name: "io.ktor:ktor*"
-        versions: [">=3.0.0"] #krever at dusseldorf migreres til 3.0.0 først
     groups:
       gradle:
         patterns:
@@ -46,3 +41,5 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    registries:
+      - ghcr
