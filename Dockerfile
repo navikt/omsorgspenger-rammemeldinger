@@ -6,4 +6,4 @@ WORKDIR /app
 
 USER nonroot
 
-CMD [ "app.jar" ]
+CMD [ "-jar", "app.jar" ]
