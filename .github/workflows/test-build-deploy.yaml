@@ -21,7 +21,7 @@ jobs:
       security-events: write
     secrets: inherit
     with:
-      javaversion: 25
+      javaversion: 21
       package-command: './gradlew clean build -x test'
       branch: master
 
@@ -31,7 +31,7 @@ jobs:
       contents: read
     secrets: inherit
     with:
-      javaversion: 25
+      javaversion: 21
 
   build:
     uses: navikt/sif-gha-workflows/.github/workflows/gradle-build.yml@main
@@ -41,7 +41,7 @@ jobs:
     secrets: inherit
     with:
       team: omsorgspenger
-      javaversion: 25
+      javaversion: 21
 
   trivy:
     needs: [ build ]
