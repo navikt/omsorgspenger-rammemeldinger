@@ -15,4 +15,4 @@ jobs:
       contents: read
     secrets: inherit
     with:
-      javaversion: 21
+      javaversion: 25
