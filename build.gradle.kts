@@ -2,36 +2,37 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitVersion = "6.0.2"
 val jsonassertVersion = "1.5.3"
-val k9rapidVersion = "1.20251128134720-c92d062"
+val k9rapidVersion = "1.20260206143842-d99f063"
 val ulidVersion = "8.3.0"
-val ktorVersion = "3.3.3"
-val dusseldorfVersion = "7.0.6"
+val ktorVersion = "3.4.0"
+val dusseldorfVersion = "7.0.7"
+val okhttpVersion = "5.3.2"
 
 // Database
-val flywayVersion = "11.20.1"
+val flywayVersion = "12.0.0"
 val hikariVersion = "7.0.2"
 val kotliqueryVersion = "1.9.1"
-val postgresVersion = "42.7.8"
+val postgresVersion = "42.7.9"
 
 // Test
 val testcontainersVersion = "1.21.4"
-val mockkVersion = "1.14.7"
+val mockkVersion = "1.14.9"
 val schemaValidatorVersion = "3.0.0"
 val awaitilityVersion = "4.3.0"
-val assertjVersion = "3.27.6"
+val assertjVersion = "3.27.7"
 
-val mainClass = "no.nav.omsorgspenger.AppKt"
+val appMainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
     kotlin("jvm") version "2.3.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "9.3.1"
     id("org.sonarqube") version "7.2.2.6593"
     jacoco
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -44,9 +45,12 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
     implementation("io.ktor:ktor-client-jackson-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttpVersion"))
+    implementation("com.squareup.okhttp3:okhttp-jvm")
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")
+    implementation("org.flywaydb:flyway-core:${flywayVersion}")
     implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
@@ -103,16 +107,13 @@ tasks {
         manifest {
             attributes(
                 mapOf(
-                    "Main-Class" to mainClass
+                    "Main-Class" to appMainClass
                 )
             )
         }
         // Fix for flyway bug https://github.com/flyway/flyway/issues/3482#issuecomment-1189357338
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
         mergeServiceFiles()
-    }
-
-    withType<Wrapper> {
-        gradleVersion = "8.8"
     }
 
     withType<JacocoReport> {
