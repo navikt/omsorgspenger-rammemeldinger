@@ -12,7 +12,7 @@ val okhttpVersion = "5.3.2"
 val flywayVersion = "12.0.0"
 val hikariVersion = "7.0.2"
 val kotliqueryVersion = "1.9.1"
-val postgresVersion = "42.7.9"
+val postgresVersion = "42.7.10"
 
 // Test
 val testcontainersVersion = "1.21.4"
@@ -24,7 +24,7 @@ val assertjVersion = "3.27.7"
 val appMainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.3.0"
+    kotlin("jvm") version "2.3.10"
     id("com.gradleup.shadow") version "9.3.1"
     id("org.sonarqube") version "7.2.2.6593"
     jacoco
