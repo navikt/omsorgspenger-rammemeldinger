@@ -9,7 +9,7 @@ val dusseldorfVersion = "7.0.7"
 val okhttpVersion = "5.3.2"
 
 // Database
-val flywayVersion = "12.0.3"
+val flywayVersion = "12.1.0"
 val hikariVersion = "7.0.2"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.10"
@@ -17,7 +17,7 @@ val postgresVersion = "42.7.10"
 // Test
 val testcontainersVersion = "1.21.4"
 val mockkVersion = "1.14.9"
-val schemaValidatorVersion = "3.0.0"
+val schemaValidatorVersion = "3.0.1"
 val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.7"
 
