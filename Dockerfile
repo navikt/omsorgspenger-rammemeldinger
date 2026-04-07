@@ -1,4 +1,4 @@
-FROM ghcr.io/navikt/sif-baseimages/java-chainguard-25:2026.03.30.1339Z
+FROM ghcr.io/navikt/sif-baseimages/java-chainguard-25:2026.04.07.0752Z
 LABEL org.opencontainers.image.source=https://github.com/navikt/omsorgspenger-rammemeldinger
 
 COPY build/libs/app.jar /app/app.jar
