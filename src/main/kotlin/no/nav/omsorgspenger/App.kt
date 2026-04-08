@@ -1,6 +1,7 @@
 package no.nav.omsorgspenger
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.server.application.*
@@ -125,15 +126,16 @@ internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationCon
 }
 
 internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {
+    val configureJackson: ObjectMapper.() -> Unit = {
+        registerKotlinModule()
+        registerModule(JavaTimeModule())
+        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+    }
+
     install(ContentNegotiation) {
-        jackson {
-            registerKotlinModule()
-            registerModule(JavaTimeModule())
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
-            jackson(contentType = ContentType.Application.Json.withCharset(Charsets.UTF_8))
-        }
+        jackson(contentType = ContentType.Application.Json.withCharset(Charsets.UTF_8), block = configureJackson)
     }
 
     install(StatusPages) {
