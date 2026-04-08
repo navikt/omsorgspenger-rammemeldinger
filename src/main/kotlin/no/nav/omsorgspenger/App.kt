@@ -132,6 +132,7 @@ internal fun Application.omsorgspengerRammemeldinger(applicationContext: Applica
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+            jackson(contentType = ContentType.Application.Json.withCharset(Charsets.UTF_8))
         }
     }
 
