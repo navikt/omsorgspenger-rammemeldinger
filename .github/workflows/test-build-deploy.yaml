@@ -26,12 +26,13 @@ jobs:
       branch: master
 
   test:
-    uses: navikt/sif-gha-workflows/.github/workflows/gradle-test.yml@main
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-test.yml@copilot/add-scan-for-sensitive-data-action
     permissions:
       contents: read
     secrets: inherit
     with:
       javaversion: 21
+      scan-sensitive-data: false
 
   build:
     uses: navikt/sif-gha-workflows/.github/workflows/gradle-build.yml@copilot/add-scan-for-sensitive-data-action
