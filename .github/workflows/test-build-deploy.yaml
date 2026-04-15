@@ -34,7 +34,7 @@ jobs:
       javaversion: 21
 
   build:
-    uses: navikt/sif-gha-workflows/.github/workflows/gradle-build.yml@main
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-build.yml@copilot/add-scan-for-sensitive-data-action
     permissions:
       contents: write
       id-token: write
