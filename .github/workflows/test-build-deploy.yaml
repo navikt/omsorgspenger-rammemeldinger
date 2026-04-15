@@ -21,7 +21,7 @@ jobs:
       security-events: write
     secrets: inherit
     with:
-      javaversion: 21
+      javaversion: 25
       package-command: './gradlew clean build -x test'
       branch: master
 
@@ -31,7 +31,7 @@ jobs:
       contents: read
     secrets: inherit
     with:
-      javaversion: 21
+      javaversion: 25
       scan-sensitive-data: false
 
   build:
@@ -42,7 +42,7 @@ jobs:
     secrets: inherit
     with:
       team: omsorgspenger
-      javaversion: 21
+      javaversion: 25
 
   trivy:
     needs: [ build ]

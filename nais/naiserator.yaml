@@ -80,8 +80,6 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-  secureLogs:
-    enabled: true
   env:
   {{#each env}}
     - name: {{@key}}

@@ -1,4 +1,4 @@
-FROM gcr.io/distroless/java21-debian12:latest
+FROM ghcr.io/navikt/sif-baseimages/java-chainguard-25:2026.04.13.0727Z
 LABEL org.opencontainers.image.source=https://github.com/navikt/omsorgspenger-rammemeldinger
 
 COPY build/libs/app.jar /app/app.jar
@@ -6,4 +6,4 @@ WORKDIR /app
 
 USER nonroot
 
-CMD [ "app.jar" ]
+CMD [ "-jar", "app.jar" ]
