@@ -23,7 +23,7 @@ internal class KnekkingTest {
         val mottaksdato = LocalDate.now()
 
         val barn = listOf(Barn(
-            identitetsnummer = "11111111113",
+            identitetsnummer = "18410162721",
             fødselsdato = mottaksdato.minusMonths(6),
             utvidetRett = false,
             aleneOmOmsorgen = true
