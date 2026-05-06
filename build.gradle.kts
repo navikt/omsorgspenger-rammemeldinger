@@ -12,7 +12,7 @@ val okhttpVersion = "5.3.2"
 val flywayVersion = "12.5.0"
 val hikariVersion = "7.0.2"
 val kotliqueryVersion = "1.9.1"
-val postgresVersion = "42.7.10"
+val postgresVersion = "42.7.11"
 
 // Test
 val testcontainersVersion = "1.21.4"
