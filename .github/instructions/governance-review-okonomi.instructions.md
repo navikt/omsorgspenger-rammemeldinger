@@ -9,7 +9,7 @@ Denne kodebasen forvalter ytelser og utbetalinger underlagt økonomireglementet 
 Copilot skal spesielt vurdere følgende:
 
 ## Uhensiktsmessig spesialbehandling
-- Flag kode som innfører logikk for å behandle enkeltpersoner, enkeltorganisasjoner eller spesifikke saker ulikt uten saklig grunnlag
+- Flagg kode som innfører logikk for å behandle enkeltpersoner, enkeltorganisasjoner eller spesifikke saker ulikt uten saklig grunnlag
 - Eksempler: hardkodede aktørId-er, fødselsnumre, saksnumre eller organisasjonsnumre som styrer forretningslogikk
 - Unntak: testdata, feiltoleransefiltre med tydelig midlertidig kommentar og tilhørende oppfølgingssak
 
@@ -27,5 +27,5 @@ Copilot skal spesielt vurdere følgende:
 
 ## Rimelighet og proporsjonalitet
 - Vurder om endringene er rimelige i omfang relativt til beskrevet behov
-- Flag hvis endringen har utilsiktede sideeffekter på beregning eller utbetaling
+- Flagg hvis endringen har utilsiktede sideeffekter på beregning eller utbetaling
 - Varsle hvis feilhåndtering endres på måter som kan føre til feilutbetalinger eller tapte krav
