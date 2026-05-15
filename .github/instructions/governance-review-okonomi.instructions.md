@@ -5,27 +5,16 @@ excludeAgent: "cloud-agent"
 
 # Økonomireglementet — spesielle hensyn
 
-Denne kodebasen forvalter ytelser og utbetalinger underlagt økonomireglementet (Reglement for økonomistyring i staten).
-Copilot skal spesielt vurdere følgende:
+Kodebasen forvalter ytelser/utbetalinger underlagt økonomireglementet. Flagg for menneskelig reviewer.
 
 ## Uhensiktsmessig spesialbehandling
-- Flagg kode som innfører logikk for å behandle enkeltpersoner, enkeltorganisasjoner eller spesifikke saker ulikt uten saklig grunnlag
-- Eksempler: hardkodede aktørId-er, fødselsnumre, saksnumre eller organisasjonsnumre som styrer forretningslogikk
-- Unntak: testdata, feiltoleransefiltre med tydelig midlertidig kommentar og tilhørende oppfølgingssak
+Logikk som behandler enkeltpersoner/organisasjoner/saker ulikt uten saklig grunnlag: hardkodede aktørId, FNR, saksnummer, orgnummer i forretningslogikk. Unntak: testdata, midlertidige filtre med kommentar + oppfølgingssak.
 
 ## Flyway-migrasjoner (økonomisk data)
-- Migrasjonsfiler som endrer tabeller med finansielle data (ytelse, beregning, oppdrag, tilbakekreving, vedtak, utbetaling, refusjon)
-- Destruktive migrasjoner (DROP TABLE, DROP COLUMN, ALTER COLUMN type change) på produksjonstabeller
-- Manglende eller feil versjonsnummerering i migrasjonsfiler
-- Migrasjoner som endrer beregningsgrunnlag, satser eller vedtaksdata krever ekstra oppmerksomhet
+Tabeller med finansielle data (ytelse, beregning, oppdrag, tilbakekreving, vedtak, utbetaling, refusjon). Destruktive migrasjoner (DROP TABLE/COLUMN, ALTER type). Feil versjonsnummerering. Endring av beregningsgrunnlag/satser/vedtaksdata.
 
-## Sporbarhet og begrunnelse
-- Sjekk at PR-beskrivelsen inneholder minst én av:
-  - Lenke til Jira-sak, GitHub issue eller Slack-tråd
-  - En tydelig beskrivelse av **hvorfor** endringen gjøres
-- Endringer i forretningslogikk uten sporbar begrunnelse skal flagges
+## Sporbarhet
+PR-beskrivelse skal inneholde lenke (Jira, issue, Slack) eller tydelig **hvorfor**. Forretningslogikk uten sporbar begrunnelse → flagg.
 
-## Rimelighet og proporsjonalitet
-- Vurder om endringene er rimelige i omfang relativt til beskrevet behov
-- Flagg hvis endringen har utilsiktede sideeffekter på beregning eller utbetaling
-- Varsle hvis feilhåndtering endres på måter som kan føre til feilutbetalinger eller tapte krav
+## Rimelighet
+Rimelig omfang vs. beskrevet behov. Utilsiktede sideeffekter på beregning/utbetaling. Feilhåndteringsendringer som kan føre til feilutbetalinger/tapte krav.
