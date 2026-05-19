@@ -4,9 +4,10 @@ val junitVersion = "6.0.3"
 val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20260508090506-edc9608"
 val ulidVersion = "8.3.0"
-val ktorVersion = "3.4.3"
+val ktorVersion = "3.4.2"
 val dusseldorfVersion = "7.0.8"
 val okhttpVersion = "5.3.2"
+val nettyVersion = "4.2.13.Final"
 
 // Database
 val flywayVersion = "12.6.0"
@@ -47,6 +48,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttpVersion"))
     implementation("com.squareup.okhttp3:okhttp-jvm")
+    implementation(platform("io.netty:netty-bom:$nettyVersion"))
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")
@@ -77,6 +79,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
     testImplementation("org.junit.platform:junit-platform-launcher:$junitVersion")
     testImplementation("org.assertj:assertj-core:$assertjVersion")
+    testImplementation("io.ktor:ktor-test-dispatcher-jvm:${ktorVersion}")
 }
 
 repositories {
