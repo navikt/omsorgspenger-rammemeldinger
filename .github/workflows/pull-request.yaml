@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    uses: navikt/sif-gha-workflows/.github/workflows/gradle-test.yml@copilot/add-scan-for-sensitive-data-action
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-test.yml@main
     permissions:
       contents: read
     secrets: inherit
