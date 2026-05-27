@@ -1,16 +1,16 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-val junitVersion = "6.0.3"
+val junitVersion = "6.1.0"
 val jsonassertVersion = "1.5.3"
-val k9rapidVersion = "1.20260508090506-edc9608"
+val k9rapidVersion = "1.20260521084156-d8354aa"
 val ulidVersion = "8.3.0"
-val ktorVersion = "3.4.2"
+val ktorVersion = "3.5.0"
 val dusseldorfVersion = "7.0.8"
 val okhttpVersion = "5.3.2"
 val nettyVersion = "4.2.13.Final"
 
 // Database
-val flywayVersion = "12.6.0"
+val flywayVersion = "12.6.1"
 val hikariVersion = "7.0.2"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.11"
