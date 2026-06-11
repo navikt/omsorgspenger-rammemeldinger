@@ -4,13 +4,13 @@ val junitVersion = "6.1.0"
 val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20260521084156-d8354aa"
 val ulidVersion = "8.3.0"
-val ktorVersion = "3.4.2"
+val ktorVersion = "3.5.0"
 val dusseldorfVersion = "7.0.8"
 val okhttpVersion = "5.3.2"
 val nettyVersion = "4.2.15.Final"
 
 // Database
-val flywayVersion = "12.7.0"
+val flywayVersion = "12.8.0"
 val hikariVersion = "7.0.2"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.11"
@@ -25,9 +25,9 @@ val assertjVersion = "3.27.7"
 val appMainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.0"
     id("com.gradleup.shadow") version "9.4.2"
-    id("org.sonarqube") version "7.3.0.8198"
+    id("org.sonarqube") version "7.3.1.8318"
     jacoco
 }
 
