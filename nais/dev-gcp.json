@@ -10,7 +10,8 @@
     "type": "POSTGRES_14",
     "tier": "db-custom-1-3840",
     "diskSize": "20",
-    "highAvailability": "false"
+    "highAvailability": "false",
+    "retainedBackups": "7"
   },
   "env": {
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-infotrygd-rammevedtak/.default",

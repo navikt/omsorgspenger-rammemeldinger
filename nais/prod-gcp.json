@@ -11,7 +11,8 @@
     "tier": "db-custom-1-3840",
     "diskSize": "20",
     "highAvailability": "true",
-    "enableAudit": "true"
+    "enableAudit": "true",
+    "retainedBackups": "30"
   },
   "env": {
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES": "api://prod-gcp.omsorgspenger.omsorgspenger-infotrygd-rammevedtak/.default",

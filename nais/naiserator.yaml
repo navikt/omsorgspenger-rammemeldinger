@@ -34,6 +34,7 @@ spec:
         tier: {{ database.tier }}
         diskSize: {{ database.diskSize }}
         highAvailability: {{ database.highAvailability }}
+        retainedBackups: {{ database.retainedBackups }}
         {{#if database.enableAudit }}
         flags:
           - name: "cloudsql.enable_pgaudit"
