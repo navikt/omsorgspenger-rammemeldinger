@@ -9,6 +9,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.utils.io.core.toByteArray
 import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.jsonBody
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
@@ -43,7 +44,7 @@ internal class TilgangsstyringRestClient(
         return kotlin.runCatching {
             httpClient.post("$tilgangUrl/api/tilgang/personer") {
                 header(
-                    HttpHeaders.Authorization, cachedAccessTokenClient.getAccessToken(
+                    HttpHeaders.Authorization, cachedAccessTokenClient.getOnBehalfOfAccessToken(
                         scopes = scopes,
                         onBehalfOf = authHeader.removePrefix("Bearer ")
                     ).asAuthoriationHeader()
@@ -108,7 +109,7 @@ internal class TilgangsstyringRestClient(
     }
 
     private fun accessTokenCheck() = kotlin.runCatching {
-        val accessTokenResponse = accessTokenClient.getAccessToken(scopes)
+        val accessTokenResponse = accessTokenClient.getClientCredentialsAccessToken(scopes)
         (SignedJWT.parse(accessTokenResponse.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()
             ?: emptyList()).contains("access_as_application")
     }.fold(

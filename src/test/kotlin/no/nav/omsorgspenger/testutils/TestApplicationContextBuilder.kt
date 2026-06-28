@@ -21,7 +21,7 @@ internal fun TestApplicationContextBuilder(
 ) = ApplicationContext.Builder(
     formidlingService = RecordingFormidlingService(),
     accessTokenClient = mockk<AccessTokenClient>().also {
-        every { it.getAccessToken(any()) }.returns(
+        every { it.getClientCredentialsAccessToken(any()) }.returns(
             AccessTokenResponse(
                 accessToken = "foo",
                 expiresIn = 1000,

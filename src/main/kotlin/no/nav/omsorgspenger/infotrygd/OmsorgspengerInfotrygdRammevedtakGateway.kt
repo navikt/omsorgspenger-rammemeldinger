@@ -139,7 +139,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
     }
 
     private fun authorizationHeader() =
-        cachedAccessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).asAuthoriationHeader()
+        cachedAccessTokenClient.getClientCredentialsAccessToken(hentRammevedtakFraInfotrygdScopes).asAuthoriationHeader()
 
     override suspend fun check() =
         Result.merge(
@@ -149,7 +149,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         )
 
     private fun accessTokenCheck() = kotlin.runCatching {
-        accessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).let {
+        accessTokenClient.getClientCredentialsAccessToken(hentRammevedtakFraInfotrygdScopes).let {
             (SignedJWT.parse(it.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()
                 ?: emptyList()).contains("access_as_application")
         }
