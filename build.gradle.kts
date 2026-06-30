@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitVersion = "6.1.0"
 val jsonassertVersion = "1.5.3"
-val k9rapidVersion = "1.20260629132830-e1ed505"
+val k9rapidVersion = "1.20260630092344-01f2f22"
 val ulidVersion = "8.3.0"
 val ktorVersion = "3.5.0"
 val dusseldorfVersion = "8.0.0"
@@ -18,7 +18,7 @@ val postgresVersion = "42.7.11"
 // Test
 val testcontainersVersion = "1.21.4"
 val mockkVersion = "1.14.11"
-val schemaValidatorVersion = "3.0.4"
+val schemaValidatorVersion = "3.0.5"
 val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.7"
 
