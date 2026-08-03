@@ -1,32 +1,32 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
-val junitVersion = "6.1.0"
+val junitVersion = "6.1.2"
 val jsonassertVersion = "1.5.3"
-val k9rapidVersion = "1.20260629132830-e1ed505"
+val k9rapidVersion = "1.20260630092344-01f2f22"
 val ulidVersion = "8.3.0"
-val ktorVersion = "3.5.0"
-val dusseldorfVersion = "8.0.0"
+val ktorVersion = "3.5.1"
+val dusseldorfVersion = "8.0.2"
 val okhttpVersion = "5.4.0"
-val nettyVersion = "4.2.15.Final"
+val nettyVersion = "4.2.16.Final"
 
 // Database
-val flywayVersion = "12.9.0"
+val flywayVersion = "12.11.0"
 val hikariVersion = "7.1.0"
 val kotliqueryVersion = "1.9.1"
-val postgresVersion = "42.7.11"
+val postgresVersion = "42.7.13"
 
 // Test
 val testcontainersVersion = "1.21.4"
 val mockkVersion = "1.14.11"
-val schemaValidatorVersion = "3.0.4"
+val schemaValidatorVersion = "3.0.6"
 val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.7"
 
 val appMainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.4.0"
-    id("com.gradleup.shadow") version "9.4.2"
+    kotlin("jvm") version "2.4.10"
+    id("com.gradleup.shadow") version "9.5.1"
     id("org.sonarqube") version "7.3.1.8318"
     jacoco
 }
