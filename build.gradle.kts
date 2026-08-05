@@ -5,7 +5,7 @@ val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20260630092344-01f2f22"
 val ulidVersion = "8.3.0"
 val ktorVersion = "3.5.1"
-val dusseldorfVersion = "8.0.3"
+val dusseldorfVersion = "8.0.4"
 val okhttpVersion = "5.4.0"
 val nettyVersion = "4.2.16.Final"
 
