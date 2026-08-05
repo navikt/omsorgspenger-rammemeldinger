@@ -39,6 +39,9 @@ updates:
 
   - package-ecosystem: docker
     directory: "/"
+      cooldown:
+      #setter cooldown til 0 siden denne bare finner avhengigheter fra teamets egne bygg
+      default-days: 0
     schedule:
       interval: daily
     registries:
