@@ -7,7 +7,7 @@
   "kafkaPool": "nav-dev",
   "clusterFss": "dev-fss",
   "database": {
-    "type": "POSTGRES_15",
+    "type": "POSTGRES_16",
     "tier": "db-custom-1-3840",
     "diskSize": "20",
     "highAvailability": "false",
