@@ -7,10 +7,10 @@ val ulidVersion = "8.3.0"
 val ktorVersion = "3.5.2"
 val dusseldorfVersion = "8.0.5"
 val okhttpVersion = "5.4.0"
-val nettyVersion = "4.2.16.Final"
+val nettyVersion = "4.2.17.Final"
 
 // Database
-val flywayVersion = "13.1.0"
+val flywayVersion = "13.2.0"
 val hikariVersion = "7.1.0"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.13"
@@ -27,7 +27,7 @@ val appMainClass = "no.nav.omsorgspenger.AppKt"
 plugins {
     kotlin("jvm") version "2.4.10"
     id("com.gradleup.shadow") version "9.6.1"
-    id("org.sonarqube") version "7.3.1.8318"
+    id("org.sonarqube") version "7.4.0.8496"
     jacoco
 }
 
