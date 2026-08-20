@@ -10,7 +10,7 @@ val okhttpVersion = "5.4.0"
 val nettyVersion = "4.2.17.Final"
 
 // Database
-val flywayVersion = "13.2.0"
+val flywayVersion = "13.3.0"
 val hikariVersion = "7.1.0"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.13"
