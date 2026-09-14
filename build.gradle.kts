@@ -5,7 +5,7 @@ val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20260901100233-1c859c8"
 val ulidVersion = "8.3.0"
 val ktorVersion = "3.5.2"
-val dusseldorfVersion = "8.0.5"
+val dusseldorfVersion = "8.0.6"
 val okhttpVersion = "5.5.0"
 val nettyVersion = "4.2.17.Final"
 
@@ -25,7 +25,7 @@ val assertjVersion = "3.27.7"
 val appMainClass = "no.nav.omsorgspenger.AppKt"
 
 plugins {
-    kotlin("jvm") version "2.4.10"
+    kotlin("jvm") version "2.4.20"
     id("com.gradleup.shadow") version "9.6.1"
     id("org.sonarqube") version "7.5.0.8588"
     jacoco
