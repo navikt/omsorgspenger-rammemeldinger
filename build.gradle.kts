@@ -7,7 +7,7 @@ val ulidVersion = "8.3.0"
 val ktorVersion = "3.5.2"
 val dusseldorfVersion = "8.0.6"
 val okhttpVersion = "5.5.0"
-val nettyVersion = "4.2.17.Final"
+val nettyVersion = "4.2.18.Final"
 
 // Database
 val flywayVersion = "13.5.0"
