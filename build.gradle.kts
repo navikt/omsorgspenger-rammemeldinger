@@ -4,13 +4,13 @@ val junitVersion = "6.1.3"
 val jsonassertVersion = "1.5.3"
 val k9rapidVersion = "1.20260901100233-1c859c8"
 val ulidVersion = "8.3.0"
-val ktorVersion = "3.5.2"
+val ktorVersion = "3.6.0"
 val dusseldorfVersion = "8.0.6"
 val okhttpVersion = "5.5.0"
 val nettyVersion = "4.2.18.Final"
 
 // Database
-val flywayVersion = "13.7.0"
+val flywayVersion = "13.8.0"
 val hikariVersion = "7.1.0"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.13"
@@ -44,6 +44,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-jackson:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
+    implementation(platform("io.ktor:ktor-bom:$ktorVersion"))
     implementation("io.ktor:ktor-client-jackson-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttpVersion"))
