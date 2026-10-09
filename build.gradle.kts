@@ -44,6 +44,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-jackson:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
+    implementation(platform("io.ktor:ktor-bom:$ktorVersion"))
     implementation("io.ktor:ktor-client-jackson-jvm:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttpVersion"))
