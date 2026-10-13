@@ -21,7 +21,6 @@ spec:
         - application: omsorgspenger-infotrygd-rammevedtak
     inbound:
       rules:
-        - application: omsorgsdager
         - application: k9-aarskvantum
           namespace: k9saksbehandling
           cluster: {{clusterFss}}
