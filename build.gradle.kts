@@ -6,7 +6,7 @@ val k9rapidVersion = "1.20261020164452-3e44ff1"
 val ulidVersion = "8.3.0"
 val ktorVersion = "3.6.0"
 val dusseldorfVersion = "8.0.7"
-val okhttpVersion = "5.5.0"
+val okhttpVersion = "5.5.1"
 val nettyVersion = "4.2.19.Final"
 
 // Database
