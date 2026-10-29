@@ -14,7 +14,6 @@ import no.nav.omsorgspenger.infotrygd.InfotrygdRammeService
 import no.nav.omsorgspenger.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerService
 import no.nav.omsorgspenger.koronaoverføringer.db.KoronaoverføringRepository
-import no.nav.omsorgspenger.overføringer.GjennomførOverføringService
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerService
 import no.nav.omsorgspenger.overføringer.apis.TilgangsstyringRestClient
 import no.nav.omsorgspenger.overføringer.db.OverføringRepository
@@ -28,7 +27,6 @@ internal class ApplicationContext(
     internal val accessTokenClient: AccessTokenClient,
     internal val omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway,
     internal val infotrygdRammeService: InfotrygdRammeService,
-    internal val gjennomførOverføringService: GjennomførOverføringService,
     internal val overføringRepository: OverføringRepository,
     internal val spleisetOverføringerService: SpleisetOverføringerService,
     internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
@@ -50,7 +48,6 @@ internal class ApplicationContext(
         internal var accessTokenClient: AccessTokenClient? = null,
         internal var omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway? = null,
         internal var infotrygdRammeService: InfotrygdRammeService? = null,
-        internal var gjennomførOverføringService: GjennomførOverføringService? = null,
         internal var overføringRepository: OverføringRepository? = null,
         internal var spleisetOverføringerService: SpleisetOverføringerService? = null,
         internal var tilgangsstyringRestClient: TilgangsstyringRestClient? = null,
@@ -117,9 +114,6 @@ internal class ApplicationContext(
                 accessTokenClient = benyttetAccessTokenClient,
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway,
                 infotrygdRammeService = benyttetInfotrygdRammeService,
-                gjennomførOverføringService = gjennomførOverføringService ?: GjennomførOverføringService(
-                    overføringRepository = benyttetOverføringRepository
-                ),
                 aleneOmOmsorgenRepository = benyttetAleneOmOmsorgenRepository,
                 healthService = HealthService(
                     healthChecks = setOf(
