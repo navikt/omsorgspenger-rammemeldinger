@@ -6,28 +6,6 @@ import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import java.sql.Array
 
 internal object OverføringLogg {
-    internal fun Session.overføringerOpprettet(
-        behovssekvensId: BehovssekvensId,
-        overføringIder: List<Long>,
-    ) = overføringIder.forEach {
-        update(leggTilLoggQuery(
-            behovssekvensId = behovssekvensId,
-            overføringId = it,
-            melding = "Opprettet"
-        ))
-    }
-
-    internal fun Session.overføringerEndret(
-        behovssekvensId: BehovssekvensId,
-        overføringIder: List<Long>,
-        endring: String
-    ) = overføringIder.forEach {
-        update(leggTilLoggQuery(
-            behovssekvensId = behovssekvensId,
-            overføringId = it,
-            melding = endring
-        ))
-    }
 
     internal fun Session.hentOverføringLogger(
         overføringIder: Array
@@ -44,22 +22,6 @@ internal object OverføringLogg {
         internal val overføringId: Long,
         internal val melding: String) {
     }
-
-    private const val LeggTilLoggStatement =
-        """
-        INSERT INTO overforing_logg (overforing_id, behovssekvens_id, melding) 
-        VALUES(:overforing_id, :behovssekvens_id, :melding)
-        """
-
-    private fun leggTilLoggQuery(
-        behovssekvensId: BehovssekvensId,
-        overføringId: Long,
-        melding: String
-    ) = queryOf(LeggTilLoggStatement, mapOf(
-        "overforing_id" to overføringId,
-        "behovssekvens_id" to behovssekvensId,
-        "melding" to melding
-    ))
 
     private const val HentLoggStatement =
         """

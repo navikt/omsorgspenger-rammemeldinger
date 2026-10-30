@@ -4,22 +4,14 @@ import kotliquery.*
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
-import no.nav.omsorgspenger.overføringer.*
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
-import no.nav.omsorgspenger.overføringer.GjennomførtOverføringer
-import no.nav.omsorgspenger.overføringer.NyOverføring
 import no.nav.omsorgspenger.overføringer.db.OverføringLogg.hentOverføringLogger
-import no.nav.omsorgspenger.overføringer.db.OverføringLogg.overføringerEndret
-import no.nav.omsorgspenger.overføringer.db.OverføringLogg.overføringerOpprettet
-import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer.opphørOverføringer
 import org.slf4j.LoggerFactory
 import java.sql.Array
-import java.time.LocalDate
 import java.time.ZonedDateTime
 import javax.sql.DataSource
 
@@ -35,47 +27,6 @@ internal class OverføringRepository(
             medKilder = true,
             medLovanvendelser = true
         )}
-    }
-
-    private fun Session.berørteOverføringer(
-        fra: Saksnummer,
-        til: Saksnummer,
-        fraOgMed: LocalDate) : Set<OverføringDb> {
-
-        val query = hentBerørteOverføringerQuery(
-            fra = fra,
-            til = til,
-            tilOgMedEtter = fraOgMed.minusDays(1)
-        )
-
-        return run(query.map { row ->
-            row.somOverføringDb()
-        }.asList).toSet()
-    }
-
-    private fun Session.lagreNyeOverføringer(
-        behovssekvensId: BehovssekvensId,
-        fra: Saksnummer,
-        til: Saksnummer,
-        lovanvendelser: Lovanvendelser,
-        antallDagerØnsketOverført: Int,
-        overføringer: List<NyOverføring>) {
-        val overføringIder = overføringer.map { overføring ->
-            updateAndReturnGeneratedKey(
-                lagreOverføringQuery(
-                    fra = fra,
-                    til = til,
-                    overføring = overføring,
-                    lovanvendelser = lovanvendelser,
-                    antallDagerØnsketOverført = antallDagerØnsketOverført
-                )
-            )!!
-        }
-
-        overføringerOpprettet(
-            behovssekvensId = behovssekvensId,
-            overføringIder = overføringIder
-        )
     }
 
     private fun Session.hentOverføringerMedOptionalStatus(
@@ -134,20 +85,6 @@ internal class OverføringRepository(
                 null -> queryOf(HentOverføringerStatement, saksnummer, saksnummer)
                 else -> queryOf("$HentOverføringerStatement AND status = ?", saksnummer, saksnummer, status)
             }
-
-        private const val HentBerørteOverføringerStatement =
-            "SELECT * FROM overforing WHERE (fra IN(?,?) OR til IN(?,?)) AND tom > ? AND status = ?"
-        private fun hentBerørteOverføringerQuery(fra: Saksnummer, til: Saksnummer, tilOgMedEtter: LocalDate) =
-            queryOf(HentBerørteOverføringerStatement, fra, til, fra, til, tilOgMedEtter, Aktiv)
-
-        private const val LagreOverføringStatement =
-            "INSERT INTO overforing (fom, tom, fra, til, antall_dager, status, lovanvendelser, antall_dager_onsket_overfort) VALUES(?,?,?,?,?,?,(to_json(?::json)),?)"
-        private fun lagreOverføringQuery(
-            fra: Saksnummer, til: Saksnummer, overføring: NyOverføring, lovanvendelser: Lovanvendelser, antallDagerØnsketOverført: Int) =
-            queryOf(
-                statement = LagreOverføringStatement,
-                overføring.periode.fom, overføring.periode.tom, fra, til, overføring.antallDager, Aktiv, lovanvendelser.somJson(), antallDagerØnsketOverført
-            )
 
         private fun Row.somPeriode() = Periode(
             fom = localDate("fom"),
@@ -224,7 +161,5 @@ internal class OverføringRepository(
 
         private fun Collection<OverføringDb>.saksnummer() : Set<Saksnummer> =
             map { listOf(it.fra, it.til) }.flatten().toSet()
-        private fun Set<OverføringDb>.utenOverføringer(fra: Saksnummer, til: Saksnummer) =
-            filterNot { it.fra == fra && it.til == til }.toSet()
     }
 }
