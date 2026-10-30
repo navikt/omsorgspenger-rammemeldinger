@@ -6,17 +6,12 @@ import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
-import no.nav.omsorgspenger.koronaoverføringer.NyOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringGitt
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringer
-import no.nav.omsorgspenger.overføringer.GjennomførtOverføringer
-import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer
-import no.nav.omsorgspenger.overføringer.db.OpphørOverføringer.opphørOverføringer
 import org.intellij.lang.annotations.Language
 import java.sql.Array
-import java.time.LocalDate
 import java.time.ZonedDateTime
 import javax.sql.DataSource
 
@@ -31,73 +26,8 @@ internal class KoronaoverføringRepository(
         }
     }
 
-    internal fun gjennomførOverføringer(
-        behovssekvensId: BehovssekvensId,
-        fra: Saksnummer,
-        til: Saksnummer,
-        lovanvendelser: Lovanvendelser,
-        antallDagerØnsketOverført: Int,
-        overføringer: List<NyOverføring>): GjennomførtOverføringer {
-        val berørteSaksnummer = setOf(fra, til)
-
-        val overføringerDb = using(sessionOf(dataSource)) { session ->
-            session.transaction { transactionalSession -> {
-                    overføringer.forEach { overføring ->
-                        transactionalSession.lagreOverføring(
-                            behovssekvensId = behovssekvensId,
-                            fra = fra,
-                            til = til,
-                            lovanvendelser = lovanvendelser,
-                            antallDagerØnsketOverført = antallDagerØnsketOverført,
-                            overføring = overføring
-                        )
-                    }
-                    transactionalSession.hentOverføringer(berørteSaksnummer)
-                }
-            }()
-        }
-
-        return GjennomførtOverføringer(
-            gjeldendeOverføringer = overføringerDb.somGjeldendeOverføringer(),
-            berørteSaksnummer = berørteSaksnummer
-        )
-    }
-
-
-    internal fun opphørOverføringer(
-        fra: Saksnummer,
-        til: Saksnummer,
-        fraOgMed: LocalDate
-    ) : OpphørOverføringer.OpphørteOverføringer{
-        return using(sessionOf(dataSource)) { session ->
-            session.transaction { tx ->
-                tx.opphørOverføringer(
-                    tabell = "koronaoverforing",
-                    fra = fra,
-                    til = til,
-                    fraOgMed = fraOgMed
-                )
-            }
-        }
-    }
 
     private fun Session.saksnummerArray(saksnummer: Set<Saksnummer>) = createArrayOf("varchar", saksnummer)
-    private fun Session.lagreOverføring(
-        behovssekvensId: BehovssekvensId,
-        fra: Saksnummer,
-        til: Saksnummer,
-        lovanvendelser: Lovanvendelser,
-        antallDagerØnsketOverført: Int,
-        overføring: NyOverføring) {
-        update(lagreOverføringQuery(
-            behovssekvensId = behovssekvensId,
-            fra = fra,
-            til = til,
-            overføring = overføring,
-            lovanvendelser = lovanvendelser,
-            antallDagerØnsketOverført = antallDagerØnsketOverført
-        ))
-    }
 
     private fun Session.hentOverføringer(saksnummer: Set<Saksnummer>) : List<OverføringDb> {
         val query = hentOverføringerQuery(
@@ -109,29 +39,6 @@ internal class KoronaoverføringRepository(
     }
 
     private companion object {
-        @Language("PostgreSQL")
-        private const val LagreOverføringStatement =
-            """
-               INSERT INTO koronaoverforing (behovssekvens_id, fom, tom, fra, til, antall_dager, antall_dager_onsket_overfort, lovanvendelser) 
-               VALUES(:behovssekvens_id, :fom, :tom, :fra, :til, :antall_dager, :antall_dager_onsket_overfort, :lovanvendelser ::jsonb) 
-            """
-
-        private fun lagreOverføringQuery(
-            behovssekvensId: BehovssekvensId, fra: Saksnummer, til: Saksnummer, overføring: NyOverføring, lovanvendelser: Lovanvendelser, antallDagerØnsketOverført: Int) =
-            queryOf(
-                statement = LagreOverføringStatement,
-                paramMap = mapOf(
-                    "behovssekvens_id" to behovssekvensId,
-                    "fom" to overføring.periode.fom,
-                    "tom" to overføring.periode.tom,
-                    "fra" to fra,
-                    "til" to til,
-                    "antall_dager" to overføring.antallDager,
-                    "antall_dager_onsket_overfort" to antallDagerØnsketOverført,
-                    "lovanvendelser" to lovanvendelser.somJson()
-                )
-            )
-
         @Language("PostgreSQL")
         private const val HentOverføringerStatement =
             """

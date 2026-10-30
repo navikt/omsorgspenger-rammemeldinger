@@ -19,7 +19,6 @@ internal fun TestApplicationContextBuilder(
     wireMockServer: WireMockServer? = null,
     additionalEnv: Map<String, String> = emptyMap()
 ) = ApplicationContext.Builder(
-    formidlingService = RecordingFormidlingService(),
     accessTokenClient = mockk<AccessTokenClient>().also {
         every { it.getClientCredentialsAccessToken(any()) }.returns(
             AccessTokenResponse(
@@ -29,7 +28,6 @@ internal fun TestApplicationContextBuilder(
             )
         )
     },
-    kafkaProducer = mockk(),
     omsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
         coEvery { it.hent(any(), any(), any()) }.returns(listOf())
         coEvery { it.check() }.returns(Healthy("OmsorgspengerInfotrygdRammevedtakGateway", "Mock helsesjekk OK!"))
