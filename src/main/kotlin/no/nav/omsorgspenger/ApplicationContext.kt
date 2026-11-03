@@ -24,13 +24,9 @@ import javax.sql.DataSource
 
 internal class ApplicationContext(
     internal val env: Environment,
-    internal val accessTokenClient: AccessTokenClient,
-    internal val omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway,
-    internal val infotrygdRammeService: InfotrygdRammeService,
     internal val overføringRepository: OverføringRepository,
     internal val spleisetOverføringerService: SpleisetOverføringerService,
     internal val aleneOmOmsorgenRepository: AleneOmOmsorgenRepository,
-    internal val saksnummerRepository: SaksnummerRepository,
     internal val saksnummerService: SaksnummerService,
     internal val tilgangsstyringRestClient: TilgangsstyringRestClient,
     internal val dataSource: DataSource,
@@ -111,9 +107,6 @@ internal class ApplicationContext(
 
             return ApplicationContext(
                 env = benyttetEnv,
-                accessTokenClient = benyttetAccessTokenClient,
-                omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway,
-                infotrygdRammeService = benyttetInfotrygdRammeService,
                 aleneOmOmsorgenRepository = benyttetAleneOmOmsorgenRepository,
                 healthService = HealthService(
                     healthChecks = setOf(
@@ -127,7 +120,6 @@ internal class ApplicationContext(
                     saksnummerService = benyttetSaksnummerService,
                     overføringRepository = benyttetOverføringRepository
                 ),
-                saksnummerRepository = benyttetSaksnummerRepository,
                 saksnummerService = benyttetSaksnummerService,
                 tilgangsstyringRestClient = benyttetTilgangsstyringRestClient,
                 koronaoverføringRepository = benyttetKoronaoverføringRepository,
