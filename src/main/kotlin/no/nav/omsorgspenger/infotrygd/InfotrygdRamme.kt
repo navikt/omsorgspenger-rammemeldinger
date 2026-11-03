@@ -20,13 +20,7 @@ internal data class InfotrygdUtvidetRettVedtak(
     override val periode: Periode,
     override val vedtatt: LocalDate,
     override val kilder: Set<Kilde>,
-    val barn: InfotrygdAnnenPart) : InfotrygdRamme {
-    internal val barnetsFødselsdato = barn.fødselsdato
-    internal val barnetsIdentitetsnummer = when (barn.type == "Identitetsnummer") {
-        true -> barn.id
-        false -> null
-    }
-}
+    val barn: InfotrygdAnnenPart) : InfotrygdRamme
 
 /**
  * Rammevedtak i Infotrygd for midlertidig alene om omsorgen.
@@ -43,12 +37,6 @@ internal data class InfotrygdMidlertidigAleneVedtak(
  *        men når vi skal tilby API for fordelinger må også disse hensynstas.
  *        I første omgang kun "proxye" det som finnes i Infotrygd
  */
-
-internal data class InfotrygdFordelingFårMelding(
-    override val periode: Periode,
-    override val vedtatt: LocalDate,
-    override val kilder: Set<Kilde>,
-    internal val lengde: Duration) : InfotrygdRamme
 
 internal data class InfotrygdFordelingGirMelding(
     override val periode: Periode,

@@ -144,11 +144,6 @@ private fun Lovanvendelser.somBegrunnelserJson() = JSONArray().also { root ->
     }
 }
 
-private data class HentOverføringerRequest(
-    val saksnummer: Saksnummer,
-    val status: Set<String>
-)
-
 private val saksnummerRegex = "[a-zA-Z0-9]{2,10}".toRegex()
 private fun ApplicationCall.saksnummer(): Saksnummer {
     return requireNotNull(request.queryParameters["saksnummer"]) {

@@ -10,9 +10,6 @@ import io.ktor.server.routing.*
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.omsorgspenger.overføringer.apis.SpleisetOverføringerApi
-import no.nav.omsorgspenger.overføringer.rivers.PubliserOverføringAvOmsorgsdager
-import no.nav.omsorgspenger.overføringer.rivers.BehandleOverføringAvOmsorgsdager
-import no.nav.omsorgspenger.overføringer.rivers.InitierOverføringAvOmsorgsdager
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.ktor.server.auth.*
@@ -24,18 +21,10 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
-import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.omsorgspenger.aleneom.apis.AleneOmOmsorgenApi
-import no.nav.omsorgspenger.fordelinger.rivers.InitierFordelingAvOmsorgsdager
 import no.nav.omsorgspenger.koronaoverføringer.apis.KoronaOverføringerApi
 import no.nav.omsorgspenger.koronaoverføringer.apis.SpleisetKoronaOverføringerApi
-import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOpphøreKoronaOverføringer
-import no.nav.omsorgspenger.koronaoverføringer.rivers.BehandleOverføreKoronaOmsorgsdager
-import no.nav.omsorgspenger.koronaoverføringer.rivers.InitierOverføreKoronaOmsorgsdager
-import no.nav.omsorgspenger.koronaoverføringer.rivers.PubliserOverføreKoronaOmsorgsdager
 import no.nav.omsorgspenger.overføringer.apis.OverføringerApi
-import no.nav.omsorgspenger.overføringer.rivers.BehandleOpphøreOverføringer
-import java.time.LocalDate
 
 fun main() {
     val applicationContext = ApplicationContext.Builder().build()
@@ -48,81 +37,11 @@ fun main() {
 }
 
 internal fun RapidsConnection.registerApplicationContext(applicationContext: ApplicationContext) {
-    InitierOverføringAvOmsorgsdager(
-        rapidsConnection = this,
-        fordelingService = applicationContext.fordelingService,
-        spleisetKoronaOverføringerService = applicationContext.spleisetKoronaOverføringerService,
-        utvidetRettService = applicationContext.utvidetRettService,
-        midlertidigAleneService = applicationContext.midlertidigAleneService,
-        behovssekvensRepository = applicationContext.behovssekvensRepository,
-        behandleMottattEtter = LocalDate.parse(
-            applicationContext.env.hentOptionalEnv("OVERFORING_BEHANDLE_MOTTATT_ETTER") ?: "2021-01-24"
-        )
-    )
-
-    BehandleOverføringAvOmsorgsdager(
-        rapidsConnection = this,
-        gjennomførOverføringService = applicationContext.gjennomførOverføringService,
-        saksnummerRepository = applicationContext.saksnummerRepository,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
-    )
-    PubliserOverføringAvOmsorgsdager(
-        rapidsConnection = this,
-        formidlingService = applicationContext.formidlingService,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
-    )
-    BehandleOpphøreOverføringer(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository,
-        overføringerRepository = applicationContext.overføringRepository
-    )
-    InitierFordelingAvOmsorgsdager(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository
-    )
-    registerOverføreKoronaOmsorgsdager(
-        applicationContext = applicationContext
-    )
-
     register(object : RapidsConnection.StatusListener {
         override fun onStartup(rapidsConnection: RapidsConnection) {
             applicationContext.start()
         }
-
-        override fun onShutdown(rapidsConnection: RapidsConnection) {
-            applicationContext.stop()
-        }
     })
-}
-
-internal fun RapidsConnection.registerOverføreKoronaOmsorgsdager(applicationContext: ApplicationContext) {
-    InitierOverføreKoronaOmsorgsdager(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository,
-        utvidetRettService = applicationContext.utvidetRettService,
-        fordelingService = applicationContext.fordelingService,
-        spleisetOverføringerService = applicationContext.spleisetOverføringerService,
-        spleisetKoronaOverføringerService = applicationContext.spleisetKoronaOverføringerService,
-        behandleMottattEtter = LocalDate.parse(
-            applicationContext.env.hentOptionalEnv("KORONA_BEHANDLE_MOTTATT_ETTER") ?: "2021-01-25"
-        )
-    )
-    BehandleOverføreKoronaOmsorgsdager(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository,
-        koronaoverføringRepository = applicationContext.koronaoverføringRepository,
-        saksnummerRepository = applicationContext.saksnummerRepository
-    )
-    PubliserOverføreKoronaOmsorgsdager(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository,
-        formidlingService = applicationContext.formidlingService
-    )
-    BehandleOpphøreKoronaOverføringer(
-        rapidsConnection = this,
-        behovssekvensRepository = applicationContext.behovssekvensRepository,
-        koronaoverføringRepository = applicationContext.koronaoverføringRepository
-    )
 }
 
 internal fun Application.omsorgspengerRammemeldinger(applicationContext: ApplicationContext) {

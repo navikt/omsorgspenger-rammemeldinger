@@ -24,15 +24,6 @@ internal class InfotrygdRammeService(
         return cache.put(cacheKey, infotrygdRammer).let { infotrygdRammer }
     }
 
-    internal suspend fun hentUtvidetRett(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
-        hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdUtvidetRettVedtak>()
-
-    internal suspend fun hentFordelingGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
-        hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdFordelingGirMelding>()
-
-    internal suspend fun hentMidlertidigAlene(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
-        hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdMidlertidigAleneVedtak>()
-
     internal suspend fun hentOverføringGir(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) =
             hentAlle(identitetsnummer, periode, correlationId).filterIsInstance<InfotrygdOverføringGirMelding>()
 

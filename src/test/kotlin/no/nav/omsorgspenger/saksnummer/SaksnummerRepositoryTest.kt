@@ -1,5 +1,7 @@
 package no.nav.omsorgspenger.saksnummer
 
+import kotliquery.queryOf
+import kotliquery.sessionOf
 import no.nav.omsorgspenger.Identitetsnummer
 import no.nav.omsorgspenger.Saksnummer
 import no.nav.omsorgspenger.testutils.DataSourceExtension
@@ -12,45 +14,67 @@ import javax.sql.DataSource
 
 @ExtendWith(DataSourceExtension::class)
 internal class SaksnummerRepositoryTest(
-    dataSource: DataSource){
+    private val dataSource: DataSource
+) {
     private val saksnummerRepository = SaksnummerRepository(
         dataSource = dataSource.cleanAndMigrate()
     )
 
     @Test
-    fun `Test håndtering av saksnummer & identitetsnummer`() {
-        val førsteMapping = mapOf(
-            Identitetsnummer1 to Saksnummer1,
-            Identitetsnummer2 to Saksnummer2
-        )
-        val saksnummer = førsteMapping.values.toSet()
+    fun `henter siste identitetsnummer for hvert etterspurte saksnummer`() {
+        leggInnMapping(Identitetsnummer1, Saksnummer1)
+        leggInnMapping(Identitetsnummer2, Saksnummer2)
+        leggInnMapping(Identitetsnummer3, Saksnummer1)
+        leggInnMapping(Identitetsnummer4, Saksnummer2)
 
-        // Mapping kan settes inn x antall ganger med samme resultat
-        for (x in 1..5) {
-            saksnummerRepository.lagreMapping(førsteMapping)
-            assertEquals(førsteMapping,saksnummerRepository.hentSisteMappingFor(saksnummer))
-        }
-
-        // Om en av sakene får et nytt identitesnummer er det kun den mappingen som blir brukt
-        saksnummerRepository.lagreMapping(mapOf(Identitetsnummer3 to Saksnummer1))
-        assertEquals(mapOf(
-            Identitetsnummer3 to Saksnummer1,
-            Identitetsnummer2 to Saksnummer2
-        ), saksnummerRepository.hentSisteMappingFor(saksnummer))
-
-        // Om også det andre saksnummeret får et nytt identitetsnummer er det kun de siste mappingene som hentes
-        saksnummerRepository.lagreMapping(mapOf(Identitetsnummer4 to Saksnummer2))
         assertEquals(mapOf(
             Identitetsnummer3 to Saksnummer1,
             Identitetsnummer4 to Saksnummer2
-        ), saksnummerRepository.hentSisteMappingFor(saksnummer))
+        ), saksnummerRepository.hentSisteMappingFor(setOf(Saksnummer1, Saksnummer2)))
+        assertEquals(
+            mapOf(Identitetsnummer3 to Saksnummer1),
+            saksnummerRepository.hentSisteMappingFor(setOf(Saksnummer1))
+        )
+    }
 
-        // Hente enkeltsaksnummer
+    @Test
+    fun `henter saksnummer for både tidligere og gjeldende identitetsnummer`() {
+        leggInnMapping(Identitetsnummer1, Saksnummer1)
+        leggInnMapping(Identitetsnummer2, Saksnummer2)
+        leggInnMapping(Identitetsnummer3, Saksnummer1)
+        leggInnMapping(Identitetsnummer4, Saksnummer2)
+
         assertEquals(Saksnummer1, saksnummerRepository.hentSaksnummerFor(Identitetsnummer1))
         assertEquals(Saksnummer2, saksnummerRepository.hentSaksnummerFor(Identitetsnummer2))
         assertEquals(Saksnummer1, saksnummerRepository.hentSaksnummerFor(Identitetsnummer3))
         assertEquals(Saksnummer2, saksnummerRepository.hentSaksnummerFor(Identitetsnummer4))
+    }
+
+    @Test
+    fun `henter siste saksnummer for et identitetsnummer`() {
+        leggInnMapping(Identitetsnummer1, Saksnummer1)
+        leggInnMapping(Identitetsnummer1, Saksnummer2)
+
+        assertEquals(Saksnummer2, saksnummerRepository.hentSaksnummerFor(Identitetsnummer1))
+    }
+
+    @Test
+    fun `returnerer tomt resultat når ingen mappinger matcher`() {
+        leggInnMapping(Identitetsnummer1, Saksnummer1)
+
+        assertEquals(emptyMap<Identitetsnummer, Saksnummer>(), saksnummerRepository.hentSisteMappingFor(setOf(Saksnummer2)))
+        assertEquals(emptyMap<Identitetsnummer, Saksnummer>(), saksnummerRepository.hentSisteMappingFor(emptySet()))
         assertNull(saksnummerRepository.hentSaksnummerFor("404"))
+    }
+
+    private fun leggInnMapping(identitetsnummer: Identitetsnummer, saksnummer: Saksnummer) {
+        sessionOf(dataSource).use { session ->
+            session.run(queryOf(
+                "INSERT INTO saksnummer (identitetsnummer, sak) VALUES (?, ?)",
+                identitetsnummer,
+                saksnummer
+            ).asUpdate)
+        }
     }
 
     private companion object {

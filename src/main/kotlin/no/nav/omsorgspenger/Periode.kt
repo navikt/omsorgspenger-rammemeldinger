@@ -15,16 +15,7 @@ internal data class Periode(
     private fun erEtter(periode: Periode) = fom.isAfter(periode.tom)
 
     internal fun inneholder(dato: LocalDate) = dato in fom..tom
-    internal fun inneholder(periode: Periode) = inneholder(periode.fom) && inneholder(periode.tom)
     internal fun overlapperMedMinstEnDag(periode: Periode) = !erFør(periode) && !erEtter(periode)
-    internal fun erKantIKant(periode: Periode) = fom.minusDays(1) == periode.tom || tom.plusDays(1) == periode.fom
-    internal fun slåSammen(periode: Periode) : Periode {
-        require(erKantIKant(periode)) { "Kan ikke slå sammen $this og $periode da de ikke er kant i kant."}
-        return Periode(
-            fom = if (fom.isBefore(periode.fom)) fom else periode.fom,
-            tom = if (tom.isAfter(periode.tom)) tom else periode.tom
-        )
-    }
     override fun toString() = "$fom/$tom"
 }
 
