@@ -2,7 +2,7 @@ package no.nav.omsorgspenger.overføringer.db
 
 import kotliquery.Session
 import kotliquery.queryOf
-import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
+import no.nav.omsorgspenger.BehovssekvensId
 import java.sql.Array
 
 internal object OverføringLogg {

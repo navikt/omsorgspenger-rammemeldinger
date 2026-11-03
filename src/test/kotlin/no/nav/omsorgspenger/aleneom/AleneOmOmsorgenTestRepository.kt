@@ -4,7 +4,7 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
+import no.nav.omsorgspenger.BehovssekvensId
 import javax.sql.DataSource
 
 internal class AleneOmOmsorgenTestRepository(

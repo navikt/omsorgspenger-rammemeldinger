@@ -1,10 +1,10 @@
 package no.nav.omsorgspenger.koronaoverføringer.db
 
 import kotliquery.*
+import no.nav.omsorgspenger.BehovssekvensId
 import no.nav.omsorgspenger.Kilde
 import no.nav.omsorgspenger.Periode
 import no.nav.omsorgspenger.Saksnummer
-import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
 import no.nav.omsorgspenger.lovverk.Lovanvendelser
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføring
 import no.nav.omsorgspenger.overføringer.GjeldendeOverføringFått

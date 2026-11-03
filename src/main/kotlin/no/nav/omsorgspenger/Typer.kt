@@ -1,10 +1,9 @@
 package no.nav.omsorgspenger
 
-import no.nav.omsorgspenger.behovssekvens.BehovssekvensId
-
 typealias Identitetsnummer = String
 typealias Saksnummer = String
 typealias CorrelationId = String
+typealias BehovssekvensId = String
 
 internal data class Kilde(
     val id: String,
