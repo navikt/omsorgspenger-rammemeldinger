@@ -10,7 +10,7 @@ val okhttpVersion = "5.5.1"
 val nettyVersion = "4.2.20.Final"
 
 // Database
-val flywayVersion = "13.12.0"
+val flywayVersion = "13.12.1"
 val hikariVersion = "7.1.0"
 val kotliqueryVersion = "1.9.1"
 val postgresVersion = "42.7.14"
@@ -18,7 +18,7 @@ val postgresVersion = "42.7.14"
 // Test
 val testcontainersVersion = "1.21.4"
 val mockkVersion = "1.14.11"
-val schemaValidatorVersion = "3.0.8"
+val schemaValidatorVersion = "3.0.9"
 val awaitilityVersion = "4.3.0"
 val assertjVersion = "3.27.7"
 
